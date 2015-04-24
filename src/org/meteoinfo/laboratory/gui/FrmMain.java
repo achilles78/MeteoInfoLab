@@ -9,6 +9,9 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import com.l2fprod.common.swing.JFontChooser;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JTable;
 import javax.xml.parsers.ParserConfigurationException;
 import org.meteoinfo.laboratory.Options;
 import org.meteoinfo.global.util.GlobalUtil;
@@ -37,7 +41,7 @@ import org.xml.sax.SAXException;
  */
 public class FrmMain extends javax.swing.JFrame {
 
-    private final OutputDockable outputDock;
+    //private final OutputDockable outputDock;
     private final EditorDockable editorDock;
     private final ConsoleDockable consoleDock;
     private final FigureDockable figuresDock;
@@ -93,7 +97,7 @@ public class FrmMain extends javax.swing.JFrame {
         CControl control = new CControl(this);
         this.add(control.getContentArea());
         CGrid grid = new CGrid(control);
-        this.outputDock = new OutputDockable("Output", "Output");
+        //this.outputDock = new OutputDockable("Output", "Output");
         editorDock = new EditorDockable("Editor", "Editor");
         this.editorDock.setStartupPath(startupPath);
         this.editorDock.setTextFont(this.options.getTextFont());
@@ -110,7 +114,7 @@ public class FrmMain extends javax.swing.JFrame {
                 PyObject var;
                 List<Object[]> vars = new ArrayList<>();
                 for (Object a : items) {
-                    PyTuple at = (PyTuple)a;
+                    PyTuple at = (PyTuple) a;
                     name = at.__getitem__(0).toString();
                     var = at.__getitem__(1);
                     if (var.toString().contains("<mipylib.dimarray.DimArray instance at")) {
@@ -119,8 +123,9 @@ public class FrmMain extends javax.swing.JFrame {
                         vars.add(new Object[]{name, "DimVariable", var.__len__(), ""});
                     }
                 }
-                if (FrmMain.this.variableDock != null)
+                if (FrmMain.this.variableDock != null) {
                     FrmMain.this.variableDock.getVariableExplorer().updateVariables(vars);
+                }
             }
 
         });
@@ -135,7 +140,22 @@ public class FrmMain extends javax.swing.JFrame {
             }
 
         });
-        grid.add(0, 0, 5, 5, this.outputDock);
+        this.fileDock.getFileExplorer().getTable().addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int row = ((JTable) e.getSource()).getSelectedRow();
+                    if (((JTable) e.getSource()).getValueAt(row, 2).toString().equals("py")) {                        
+                        File file = new File(FrmMain.this.fileDock.getFileExplorer().getPath().getAbsoluteFile() +
+                                File.separator + ((JTable)e.getSource()).getValueAt(row, 0).toString());
+                        FrmMain.this.editorDock.openFile(file);
+                    }
+                }
+            }
+
+        });
+        //grid.add(0, 0, 5, 5, this.outputDock);
         grid.add(0, 0, 5, 5, editorDock);
         grid.add(0, 5, 5, 5, consoleDock);
         grid.add(5, 0, 5, 5, this.variableDock);
@@ -444,8 +464,7 @@ public class FrmMain extends javax.swing.JFrame {
         String code = te.getTextArea().getText();
         //this.consoleDock.runfile(te.getTextArea().getText());
         //this.consoleDock.exec(te.getTextArea().getText());
-        //this.consoleDock.runPythonScript(code);
-        this.consoleDock.runPythonScript(code, this.outputDock.getTextArea());
+        this.consoleDock.runPythonScript(code);
 //        if (!te.getFileName().isEmpty()) {
 //            te.saveFile(te.getFile());
 //            try {

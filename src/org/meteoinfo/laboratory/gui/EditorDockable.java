@@ -255,6 +255,25 @@ public class EditorDockable extends DefaultSingleCDockable{
     }
     
     /**
+     * Open script file
+     *
+     * @param file The file
+     */
+    public void openFile(File file) {
+        // Close default untitled document if it is still empty
+        if (this.tabbedPanel.getTabCount() == 1) {
+            TextEditor textEditor = getActiveTextEditor();
+            if (textEditor.getTextArea().getDocument().getLength() == 0 && textEditor.getFileName().isEmpty()) {
+                this.removeTextEditor(textEditor);
+            }
+        }
+
+        // Open file
+        TextEditor editor = addNewTextEditor(file.getName());
+        editor.openFile(file);
+    }
+    
+    /**
      * Run Jython script
      * @param jTextArea_Output
      */

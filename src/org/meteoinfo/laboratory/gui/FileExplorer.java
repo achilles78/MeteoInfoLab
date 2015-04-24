@@ -96,6 +96,14 @@ public class FileExplorer extends JPanel implements MouseListener{
         this.listFiles(path);
     }
     
+    /**
+     * Get table
+     * @return Table
+     */
+    public JTable getTable(){
+        return this.jtFile;
+    }
+    
     public void addCurrentPathChangedListener(ICurrentPathChangedListener listener) {
         this.listeners.add(ICurrentPathChangedListener.class, listener);
     }

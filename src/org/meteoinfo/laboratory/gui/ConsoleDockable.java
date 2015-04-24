@@ -192,6 +192,53 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         }
     }
     
+//    /**
+//     * Run Jython script
+//     * @param code
+//     */
+//    public void runPythonScript(final String code) {
+//
+//        SwingWorker worker = new SwingWorker<String, String>() {
+//            PrintStream oout = System.out;
+//            PrintStream oerr = System.err;
+//
+//            @Override
+//            protected String doInBackground() throws Exception {
+//                JTextPane jTextPane_Output = interp.console.getTextPane();
+//                JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
+//                JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
+//                //jTextPane_Output.setText("");
+//                interp.console.println("run script...");
+//                interp.setOut(writer);
+//                interp.setErr(writer);
+//                System.setOut(printStream);
+//                System.setErr(printStream);
+//                
+//                String encoding = EncodingUtil.findEncoding(code);
+//                if (encoding != null) {
+//                    try {
+//                        interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
+//                    } catch (Exception e) {
+//                    }
+//                } else {
+//                    try {
+//                        interp.execfile(new ByteArrayInputStream(code.getBytes()));
+//                    } catch (Exception e) {
+//                    }
+//                }
+//                //interp.console.print(">>> ", Color.red);
+//                return "";
+//            }
+//
+//            @Override
+//            protected void done() {
+//                System.setOut(oout);
+//                System.setErr(oerr);
+//            }
+//        };
+//        worker.execute();
+//    }
+    
     /**
      * Run Jython script
      * @param code
@@ -204,77 +251,39 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
             @Override
             protected String doInBackground() throws Exception {
+                //JTextAreaWriter writer = new JTextAreaWriter(jTextArea_Output);
+                //JTextAreaPrintStream printStream = new JTextAreaPrintStream(System.out, jTextArea_Output);
+                //jTextArea_Output.setText("");
+                
                 JTextPane jTextPane_Output = interp.console.getTextPane();
                 JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
                 JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
-                //jTextPane_Output.setText("");
+
                 interp.console.println("run script...");
                 interp.setOut(writer);
                 interp.setErr(writer);
                 System.setOut(printStream);
                 System.setErr(printStream);
-                
+
                 String encoding = EncodingUtil.findEncoding(code);
                 if (encoding != null) {
                     try {
                         interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
                     } catch (Exception e) {
+                        e.printStackTrace();
+                        interp.console.print(">>> ", Color.red);
+                        interp.console.setForeground(Color.black);
                     }
                 } else {
                     try {
                         interp.execfile(new ByteArrayInputStream(code.getBytes()));
                     } catch (Exception e) {
+                        e.printStackTrace();
+                        interp.console.print(">>> ", Color.red);
+                        interp.console.setForeground(Color.black);
                     }
                 }
-                //interp.console.print(">>> ", Color.red);
-                return "";
-            }
 
-            @Override
-            protected void done() {
-                System.setOut(oout);
-                System.setErr(oerr);
-            }
-        };
-        worker.execute();
-    }
-    
-    /**
-     * Run Jython script
-     * @param code
-     * @param textArea
-     */
-    public void runPythonScript(final String code, final JTextArea textArea) {
-
-        SwingWorker worker = new SwingWorker<String, String>() {
-            PrintStream oout = System.out;
-            PrintStream oerr = System.err;
-
-            @Override
-            protected String doInBackground() throws Exception {              
-                JTextAreaWriter writer = new JTextAreaWriter(textArea);
-                JTextAreaPrintStream printStream = new JTextAreaPrintStream(System.out, textArea);
-                textArea.setText("");
-                PythonInterpreter interp = new PythonInterpreter();
-                //interp.console.println("run script...");
-                interp.setOut(writer);
-                interp.setErr(writer);
-                System.setOut(printStream);
-                System.setErr(printStream);
-                
-                String encoding = EncodingUtil.findEncoding(code);
-                if (encoding != null) {
-                    try {
-                        interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
-                    } catch (Exception e) {
-                    }
-                } else {
-                    try {
-                        interp.execfile(new ByteArrayInputStream(code.getBytes()));
-                    } catch (Exception e) {
-                    }
-                }
-                //interp.console.print(">>> ", Color.red);
                 return "";
             }
 
