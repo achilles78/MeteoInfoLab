@@ -13,7 +13,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,6 +27,8 @@ import javax.swing.event.EventListenerList;
 import javax.swing.table.DefaultTableModel;
 import org.meteoinfo.laboratory.event.CurrentPathChangedEvent;
 import org.meteoinfo.laboratory.event.ICurrentPathChangedListener;
+import org.meteoinfo.table.IconRenderer;
+import org.meteoinfo.table.IconText;
 
 /**
  *
@@ -63,6 +69,7 @@ public class FileExplorer extends JPanel implements MouseListener{
         dtmFile.addColumn("File Type");
         dtmFile.addColumn("Date Modified");
         jtFile = new JTable(dtmFile);
+        jtFile.getColumnModel().getColumn(0).setCellRenderer(new IconRenderer());
         jtFile.setShowGrid(false);
         jtFile.addMouseListener(this);
         //jlLocal = new JLabel("本地状态", JLabel.CENTER);
@@ -194,7 +201,7 @@ public class FileExplorer extends JPanel implements MouseListener{
                 listFiles(this.path);
                 this.fireCurrentPathChangedEvent();
             }
-            else if (((JTable)e.getSource()).getValueAt(row, 0).toString().equals("To Parent")
+            else if (((JTable)e.getSource()).getValueAt(row, 0).toString().equals("")
                     && ((JTable)e.getSource()).getValueAt(row, 2).toString().equals(""))
             {
                 this.path = new File(currentPath).getParentFile();
@@ -260,20 +267,31 @@ public class FileExplorer extends JPanel implements MouseListener{
         //Add "To Parent" line if the path is not root path
         if (strPath.split("\\\\").length > 1)
         {
-            dtmFile.addRow(new String[]{"To Parent", "", "", ""});
+            java.net.URL imgURL = this.getClass().getResource("/org/meteoinfo/laboratory/resources/previous.png");
+            ImageIcon icon = new ImageIcon(imgURL);
+            dtmFile.addRow(new Object[]{new IconText(icon, ""), "", "", ""});
         }
 
         //List all files
+        java.net.URL folderURL = this.getClass().getResource("/org/meteoinfo/laboratory/resources/folder.png");
+        ImageIcon folderIcon = new ImageIcon(folderURL);
+        java.net.URL fileURL = this.getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_NewFile.Image.png");
+        ImageIcon fileIcon = new ImageIcon(fileURL);
         File[] files = path.listFiles();
-        for (File file : files) {
+        Arrays.sort(files);
+        for (File file : files){
             String name = file.getName();
             if (file.isDirectory()) {
-                dtmFile.addRow(new String[]{name, "", "Folder", ""});
-            } else {                
+                dtmFile.addRow(new Object[]{new IconText(folderIcon, name), "", "Folder", ""});
+            } 
+        }
+        for (File file : files) {
+            String name = file.getName();
+            if (file.isFile()) {                              
                 if (name.lastIndexOf(".") != -1) {
-                    dtmFile.addRow(new String[]{name, sizeFormat(file.length()), name.substring(name.lastIndexOf(".") + 1), new SimpleDateFormat("yyyy/M/d hh:mm").format(new Date(file.lastModified()))});
+                    dtmFile.addRow(new Object[]{new IconText(fileIcon, name), sizeFormat(file.length()), name.substring(name.lastIndexOf(".") + 1), new SimpleDateFormat("yyyy/M/d hh:mm").format(new Date(file.lastModified()))});
                 } else {
-                    dtmFile.addRow(new String[]{name, sizeFormat(file.length()), "", new SimpleDateFormat("yyyy/M/d hh:mm").format(new Date(file.lastModified()))});
+                    dtmFile.addRow(new Object[]{new IconText(fileIcon, name), sizeFormat(file.length()), "", new SimpleDateFormat("yyyy/M/d hh:mm").format(new Date(file.lastModified()))});
                 }
             }
         }

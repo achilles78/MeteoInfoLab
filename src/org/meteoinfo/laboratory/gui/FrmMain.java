@@ -146,10 +146,12 @@ public class FrmMain extends javax.swing.JFrame {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int row = ((JTable) e.getSource()).getSelectedRow();
-                    if (((JTable) e.getSource()).getValueAt(row, 2).toString().equals("py")) {                        
-                        File file = new File(FrmMain.this.fileDock.getFileExplorer().getPath().getAbsoluteFile() +
-                                File.separator + ((JTable)e.getSource()).getValueAt(row, 0).toString());
-                        FrmMain.this.editorDock.openFile(file);
+                    if (row >= 0){
+                        if (((JTable) e.getSource()).getValueAt(row, 2).toString().equals("py")) {                        
+                            File file = new File(FrmMain.this.fileDock.getFileExplorer().getPath().getAbsoluteFile() +
+                                    File.separator + ((JTable)e.getSource()).getValueAt(row, 0).toString());
+                            FrmMain.this.editorDock.openFile(file);
+                        }
                     }
                 }
             }
