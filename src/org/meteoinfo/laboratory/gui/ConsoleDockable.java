@@ -86,6 +86,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             //    interp.exec("sys.path.append('" + jarfn + "')");
             //}
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         new Thread(interp).start();
@@ -93,6 +94,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("mipylib.miplot.isinteractive = True");
             interp.exec("mipylib.miplot.milapp = mlapp");
         } catch (Exception e) {
+            e.printStackTrace();
         }
         //this.setCursor(Cursor.getDefaultCursor());
     }        
