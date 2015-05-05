@@ -19,11 +19,9 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 import org.python.core.Py;
-import org.python.util.PythonInterpreter;
 
 /**
  *
@@ -45,7 +43,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         //System.out.println(console.getFont());
         console.setPreferredSize(new Dimension(600, 400));
         console.println(new ImageIcon(this.getClass().getResource("/org/meteoinfo/laboratory/resources/jython_small_c.png")));
-        this.initializeConsole(console);
+        this.initializeConsole(console, parent.getCurrentFolder());
 
         this.getContentPane().add(console, BorderLayout.CENTER);
     }
@@ -55,7 +53,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
      *
      * @param console
      */
-    private void initializeConsole(JConsole console) {
+    private void initializeConsole(JConsole console, String currentPath) {
         boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
                 getInputArguments().toString().contains("jdwp");
         //String pluginPath = this.startupPath + File.separator + "plugins";
@@ -93,6 +91,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         try {
             interp.exec("mipylib.miplot.isinteractive = True");
             interp.exec("mipylib.miplot.milapp = mlapp");
+            interp.exec("mipylib.midata.currentfolder = '" + currentPath + "'");
         } catch (Exception e) {
             e.printStackTrace();
         }

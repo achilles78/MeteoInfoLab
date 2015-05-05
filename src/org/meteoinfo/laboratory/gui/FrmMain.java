@@ -577,6 +577,14 @@ public class FrmMain extends javax.swing.JFrame {
     public FigureDockable getFigureDock() {
         return this.figuresDock;
     }
+    
+    /**
+     * Get current folder
+     * @return Current folder
+     */
+    public String getCurrentFolder(){
+        return this.options.getCurrentFolder();
+    }
 
     /**
      * Get console dockable
@@ -633,6 +641,13 @@ public class FrmMain extends javax.swing.JFrame {
             this.jComboBox_CurrentFolder.addItem(path);
         }
         this.jComboBox_CurrentFolder.setSelectedItem(path);
+        
+        PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
+        try {
+            interp.exec("mipylib.midata.currentfolder = '" + path + "'");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
