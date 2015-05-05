@@ -63,7 +63,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         interp = new PythonInteractiveInterpreter(console);
         String path = this.startupPath + File.separator + "pylib";
         if (isDebug) {
-            path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfo/pylib";
+            path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfoLab/pylib";
         }
 
         //this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

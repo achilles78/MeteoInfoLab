@@ -5,10 +5,8 @@
  */
 package org.meteoinfo.array;
 
-import org.python.core.Py;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
-import org.python.core.PyNone;
 import org.python.core.PyObject;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
