@@ -116,7 +116,8 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
     public void fireConsoleExecEvent() {
         fireConsoleExecEvent(new ConsoleExecEvent(this));
         this.console.print(">>> ", Color.red);
-        this.console.setForeground(Color.black);
+        //this.console.setStyle(Color.black);
+        //this.console.setForeground(Color.black);
     }
 
     private void fireConsoleExecEvent(ConsoleExecEvent event) {

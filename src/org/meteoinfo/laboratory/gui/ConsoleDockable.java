@@ -273,7 +273,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                     } catch (Exception e) {
                         e.printStackTrace();
                         interp.console.print(">>> ", Color.red);
-                        interp.console.setForeground(Color.black);
+                        //interp.console.setStyle(Color.black);
+                        //interp.console.setForeground(Color.black);
                     }
                 } else {
                     try {
@@ -281,7 +282,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                     } catch (Exception e) {
                         e.printStackTrace();
                         interp.console.print(">>> ", Color.red);
-                        interp.console.setForeground(Color.black);
+                        //interp.console.setStyle(Color.black);
+                        //interp.console.setForeground(Color.black);
                     }
                 }
 
