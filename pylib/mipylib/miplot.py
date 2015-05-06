@@ -22,6 +22,7 @@ from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
 from org.meteoinfo.laboratory.gui import FrmMain
 from org.meteoinfo.projection import ProjectionInfo
+from org.meteoinfo.shape import ShapeTypes
 
 from javax.swing import WindowConstants
 from java.awt import Color, Font
@@ -631,7 +632,10 @@ def __contour_griddata_m(plot, gdata, ls, fill=False):
         layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
     else:
         layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
-    plot.addLayer(0, layer)
+    if layer.getShapeType() == ShapeTypes.Polygon:
+        plot.addLayer(0, layer)
+    else:
+        plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent())
     chart = Chart(plot)
     #chart.setAntiAlias(True)

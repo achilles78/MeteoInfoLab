@@ -233,7 +233,7 @@ public class Options {
                 this.currentFolder = currentPath;
                 System.setProperty("user.dir", currentPath);
             } else {
-                this.currentFolder = System.getProperty("uer.dir");
+                this.currentFolder = System.getProperty("user.dir");
             }
 
             //Font
