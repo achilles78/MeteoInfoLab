@@ -4,9 +4,10 @@
 # Purpose: MeteoInfo Dataset module
 # Note: Jython
 #-----------------------------------------------------
+#import math
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.data import GridData, ArrayMath
-from ucar.ma2 import Array
+from org.meteoinfo.data import GridData, ArrayMath, ArrayUtil
+from ucar.ma2 import Array, Range
         
 # The encapsulate class of Array
 class MIArray():
@@ -14,31 +15,34 @@ class MIArray():
     # array must be a ucar.ma2.Array object
     def __init__(self, array):
         self.array = array
+        self.rank = array.getRank()
         
     def __len__(self):
         return int(self.array.getSize())
         
     def __str__(self):
-        return self.array.toString()
+        return ArrayUtil.toString(self.array)
         
     def __repr__(self):
-        return self.array.toString()
+        return ArrayUtil.toString(self.array)
     
     def __getitem__(self, indices):
-        #print type(indices)
+        #print type(indices)            
         if not isinstance(indices, tuple):
-            print 'indices must be tuple!'
-            return None
+            inds = []
+            inds.append(indices)
+            indices = inds
         
-        if len(indices) != self.ndim:
-            print 'indices must be ' + str(self.ndim) + ' dimensions!'
+        if len(indices) != self.rank:
+            print 'indices must be ' + str(self.rank) + ' dimensions!'
             return None
             
-        origin = []
-        size = []
-        stride = []
-        dims = []
-        for i in range(0, self.ndim):   
+        #origin = []
+        #size = []
+        #stride = []
+        ranges = []
+        flips = []
+        for i in range(0, self.rank):   
             if isinstance(indices[i], int):
                 sidx = indices[i]
                 eidx = indices[i]
@@ -47,11 +51,19 @@ class MIArray():
                 sidx = 0 if indices[i].start is None else indices[i].start
                 eidx = indices[i].stop is None and self.getshape()[i]-1 or indices[i].stop
                 step = indices[i].step is None and 1 or indices[i].step
-            origin.append(sidx)
-            n = eidx - sidx + 1
-            size.append(n)
-            stride.append(step)                    
-        r = ArrayMath.section(self.array, origin, size, stride)
+            if step < 0:
+                step = abs(step)
+                flips.append(i)
+            rr = Range(sidx, eidx, step)
+            ranges.append(rr)
+            #origin.append(sidx)
+            #n = eidx - sidx + 1
+            #size.append(n)
+            #stride.append(step)                    
+        #r = ArrayMath.section(self.array, origin, size, stride)
+        r = ArrayMath.section(self.array, ranges)
+        for i in flips:
+            r = r.flip(i)
         return MIArray(r)
     
     def __abs__(self):
@@ -137,5 +149,17 @@ class MIArray():
         else:
             return ArrayMath.aveDouble(self.array, missingv)
             
+    def sin(self):
+        return MIArray(ArrayMath.sin(self.array))
+        
+    def cos(self):
+        return MIArray(ArrayMath.cos(self.array))
+            
     def aslist(self):
         return ArrayMath.asList(self.array)
+        
+    def inpolygon(self, x, y, polygon):
+        return MIArray(ArrayMath.inPolygon(self.array, x, y, polygon))
+        
+    def maskout(self, x, y, polygon, missingv):
+        return MIArray(ArrayMath.maskout(self.array, x, y, polygon, missingv))

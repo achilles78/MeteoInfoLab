@@ -5,7 +5,8 @@
 # Note: Jython
 #-----------------------------------------------------
 import os
-from org.meteoinfo.data import GridData, StationData, DataMath, TableData, ArrayMath
+import math
+from org.meteoinfo.data import GridData, StationData, DataMath, TableData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
 
@@ -19,8 +20,12 @@ from dimarray import PyGridData, DimArray
 from miarray import MIArray
 
 from java.awt import Color
+from java.lang import Math, Double
 
 # Global variables
+pi = Math.PI
+e = Math.E
+inf = Double.POSITIVE_INFINITY
 meteodatalist = []
 c_meteodata = None
 currentfolder = None
@@ -230,6 +235,14 @@ def getstationdata(varname='var', timeindex=0, levelindex=0):
         return sdata
     else:
         return None
+
+def asciiread(filename, **kwargs):
+    delimiter = kwargs.pop('delimiter', None)
+    datatype = kwargs.pop('datatype', None)
+    headerlines = kwargs.pop('headerlines', 0)
+    shape = kwargs.pop('shape', None)    
+    a = ArrayUtil.readASCIIFile(filename, delimiter, headerlines, datatype, shape)
+    return MIArray(a)
         
 def readtable(filename, **kwargs):
     delimiter = kwargs.pop('delimiter', ',')
@@ -239,23 +252,60 @@ def readtable(filename, **kwargs):
     tdata = TableData()
     tdata.readASCIIFile(filename, delimiter, headerlines, format, encoding)
     return PyTableData(tdata)
+
+def array(data):
+    return MIArray(ArrayUtil.array(data))
     
-def arange(start=0, stop=1, step=1, dtype=None):
-    return MIArray(ArrayMath.arrayRange(start, stop, step))
+def arange(*args):
+    if len(args) == 1:
+        start = 0
+        stop = args[0]
+        step = 1
+    elif len(args) == 2:
+        start = 0
+        stop = args[0]
+        step = args[1]
+    else:
+        start = args[0]
+        stop = args[1]
+        step = args[2]
+    return MIArray(ArrayUtil.arrayRange(start, stop, step))
+    
+def arange1(start, n, step):
+    return MIArray(ArrayUtil.arrayRange(start, n, step))
     
 def linspace(start=0, stop=1, n=100, dtype=None):
-    return MIArray(ArrayMath.lineSpace(start, stop, n))
+    return MIArray(ArrayUtil.lineSpace(start, stop, n))
     
 def zeros(n):
-    return MIArray(ArrayMath.zeros(n))
+    return MIArray(ArrayUtil.zeros(n))
     
-def asgriddata(data):
-    if isinstance(data, PyGridData):
-        return data
-    elif isinstance(data, DimArray):
-        return data.asgriddata()
+def ones(n):
+    return MIArray(ArrayUtil.ones(n))
+    
+def sin(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.sin()
     else:
-        return None
+        return math.sin(a)
+    
+def cos(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.cos()
+    else:
+        return math.cos(a)
+    
+def asgriddata(data, x=None, y=None, missingv=-9999.0):
+    if x == None:    
+        if isinstance(data, PyGridData):
+            return data
+        elif isinstance(data, DimArray):
+            return data.asgriddata()
+        else:
+            return None
+    else:
+        gdata = GridData(data.array, x.array, y.array, missingv)
+        return PyGridData(gdata)
         
 def shaperead(fn):
     layer = MapDataManage.loadLayer(fn)

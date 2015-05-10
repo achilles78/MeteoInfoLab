@@ -6,6 +6,7 @@
 #-----------------------------------------------------
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, ArrayMath
+from org.meteoinfo.layer import VectorLayer
 from ucar.ma2 import Array
 import miarray
 from miarray import MIArray
@@ -34,20 +35,29 @@ class DimArray():
             len = len * l
         return len
         
+    def __str__(self):
+        return self.array.__str__()
+        
+    def __repr__(self):
+        return self.array.__repr__()
+        
     def __getitem__(self, indices):
         #print type(indices)
         if not isinstance(indices, tuple):
-            print 'indices must be tuple!'
-            return None
+            inds = []
+            inds.append(indices)
+            indices = inds
         
         if len(indices) != self.ndim:
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
             return None
             
-        origin = []
-        size = []
-        stride = []
+        #origin = []
+        #size = []
+        #stride = []
         dims = []
+        ranges = []
+        flips = []
         for i in range(0, self.ndim):   
             if isinstance(indices[i], int):
                 sidx = indices[i]
@@ -57,15 +67,23 @@ class DimArray():
                 sidx = 0 if indices[i].start is None else indices[i].start
                 eidx = indices[i].stop is None and self.dims[i].getDimLength()-1 or indices[i].stop
                 step = indices[i].step is None and 1 or indices[i].step
-            origin.append(sidx)
-            n = eidx - sidx + 1
-            size.append(n)
-            stride.append(step)
+            if step < 0:
+                step = abs(step)
+                flips.append(i)
+            rr = Range(sidx, eidx, step)
+            ranges.append(rr)
+            #origin.append(sidx)
+            #n = eidx - sidx + 1
+            #size.append(n)
+            #stride.append(step)
             if n > 1:
                 dim = self.dims[i]
                 dims.append(dim.extract(sidx, eidx, step))
                     
-        r = ArrayMath.section(self.array.array, origin, size, stride)
+        #r = ArrayMath.section(self.array.array, origin, size, stride)
+        r = ArrayMath.section(self.array, ranges)
+        for i in flips:
+            r = r.flip(i)
         array = MIArray(r)
         data = DimArray(array, dims, self.missingvalue, self.proj)
         return data
@@ -128,6 +146,14 @@ class DimArray():
         r = DimArray(self.array.__pow__(other), self.dims, self.missingvalue, self.proj)
         return r
         
+    def sin(self):
+        r = DimArray(self.array.sin(), self.dims, self.missingvalue, self.proj)
+        return r
+        
+    def cos(self):
+        r = DimArray(self.array.cos(), self.dims, self.missingvalue, self.proj)
+        return r
+        
     def getminvalue(self):
         return self.array.getminvalue()
         
@@ -139,13 +165,25 @@ class DimArray():
         
     def ave(self, missingv=None):
         return self.array.ave(missingv)
+        
+    def inpolygon(self, polygon):
+        x = self.dims[1].getDimValue()
+        y = self.dims[0].getDimValue()
+        r = DimArray(self.array.inpolygon(x, y, polygon), self.dims, self.missingvalue, self.proj)
+        return r
+        
+    def maskout(self, polygon):
+        x = self.dims[1].getDimValue()
+        y = self.dims[0].getDimValue()
+        r = DimArray(self.array.maskout(x, y, polygon, self.missingvalue), self.dims, self.missingvalue, self.proj)
+        return r
     
         
 # The encapsulate class of GridData
 class PyGridData():
     
     # griddata must be a GridData object
-    def __init__(self, griddata=None, dataarray=None, xarray=None, yarray=None):
+    def __init__(self, griddata=None):
         if griddata != None:
             self.data = griddata
         else:
@@ -242,4 +280,4 @@ class PyGridData():
         return self.data.getMinValue()
         
     def getmaxvalue(self):
-        return self.data.getMaxValue()
+        return self.data.getMaxValue()                       

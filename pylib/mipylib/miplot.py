@@ -99,18 +99,10 @@ def plot(*args, **kwargs):
             ydatalist.append(ydata)
         else:
             if c == 'x':
-                if isinstance(arg, MIArray):
-                    data = arg.array
-                else:
-                    data = arg
-                xdatalist.append(data)                
+                xdatalist.append(arg)                
                 c = 'y'
             elif c == 'y':
-                if isinstance(arg, MIArray):
-                    data = arg.array
-                else:
-                    data = arg
-                ydatalist.append(data)
+                ydatalist.append(arg)
                 c = 's'
             elif c == 's':
                 if isinstance(arg, basestring):
@@ -120,13 +112,22 @@ def plot(*args, **kwargs):
                     styles.append('-')
                     xdatalist.append(arg)
                     c = 'y'
-    while len(styles) < len(xdatalist):
-        styles.append('-')
+    if len(styles) == 0:
+        styles = None
+    else:
+        while len(styles) < len(xdatalist):
+            styles.append('-')
     
     #Add data series
     for i in range(0, len(xdatalist)):
         label = kwargs.pop('label', 'S_' + str(i + 1))
-        dataset.addSeries(label, xdatalist[i], ydatalist[i])
+        xdata = xdatalist[i]
+        if isinstance(xdata, MIArray):
+            xdata = xdata.array
+        ydata = ydatalist[i]
+        if isinstance(ydata, MIArray):
+            ydata = ydata.array
+        dataset.addSeries(label, xdata, ydata)
     
     #Create XY1DPlot
     if c_plot is None:
@@ -136,10 +137,11 @@ def plot(*args, **kwargs):
         plot.setDataset(dataset)
     
     #Set plot data styles
-    for i in range(0, len(styles)):
-        idx = dataset.getSeriesCount() - len(styles) + i
-        print 'Series index: ' + str(idx)
-        __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
+    if styles != None:
+        for i in range(0, len(styles)):
+            idx = dataset.getSeriesCount() - len(styles) + i
+            print 'Series index: ' + str(idx)
+            __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
     
     #Paint dataset
     chart = chartpanel.getChart()
@@ -603,6 +605,7 @@ def contourm(*args, **kwargs):
         
 def contourfm(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
     plot = args[0]
     args = args[1:]
     n = len(args) 
@@ -612,7 +615,8 @@ def contourfm(*args, **kwargs):
     elif n <=4:
         x = args[0]
         y = args[1]
-        gdata = args[4]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
@@ -694,6 +698,8 @@ def axesm(proj='longlat', **kwargs):
     c_plot.getMapView().projectLayers(toproj)
         
 def geoshow(plot, layer, **kwargs):
+    visible = kwargs.pop('visible', True)
+    layer.setVisible(visible)
     drawfill = kwargs.pop('drawfill', False)
     fcobj = kwargs.pop('facecolor', None)
     if fcobj == None:
@@ -724,6 +730,16 @@ def geoshow(plot, layer, **kwargs):
         lb.setOutlineColor(linecolor)
         lb.setOutlineSize(size)
     plot.addLayer(layer)
+    if isinteractive:
+        chartpanel.paintGraphics()
+    
+def figmask(plot, dlayer, mlayer):
+    mapview = plot.getMapView()
+    mapview.getMaskOut().setMask(True)
+    mapview.getMaskOut().setMaskLayer(mlayer.getLayerName())
+    dlayer.setMaskout(True)
+    if isinteractive:
+        chartpanel.paintGraphics()
     
 def display(data):
     if not ismap:
