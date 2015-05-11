@@ -128,11 +128,17 @@ class MIArray():
         r = MIArray(ArrayMath.pow(self.array, other))
         return r
         
-    def getminvalue(self):
-        return self.array.getMinimum()
+    def getminvalue(self, missingv=None):
+        if missingv == None:
+            return ArrayMath.getMinimum(self.array)
+        else:
+            return ArrayMath.getMinimum(self.array, missingv)
         
-    def getmaxvalue(self):
-        return self.array.getMaximum()
+    def getmaxvalue(self, missingv=None):
+        if missingv == None:
+            return ArrayMath.getMaximum(self.array)
+        else:
+            return ArrayMath.getMaximum(self.array, missingv)
         
     def getshape(self):
         return self.array.getShape()
@@ -149,6 +155,9 @@ class MIArray():
         else:
             return ArrayMath.aveDouble(self.array, missingv)
             
+    def sqrt(self):
+        return MIArray(ArrayMath.sqrt(self.array))
+    
     def sin(self):
         return MIArray(ArrayMath.sin(self.array))
         

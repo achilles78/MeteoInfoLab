@@ -16,7 +16,7 @@ import dimarray
 import miarray
 from dimdatafile import DimDataFile
 from dimvariable import DimVariable
-from dimarray import PyGridData, DimArray
+from dimarray import PyGridData, DimArray, PyStationData
 from miarray import MIArray
 
 from java.awt import Color
@@ -36,82 +36,6 @@ def isgriddata(gdata):
 def isstationdata(sdata):
     return isinstance(sdata, PyStationData)
 
-###############################################################         
-# The encapsulate class of StationData
-class PyStationData():
-    
-    # data must be a GridData object
-    def __init__(self, data=None):
-        self.data = data
-    
-    def add(self, other):
-        gdata = None
-        if isinstance(other, PyStationData):            
-            gdata = PyStationData(self.data.add(other.data))
-        else:
-            gdata = PyStationData(self.data.add(other))
-        return gdata
-    
-    def __add__(self, other):
-        gdata = None
-        print isinstance(other, PyStationData)
-        if isinstance(other, PyStationData):            
-            gdata = PyStationData(self.data.add(other.data))
-        else:
-            gdata = PyStationData(self.data.add(other))
-        return gdata
-        
-    def __radd__(self, other):
-        return PyStationData.__add__(self, other)
-        
-    def __sub__(self, other):
-        gdata = None
-        if isinstance(other, PyStationData):
-            gdata = PyStationData(self.data.sub(other.data))
-        else:
-            gdata = PyStationData(self.data.sub(other))
-        return gdata
-        
-    def __rsub__(self, other):
-        gdata = None
-        if isinstance(other, PyStationData):
-            gdata = PyStationData(other.data.sub(self.data))
-        else:
-            gdata = PyStationData(DataMath.sub(other, self.data))
-        return gdata
-    
-    def __mul__(self, other):
-        gdata = None
-        if isinstance(other, PyStationData):
-            gdata = PyStationData(self.data.mul(other.data))
-        else:
-            gdata = PyStationData(self.data.mul(other))
-        return gdata
-        
-    def __rmul__(self, other):
-        return PyStationData.__mul__(self, other)
-        
-    def __div__(self, other):
-        gdata = None
-        if isinstance(other, PyStationData):
-            gdata = PyStationData(self.data.div(other.data))
-        else:
-            gdata = PyStationData(self.data.div(other))
-        return gdata
-        
-    def __rdiv__(self, other):
-        gdata = None
-        if isinstance(other, PyStationData):
-            gdata = PyStationData(other.data.div(self.data))
-        else:
-            gdata = PyStationData(DataMath.div(other, self))
-        return gdata
-        
-    # other must be a numeric data
-    def __pow__(self, other):
-        gdata = PyStationData(self.data.pow(other))
-        return gdata
-
 ###############################################################        
 #  The encapsulate class of TableData
 class PyTableData():
@@ -122,8 +46,14 @@ class PyTableData():
     def __getitem__(self, key):
         if isinstance(key, str):
             print key
-            return self.data.getColumnData(key).getValidDataValues()
+            return self.data.getColumnData(key).getDataValues()
         return None
+        
+    def addcolumn(self, colname, dtype, coldata):
+        self.data.addColumnData(colname, dtype, coldata)
+        
+    def savefile(self, filename):
+        self.data.saveAsCSVFile(filename)
 
 #################################################################  
 
@@ -283,6 +213,12 @@ def zeros(n):
 def ones(n):
     return MIArray(ArrayUtil.ones(n))
     
+def sqrt(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.sqrt()
+    else:
+        return math.sqrt(a)
+
 def sin(a):
     if isinstance(a, DimArray) or isinstance(a, MIArray):
         return a.sin()

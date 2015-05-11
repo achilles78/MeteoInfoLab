@@ -5,6 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.data.meteodata import Variable, Dimension
+from org.meteoinfo.data import ArrayMath
 import dimarray
 from dimarray import DimArray, PyGridData
 import miarray
@@ -21,7 +22,7 @@ class DimVariable():
         self.ndim = variable.getDimNumber()
         
     # get dimension length
-    def getdimlen(self, idx):
+    def dimlen(self, idx):
         return self.variable.getDimLength(idx)
         
     def __len__(self):
@@ -52,7 +53,7 @@ class DimVariable():
                 step = 1
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
-                eidx = k.stop is None and self.getdimlen(i)-1 or k.stop
+                eidx = k.stop is None and self.dimlen(i)-1 or k.stop
                 step = k.step is None and 1 or k.step
             elif isinstance(k, tuple):
                 #k = k[0]
@@ -76,7 +77,8 @@ class DimVariable():
             if n > 1:
                 dim = self.variable.getDimension(i)
                 dims.append(dim.extract(sidx, eidx, step))
-                    
-        array = MIArray(self.dataset.read(self.name, origin, size, stride).reduce())
+        rr = self.dataset.read(self.name, origin, size, stride).reduce()
+        ArrayMath.missingToNaN(rr, self.dataset.missingvalue)
+        array = MIArray(rr)
         data = DimArray(array, dims, self.dataset.missingvalue, self.dataset.proj)
         return data

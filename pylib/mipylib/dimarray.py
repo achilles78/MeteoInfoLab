@@ -146,6 +146,14 @@ class DimArray():
         r = DimArray(self.array.__pow__(other), self.dims, self.missingvalue, self.proj)
         return r
         
+    # get dimension length
+    def dimlen(self, idx):
+        return self.dims[idx].getDimLength(idx)
+        
+    def sqrt(self):
+        r = DimArray(self.array.sqrt(), self.dims, self.missingvalue, self.proj)
+        return r
+    
     def sin(self):
         r = DimArray(self.array.sin(), self.dims, self.missingvalue, self.proj)
         return r
@@ -155,16 +163,18 @@ class DimArray():
         return r
         
     def getminvalue(self):
+        #return self.array.getminvalue(self.missingvalue)
         return self.array.getminvalue()
         
     def getmaxvalue(self):
-        return self.array.getmaxvalue()
+        #return self.array.getmaxvalue(self.missingvalue)
+        return self.array.getminvalue()
         
-    def sum(self, missingv=None):
-        return self.array.sum(missingv)
+    def sum(self):
+        return self.array.sum(self.missingvalue)
         
-    def ave(self, missingv=None):
-        return self.array.ave(missingv)
+    def ave(self):
+        return self.array.ave(self.missingvalue)
         
     def inpolygon(self, polygon):
         x = self.dims[1].getDimValue()
@@ -176,6 +186,11 @@ class DimArray():
         x = self.dims[1].getDimValue()
         y = self.dims[0].getDimValue()
         r = DimArray(self.array.maskout(x, y, polygon, self.missingvalue), self.dims, self.missingvalue, self.proj)
+        return r
+        
+    def tostation(self, x, y):
+        gdata = self.asgriddata()
+        r = gdata.data.toStation(x, y)
         return r
     
         
@@ -280,4 +295,80 @@ class PyGridData():
         return self.data.getMinValue()
         
     def getmaxvalue(self):
-        return self.data.getMaxValue()                       
+        return self.data.getMaxValue()        
+
+###############################################################         
+# The encapsulate class of StationData
+class PyStationData():
+    
+    # data must be a GridData object
+    def __init__(self, data=None):
+        self.data = data
+    
+    def add(self, other):
+        gdata = None
+        if isinstance(other, PyStationData):            
+            gdata = PyStationData(self.data.add(other.data))
+        else:
+            gdata = PyStationData(self.data.add(other))
+        return gdata
+    
+    def __add__(self, other):
+        gdata = None
+        print isinstance(other, PyStationData)
+        if isinstance(other, PyStationData):            
+            gdata = PyStationData(self.data.add(other.data))
+        else:
+            gdata = PyStationData(self.data.add(other))
+        return gdata
+        
+    def __radd__(self, other):
+        return PyStationData.__add__(self, other)
+        
+    def __sub__(self, other):
+        gdata = None
+        if isinstance(other, PyStationData):
+            gdata = PyStationData(self.data.sub(other.data))
+        else:
+            gdata = PyStationData(self.data.sub(other))
+        return gdata
+        
+    def __rsub__(self, other):
+        gdata = None
+        if isinstance(other, PyStationData):
+            gdata = PyStationData(other.data.sub(self.data))
+        else:
+            gdata = PyStationData(DataMath.sub(other, self.data))
+        return gdata
+    
+    def __mul__(self, other):
+        gdata = None
+        if isinstance(other, PyStationData):
+            gdata = PyStationData(self.data.mul(other.data))
+        else:
+            gdata = PyStationData(self.data.mul(other))
+        return gdata
+        
+    def __rmul__(self, other):
+        return PyStationData.__mul__(self, other)
+        
+    def __div__(self, other):
+        gdata = None
+        if isinstance(other, PyStationData):
+            gdata = PyStationData(self.data.div(other.data))
+        else:
+            gdata = PyStationData(self.data.div(other))
+        return gdata
+        
+    def __rdiv__(self, other):
+        gdata = None
+        if isinstance(other, PyStationData):
+            gdata = PyStationData(other.data.div(self.data))
+        else:
+            gdata = PyStationData(DataMath.div(other, self))
+        return gdata
+        
+    # other must be a numeric data
+    def __pow__(self, other):
+        gdata = PyStationData(self.data.pow(other))
+        return gdata        

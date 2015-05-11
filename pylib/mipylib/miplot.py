@@ -513,17 +513,19 @@ def __getcolormap(**kwargs):
         cmapstr = kwargs.pop('cmap', 'matlab_jet')
         cmap = ColorUtil.getColorMap(cmapstr)
     return cmap
-        
-def contour(*args, **kwargs):
+      
+def imshow(*args, **kwargs):
     n = len(args)
     cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
     if n <= 2:
         gdata = midata.asgriddata(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
-        gdata = args[4]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
@@ -534,35 +536,46 @@ def contour(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-    layer = __contour_griddata(gdata, ls)
+    layer = __plot_griddata(gdata, ls, 'imshow')
     return layer
-
-def __contour_griddata(gdata, ls, fill=False):
-    #print 'GridData...'
-    if fill:
-        layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
-    else:
-        layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
-    mapview = MapView()
-    plot = XY2DPlot(mapview)
-    plot.addLayer(layer)
-    chart = Chart(plot)
-    #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    if isinteractive:
-        chartpanel.paintGraphics()
-    return layer
-        
-def contourf(*args, **kwargs):
-    n = len(args)    
+      
+def contour(*args, **kwargs):
+    n = len(args)
     cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
     if n <= 2:
         gdata = midata.asgriddata(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
-        gdata = args[4]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, missingv)
+        args = args[3:]
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    layer = __plot_griddata(gdata, ls, 'contour')
+    return layer
+
+def contourf(*args, **kwargs):
+    n = len(args)    
+    cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
+    if n <= 2:
+        gdata = midata.asgriddata(args[0])
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
@@ -575,11 +588,57 @@ def contourf(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-    layer = __contour_griddata(gdata, ls, fill=True)
+    layer = __plot_griddata(gdata, ls, 'contourf')
     return layer
 
-def contourm(*args, **kwargs):      
+def quiver(*args, **kwargs):
+    n = len(args)    
     cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
+    if n <= 2:
+        gdata = midata.asgriddata(args[0])
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, missingv)
+        args = args[3:]
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+        else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    layer = __plot_griddata(gdata, ls, 'contourf')
+    return layer
+    
+def __plot_griddata(gdata, ls, type):
+    #print 'GridData...'
+    if type == 'contourf':
+        layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
+    elif type == 'contour':
+        layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
+    elif type == 'imshow':
+        layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)
+    mapview = MapView()
+    plot = XY2DPlot(mapview)
+    plot.addLayer(layer)
+    chart = Chart(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    if isinteractive:
+        chartpanel.paintGraphics()
+    return layer
+        
+def imshowm(*args, **kwargs):
+    cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
     plot = args[0]
     args = args[1:]
     n = len(args) 
@@ -589,7 +648,8 @@ def contourm(*args, **kwargs):
     elif n <=4:
         x = args[0]
         y = args[1]
-        gdata = args[4]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
@@ -600,7 +660,34 @@ def contourm(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-    layer = __contour_griddata_m(plot, gdata, ls)
+    layer = __plot_griddata_m(plot, gdata, ls, 'imshow')
+    return layer
+    
+def contourm(*args, **kwargs):      
+    cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
+    plot = args[0]
+    args = args[1:]
+    n = len(args) 
+    if n <= 2:
+        gdata = midata.asgriddata(args[0])
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, missingv)
+        args = args[3:]
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    layer = __contour_griddata_m(plot, gdata, ls, 'contour')
     return layer
         
 def contourfm(*args, **kwargs):
@@ -627,19 +714,92 @@ def contourfm(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-    layer = __contour_griddata_m(plot, gdata, ls, fill=True)
+    layer = __plot_griddata_m(plot, gdata, ls, 'contourf')
+    return layer
+    
+def quiverm(*args, **kwargs):
+    cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
+    isuv = kwargs.pop('isuv', True)
+    size = kwargs.pop('size', 10)
+    plot = args[0]
+    args = args[1:]
+    n = len(args) 
+    iscolor = False
+    cdata = None
+    if n <= 4:
+        udata = midata.asgriddata(args[0])
+        vdata = midata.asgriddata(args[1])
+        args = args[2:]
+        if len(args) > 0:
+            cdata = midata.asgriddata(args[0])
+            iscolor = True
+            args = args[1:]
+    elif n <= 6:
+        x = args[0]
+        y = args[1]
+        u = args[2]
+        v = args[3]
+        udata = midata.asgriddata(u, x, y, missingv)
+        vdata = midata.asgriddata(v, x, y, missingv)
+        args = args[4:]
+        if len(args) > 0:
+            cdata = midata.asgriddata(args[0], x, y, missingv)
+            iscolor = True
+            args = args[1:]
+    if iscolor:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), cn, cmap)
+            else:
+                ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), level_arg, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), cmap)
+    else:    
+        if cmap.getColorCount() == 1:
+            c = cmap.getColor(0)
+        else:
+            c = Color.black
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, size)
+    layer = __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, 'quiver', isuv)
     return layer
         
-def __contour_griddata_m(plot, gdata, ls, fill=False):
+def __plot_griddata_m(plot, gdata, ls, type):
     #print 'GridData...'
-    if fill:
+    if type == 'contourf':
         layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
-    else:
+    elif type == 'contour':
         layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
-    if layer.getShapeType() == ShapeTypes.Polygon:
+    elif type == 'imshow':
+        layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)
+    else:
+        layer = None
+        return layer
+        
+    shapetype = layer.getShapeType()
+    if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
         plot.addLayer(0, layer)
     else:
         plot.addLayer(layer)
+    plot.setDrawExtent(layer.getExtent())
+    chart = Chart(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    if isinteractive:
+        chartpanel.paintGraphics()
+    return layer
+    
+def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv):
+    #print 'GridData...'
+    if type == 'quiver':
+        if cdata == None:
+            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
+        else:
+            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
+    shapetype = layer.getShapeType()
+    plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent())
     chart = Chart(plot)
     #chart.setAntiAlias(True)
