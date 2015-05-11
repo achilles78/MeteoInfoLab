@@ -639,6 +639,7 @@ def __plot_griddata(gdata, ls, type):
 def imshowm(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
+    proj = kwargs.pop('proj', None)
     plot = args[0]
     args = args[1:]
     n = len(args) 
@@ -660,12 +661,13 @@ def imshowm(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-    layer = __plot_griddata_m(plot, gdata, ls, 'imshow')
+    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj)
+    gdata = None
     return layer
     
 def contourm(*args, **kwargs):      
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)
+    missingv = kwargs.pop('missingv', -9999.0)    
     plot = args[0]
     args = args[1:]
     n = len(args) 
@@ -688,6 +690,7 @@ def contourm(*args, **kwargs):
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
     layer = __contour_griddata_m(plot, gdata, ls, 'contour')
+    gdata = None
     return layer
         
 def contourfm(*args, **kwargs):
@@ -715,6 +718,7 @@ def contourfm(*args, **kwargs):
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
     layer = __plot_griddata_m(plot, gdata, ls, 'contourf')
+    gdata = None
     return layer
     
 def quiverm(*args, **kwargs):
@@ -764,9 +768,12 @@ def quiverm(*args, **kwargs):
             c = Color.black
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, size)
     layer = __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, 'quiver', isuv)
+    udata = None
+    vdata = None
+    cdata = None
     return layer
         
-def __plot_griddata_m(plot, gdata, ls, type):
+def __plot_griddata_m(plot, gdata, ls, type, proj=None):
     #print 'GridData...'
     if type == 'contourf':
         layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
@@ -777,6 +784,9 @@ def __plot_griddata_m(plot, gdata, ls, type):
     else:
         layer = None
         return layer
+    
+    if (proj != None):
+        layer.setProjInfo(proj)
         
     shapetype = layer.getShapeType()
     if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
@@ -832,12 +842,12 @@ def worldmap():
     return plot
     
 def axesm(proj='longlat', **kwargs):
-    origin = kwargs.pop('origin', [0, 0, 0])    
+    origin = kwargs.pop('origin', (0, 0, 0))    
     lat_0 = origin[0]
     lon_0 = origin[1]
     lat_ts = kwargs.pop('truescalelat', 0)
     k = kwargs.pop('scalefactor', 1)
-    paralles = kwargs.pop('paralles', [30, 60])
+    paralles = kwargs.pop('paralles', (30, 60))
     lat_1 = paralles[0]
     if len(paralles) == 2:
         lat_2 = paralles[1]
@@ -845,6 +855,7 @@ def axesm(proj='longlat', **kwargs):
         lat_2 = lat_1
     x_0 = kwargs.pop('falseeasting', 0)
     y_0 = kwargs.pop('falsenorthing', 0)
+    h = kwargs.pop('h', 0)
     projstr = '+proj=' + proj \
         + ' +lat_0=' + str(lat_0) \
         + ' +lon_0=' + str(lon_0) \
@@ -853,9 +864,14 @@ def axesm(proj='longlat', **kwargs):
         + ' +lat_ts=' + str(lat_ts) \
         + ' +k=' + str(k) \
         + ' +x_0=' + str(x_0) \
-        + ' +y_0=' + str(y_0)
-    toproj = ProjectionInfo(projstr)
+        + ' +y_0=' + str(y_0) \
+        + ' +h=' + str(h)
+    toproj = ProjectionInfo(projstr)    
+    gridlabel = kwargs.pop('gridlabel', True)
+    c_plot.getMapFrame().setDrawGridLabel(gridlabel)
+    c_plot.getMapFrame().setDrawGridTickLine(gridlabel)
     c_plot.getMapView().projectLayers(toproj)
+    return toproj
         
 def geoshow(plot, layer, **kwargs):
     visible = kwargs.pop('visible', True)

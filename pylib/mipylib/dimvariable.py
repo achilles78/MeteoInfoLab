@@ -20,11 +20,7 @@ class DimVariable():
         self.dataset = dataset
         self.name = variable.getName()
         self.ndim = variable.getDimNumber()
-        
-    # get dimension length
-    def dimlen(self, idx):
-        return self.variable.getDimLength(idx)
-        
+            
     def __len__(self):
         len = 1;
         for dim in self.variable.getDimensions():
@@ -34,8 +30,9 @@ class DimVariable():
     def __getitem__(self, indices):
         #print type(indices)
         if not isinstance(indices, tuple):
-            print 'indices must be tuple!'
-            return None
+            inds = []
+            inds.append(indices)
+            indices = inds
         
         if len(indices) != self.ndim:
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
@@ -82,3 +79,13 @@ class DimVariable():
         array = MIArray(rr)
         data = DimArray(array, dims, self.dataset.missingvalue, self.dataset.proj)
         return data
+        
+    # get dimension length
+    def dimlen(self, idx):
+        return self.variable.getDimLength(idx)
+        
+    def adddim(self, dimtype, dimvalue):
+        if isinstance(dimvalue, MIArray):
+            dimvalue = dimvalue.aslist()
+        self.variable.addDimension(dimtype, dimvalue)
+        self.ndim = self.variable.getDimNumber()

@@ -7,7 +7,7 @@
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, ArrayMath
 from org.meteoinfo.layer import VectorLayer
-from ucar.ma2 import Array
+from ucar.ma2 import Array, Range
 import miarray
 from miarray import MIArray
 
@@ -73,7 +73,7 @@ class DimArray():
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
             #origin.append(sidx)
-            #n = eidx - sidx + 1
+            n = eidx - sidx + 1
             #size.append(n)
             #stride.append(step)
             if n > 1:
@@ -81,7 +81,7 @@ class DimArray():
                 dims.append(dim.extract(sidx, eidx, step))
                     
         #r = ArrayMath.section(self.array.array, origin, size, stride)
-        r = ArrayMath.section(self.array, ranges)
+        r = ArrayMath.section(self.array.array, ranges)
         for i in flips:
             r = r.flip(i)
         array = MIArray(r)
