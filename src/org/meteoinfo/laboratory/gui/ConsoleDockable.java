@@ -28,7 +28,7 @@ import org.python.core.Py;
  * @author yaqiang
  */
 public class ConsoleDockable extends DefaultSingleCDockable {
-    
+
     private String startupPath;
     private FrmMain parent;
     private PythonInteractiveInterpreter interp;
@@ -96,21 +96,23 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             e.printStackTrace();
         }
         //this.setCursor(Cursor.getDefaultCursor());
-    }        
-    
+    }
+
     /**
      * Get interactive interpreter
+     *
      * @return Interactive interpreter
      */
-    public PythonInteractiveInterpreter getInterpreter(){
+    public PythonInteractiveInterpreter getInterpreter() {
         return this.interp;
     }
-    
+
     /**
      * Get console
+     *
      * @return Console
      */
-    public JConsole getConsole(){
+    public JConsole getConsole() {
         return this.interp.console;
     }
 
@@ -160,7 +162,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         this.interp.exec(command);
         //this.interp.push(command);
         this.interp.out.print(">>> ");
-        interp.exec("mipylib.miplot.isinteractive = True");        
+        interp.exec("mipylib.miplot.isinteractive = True");
     }
 
     /**
@@ -192,7 +194,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             Logger.getLogger(ConsoleDockable.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
 //    /**
 //     * Run Jython script
 //     * @param code
@@ -239,9 +241,9 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 //        };
 //        worker.execute();
 //    }
-    
     /**
      * Run Jython script
+     *
      * @param code
      */
     public void runPythonScript(final String code) {
@@ -255,7 +257,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 //JTextAreaWriter writer = new JTextAreaWriter(jTextArea_Output);
                 //JTextAreaPrintStream printStream = new JTextAreaPrintStream(System.out, jTextArea_Output);
                 //jTextArea_Output.setText("");
-                
+
                 JTextPane jTextPane_Output = interp.console.getTextPane();
                 JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
                 JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
@@ -266,27 +268,36 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 System.setOut(printStream);
                 System.setErr(printStream);
 
-                String encoding = EncodingUtil.findEncoding(code);
-                if (encoding != null) {
-                    try {
-                        interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        interp.console.print(">>> ", Color.red);
-                        //interp.console.setStyle(Color.black);
-                        //interp.console.setForeground(Color.black);
-                    }
-                } else {
-                    try {
-                        interp.execfile(new ByteArrayInputStream(code.getBytes()));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        interp.console.print(">>> ", Color.red);
-                        //interp.console.setStyle(Color.black);
-                        //interp.console.setForeground(Color.black);
-                    }
+                String encoding = "utf-8";
+                try {
+                    interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    interp.console.print(">>> ", Color.red);
+                    interp.console.setStyle(Color.black);
+                    //interp.console.setForeground(Color.black);
                 }
 
+                //String encoding = EncodingUtil.findEncoding(code);                
+//                if (encoding != null) {
+//                    try {
+//                        interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        interp.console.print(">>> ", Color.red);
+//                        //interp.console.setStyle(Color.black);
+//                        //interp.console.setForeground(Color.black);
+//                    }
+//                } else {
+//                    try {
+//                        interp.execfile(new ByteArrayInputStream(code.getBytes()));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        interp.console.print(">>> ", Color.red);
+//                        //interp.console.setStyle(Color.black);
+//                        //interp.console.setForeground(Color.black);
+//                    }
+//                }
                 return "";
             }
 
