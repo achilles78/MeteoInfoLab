@@ -9,6 +9,7 @@ import math
 from org.meteoinfo.data import GridData, StationData, DataMath, TableData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
+from org.meteoinfo.geoprocess import GeoComputation
 
 import dimdatafile
 import dimvariable
@@ -45,10 +46,20 @@ class PyTableData():
         
     def __getitem__(self, key):
         if isinstance(key, str):
-            print key
-            return self.data.getColumnData(key).getDataValues()
+            print key     
+            coldata = self.data.getColumnData(key)
+            if coldata.getDataType().isNumeric():
+                return coldata.getDataValues()
+            else:
+                return coldata.getData()
         return None
         
+    def coldata(self, key):
+        if isinstance(key, str):
+            print key     
+            return self.data.getColumnData(key).getDataValues()
+        return None
+    
     def addcolumn(self, colname, dtype, coldata):
         self.data.addColumnData(colname, dtype, coldata)
         
@@ -74,22 +85,29 @@ def __getfilename(fname):
         else:
             print 'File not exist: ' + fname
             return None
-      
-def addfile_grads(fname):
+          
+def addfile(fname):
+    if not os.path.exists(fname):
+        print 'The file does not exist: ' + fname
+        return None
+        
     fname = __getfilename(fname)
+    fsufix = os.path.splitext(fname)[1]
+    if fsufix == '.ctl':
+        return addfile_grads(fname)
+    elif fsufix == '.tif':
+        return addfile_geotiff(fname)
+    
     meteodata = MeteoDataInfo()
-    meteodata.openGrADSData(fname)
+    meteodata.openData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile(fname):
+def addfile_grads(fname):
     fname = __getfilename(fname)
-    if os.path.splitext(fname)[1] == '.ctl':
-        return addfile_grads(fname)
-    
     meteodata = MeteoDataInfo()
-    meteodata.openData(fname)
+    meteodata.openGrADSData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
@@ -126,6 +144,15 @@ def addfile_mm5(fname):
     datafile = DimDataFile(meteodata)
     return datafile
     
+def addfile_lonlat(fname, missingv=-9999.0):
+    fname = __getfilename(fname)
+    meteodata = MeteoDataInfo()
+    meteodata.openLonLatData(fname)
+    meteodata.getDataInfo().setMissingValue(missingv)
+    __addmeteodata(meteodata)
+    datafile = DimDataFile(meteodata)
+    return datafile
+    
 def addfile_micaps(fname):
     fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -138,6 +165,14 @@ def addfile_hyconc(fname):
     fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openHYSPLITConcData(fname)
+    __addmeteodata(meteodata)
+    datafile = DimDataFile(meteodata)
+    return datafile
+    
+def addfile_geotiff(fname):
+    fname = __getfilename(fname)
+    meteodata = MeteoDataInfo()
+    meteodata.openGeoTiffData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
@@ -175,7 +210,7 @@ def asciiread(filename, **kwargs):
     return MIArray(a)
         
 def readtable(filename, **kwargs):
-    delimiter = kwargs.pop('delimiter', ',')
+    delimiter = kwargs.pop('delimiter', None)
     format = kwargs.pop('format', None)
     headerlines = kwargs.pop('headerlines', 0)
     encoding = kwargs.pop('encoding', 'UTF8')
@@ -243,9 +278,16 @@ def asgriddata(data, x=None, y=None, missingv=-9999.0):
         gdata = GridData(data.array, x.array, y.array, missingv)
         return PyGridData(gdata)
         
+def asstationdata(data, x, y, missingv=-9999.0):
+    stdata = StationData(data.array, x.array, y.array, missingv)
+    return PyStationData(stdata)
+        
 def shaperead(fn):
     layer = MapDataManage.loadLayer(fn)
     pgb = layer.getLegendScheme().getLegendBreaks().get(0)
     pgb.setDrawFill(False)
     pgb.setOutlineColor(Color.darkGray) 
     return layer
+    
+def inpolygon(x, y, polygon):
+    return GeoComputation.pointInPolygon(polygon, x, y)

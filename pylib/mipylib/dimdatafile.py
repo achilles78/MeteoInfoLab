@@ -9,7 +9,7 @@ from ucar.ma2 import Section
 import dimvariable
 from dimvariable import DimVariable
 import dimarray
-from dimarray import PyGridData
+from dimarray import PyGridData, PyStationData
 
 # Dimension dataset
 class DimDataFile():
@@ -49,7 +49,7 @@ class DimDataFile():
         else:
             return None
         
-    def stationdata(varname='var', timeindex=0, levelindex=0):
+    def stationdata(self, varname='var', timeindex=0, levelindex=0):
         if self.dataset.isStationData():
             self.dataset.setTimeIndex(timeindex)
             self.dataset.setLevelIndex(levelindex)

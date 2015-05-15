@@ -5,7 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.data import GridData, ArrayMath
+from org.meteoinfo.data import GridData, StationData, ArrayMath
 from org.meteoinfo.layer import VectorLayer
 from ucar.ma2 import Array, Range
 import miarray
@@ -301,9 +301,12 @@ class PyGridData():
 # The encapsulate class of StationData
 class PyStationData():
     
-    # data must be a GridData object
+    # data must be a StationData object
     def __init__(self, data=None):
         self.data = data
+    
+    def __len__(self):
+        return self.data.getStNum()
     
     def add(self, other):
         gdata = None
@@ -372,3 +375,24 @@ class PyStationData():
     def __pow__(self, other):
         gdata = PyStationData(self.data.pow(other))
         return gdata        
+        
+    def getminvalue(self):
+        return self.data.getMinValue()
+        
+    def getmaxvalue(self):
+        return self.data.getMaxValue() 
+        
+    def maskout(self, polygon):
+        return PyStationData(self.data.maskout(polygon))
+        
+    def maskin(self, polygon):
+        return PyStationData(self.data.maskin(polygon))
+        
+    def filter(self, stations):
+        return PyStationData(self.data.filter(stations))
+        
+    def join(self, other):
+        return PyStationData(self.data.join(other.data))
+        
+    def savedata(self, filename, fieldname='data', savemissingv=False):
+        self.data.saveAsCSVFile(filename, fieldname, savemissingv)

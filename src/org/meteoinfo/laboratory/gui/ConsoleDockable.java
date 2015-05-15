@@ -70,6 +70,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         try {
             interp.set("mlapp", parent);
             interp.exec("import sys");
+            interp.exec("import os");
             //interp.exec("sys.setdefaultencoding('utf-8')");
             interp.exec("sys.path.append('" + path + "')");
             interp.exec("from milab import *");

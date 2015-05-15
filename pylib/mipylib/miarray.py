@@ -21,10 +21,10 @@ class MIArray():
         return int(self.array.getSize())
         
     def __str__(self):
-        return ArrayUtil.toString(self.array)
+        return ArrayUtil.convertToString(self.array)
         
     def __repr__(self):
-        return ArrayUtil.toString(self.array)
+        return ArrayUtil.convertToString(self.array)
     
     def __getitem__(self, indices):
         #print type(indices)            

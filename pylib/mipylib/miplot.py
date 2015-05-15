@@ -28,7 +28,7 @@ from javax.swing import WindowConstants
 from java.awt import Color, Font
 
 import dimarray
-from dimarray import DimArray, PyGridData
+from dimarray import DimArray, PyGridData, PyStationData
 import miarray
 from miarray import MIArray
 import midata
@@ -78,9 +78,12 @@ def plot(*args, **kwargs):
     if c_plot is None:
         dataset = XYListDataset()
     else:
-        dataset = c_plot.getDataset()
-        if dataset is None:
+        if not isinstance(c_plot, XY1DPlot):
             dataset = XYListDataset()
+        else:
+            dataset = c_plot.getDataset()
+            if dataset is None:
+                dataset = XYListDataset()
     xdatalist = []
     ydatalist = []
     styles = []
@@ -133,8 +136,11 @@ def plot(*args, **kwargs):
     if c_plot is None:
         plot = XY1DPlot(dataset)
     else:
-        plot = c_plot
-        plot.setDataset(dataset)
+        if isinstance(c_plot, XY1DPlot):
+            plot = c_plot
+            plot.setDataset(dataset)
+        else:
+            plot = XY1DPlot(dataset)
     
     #Set plot data styles
     if styles != None:
@@ -145,7 +151,7 @@ def plot(*args, **kwargs):
     
     #Paint dataset
     chart = chartpanel.getChart()
-    if c_plot is None:
+    if c_plot is None or (not isinstance(c_plot, XY1DPlot)):
         chart.clearPlots()
         chart.setPlot(plot)
     #chart.setAntiAlias(True)
@@ -154,54 +160,25 @@ def plot(*args, **kwargs):
 		chartpanel.paintGraphics()
     return plot    
  
-def hist(x, bins=10, range=None, normed=False, cumulative=False, \
-    bottom=None, histtype='bar', align='mid', \
+def hist(x, bins=10, range=None, normed=False, cumulative=False,
+    bottom=None, histtype='bar', align='mid',
     orientation='vertical', rwidth=None, log=False, **kwargs):
     
     return None
     
-def scatter(*args, **kwargs):
-    #Parse args
+def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
+            alpha=None, linewidths=None, verts=None, hold=None, **kwargs):
+    #Get dataset
     if c_plot is None:
         dataset = XYListDataset()
     else:
         dataset = c_plot.getDataset()
         if dataset is None:
-            dataset = XYListDataset()
-    xdatalist = []
-    ydatalist = []
-    styles = []
-    c = 'x'
-    for arg in args:
-        if len(args) == 1:
-            ydata = arg
-            xdata = []
-            for i in range(0, len(ydata)):
-                xdata.append(i)
-            xdatalist.append(xdata)
-            ydatalist.append(ydata)
-        else:
-            if c == 'x':
-                xdatalist.append(arg)                
-                c = 'y'
-            elif c == 'y':
-                ydatalist.append(arg)
-                c = 's'
-            elif c == 's':
-                if isinstance(arg, basestring):
-                    styles.append(arg)
-                    c = 'x'
-                else:
-                    styles.append('-')
-                    xdatalist.append(arg)
-                    c = 'y'
-    while len(styles) < len(xdatalist):
-        styles.append('-')
+            dataset = XYListDataset()    
     
     #Add data series
-    for i in range(0, len(xdatalist)):
-        label = kwargs.pop('label', 'S_' + str(i + 1))
-        dataset.addSeries(label, xdatalist[i], ydatalist[i])
+    label = kwargs.pop('label', 'S_0')
+    dataset.addSeries(label, x, y)
     
     #Create XY1DPlot
     if c_plot is None:
@@ -211,10 +188,14 @@ def scatter(*args, **kwargs):
         plot.setDataset(dataset)
     
     #Set plot data styles
-    for i in range(0, len(styles)):
-        idx = dataset.getSeriesCount() - len(styles) + i
-        print 'Series index: ' + str(idx)
-        __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
+    pointStyle = __getpointstyle(marker)
+    c = kwargs.pop('color', c)
+    color = __getcolor(c)
+    pb = PointBreak()
+    pb.setSize(s)
+    pb.setStyle(pointStyle)
+    pb.setColor(color)
+    plot.setLegendBreak(0, pb)
     
     #Paint dataset
     chart = chartpanel.getChart()
@@ -635,6 +616,44 @@ def __plot_griddata(gdata, ls, type):
     if isinteractive:
         chartpanel.paintGraphics()
     return layer
+    
+def scatterm(*args, **kwargs):
+    cmap = __getcolormap(**kwargs)
+    missingv = kwargs.pop('missingv', -9999.0)
+    proj = kwargs.pop('proj', None)
+    plot = args[0]
+    args = args[1:]
+    n = len(args) 
+    if n <= 2:
+        if isinstance(args[0], PyStationData):
+            gdata = args[0]
+        else:
+            gdata = midata.asgriddata(args[0])
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        if a.rank == 1:
+            gdata = midata.asstationdata(a, x, y, missingv)
+        else:
+            gdata = midata.asgriddata(a, x, y, missingv)
+        args = args[3:]
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    if isinstance(gdata, PyGridData):
+        layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj)
+    else:
+        layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj)
+    gdata = None
+    return layer
         
 def imshowm(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
@@ -660,7 +679,8 @@ def imshowm(*args, **kwargs):
         else:
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+        #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+        ls = LegendManage.createImageLegend(gdata.data, cmap)
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj)
     gdata = None
     return layer
@@ -781,6 +801,8 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None):
         layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
     elif type == 'imshow':
         layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)
+    elif type == 'scatter':
+        layer = DrawMeteoData.createGridPointLayer(gdata.data, ls, 'layer', 'data')
     else:
         layer = None
         return layer
@@ -793,6 +815,26 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None):
         plot.addLayer(0, layer)
     else:
         plot.addLayer(layer)
+    plot.setDrawExtent(layer.getExtent())
+    chart = Chart(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    if isinteractive:
+        chartpanel.paintGraphics()
+    return layer
+    
+def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
+    #print 'GridData...'
+    if type == 'scatter':
+        layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
+    else:
+        layer = None
+        return layer
+    
+    if (proj != None):
+        layer.setProjInfo(proj)
+ 
+    plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent())
     chart = Chart(plot)
     #chart.setAntiAlias(True)
@@ -817,6 +859,8 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv):
     if isinteractive:
         chartpanel.paintGraphics()
     return layer
+
+
     
 def clabel(layer, **kwargs):
     font = __getfont(**kwargs)
@@ -841,37 +885,47 @@ def worldmap():
     c_plot = plot
     return plot
     
-def axesm(proj='longlat', **kwargs):
-    origin = kwargs.pop('origin', (0, 0, 0))    
-    lat_0 = origin[0]
-    lon_0 = origin[1]
-    lat_ts = kwargs.pop('truescalelat', 0)
-    k = kwargs.pop('scalefactor', 1)
-    paralles = kwargs.pop('paralles', (30, 60))
-    lat_1 = paralles[0]
-    if len(paralles) == 2:
-        lat_2 = paralles[1]
-    else:
-        lat_2 = lat_1
-    x_0 = kwargs.pop('falseeasting', 0)
-    y_0 = kwargs.pop('falsenorthing', 0)
-    h = kwargs.pop('h', 0)
-    projstr = '+proj=' + proj \
-        + ' +lat_0=' + str(lat_0) \
-        + ' +lon_0=' + str(lon_0) \
-        + ' +lat_1=' + str(lat_1) \
-        + ' +lat_2=' + str(lat_2) \
-        + ' +lat_ts=' + str(lat_ts) \
-        + ' +k=' + str(k) \
-        + ' +x_0=' + str(x_0) \
-        + ' +y_0=' + str(y_0) \
-        + ' +h=' + str(h)
-    toproj = ProjectionInfo(projstr)    
+def axesm(projinfo=None, proj='longlat', **kwargs):
+    if projinfo == None:
+        origin = kwargs.pop('origin', (0, 0, 0))    
+        lat_0 = origin[0]
+        lon_0 = origin[1]
+        lat_0 = kwargs.pop('lat_0', lat_0)
+        lon_0 = kwargs.pop('lon_0', lon_0)
+        lat_ts = kwargs.pop('truescalelat', 0)
+        lat_ts = kwargs.pop('lat_ts', lat_ts)
+        k = kwargs.pop('scalefactor', 1)
+        k = kwargs.pop('k', k)
+        paralles = kwargs.pop('paralles', (30, 60))
+        lat_1 = paralles[0]
+        if len(paralles) == 2:
+            lat_2 = paralles[1]
+        else:
+            lat_2 = lat_1
+        lat_1 = kwargs.pop('lat_1', lat_1)
+        lat_2 = kwargs.pop('lat_2', lat_2)
+        x_0 = kwargs.pop('falseeasting', 0)
+        y_0 = kwargs.pop('falsenorthing', 0)
+        x_0 = kwargs.pop('x_0', x_0)
+        y_0 = kwargs.pop('y_0', y_0)
+        h = kwargs.pop('h', 0)
+        projstr = '+proj=' + proj \
+            + ' +lat_0=' + str(lat_0) \
+            + ' +lon_0=' + str(lon_0) \
+            + ' +lat_1=' + str(lat_1) \
+            + ' +lat_2=' + str(lat_2) \
+            + ' +lat_ts=' + str(lat_ts) \
+            + ' +k=' + str(k) \
+            + ' +x_0=' + str(x_0) \
+            + ' +y_0=' + str(y_0) \
+            + ' +h=' + str(h)
+        projinfo = ProjectionInfo(projstr)   
+        
     gridlabel = kwargs.pop('gridlabel', True)
     c_plot.getMapFrame().setDrawGridLabel(gridlabel)
     c_plot.getMapFrame().setDrawGridTickLine(gridlabel)
-    c_plot.getMapView().projectLayers(toproj)
-    return toproj
+    c_plot.getMapView().projectLayers(projinfo)
+    return projinfo
         
 def geoshow(plot, layer, **kwargs):
     visible = kwargs.pop('visible', True)
