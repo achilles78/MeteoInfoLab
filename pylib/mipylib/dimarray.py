@@ -150,6 +150,9 @@ class DimArray():
     def dimlen(self, idx):
         return self.dims[idx].getDimLength(idx)
         
+    def dimvalue(self, idx):
+        return self.dims[idx].getDimValue()
+        
     def sqrt(self):
         r = DimArray(self.array.sqrt(), self.dims, self.missingvalue, self.proj)
         return r

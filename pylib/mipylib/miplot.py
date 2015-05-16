@@ -69,7 +69,17 @@ def hold(ishold):
         c_plot = chartpanel.getChart().getPlot()
     else:
         c_plot = None
-        
+ 
+def __getplotdata(data):
+    if isinstance(data, MIArray):
+        return data.array
+    elif isinstance(data, DimArray):
+        return data.array.array
+    elif isinstance(data, list):
+        return data
+    else:
+        return data
+ 
 def plot(*args, **kwargs):
     if ismap:
         map(False)
@@ -85,27 +95,23 @@ def plot(*args, **kwargs):
             if dataset is None:
                 dataset = XYListDataset()
     xdatalist = []
-    ydatalist = []
+    ydatalist = []    
     styles = []
-    c = 'x'
-    for arg in args:
-        if len(args) == 1:
-            if isinstance(arg, MIArray):
-                data = arg.array
-            else:
-                data = arg
-            ydata = data
-            xdata = []
-            for i in range(0, len(arg)):
-                xdata.append(i)
-            xdatalist.append(xdata)
-            ydatalist.append(ydata)
-        else:
+    if len(args) == 1:
+        ydata = __getplotdata(args[0])
+        xdata = []
+        for i in range(0, len(args[0])):
+            xdata.append(i)
+        xdatalist.append(xdata)
+        ydatalist.append(ydata)
+    else:
+        c = 'x'
+        for arg in args: 
             if c == 'x':
-                xdatalist.append(arg)                
+                xdatalist.append(__getplotdata(arg))                
                 c = 'y'
             elif c == 'y':
-                ydatalist.append(arg)
+                ydatalist.append(__getplotdata(arg))
                 c = 's'
             elif c == 's':
                 if isinstance(arg, basestring):
@@ -113,7 +119,7 @@ def plot(*args, **kwargs):
                     c = 'x'
                 else:
                     styles.append('-')
-                    xdatalist.append(arg)
+                    xdatalist.append(__getplotdata(arg))
                     c = 'y'
     if len(styles) == 0:
         styles = None
