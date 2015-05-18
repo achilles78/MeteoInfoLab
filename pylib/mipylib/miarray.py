@@ -32,14 +32,14 @@ class MIArray():
             inds = []
             inds.append(indices)
             indices = inds
+            
+        if self.rank == 0:
+            return self
         
         if len(indices) != self.rank:
             print 'indices must be ' + str(self.rank) + ' dimensions!'
             return None
-            
-        #origin = []
-        #size = []
-        #stride = []
+
         ranges = []
         flips = []
         for i in range(0, self.rank):   
@@ -56,15 +56,44 @@ class MIArray():
                 flips.append(i)
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
-            #origin.append(sidx)
-            #n = eidx - sidx + 1
-            #size.append(n)
-            #stride.append(step)                    
-        #r = ArrayMath.section(self.array, origin, size, stride)
         r = ArrayMath.section(self.array, ranges)
         for i in flips:
             r = r.flip(i)
         return MIArray(r)
+        
+    def __setitem__(self, indices, value):
+        #print type(indices)            
+        if not isinstance(indices, tuple):
+            inds = []
+            inds.append(indices)
+            indices = inds
+        
+        if self.rank == 0:
+            self.array.setObject(0, value)
+            return None
+        
+        if len(indices) != self.rank:
+            print 'indices must be ' + str(self.rank) + ' dimensions!'
+            return None
+
+        ranges = []
+        flips = []
+        for i in range(0, self.rank):   
+            if isinstance(indices[i], int):
+                sidx = indices[i]
+                eidx = indices[i]
+                step = 1
+            else:
+                sidx = 0 if indices[i].start is None else indices[i].start
+                eidx = indices[i].stop is None and self.getshape()[i]-1 or indices[i].stop
+                step = indices[i].step is None and 1 or indices[i].step
+            if step < 0:
+                step = abs(step)
+                flips.append(i)
+            rr = Range(sidx, eidx, step)
+            ranges.append(rr)
+
+        ArrayMath.setSection(self.array, ranges, value)
     
     def __abs__(self):
         return MIArray(ArrayMath.abs(self.array))

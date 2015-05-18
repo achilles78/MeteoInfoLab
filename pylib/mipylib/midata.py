@@ -237,7 +237,7 @@ def arange(*args):
     return MIArray(ArrayUtil.arrayRange(start, stop, step))
     
 def arange1(start, n, step):
-    return MIArray(ArrayUtil.arrayRange(start, n, step))
+    return MIArray(ArrayUtil.arrayRange1(start, n, step))
     
 def linspace(start=0, stop=1, n=100, dtype=None):
     return MIArray(ArrayUtil.lineSpace(start, stop, n))
