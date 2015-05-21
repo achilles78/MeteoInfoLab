@@ -6,7 +6,7 @@
 #-----------------------------------------------------
 import os
 import math
-from org.meteoinfo.data import GridData, StationData, DataMath, TableData, ArrayMath, ArrayUtil
+from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.geoprocess import GeoComputation
@@ -43,28 +43,55 @@ class PyTableData():
     # Must be a TableData object
     def __init__(self, data=None):
         self.data = data
+        self.timedata = isinstance(data, TimeTableData)
         
     def __getitem__(self, key):
         if isinstance(key, str):
             print key     
             coldata = self.data.getColumnData(key)
             if coldata.getDataType().isNumeric():
-                return coldata.getDataValues()
+                return MIArray(ArrayUtil.array(coldata.getDataValues()))
             else:
                 return coldata.getData()
         return None
-        
+    
+    def colnames(self):
+        return self.data.getDataTable().getColumnNames()
+    
     def coldata(self, key):
         if isinstance(key, str):
             print key     
-            return self.data.getColumnData(key).getDataValues()
+            values = self.data.getColumnData(key).getDataValues()
+            return MIArray(ArrayUtil.array(values))
         return None
     
-    def addcolumn(self, colname, dtype, coldata):
-        self.data.addColumnData(colname, dtype, coldata)
+    def addcol(self, colname, dtype, coldata):
+        if isinstance(coldata, MIArray):
+            self.data.addColumnData(colname, dtype, coldata.aslist())
+        else:
+            self.data.addColumnData(colname, dtype, coldata)
+        
+    def delcol(self, colname):
+        self.data.removeColumn(colname)
+        
+    #Set time column
+    def timecol(self, colname):
+        tdata = TimeTableData(self.data.dataTable)
+        tdata.setTimeColName(colname)
+        self.data = tdata;
+        self.timedata = True
         
     def savefile(self, filename):
         self.data.saveAsCSVFile(filename)
+        
+    def ave_year(self, colnames):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_Year(cols)
+            return PyTableData(TableData(dtable))
 
 #################################################################  
 
@@ -214,8 +241,7 @@ def readtable(filename, **kwargs):
     format = kwargs.pop('format', None)
     headerlines = kwargs.pop('headerlines', 0)
     encoding = kwargs.pop('encoding', 'UTF8')
-    tdata = TableData()
-    tdata.readASCIIFile(filename, delimiter, headerlines, format, encoding)
+    tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
     return PyTableData(tdata)
 
 def array(data):
