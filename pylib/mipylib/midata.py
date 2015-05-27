@@ -54,6 +54,12 @@ class PyTableData():
             else:
                 return coldata.getData()
         return None
+        
+    def __setitem__(self, key, value):
+        if isinstance(value, MIArray):
+            self.data.setColumnData(key, value.aslist())
+        else:
+            self.data.setColumnData(key, value)
     
     def colnames(self):
         return self.data.getDataTable().getColumnNames()
@@ -80,6 +86,9 @@ class PyTableData():
         tdata.setTimeColName(colname)
         self.data = tdata;
         self.timedata = True
+        
+    def join(self, other, colname):
+        self.data.join(other.data, colname)
         
     def savefile(self, filename):
         self.data.saveAsCSVFile(filename)
