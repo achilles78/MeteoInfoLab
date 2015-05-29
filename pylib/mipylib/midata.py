@@ -54,6 +54,12 @@ class PyTableData():
             else:
                 return coldata.getData()
         return None
+        
+    def __setitem__(self, key, value):
+        if isinstance(value, MIArray):
+            self.data.setColumnData(key, value.aslist())
+        else:
+            self.data.setColumnData(key, value)
     
     def colnames(self):
         return self.data.getDataTable().getColumnNames()
@@ -81,6 +87,12 @@ class PyTableData():
         self.data = tdata;
         self.timedata = True
         
+    def join(self, other, colname, colname1=None):
+        if colname1 == None:
+            self.data.join(other.data, colname)
+        else:
+            self.data.join(other.data, colname, colname1)
+        
     def savefile(self, filename):
         self.data.saveAsCSVFile(filename)
         
@@ -91,6 +103,15 @@ class PyTableData():
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_Year(cols)
+            return PyTableData(TableData(dtable))
+            
+    def ave_yearmonth(self, colnames, month):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_YearMonth(cols, month)
             return PyTableData(TableData(dtable))
 
 #################################################################  

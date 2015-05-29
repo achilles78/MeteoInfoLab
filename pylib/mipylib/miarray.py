@@ -62,7 +62,11 @@ class MIArray():
         return MIArray(r)
         
     def __setitem__(self, indices, value):
-        #print type(indices)            
+        #print type(indices) 
+        if isinstance(indices, MIArray):
+            ArrayMath.setValue(self.array, indices.array, value)
+            return None
+        
         if not isinstance(indices, tuple):
             inds = []
             inds.append(indices)
@@ -155,6 +159,48 @@ class MIArray():
     # other must be a numeric data
     def __pow__(self, other):
         r = MIArray(ArrayMath.pow(self.array, other))
+        return r
+        
+    def __lt__(self, other):
+        if isinstance(other, MIArray):
+            r = MIArray(ArrayMath.lessThan(self.array, other.array))
+        else:
+            r = MIArray(ArrayMath.lessThan(self.array, other))
+        return r
+        
+    def __le__(self, other):
+        if isinstance(other, MIArray):
+            r = MIArray(ArrayMath.lessThanOrEqual(self.array, other.array))
+        else:
+            r = MIArray(ArrayMath.lessThanOrEqual(self.array, other))
+        return r
+        
+    def __eq__(self, other):
+        if isinstance(other, MIArray):
+            r = MIArray(ArrayMath.equal(self.array, other.array))
+        else:
+            r = MIArray(ArrayMath.equal(self.array, other))
+        return r
+        
+    def __ne__(self, other):
+        if isinstance(other, MIArray):
+            r = MIArray(ArrayMath.notEqual(self.array, other.array))
+        else:
+            r = MIArray(ArrayMath.notEqual(self.array, other))
+        return r
+        
+    def __gt__(self, other):
+        if isinstance(other, MIArray):
+            r = MIArray(ArrayMath.greaterThan(self.array, other.array))
+        else:
+            r = MIArray(ArrayMath.greaterThan(self.array, other))
+        return r
+        
+    def __ge__(self, other):
+        if isinstance(other, MIArray):
+            r = MIArray(ArrayMath.greaterThanOrEqual(self.array, other.array))
+        else:
+            r = MIArray(ArrayMath.greaterThanOrEqual(self.array, other))
         return r
         
     def getminvalue(self, missingv=None):

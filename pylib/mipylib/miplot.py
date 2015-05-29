@@ -108,10 +108,12 @@ def plot(*args, **kwargs):
         c = 'x'
         for arg in args: 
             if c == 'x':
-                xdatalist.append(__getplotdata(arg))                
+                #xdatalist.append(__getplotdata(arg))    
+                xdatalist.append(arg)
                 c = 'y'
             elif c == 'y':
-                ydatalist.append(__getplotdata(arg))
+                #ydatalist.append(__getplotdata(arg))
+                ydatalist.append(arg)
                 c = 's'
             elif c == 's':
                 if isinstance(arg, basestring):
@@ -119,7 +121,8 @@ def plot(*args, **kwargs):
                     c = 'x'
                 else:
                     styles.append('-')
-                    xdatalist.append(__getplotdata(arg))
+                    #xdatalist.append(__getplotdata(arg))
+                    xdatalist.append(arg)
                     c = 'y'
     if len(styles) == 0:
         styles = None
@@ -130,12 +133,8 @@ def plot(*args, **kwargs):
     #Add data series
     for i in range(0, len(xdatalist)):
         label = kwargs.pop('label', 'S_' + str(i + 1))
-        xdata = xdatalist[i]
-        if isinstance(xdata, MIArray):
-            xdata = xdata.array
-        ydata = ydatalist[i]
-        if isinstance(ydata, MIArray):
-            ydata = ydata.array
+        xdata = __getplotdata(xdatalist[i])
+        ydata = __getplotdata(ydatalist[i])
         dataset.addSeries(label, xdata, ydata)
     
     #Create XY1DPlot
