@@ -165,6 +165,18 @@ class DimArray():
         r = DimArray(self.array.cos(), self.dims, self.missingvalue, self.proj)
         return r
         
+    def exp(self):
+        r = DimArray(self.array.exp(), self.dims, self.missingvalue, self.proj)
+        return r
+        
+    def log(self):
+        r = DimArray(self.array.log(), self.dims, self.missingvalue, self.proj)
+        return r
+        
+    def log10(self):
+        r = DimArray(self.array.log10(), self.dims, self.missingvalue, self.proj)
+        return r
+        
     def getminvalue(self):
         #return self.array.getminvalue(self.missingvalue)
         return self.array.getminvalue()

@@ -238,6 +238,15 @@ class MIArray():
         
     def cos(self):
         return MIArray(ArrayMath.cos(self.array))
+        
+    def exp(self):
+        return MIArray(ArrayMath.exp(self.array))
+        
+    def log(self):
+        return MIArray(ArrayMath.log(self.array))
+        
+    def log10(self):
+        return MIArray(ArrayMath.log10(self.array))
             
     def aslist(self):
         return ArrayMath.asList(self.array)

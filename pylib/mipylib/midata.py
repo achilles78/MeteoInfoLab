@@ -312,6 +312,24 @@ def cos(a):
         return a.cos()
     else:
         return math.cos(a)
+        
+def exp(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.exp()
+    else:
+        return math.exp(a)
+        
+def log(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.log()
+    else:
+        return math.log(a)
+        
+def log10(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.log10()
+    else:
+        return math.log10(a)
     
 def asgriddata(data, x=None, y=None, missingv=-9999.0):
     if x == None:    

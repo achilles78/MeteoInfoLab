@@ -79,7 +79,11 @@ def __getplotdata(data):
         return data
     else:
         return data
- 
+
+def draw_if_interactive():
+    if isinteractive:
+		chartpanel.paintGraphics()
+        
 def plot(*args, **kwargs):
     if ismap:
         map(False)
@@ -161,8 +165,7 @@ def plot(*args, **kwargs):
         chart.setPlot(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    if isinteractive:
-		chartpanel.paintGraphics()
+    draw_if_interactive()
     return plot    
  
 def hist(x, bins=10, range=None, normed=False, cumulative=False,
@@ -183,7 +186,9 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     
     #Add data series
     label = kwargs.pop('label', 'S_0')
-    dataset.addSeries(label, x, y)
+    xdata = __getplotdata(x)
+    ydata = __getplotdata(y)
+    dataset.addSeries(label, xdata, ydata)
     
     #Create XY1DPlot
     if c_plot is None:
@@ -197,6 +202,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     c = kwargs.pop('color', c)
     color = __getcolor(c)
     pb = PointBreak()
+    pb.setCaption(label)
     pb.setSize(s)
     pb.setStyle(pointStyle)
     pb.setColor(color)
@@ -209,8 +215,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
         chart.setPlot(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    if isinteractive:
-		chartpanel.paintGraphics()
+    draw_if_interactive()
     return plot 
  
 def figure():
@@ -406,8 +411,7 @@ def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     ctitile = ChartText(title, font)
     ctitile.setColor(c)
     chartpanel.getChart().getPlot().setTitle(ctitile)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
 
 def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     if bold:
@@ -421,8 +425,7 @@ def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     axis.setDrawLabel(True)
     axis.setLabelFont(font)
     axis.setLabelColor(c)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
     
 def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     if bold:
@@ -436,8 +439,24 @@ def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     axis.setDrawLabel(True)
     axis.setLabelFont(font)
     axis.setLabelColor(c)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
+    
+def text(x, y, s, **kwargs):
+    fontname = kwargs.pop('fontname', 'Arial')
+    fontsize = kwargs.pop('fontsize', '14')
+    bold = kwargs.pop('bold', False)
+    color = kwargs.pop('color', 'black')
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    c = __getcolor(color)
+    text = ChartText(s, font)
+    text.setColor(c)
+    text.setX(x)
+    text.setY(y)
+    chartpanel.getChart().getPlot().addText(text)
+    draw_if_interactive()
     
 def axis(limits):
     if len(limits) == 4:
@@ -447,8 +466,23 @@ def axis(limits):
         ymax = limits[3]
         plot = chartpanel.getChart().getPlot()
         plot.setDrawExtent(Extent(xmin, xmax, ymin, ymax))
-        if isinteractive:
-            chartpanel.paintGraphics()
+        draw_if_interactive()
+            
+def xlim(xmin, xmax):
+    plot = chartpanel.getChart().getPlot()
+    extent = plot.getDrawExtent()
+    extent.minX = xmin
+    extent.maxX = xmax
+    plot.setDrawExtent(extent)
+    draw_if_interactive()
+            
+def ylim(ymin, ymax):
+    plot = chartpanel.getChart().getPlot()
+    extent = plot.getDrawExtent()
+    extent.minY = ymin
+    extent.maxY = ymax
+    plot.setDrawExtent(extent)
+    draw_if_interactive()        
             
 def legend(*args, **kwargs):
     plot = chartpanel.getChart().getPlot()
@@ -463,8 +497,7 @@ def legend(*args, **kwargs):
         legend.setX(x)
         legend.setY(y)
     plot.setDrawLegend(True)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
         
 def colorbar(layer, **kwargs):
     cmap = kwargs.pop('cmap', None)
@@ -481,8 +514,7 @@ def colorbar(layer, **kwargs):
     legend.setPosition(LegendPosition.RIGHT_OUTSIDE)
     legend.setDrawNeatLine(False)
     plot.setDrawLegend(True)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
 
 def __getcolormap(**kwargs):
     colors = kwargs.pop('colors', None)
@@ -618,8 +650,7 @@ def __plot_griddata(gdata, ls, type):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
     return layer
     
 def scatterm(*args, **kwargs):
@@ -824,8 +855,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
     return layer
     
 def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
@@ -844,8 +874,7 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
     return layer
     
 def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv):
@@ -861,8 +890,7 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
     return layer
 
 
@@ -875,8 +903,7 @@ def clabel(layer, **kwargs):
     labelset.setLabelFont(font)
     labelset.setLabelColor(color)
     layer.addLabelsContourDynamic(layer.getExtent())
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
         
 def worldmap():
     mapview = MapView()
@@ -965,16 +992,14 @@ def geoshow(plot, layer, **kwargs):
         lb.setOutlineColor(linecolor)
         lb.setOutlineSize(size)
     plot.addLayer(layer)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
     
 def figmask(plot, dlayer, mlayer):
     mapview = plot.getMapView()
     mapview.getMaskOut().setMask(True)
     mapview.getMaskOut().setMaskLayer(mlayer.getLayerName())
     dlayer.setMaskout(True)
-    if isinteractive:
-        chartpanel.paintGraphics()
+    draw_if_interactive()
     
 def display(data):
     if not ismap:
