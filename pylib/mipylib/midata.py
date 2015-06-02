@@ -92,6 +92,8 @@ class PyTableData():
             self.data.join(other.data, colname)
         else:
             self.data.join(other.data, colname, colname1)
+    def join(self, other, colname):
+        self.data.join(other.data, colname)
         
     def savefile(self, filename):
         self.data.saveAsCSVFile(filename)
