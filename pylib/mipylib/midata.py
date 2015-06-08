@@ -288,8 +288,8 @@ def arange(*args):
 def arange1(start, n, step):
     return MIArray(ArrayUtil.arrayRange1(start, n, step))
     
-def linspace(start=0, stop=1, n=100, dtype=None):
-    return MIArray(ArrayUtil.lineSpace(start, stop, n))
+def linspace(start=0, stop=1, n=100, endpoint=True, retstep=False, dtype=None):
+    return MIArray(ArrayUtil.lineSpace(start, stop, n, endpoint))
     
 def zeros(n):
     return MIArray(ArrayUtil.zeros(n))
@@ -334,7 +334,7 @@ def log10(a):
         return math.log10(a)
     
 def asgriddata(data, x=None, y=None, missingv=-9999.0):
-    if x == None:    
+    if x is None:    
         if isinstance(data, PyGridData):
             return data
         elif isinstance(data, DimArray):

@@ -161,6 +161,10 @@ class MIArray():
         r = MIArray(ArrayMath.pow(self.array, other))
         return r
         
+    def __neg__(self):
+        r = MIArray(ArrayMath.sub(0, self.array))
+        return r
+        
     def __lt__(self, other):
         if isinstance(other, MIArray):
             r = MIArray(ArrayMath.lessThan(self.array, other.array))

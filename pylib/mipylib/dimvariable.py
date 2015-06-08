@@ -52,8 +52,7 @@ class DimVariable():
                 sidx = 0 if k.start is None else k.start
                 eidx = k.stop is None and self.dimlen(i)-1 or k.stop
                 step = k.step is None and 1 or k.step
-            elif isinstance(k, tuple):
-                #k = k[0]
+            elif isinstance(k, tuple) or isinstance(k, list):
                 dim = self.variable.getDimension(i)
                 sidx = dim.getValueIndex(k[0])
                 if len(k) == 1:
@@ -66,11 +65,12 @@ class DimVariable():
                     else:
                         step = int(k[2] / dim.getDeltaValue)
             else:
+                print k
                 return None
             origin.append(sidx)
             n = eidx - sidx + 1
             size.append(n)
-            stride.append(step)
+            stride.append(step)            
             if n > 1:
                 dim = self.variable.getDimension(i)
                 dims.append(dim.extract(sidx, eidx, step))

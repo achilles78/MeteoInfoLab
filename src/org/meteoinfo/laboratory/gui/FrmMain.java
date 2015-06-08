@@ -22,6 +22,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.xml.parsers.ParserConfigurationException;
+import org.meteoinfo.chart.ChartPanel;
 import org.meteoinfo.laboratory.Options;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.event.ConsoleExecEvent;
@@ -462,6 +463,7 @@ public class FrmMain extends javax.swing.JFrame {
         if (!te.getFileName().isEmpty()) {
             te.saveFile(te.getFile());
         }
+        
         String code = te.getTextArea().getText();
         //this.consoleDock.runfile(te.getTextArea().getText());
         //this.consoleDock.exec(te.getTextArea().getText());

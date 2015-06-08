@@ -262,7 +262,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 JTextPane jTextPane_Output = interp.console.getTextPane();
                 JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
                 JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
-
+                
                 interp.console.println("run script...");
                 interp.setOut(writer);
                 interp.setErr(writer);
@@ -271,12 +271,16 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
                 String encoding = "utf-8";
                 try {
+                    interp.exec("mipylib.miplot.isinteractive = True");
+                    interp.exec("clf()");
                     interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
+                    interp.exec("mipylib.miplot.isinteractive = True");
                 } catch (Exception e) {
                     e.printStackTrace();
                     interp.console.print(">>> ", Color.red);
                     interp.console.setStyle(Color.black);
                     //interp.console.setForeground(Color.black);
+                    interp.exec("mipylib.miplot.isinteractive = True");
                 }
 
                 //String encoding = EncodingUtil.findEncoding(code);                

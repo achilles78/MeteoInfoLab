@@ -51,5 +51,29 @@ public class FigureDockable extends DefaultSingleCDockable{
 
         return cp;
     }
+    
+    /**
+     * Get current figure
+     * @return Figure
+     */
+    public ChartPanel getCurrentFigure(){        
+        if (this.tabbedPanel.getTabCount() == 0)
+            return null;
+        
+        return (ChartPanel)this.tabbedPanel.getSelectedComponent();
+    }
 
+    /**
+     * Get figure
+     * @param idx Figure index
+     * @return Figure
+     */
+    public ChartPanel getFigure(int idx){
+        if (this.tabbedPanel.getTabCount() > idx){
+            return (ChartPanel)this.tabbedPanel.getTabComponentAt(idx);
+        } else {
+            return null;
+        }
+    }
+    
 }

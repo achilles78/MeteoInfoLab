@@ -7,7 +7,7 @@
 import os
 import inspect
 
-from org.meteoinfo.chart import ChartPanel
+from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, GridData
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
@@ -38,7 +38,7 @@ milapp = None
 isinteractive = False
 maplayout = MapLayout()
 chartpanel = ChartPanel(Chart())
-isholdon = False
+isholdon = True
 c_plot = None
 ismap = False
 maplayer = None
@@ -64,11 +64,8 @@ def map(map=True):
         print 'Switch to figure mode'
 
 def hold(ishold):
-    global c_plot
-    if ishold:
-        c_plot = chartpanel.getChart().getPlot()
-    else:
-        c_plot = None
+    global isholdon
+    isholdon = ishold
  
 def __getplotdata(data):
     if isinstance(data, MIArray):
@@ -89,15 +86,20 @@ def plot(*args, **kwargs):
         map(False)
 
     #Parse args
-    if c_plot is None:
-        dataset = XYListDataset()
-    else:
-        if not isinstance(c_plot, XY1DPlot):
+    global c_plot
+    if isholdon:
+        if c_plot == None:
             dataset = XYListDataset()
         else:
-            dataset = c_plot.getDataset()
-            if dataset is None:
+            if not isinstance(c_plot, XY1DPlot):
                 dataset = XYListDataset()
+            else:
+                dataset = c_plot.getDataset()
+                if dataset is None:
+                    dataset = XYListDataset()
+    else:
+        dataset = XYListDataset()
+    
     xdatalist = []
     ydatalist = []    
     styles = []
@@ -106,6 +108,18 @@ def plot(*args, **kwargs):
         xdata = []
         for i in range(0, len(args[0])):
             xdata.append(i)
+        xdatalist.append(xdata)
+        ydatalist.append(ydata)
+    elif len(args) == 2:
+        if isinstance(args[1], basestring):
+            ydata = __getplotdata(args[0])
+            xdata = []
+            for i in range(0, len(args[0])):
+                xdata.append(i)
+            styles.append(args[1])
+        else:
+            xdata = __getplotdata(args[0])
+            ydata = __getplotdata(args[1])
         xdatalist.append(xdata)
         ydatalist.append(ydata)
     else:
@@ -135,7 +149,8 @@ def plot(*args, **kwargs):
             styles.append('-')
     
     #Add data series
-    for i in range(0, len(xdatalist)):
+    snum = len(xdatalist)
+    for i in range(0, snum):
         label = kwargs.pop('label', 'S_' + str(i + 1))
         xdata = __getplotdata(xdatalist[i])
         ydata = __getplotdata(ydatalist[i])
@@ -152,21 +167,32 @@ def plot(*args, **kwargs):
             plot = XY1DPlot(dataset)
     
     #Set plot data styles
+    lines = []
     if styles != None:
         for i in range(0, len(styles)):
             idx = dataset.getSeriesCount() - len(styles) + i
             print 'Series index: ' + str(idx)
-            __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
+            line = __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
+            lines.append(line)
+    else:
+        for i in range(0, snum):
+            idx = dataset.getSeriesCount() - snum + i
+            line = __setplotstyle(plot, idx, None, 1, **kwargs)
+            lines.append(line)
     
     #Paint dataset
     chart = chartpanel.getChart()
     if c_plot is None or (not isinstance(c_plot, XY1DPlot)):
         chart.clearPlots()
         chart.setPlot(plot)
+    c_plot = plot
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
     draw_if_interactive()
-    return plot    
+    if len(lines) > 1:
+        return lines
+    else:
+        return lines[0]
  
 def hist(x, bins=10, range=None, normed=False, cumulative=False,
     bottom=None, histtype='bar', align='mid',
@@ -215,32 +241,26 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
         chart.setPlot(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
+    global c_plot
+    c_plot = plot
     draw_if_interactive()
-    return plot 
+    return pb 
  
 def figure():
     show()
     
 def show():
-    #print ismap
-    if ismap:
-        frame = MapForm(maplayout)
-        frame.setSize(750, 540)
-        frame.setLocationRelativeTo(None)
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-        frame.setVisible(True)
-        maplayout.paintGraphics()
+    if milapp == None:
+        form = ChartForm(chartpanel)
+        chartpanel.paintGraphics()
+        form.setSize(600, 500)
+        form.setLocationRelativeTo(None)
+        form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
+        form.setVisible(True)     
     else:
-        if milapp == None:
-            form = ChartForm(chartpanel)
-            chartpanel.paintGraphics()
-            form.setSize(600, 500)
-            form.setLocationRelativeTo(None)
-            form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-            form.setVisible(True)     
-        else:
-            figureDock = milapp.getFigureDock()
-            figureDock.addNewFigure('Figure 1', chartpanel)
+        figureDock = milapp.getFigureDock()
+        figureDock.addNewFigure('Figure 1', chartpanel)
+        
     
 def subplot(nrows, ncols, plot_number):
     global c_plot
@@ -250,6 +270,7 @@ def subplot(nrows, ncols, plot_number):
     plot = chart.getPlot(plot_number)
     if plot is None:
         plot = XY1DPlot()
+        plot.isSubPlot = True
         plot_number -= 1
         rowidx = plot_number / ncols
         colidx = plot_number % ncols
@@ -259,17 +280,131 @@ def subplot(nrows, ncols, plot_number):
     c_plot = plot
     return plot
     
-def savefig(fname, width=None, height=None):
+def axes(**kwargs):
+    position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
+    bottomaxis = kwargs.pop('bottomaxis', True)
+    leftaxis = kwargs.pop('leftaxis', True)
+    topaxis = kwargs.pop('topaxis', True)
+    rightaxis = kwargs.pop('rightaxis', True)
+    xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
+    yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
+    xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
+    ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
+    xscale = kwargs.pop('xscale', 'linear')    #or 'log'
+    yscale = kwargs.pop('yscale', 'linear')    #or 'log'
+    xtick = kwargs.pop('xtick', [])
+    ytick = kwargs.pop('ytick', [])
+    xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
+    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'
+    plot = XY1DPlot()
+    plot.setPosition(position[0], position[1], position[2], position[3])
+    if bottomaxis == False:
+        plot.getAxis(Location.BOTTOM).setVisible(False)
+    if leftaxis == False:
+        plot.getAxis(Location.LEFT).setVisible(False)
+    if topaxis == False:
+        plot.getAxis(Location.TOP).setVisible(False)
+    if rightaxis == False:
+        plot.getAxis(Location.RIGHT).setVisible(False)
+    chartpanel.getChart().addPlot(plot)
+    global c_plot
+    c_plot = plot
+    return plot
+    
+def twinx(ax):
+    ax.getAxis(Location.RIGHT).setVisible(False)
+    plot = XY1DPlot()
+    plot.setPosition(ax.getPosition())
+    plot.getAxis(Location.BOTTOM).setVisible(False)
+    plot.getAxis(Location.LEFT).setVisible(False)
+    plot.getAxis(Location.TOP).setVisible(False)
+    axis = plot.getAxis(Location.RIGHT)
+    axis.setDrawTickLabel(True)
+    axis.setDrawLabel(True)
+    chartpanel.getChart().addPlot(plot)
+    global c_plot
+    c_plot = plot
+    return plot
+    
+def yaxis(ax, **kwargs):
+    shift = kwargs.pop('shift', 0)
+    color = kwargs.pop('color', 'black')
+    c = __getcolor(color)
+    axis_l = ax.getAxis(Location.LEFT)
+    axis_l.setShift(shift)
+    axis_l.setColor_All(c)   
+    axis_r = ax.getAxis(Location.RIGHT)
+    axis_r.setShift(shift)
+    axis_r.setColor_All(c)    
+    draw_if_interactive
+    
+def antialias(b):
+    chartpanel.getChart().setAntiAlias(b)
+    draw_if_interactive()
+    
+def savefig(fname, width=None, height=None, dpi=None):
     if (not width is None) and (not height is None):
         chartpanel.setSize(width, height)
     chartpanel.paintGraphics()
-    chartpanel.exportToPicture(fname)    
+    if dpi != None:
+        chartpanel.saveImage(fname, dpi)
+    else:
+        chartpanel.saveImage(fname)   
+        
+def savefig_jpeg(fname, width=None, height=None, dpi=None):
+    if (not width is None) and (not height is None):
+        chartpanel.setSize(width, height)
+    chartpanel.paintGraphics()
+    if not dpi is None:
+        chartpanel.saveImage_Jpeg(fname, dpi)
+    else:
+        chartpanel.saveImage(fname)  
+
+# Clear current axes
+def cla():
+    if not c_plot is None:
+        chartpanel.getChart().removePlot(c_plot)
+        draw_if_interactive()
+
+# Clear current figure    
+def clf():
+    if chartpanel is None:
+        return
+    
+    if chartpanel.getChart() is None:
+        return
+        
+    chartpanel.getChart().clearPlots()
+    global c_plot
+    c_plot = None
+    draw_if_interactive()
+
+# Clear last layer    
+def cll():
+    if not c_plot is None:
+        if isinstance(c_plot, XY1DPlot):
+            c_plot.removeLastSeries()
+        elif isinstance(c_plot, XY2DPlot):
+            c_plot.removeLastLayer()
+        draw_if_interactive()
  	
-def __setplotstyle(plot, idx, style, n, **kwargs):
-    c = __getcolor(style)
+def __setplotstyle(plot, idx, style, n, **kwargs):    
     linewidth = kwargs.pop('linewidth', 1.0)
+    color = kwargs.pop('color', 'red')
+    c = __getcolor(color)
     #print 'Line width: ' + str(linewidth)
     caption = plot.getLegendBreak(idx).getCaption()
+    if style is None:
+        plot.setChartPlotMethod(ChartPlotMethod.LINE)
+        plb = PolylineBreak()
+        plb.setCaption(caption)
+        plb.setSize(linewidth)
+        if not c is None:
+            plb.setColor(c)
+        plot.setLegendBreak(idx, plb)
+        return
+        
+    c = __getcolor(style)
     pointStyle = __getpointstyle(style)
     lineStyle = __getlinestyle(style)
     if not pointStyle is None:
@@ -277,11 +412,16 @@ def __setplotstyle(plot, idx, style, n, **kwargs):
             #plot.setChartPlotMethod(ChartPlotMethod.POINT)            
             pb = PointBreak()
             pb.setCaption(caption)
-            pb.setSize(8)
+            if '.' in style:
+                pb.setSize(4)
+                pb.setDrawOutline(False)
+            else:
+                pb.setSize(8)
             pb.setStyle(pointStyle)
             if not c is None:
                 pb.setColor(c)
             plot.setLegendBreak(idx, pb)
+            return pb
         else:
             plot.setChartPlotMethod(ChartPlotMethod.LINE_POINT)
             plb = PolylineBreak()
@@ -295,6 +435,7 @@ def __setplotstyle(plot, idx, style, n, **kwargs):
                 plb.setColor(c)
                 plb.setSymbolColor(c)
             plot.setLegendBreak(idx, plb)
+            return plb
     else:
         plot.setChartPlotMethod(ChartPlotMethod.LINE)
         plb = PolylineBreak()
@@ -305,6 +446,7 @@ def __setplotstyle(plot, idx, style, n, **kwargs):
         if not lineStyle is None:
             plb.setStyle(lineStyle)
         plot.setLegendBreak(idx, plb)
+        return plb
     
 def __getlinestyle(style):
     lineStyle = None
@@ -322,6 +464,8 @@ def __getlinestyle(style):
 def __getpointstyle(style):
     pointStyle = None
     if 'o' in style:
+        pointStyle = PointStyle.Circle
+    elif '.' in style:
         pointStyle = PointStyle.Circle
     elif 'D' in style:
         pointStyle = PointStyle.Diamond
@@ -419,7 +563,7 @@ def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
-    plot = chartpanel.getChart().getPlot()
+    plot = c_plot
     axis = plot.getXAxis()
     axis.setLabel(label)
     axis.setDrawLabel(True)
@@ -433,12 +577,16 @@ def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
-    plot = chartpanel.getChart().getPlot()
+    plot = c_plot
     axis = plot.getYAxis()
     axis.setLabel(label)
     axis.setDrawLabel(True)
     axis.setLabelFont(font)
     axis.setLabelColor(c)
+    axis_r = plot.getAxis(Location.RIGHT)
+    axis_r.setLabel(label)
+    axis_r.setLabelFont(font)
+    axis_r.setLabelColor(c)
     draw_if_interactive()
     
 def text(x, y, s, **kwargs):
@@ -455,7 +603,7 @@ def text(x, y, s, **kwargs):
     text.setColor(c)
     text.setX(x)
     text.setY(y)
-    chartpanel.getChart().getPlot().addText(text)
+    c_plot.addText(text)
     draw_if_interactive()
     
 def axis(limits):
@@ -464,12 +612,34 @@ def axis(limits):
         xmax = limits[1]
         ymin = limits[2]
         ymax = limits[3]
-        plot = chartpanel.getChart().getPlot()
-        plot.setDrawExtent(Extent(xmin, xmax, ymin, ymax))
+        c_plot.setDrawExtent(Extent(xmin, xmax, ymin, ymax))
         draw_if_interactive()
-            
+
+def grid(b=None, which='major', axis='both', **kwargs):
+    plot = c_plot
+    gridline = plot.getGridLine()
+    isDraw = gridline.isDrawXLine()
+    if b is None:
+        isDraw = not gridline.isDrawXLine()
+    elif b == True or b == 'on':
+        isDraw = True
+    elif b == False or b == 'on':
+        isDraw = False
+    gridline.setDrawXLine(isDraw)
+    gridline.setDrawYLine(isDraw)
+    color = kwargs.pop('color', None)
+    if not color is None:
+        c = __getcolor(color)
+        gridline.setColor(c)
+    linewidth = kwargs.pop('linewidth', 1)
+    gridline.setSize(linewidth)
+    linestyle = kwargs.pop('linestyle', '--')
+    linestyle = __getlinestyle(linestyle)
+    gridline.setStyle(linestyle)
+    draw_if_interactive()
+    
 def xlim(xmin, xmax):
-    plot = chartpanel.getChart().getPlot()
+    plot = c_plot
     extent = plot.getDrawExtent()
     extent.minX = xmin
     extent.maxX = xmax
@@ -477,7 +647,7 @@ def xlim(xmin, xmax):
     draw_if_interactive()
             
 def ylim(ymin, ymax):
-    plot = chartpanel.getChart().getPlot()
+    plot = c_plot
     extent = plot.getDrawExtent()
     extent.minY = ymin
     extent.maxY = ymax
@@ -485,9 +655,19 @@ def ylim(ymin, ymax):
     draw_if_interactive()        
             
 def legend(*args, **kwargs):
-    plot = chartpanel.getChart().getPlot()
-    plot.updateLegendScheme()
-    legend = plot.getLegend()
+    plot = c_plot
+    plot.setDrawLegend(True)
+    legend = plot.getLegend()   
+    if len(args) > 0:
+        lbs = args[0]
+        if len(args) == 2:
+            for i in range(0, len(lbs)):
+                labels = args[1]
+                lbs[i].setCaption(labels[i])
+        ls = LegendScheme()
+        ls.setLegendBreaks(lbs)
+        legend.setLegendScheme(ls)
+            
     loc = kwargs.pop('loc', 'upper right')    
     lp = LegendPosition.fromString(loc)
     legend.setPosition(lp)
@@ -495,14 +675,13 @@ def legend(*args, **kwargs):
         x = kwargs.pop('x', 0)
         y = kwargs.pop('y', 0)
         legend.setX(x)
-        legend.setY(y)
-    plot.setDrawLegend(True)
+        legend.setY(y)    
     draw_if_interactive()
         
 def colorbar(layer, **kwargs):
     cmap = kwargs.pop('cmap', None)
     shrink = kwargs.pop('shrink', 1)
-    plot = chartpanel.getChart().getPlot()
+    plot = c_plot
     ls = layer.getLegendScheme()
     legend = plot.getLegend()
     if legend == None:
@@ -650,15 +829,16 @@ def __plot_griddata(gdata, ls, type):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
+    global c_plot
+    c_plot = plot
     draw_if_interactive()
     return layer
     
 def scatterm(*args, **kwargs):
+    plot = c_plot
     cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
     proj = kwargs.pop('proj', None)
-    plot = args[0]
-    args = args[1:]
     n = len(args) 
     if n <= 2:
         if isinstance(args[0], PyStationData):
@@ -692,11 +872,10 @@ def scatterm(*args, **kwargs):
     return layer
         
 def imshowm(*args, **kwargs):
+    plot = c_plot
     cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
     proj = kwargs.pop('proj', None)
-    plot = args[0]
-    args = args[1:]
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -721,11 +900,10 @@ def imshowm(*args, **kwargs):
     gdata = None
     return layer
     
-def contourm(*args, **kwargs):      
+def contourm(*args, **kwargs):  
+    plot = c_plot
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)    
-    plot = args[0]
-    args = args[1:]
+    missingv = kwargs.pop('missingv', -9999.0)        
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -745,15 +923,14 @@ def contourm(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-    layer = __contour_griddata_m(plot, gdata, ls, 'contour')
+    layer = __plot_griddata_m(plot, gdata, ls, 'contour')
     gdata = None
     return layer
         
 def contourfm(*args, **kwargs):
+    plot = c_plot
     cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
-    plot = args[0]
-    args = args[1:]
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -778,12 +955,11 @@ def contourfm(*args, **kwargs):
     return layer
     
 def quiverm(*args, **kwargs):
+    plot = c_plot
     cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
     isuv = kwargs.pop('isuv', True)
     size = kwargs.pop('size', 10)
-    plot = args[0]
-    args = args[1:]
     n = len(args) 
     iscolor = False
     cdata = None
@@ -855,6 +1031,8 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
+    global c_plot
+    c_plot = plot
     draw_if_interactive()
     return layer
     
@@ -874,6 +1052,8 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
+    global c_plot
+    c_plot = plot
     draw_if_interactive()
     return layer
     
@@ -890,6 +1070,8 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv):
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
+    global c_plot
+    c_plot = plot
     draw_if_interactive()
     return layer
 
@@ -954,12 +1136,14 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
         projinfo = ProjectionInfo(projstr)   
         
     gridlabel = kwargs.pop('gridlabel', True)
+    global c_plot
     c_plot.getMapFrame().setDrawGridLabel(gridlabel)
     c_plot.getMapFrame().setDrawGridTickLine(gridlabel)
     c_plot.getMapView().projectLayers(projinfo)
     return projinfo
         
-def geoshow(plot, layer, **kwargs):
+def geoshow(layer, **kwargs):
+    plot = c_plot
     visible = kwargs.pop('visible', True)
     layer.setVisible(visible)
     drawfill = kwargs.pop('drawfill', False)
@@ -994,7 +1178,8 @@ def geoshow(plot, layer, **kwargs):
     plot.addLayer(layer)
     draw_if_interactive()
     
-def figmask(plot, dlayer, mlayer):
+def figmask(dlayer, mlayer):
+    plot = c_plot
     mapview = plot.getMapView()
     mapview.getMaskOut().setMask(True)
     mapview.getMaskOut().setMaskLayer(mlayer.getLayerName())

@@ -34,8 +34,8 @@ class DimDataFile():
     def __repr__(self):
         return self.dataset.getInfoText()
         
-    def read(self, varname, origin, size, stride=None):
-        return self.dataset.read(varname, origin, size)
+    def read(self, varname, origin, size, stride):
+        return self.dataset.read(varname, origin, size, stride)
         
     def dump(self):
         print self.dataset.getInfoText()
