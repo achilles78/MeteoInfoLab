@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\chart"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis"/>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="105,37" MainFormSize="1027,617"/>
+  <Startup MainFormLocation="102,24" MainFormSize="1081,681"/>
 </MeteoInfo>

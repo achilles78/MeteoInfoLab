@@ -11,7 +11,7 @@ from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, GridData
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import XY1DPlot, XY2DPlot, MapPlot, ChartPlotMethod
+from org.meteoinfo.chart.plot import XY1DPlot, XY2DPlot, MapPlot, ChartPlotMethod, PlotOrientation
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition
 from org.meteoinfo.script import ChartForm, MapForm
 from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, PointBreak, PolylineBreak, LegendManage, LegendScheme
@@ -591,7 +591,7 @@ def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     
 def text(x, y, s, **kwargs):
     fontname = kwargs.pop('fontname', 'Arial')
-    fontsize = kwargs.pop('fontsize', '14')
+    fontsize = kwargs.pop('fontsize', 14)
     bold = kwargs.pop('bold', False)
     color = kwargs.pop('color', 'black')
     if bold:
@@ -676,11 +676,15 @@ def legend(*args, **kwargs):
         y = kwargs.pop('y', 0)
         legend.setX(x)
         legend.setY(y)    
+    frameon = kwargs.pop('frameon', True)
+    legend.setDrawNeatLine(frameon)
     draw_if_interactive()
         
 def colorbar(layer, **kwargs):
     cmap = kwargs.pop('cmap', None)
     shrink = kwargs.pop('shrink', 1)
+    orientation = kwargs.pop('orientation', 'vertical')
+    aspect = kwargs.pop('aspect', 20)
     plot = c_plot
     ls = layer.getLegendScheme()
     legend = plot.getLegend()
@@ -689,8 +693,15 @@ def colorbar(layer, **kwargs):
         plot.setLegend(legend)
     else:
         legend.setLegendScheme(ls)
-    legend.setColorbar(True)    
-    legend.setPosition(LegendPosition.RIGHT_OUTSIDE)
+    legend.setColorbar(True)   
+    legend.setShrink(shrink)
+    legend.setAspect(aspect)
+    if orientation == 'horizontal':
+        legend.setPlotOrientation(PlotOrientation.HORIZONTAL)
+        legend.setPosition(LegendPosition.LOWER_CENTER_OUTSIDE)
+    else:
+        legend.setPlotOrientation(PlotOrientation.VERTICAL)
+        legend.setPosition(LegendPosition.RIGHT_OUTSIDE)
     legend.setDrawNeatLine(False)
     plot.setDrawLegend(True)
     draw_if_interactive()
@@ -1136,9 +1147,16 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
         projinfo = ProjectionInfo(projstr)   
         
     gridlabel = kwargs.pop('gridlabel', True)
+    gridline = kwargs.pop('gridline', False)
+    griddx = kwargs.pop('griddx', 10)
+    griddy = kwargs.pop('griddy', 10)
     global c_plot
-    c_plot.getMapFrame().setDrawGridLabel(gridlabel)
-    c_plot.getMapFrame().setDrawGridTickLine(gridlabel)
+    mapframe = c_plot.getMapFrame()
+    mapframe.setDrawGridLabel(gridlabel)
+    mapframe.setDrawGridTickLine(gridlabel)
+    mapframe.setDrawGridLine(gridline)
+    mapframe.setGridXDelt(griddx)
+    mapframe.setGridYDelt(griddy)
     c_plot.getMapView().projectLayers(projinfo)
     return projinfo
         

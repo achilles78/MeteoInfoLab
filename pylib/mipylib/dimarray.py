@@ -7,7 +7,7 @@
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, StationData, ArrayMath
 from org.meteoinfo.layer import VectorLayer
-from ucar.ma2 import Array, Range
+from ucar.ma2 import Array, Range, MAMath
 import miarray
 from miarray import MIArray
 
@@ -16,7 +16,7 @@ class DimArray():
     
     # array must be MIArray
     def __init__(self, array=None, dims=None, missingvalue=-9999.0, proj=None):
-        self.array = array
+        self.array = array        
         self.dims = dims
         self.ndim = len(dims)
         self.missingvalue = missingvalue
@@ -84,7 +84,9 @@ class DimArray():
         r = ArrayMath.section(self.array.array, ranges)
         for i in flips:
             r = r.flip(i)
-        array = MIArray(r)
+        rr = Array.factory(r.getDataType(), r.getShape());
+        MAMath.copy(rr, r);
+        array = MIArray(rr)
         data = DimArray(array, dims, self.missingvalue, self.proj)
         return data
         
@@ -202,7 +204,13 @@ class DimArray():
         y = self.dims[0].getDimValue()
         r = DimArray(self.array.maskout(x, y, polygon, self.missingvalue), self.dims, self.missingvalue, self.proj)
         return r
+     
+    def aslist(self):
+        return ArrayMath.asList(self.array.array)
         
+    def asarray(self):
+        return self.array.array
+     
     def tostation(self, x, y):
         gdata = self.asgriddata()
         r = gdata.data.toStation(x, y)

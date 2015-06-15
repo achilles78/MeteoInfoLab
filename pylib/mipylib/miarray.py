@@ -255,6 +255,9 @@ class MIArray():
     def aslist(self):
         return ArrayMath.asList(self.array)
         
+    def asarray(self):
+        return self.array
+        
     def inpolygon(self, x, y, polygon):
         return MIArray(ArrayMath.inPolygon(self.array, x, y, polygon))
         

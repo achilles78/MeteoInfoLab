@@ -10,6 +10,8 @@ from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeT
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.geoprocess import GeoComputation
+from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
+from org.meteoinfo.global import PointD
 
 import dimdatafile
 import dimvariable
@@ -332,6 +334,51 @@ def log10(a):
         return a.log10()
     else:
         return math.log10(a)
+        
+def linregress(x, y):
+    if isinstance(x, list):
+        xl = x
+    else:
+        xl = x.asarray()
+    if isinstance(y, list):
+        yl = y
+    else:
+        yl = y.asarray()
+    r = ArrayMath.lineRegress(xl, yl)
+    return r[0], r[1], r[2]
+    
+def polyval(p, x):
+    return ArrayMath.polyVal(p, x.asarray())
+
+# Performs a centered difference operation on a grid data in the x or y direction    
+def cdiff(a, isx):
+    if isinstance(a, DimArray):
+        r = ArrayMath.cdiff(a.asarray(), isx)
+        return DimArray(MIArray(r), a.dims, a.missingvalue, a.proj)
+    else:
+        return MIArray(ArrayMath.cdiff(a.asarray(), isx))
+
+# Calculates the vertical component of the curl (ie, vorticity)    
+def hcurl(u, v):
+    if isinstance(u, DimArray) and isinstance(v, DimArray):
+        ydim = u.dims[0]
+        xdim = u.dims[1]
+        r = ArrayMath.hcurl(u.asarray(), v.asarray(), xdim.getDimValue(), ydim.getDimValue())
+        return DimArray(MIArray(r), u.dims, u.missingvalue, u.proj)
+
+#  Calculates the horizontal divergence using finite differencing        
+def hdivg(u, v):
+    if isinstance(u, DimArray) and isinstance(v, DimArray):
+        ydim = u.dims[0]
+        xdim = u.dims[1]
+        r = ArrayMath.hdivg(u.asarray(), v.asarray(), xdim.getDimValue(), ydim.getDimValue())
+        return DimArray(MIArray(r), u.dims, u.missingvalue, u.proj)
+        
+#  Calculates the horizontal divergence using finite differencing        
+def magnitude(u, v):
+    if isinstance(u, DimArray) and isinstance(v, DimArray):
+        r = ArrayMath.magnitude(u.asarray(), v.asarray())
+        return DimArray(MIArray(r), u.dims, u.missingvalue, u.proj)
     
 def asgriddata(data, x=None, y=None, missingv=-9999.0):
     if x is None:    
@@ -342,7 +389,7 @@ def asgriddata(data, x=None, y=None, missingv=-9999.0):
         else:
             return None
     else:
-        gdata = GridData(data.array, x.array, y.array, missingv)
+        gdata = GridData(data.asarray(), x.array, y.array, missingv)
         return PyGridData(gdata)
         
 def asstationdata(data, x, y, missingv=-9999.0):
@@ -358,3 +405,60 @@ def shaperead(fn):
     
 def inpolygon(x, y, polygon):
     return GeoComputation.pointInPolygon(polygon, x, y)
+
+def projinfo(proj='longlat', **kwargs):
+    if proj == 'longlat' and len(kwargs) == 0:
+        return KnownCoordinateSystems.geographic.world.WGS1984
+        
+    origin = kwargs.pop('origin', (0, 0, 0))    
+    lat_0 = origin[0]
+    lon_0 = origin[1]
+    lat_0 = kwargs.pop('lat_0', lat_0)
+    lon_0 = kwargs.pop('lon_0', lon_0)
+    lat_ts = kwargs.pop('truescalelat', 0)
+    lat_ts = kwargs.pop('lat_ts', lat_ts)
+    k = kwargs.pop('scalefactor', 1)
+    k = kwargs.pop('k', k)
+    paralles = kwargs.pop('paralles', (30, 60))
+    lat_1 = paralles[0]
+    if len(paralles) == 2:
+        lat_2 = paralles[1]
+    else:
+        lat_2 = lat_1
+    lat_1 = kwargs.pop('lat_1', lat_1)
+    lat_2 = kwargs.pop('lat_2', lat_2)
+    x_0 = kwargs.pop('falseeasting', 0)
+    y_0 = kwargs.pop('falsenorthing', 0)
+    x_0 = kwargs.pop('x_0', x_0)
+    y_0 = kwargs.pop('y_0', y_0)
+    h = kwargs.pop('h', 0)
+    projstr = '+proj=' + proj \
+        + ' +lat_0=' + str(lat_0) \
+        + ' +lon_0=' + str(lon_0) \
+        + ' +lat_1=' + str(lat_1) \
+        + ' +lat_2=' + str(lat_2) \
+        + ' +lat_ts=' + str(lat_ts) \
+        + ' +k=' + str(k) \
+        + ' +x_0=' + str(x_0) \
+        + ' +y_0=' + str(y_0) \
+        + ' +h=' + str(h)
+        
+    return ProjectionInfo(projstr)     
+    
+def project(x, y, toproj, fromproj=None):
+    if isinstance(toproj, str):
+        toproj = ProjectionInfo(toproj)
+    if fromproj is None:
+        fromproj = KnownCoordinateSystems.geographic.world.WGS1984
+    else:        
+        if isinstance(fromproj, str):
+            fromproj = ProjectionInfo(fromproj)
+    inpt = PointD(x, y)
+    outpt = Reproject.reprojectPoint(inpt, fromproj, toproj)
+    return outpt.X, outpt.Y
+    
+def projectxy(lllon, lllat, xnum, ynum, dx, dy, toproj, fromproj=None):
+    x, y = project(lllon, lllat, toproj, fromproj)
+    xx = arange1(x, xnum, dx)
+    yy = arange1(y, ynum, dy)
+    return xx, yy

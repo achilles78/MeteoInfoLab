@@ -11,6 +11,10 @@ from dimvariable import DimVariable
 import dimarray
 from dimarray import PyGridData, PyStationData
 
+from datetime import datetime
+
+from java.util import Calendar
+
 # Dimension dataset
 class DimDataFile():
     
@@ -57,3 +61,16 @@ class DimDataFile():
             return sdata
         else:
             return None
+            
+    def gettime(self, idx):
+        date = self.dataset.getDataInfo().getTimes().get(idx)
+        cal = Calendar.getInstance()
+        cal.setTime(date)
+        year = cal.get(Calendar.YEAR)
+        month = cal.get(Calendar.MONTH) + 1
+        day = cal.get(Calendar.DAY_OF_MONTH)
+        hour = cal.get(Calendar.HOUR_OF_DAY)
+        minute = cal.get(Calendar.MINUTE)
+        second = cal.get(Calendar.SECOND)
+        dt = datetime(year, month, day, hour, minute, second)
+        return dt
