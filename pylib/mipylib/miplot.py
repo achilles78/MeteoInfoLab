@@ -1150,6 +1150,7 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     gridline = kwargs.pop('gridline', False)
     griddx = kwargs.pop('griddx', 10)
     griddy = kwargs.pop('griddy', 10)
+    frameon = kwargs.pop('frameon', True)
     global c_plot
     mapframe = c_plot.getMapFrame()
     mapframe.setDrawGridLabel(gridlabel)
@@ -1157,6 +1158,7 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     mapframe.setDrawGridLine(gridline)
     mapframe.setGridXDelt(griddx)
     mapframe.setGridYDelt(griddy)
+    c_plot.setDrawNeatLine(frameon)
     c_plot.getMapView().projectLayers(projinfo)
     return projinfo
         
