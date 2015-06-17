@@ -318,7 +318,10 @@ class PyGridData():
         return self.data.getMinValue()
         
     def getmaxvalue(self):
-        return self.data.getMaxValue()        
+        return self.data.getMaxValue()  
+
+    def interpolate(self):
+        return PyGridData(self.data.interpolate())
 
 ###############################################################         
 # The encapsulate class of StationData
@@ -415,7 +418,7 @@ class PyStationData():
         return PyStationData(self.data.filter(stations))
         
     def join(self, other):
-        return PyStationData(self.data.join(other.data))
+        return PyStationData(self.data.join(other.data))        
         
     def savedata(self, filename, fieldname='data', savemissingv=False):
         self.data.saveAsCSVFile(filename, fieldname, savemissingv)

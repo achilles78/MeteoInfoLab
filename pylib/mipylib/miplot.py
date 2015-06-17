@@ -942,6 +942,7 @@ def contourfm(*args, **kwargs):
     plot = c_plot
     cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
+    interpolate = kwargs.pop('interpolate', False)
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -958,9 +959,13 @@ def contourfm(*args, **kwargs):
             cn = level_arg
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
         else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    if interpolate:
+        gdata = gdata.interpolate()
     layer = __plot_griddata_m(plot, gdata, ls, 'contourf')
     gdata = None
     return layer
