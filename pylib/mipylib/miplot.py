@@ -13,6 +13,7 @@ from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import XY1DPlot, XY2DPlot, MapPlot, ChartPlotMethod, PlotOrientation
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition
+from org.meteoinfo.chart.axis import LonLatAxis
 from org.meteoinfo.script import ChartForm, MapForm
 from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, PointBreak, PolylineBreak, LegendManage, LegendScheme
 from org.meteoinfo.drawing import PointStyle
@@ -103,19 +104,30 @@ def plot(*args, **kwargs):
     xdatalist = []
     ydatalist = []    
     styles = []
+    xaxistype = None
     if len(args) == 1:
         ydata = __getplotdata(args[0])
-        xdata = []
-        for i in range(0, len(args[0])):
-            xdata.append(i)
+        if isinstance(args[0], DimArray):
+            xdata = args[0].dimvalue(0)
+            if args[0].islonlatdim(0):
+                xaxistype = 'lonlat'
+        else:
+            xdata = []
+            for i in range(0, len(args[0])):
+                xdata.append(i)
         xdatalist.append(xdata)
         ydatalist.append(ydata)
     elif len(args) == 2:
         if isinstance(args[1], basestring):
             ydata = __getplotdata(args[0])
-            xdata = []
-            for i in range(0, len(args[0])):
-                xdata.append(i)
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+                if args[0].islonlatdim(0):
+                    xaxistype = 'lonlat'
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
             styles.append(args[1])
         else:
             xdata = __getplotdata(args[0])
@@ -158,14 +170,17 @@ def plot(*args, **kwargs):
     
     #Create XY1DPlot
     if c_plot is None:
-        plot = XY1DPlot(dataset)
+        plot = XY1DPlot()
     else:
         if isinstance(c_plot, XY1DPlot):
             plot = c_plot
-            plot.setDataset(dataset)
         else:
-            plot = XY1DPlot(dataset)
+            plot = XY1DPlot()
     
+    if xaxistype == 'lonlat':
+        plot.setXAxis(LonLatAxis('Longitude', True))
+    plot.setDataset(dataset)
+            
     #Set plot data styles
     lines = []
     if styles != None:
@@ -1115,7 +1130,7 @@ def worldmap():
     c_plot = plot
     return plot
     
-def axesm(projinfo=None, proj='longlat', **kwargs):
+def axesm(projinfo=None, proj='longlat', **kwargs):    
     if projinfo == None:
         origin = kwargs.pop('origin', (0, 0, 0))    
         lat_0 = origin[0]
@@ -1156,7 +1171,11 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     griddx = kwargs.pop('griddx', 10)
     griddy = kwargs.pop('griddy', 10)
     frameon = kwargs.pop('frameon', True)
+    
     global c_plot
+    mapview = MapView()
+    mapview.setXYScaleFactor(1.0)
+    c_plot = MapPlot(mapview)    
     mapframe = c_plot.getMapFrame()
     mapframe.setDrawGridLabel(gridlabel)
     mapframe.setDrawGridTickLine(gridlabel)
@@ -1165,7 +1184,10 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     mapframe.setGridYDelt(griddy)
     c_plot.setDrawNeatLine(frameon)
     c_plot.getMapView().projectLayers(projinfo)
-    return projinfo
+    chart = chartpanel.getChart()
+    chart.clearPlots()
+    chart.setPlot(c_plot)
+    return c_plot, projinfo
         
 def geoshow(layer, **kwargs):
     plot = c_plot
@@ -1203,12 +1225,13 @@ def geoshow(layer, **kwargs):
     plot.addLayer(layer)
     draw_if_interactive()
     
-def figmask(dlayer, mlayer):
+def masklayer(mobj, layers):
     plot = c_plot
     mapview = plot.getMapView()
     mapview.getMaskOut().setMask(True)
-    mapview.getMaskOut().setMaskLayer(mlayer.getLayerName())
-    dlayer.setMaskout(True)
+    mapview.getMaskOut().setMaskLayer(mobj.getLayerName())
+    for layer in layers:
+        layer.setMaskout(True)
     draw_if_interactive()
     
 def display(data):

@@ -20,6 +20,8 @@ class DimVariable():
         self.dataset = dataset
         self.name = variable.getName()
         self.ndim = variable.getDimNumber()
+        if not dataset is None:
+            self.proj = dataset.proj
             
     def __len__(self):
         len = 1;

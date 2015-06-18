@@ -6,6 +6,7 @@
 #-----------------------------------------------------
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, StationData, ArrayMath
+from org.meteoinfo.data.meteodata import DimensionType
 from org.meteoinfo.layer import VectorLayer
 from ucar.ma2 import Array, Range, MAMath
 import miarray
@@ -154,6 +155,30 @@ class DimArray():
         
     def dimvalue(self, idx):
         return self.dims[idx].getDimValue()
+        
+    def islondim(self, idx):
+        dim = self.dims[idx]
+        if dim.getDimType() == DimensionType.X and self.proj.isLonLat():
+            return True
+        else:
+            return False
+            
+    def islatdim(self, idx):
+        dim = self.dims[idx]
+        if dim.getDimType() == DimensionType.Y and self.proj.isLonLat():
+            return True
+        else:
+            return False
+            
+    def islonlatdim(self, idx):
+        return self.islondim(idx) or self.islatdim(idx)
+            
+    def istimedim(self, idx):
+        dim = self.dims[idx]
+        if dim.getDimType() == DimensionType.T:
+            return True
+        else:
+            return False
         
     def sqrt(self):
         r = DimArray(self.array.sqrt(), self.dims, self.missingvalue, self.proj)
