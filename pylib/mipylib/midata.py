@@ -144,11 +144,13 @@ def addfile(fname):
         return None
         
     fname = __getfilename(fname)
-    fsufix = os.path.splitext(fname)[1]
+    fsufix = os.path.splitext(fname)[1].lower()
     if fsufix == '.ctl':
         return addfile_grads(fname)
     elif fsufix == '.tif':
         return addfile_geotiff(fname)
+    elif fsufix == '.awx':
+        return addfile_awx(fname)
     
     meteodata = MeteoDataInfo()
     meteodata.openData(fname)
@@ -225,6 +227,14 @@ def addfile_geotiff(fname):
     fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openGeoTiffData(fname)
+    __addmeteodata(meteodata)
+    datafile = DimDataFile(meteodata)
+    return datafile
+    
+def addfile_awx(fname):
+    fname = __getfilename(fname)
+    meteodata = MeteoDataInfo()
+    meteodata.openAWXData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
