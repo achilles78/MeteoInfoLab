@@ -83,6 +83,7 @@ public class MeteoInfoLab {
         interp.exec("sys.path.append('" + path + "')");
         for (String jarfn : jarfns) {
             interp.exec("sys.path.append('" + jarfn + "')");
+            interp.exec("mipylib.miplot.batchmode = True");
         }
         interp.execfile(fn);
         System.exit(0);

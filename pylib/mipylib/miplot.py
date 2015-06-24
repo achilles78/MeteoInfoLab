@@ -36,9 +36,10 @@ import midata
 
 ## Global ##
 milapp = None
+batchmode = False
 isinteractive = False
 maplayout = MapLayout()
-chartpanel = ChartPanel(Chart())
+chartpanel = None
 isholdon = True
 c_plot = None
 ismap = False
@@ -196,6 +197,9 @@ def plot(*args, **kwargs):
             lines.append(line)
     
     #Paint dataset
+    if chartpanel is None:
+        figure()
+        
     chart = chartpanel.getChart()
     if c_plot is None or (not isinstance(c_plot, XY1DPlot)):
         chart.clearPlots()
@@ -250,6 +254,9 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     plot.setLegendBreak(0, pb)
     
     #Paint dataset
+    if chartpanel is None:
+        figure()
+        
     chart = chartpanel.getChart()
     if c_plot is None:
         chart.clearPlots()
@@ -262,22 +269,27 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     return pb 
  
 def figure():
+    global chartpanel
+    chartpanel = ChartPanel(Chart())
     show()
     
 def show():
     if milapp == None:
-        form = ChartForm(chartpanel)
-        chartpanel.paintGraphics()
-        form.setSize(600, 500)
-        form.setLocationRelativeTo(None)
-        form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-        form.setVisible(True)     
+        if !batchmode:            
+            form = ChartForm(chartpanel)
+            chartpanel.paintGraphics()
+            form.setSize(600, 500)
+            form.setLocationRelativeTo(None)
+            form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
+            form.setVisible(True)     
     else:
         figureDock = milapp.getFigureDock()
-        figureDock.addNewFigure('Figure 1', chartpanel)
-        
+        figureDock.addFigure(chartpanel)
     
 def subplot(nrows, ncols, plot_number):
+    if chartpanel is None:
+        figure()
+        
     global c_plot
     chart = chartpanel.getChart()
     chart.setRowNum(nrows)
@@ -296,6 +308,9 @@ def subplot(nrows, ncols, plot_number):
     return plot
     
 def axes(**kwargs):
+    if chartpanel is None:
+        figure()
+        
     position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
     bottomaxis = kwargs.pop('bottomaxis', True)
     leftaxis = kwargs.pop('leftaxis', True)
@@ -354,6 +369,9 @@ def yaxis(ax, **kwargs):
     draw_if_interactive
     
 def antialias(b):
+    if chartpanel is None:
+        figure()
+        
     chartpanel.getChart().setAntiAlias(b)
     draw_if_interactive()
     
@@ -533,7 +551,7 @@ def __getcolor(style):
                 c = Color.magenta
             elif 'y' in style:
                 c = Color.yellow 
-    elif isinstance(style, tuple):
+    elif isinstance(style, tuple) or isinstance(style, list):
         if len(style) == 3:
             c = Color(style[0], style[1], style[2])
         else:
@@ -756,6 +774,8 @@ def imshow(*args, **kwargs):
             cn = level_arg
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
         else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
@@ -781,6 +801,8 @@ def contour(*args, **kwargs):
             cn = level_arg
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
         else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
@@ -852,6 +874,10 @@ def __plot_griddata(gdata, ls, type):
     mapview = MapView()
     plot = XY2DPlot(mapview)
     plot.addLayer(layer)
+    
+    if chartpanel is None:
+        figure()
+    
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
@@ -887,6 +913,8 @@ def scatterm(*args, **kwargs):
             cn = level_arg
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
         else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
@@ -918,6 +946,8 @@ def imshowm(*args, **kwargs):
             cn = level_arg
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
         else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
@@ -946,6 +976,8 @@ def contourm(*args, **kwargs):
             cn = level_arg
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
         else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
             ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
@@ -1021,6 +1053,8 @@ def quiverm(*args, **kwargs):
                 cn = level_arg
                 ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), cn, cmap)
             else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
                 ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), level_arg, cmap)
         else:
             ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), cmap)
@@ -1059,6 +1093,10 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None):
     else:
         plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent())
+    
+    if chartpanel is None:
+        figure()
+    
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
@@ -1080,6 +1118,10 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
  
     plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent())
+    
+    if chartpanel is None:
+        figure()
+    
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
@@ -1098,6 +1140,10 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv):
     shapetype = layer.getShapeType()
     plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent())
+    
+    if chartpanel is None:
+        figure()
+    
     chart = Chart(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
@@ -1131,6 +1177,9 @@ def worldmap():
     return plot
     
 def axesm(projinfo=None, proj='longlat', **kwargs):    
+    if chartpanel is None:
+        figure()
+        
     if projinfo == None:
         origin = kwargs.pop('origin', (0, 0, 0))    
         lat_0 = origin[0]
@@ -1193,34 +1242,34 @@ def geoshow(layer, **kwargs):
     plot = c_plot
     visible = kwargs.pop('visible', True)
     layer.setVisible(visible)
-    drawfill = kwargs.pop('drawfill', False)
     fcobj = kwargs.pop('facecolor', None)
-    if fcobj == None:
+    ecobj = kwargs.pop('edgecolor', 'k')
+    if fcobj is None:
         facecolor = Color.lightGray
+        drawfill = False
     else:
         facecolor = __getcolor(fcobj)
-    lcobj = kwargs.pop('linecolor', None)
-    if lcobj == None:
-        linecolor = Color.black
+        drawfill = True
+    if ecobj is None:
+        drawline = False  
+        edgecolor = Color.black
     else:
-        if isinstance(lcobj, str):
-            linecolor = __getcolor(lcobj)
-        else:
-            if len(lcobj) == 3:                
-                linecolor = Color(lcobj[0], lcobj[1], lcobj[2])
-            else:
-                linecolor = Color(lcobj[0], lcobj[1], lcobj[2], lcobj[3])
+        drawline = True
+        edgecolor = __getcolor(ecobj)
+        
     size = kwargs.pop('size', 1)
     lb = layer.getLegendScheme().getLegendBreaks().get(0)
     lb.setColor(facecolor)
     btype = lb.getBreakType()
     if btype == BreakTypes.PointBreak:
-        lb.setOutlineColor(linecolor)
+        lb.setDrawOutline(drawline)
+        lb.setOutlineColor(edgecolor)
     elif btype == BreakTypes.PolylineBreak:
         lb.setSize(size)
     elif btype == BreakTypes.PolygonBreak:
         lb.setDrawFill(drawfill)
-        lb.setOutlineColor(linecolor)
+        lb.setDrawOutline(drawline)
+        lb.setOutlineColor(edgecolor)
         lb.setOutlineSize(size)
     plot.addLayer(layer)
     draw_if_interactive()

@@ -5,6 +5,7 @@
  */
 package org.meteoinfo.laboratory.gui;
 
+import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import com.l2fprod.common.swing.JFontChooser;
@@ -95,6 +96,9 @@ public class FrmMain extends javax.swing.JFrame {
         //Add dockable panels
         CControl control = new CControl(this);
         this.add(control.getContentArea());
+        
+        control.putProperty(ScreenDockStation.WINDOW_FACTORY, new CustomWindowFactory());
+        
         CGrid grid = new CGrid(control);
         //this.outputDock = new OutputDockable("Output", "Output");
         editorDock = new EditorDockable("Editor", "Editor");
@@ -128,7 +132,7 @@ public class FrmMain extends javax.swing.JFrame {
             }
 
         });
-        figuresDock = new FigureDockable("Figures", "Figures");
+        figuresDock = new FigureDockable(this, "Figures", "Figures");
         this.variableDock = new VariableDockable("Variables", "Variable explorer");
         this.fileDock = new FileDockable("Files", "File explorer");
         this.fileDock.setPath(new File(cf));
