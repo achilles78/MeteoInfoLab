@@ -15,7 +15,7 @@ from org.meteoinfo.chart.plot import XY1DPlot, XY2DPlot, MapPlot, ChartPlotMetho
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition
 from org.meteoinfo.chart.axis import LonLatAxis
 from org.meteoinfo.script import ChartForm, MapForm
-from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, PointBreak, PolylineBreak, LegendManage, LegendScheme
+from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.drawing import PointStyle
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
@@ -222,6 +222,7 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
 def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
             alpha=None, linewidths=None, verts=None, hold=None, **kwargs):
     #Get dataset
+    global c_plot
     if c_plot is None:
         dataset = XYListDataset()
     else:
@@ -263,7 +264,6 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
         chart.setPlot(plot)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    global c_plot
     c_plot = plot
     draw_if_interactive()
     return pb 
@@ -275,7 +275,7 @@ def figure():
     
 def show():
     if milapp == None:
-        if !batchmode:            
+        if not batchmode:            
             form = ChartForm(chartpanel)
             chartpanel.paintGraphics()
             form.setSize(600, 500)
@@ -395,8 +395,10 @@ def savefig_jpeg(fname, width=None, height=None, dpi=None):
 
 # Clear current axes
 def cla():
+    global c_plot
     if not c_plot is None:
         chartpanel.getChart().removePlot(c_plot)
+        c_plot = None
         draw_if_interactive()
 
 # Clear current figure    
@@ -754,6 +756,23 @@ def __getcolormap(**kwargs):
         cmapstr = kwargs.pop('cmap', 'matlab_jet')
         cmap = ColorUtil.getColorMap(cmapstr)
     return cmap
+    
+def __getlegendscheme(args, min, max, **kwargs):
+    ls = kwargs.pop('symbolspec', None)
+    if ls is None:
+        cmap = __getcolormap(**kwargs)
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(min, max, cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(min, max, level_arg, cmap)
+        else:    
+            ls = LegendManage.createLegendScheme(min, max, cmap)
+    return ls
       
 def imshow(*args, **kwargs):
     n = len(args)
@@ -888,9 +907,8 @@ def __plot_griddata(gdata, ls, type):
     
 def scatterm(*args, **kwargs):
     plot = c_plot
-    cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
-    proj = kwargs.pop('proj', None)
+    proj = kwargs.pop('proj', None)    
     n = len(args) 
     if n <= 2:
         if isinstance(args[0], PyStationData):
@@ -907,17 +925,7 @@ def scatterm(*args, **kwargs):
         else:
             gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
     if isinstance(gdata, PyGridData):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj)
     else:
@@ -958,7 +966,6 @@ def imshowm(*args, **kwargs):
     
 def contourm(*args, **kwargs):  
     plot = c_plot
-    cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)        
     n = len(args) 
     if n <= 2:
@@ -970,24 +977,13 @@ def contourm(*args, **kwargs):
         a = args[2]
         gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
     layer = __plot_griddata_m(plot, gdata, ls, 'contour')
     gdata = None
     return layer
         
 def contourfm(*args, **kwargs):
     plot = c_plot
-    cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
     interpolate = kwargs.pop('interpolate', False)
     n = len(args) 
@@ -1000,17 +996,7 @@ def contourfm(*args, **kwargs):
         a = args[2]
         gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+    ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
     if interpolate:
         gdata = gdata.interpolate()
     layer = __plot_griddata_m(plot, gdata, ls, 'contourf')
@@ -1273,6 +1259,81 @@ def geoshow(layer, **kwargs):
         lb.setOutlineSize(size)
     plot.addLayer(layer)
     draw_if_interactive()
+
+def makesymbolspec(geometry, *args, **kwargs):    
+    if geometry == 'point':
+        ls = LegendScheme(ShapeTypes.Point)
+    elif geometry == 'line':
+        ls = LegendScheme(ShapeTypes.Polyline)
+    elif geometry == 'polygon':
+        ls = LegendScheme(ShapeTypes.Polygon)
+    else:
+        ls = LegendScheme()    
+    field = kwargs.pop('field', '')    
+    ls.setFieldName(field)
+    n = len(args)
+    isunique = True
+    for arg in args:
+        lb, isu = __getlegendbreak(geometry, arg)
+        if isunique  and not isu:
+            isunique = False
+        ls.addLegendBreak(lb)
+        
+    if ls.getBreakNum() > 1:
+        if isunique:
+            ls.setLegendType(LegendType.UniqueValue)
+        else:
+            ls.setLegendType(LegendType.GraduatedColor)
+            
+    return ls
+
+def __getlegendbreak(geometry, rule):        
+    if geometry == 'point':
+        lb = PointBreak()        
+        marker = rule.pop('marker', 'o')
+        pstyle = __getpointstyle(marker)
+        lb.setStyle(pstyle)
+        size = rule.pop('size', 6)
+        lb.setSize(size)
+        ecobj = rule.pop('edgecolor', 'k')
+        edgecolor = __getcolor(ecobj)
+        lb.setOutlineColor(edgecolor)
+        fill = rule.pop('fill', True)
+        lb.setDrawFill(fill)
+        edge = rule.pop('edge', True)
+        lb.setDrawOutline(edge)
+    elif geometry == 'line':
+        lb = PolylineBreak()
+        size = rule.pop('size', 6)
+        lb.setSize(size)
+        lsobj = rule.pop('linestyle', '-')
+        linestyle = __getlinestyle(lsobj)
+        lb.setStyle(linestyle)
+    elif geometry == 'polygon':
+        lb = PolygonBreak()
+        ecobj = rule.pop('edgecolor', 'k')
+        edgecolor = __getcolor(ecobj)
+        lb.setOutlineColor(edgecolor)
+        fill = rule.pop('fill', True)
+        lb.setDrawFill(fill)
+        edge = rule.pop('edge', True)
+        lb.setDrawOutline(edge)
+    else:
+        lb = ColorBreak()
+    cobj = rule.pop('color', 'k')
+    color = __getcolor(cobj)
+    lb.setColor(color)
+    value = rule.pop('value', None)
+    isunique = True
+    if not value is None:
+        if isinstance(value, tuple):
+            lb.setStartValue(value[0])
+            lb.setEndValue(value[1])
+            isunique = False
+        else:
+            lb.setStartValue(value)
+            lb.setEndValue(value)
+    return lb, isunique
     
 def masklayer(mobj, layers):
     plot = c_plot

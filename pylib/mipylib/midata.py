@@ -303,11 +303,21 @@ def arange1(start, n, step):
 def linspace(start=0, stop=1, n=100, endpoint=True, retstep=False, dtype=None):
     return MIArray(ArrayUtil.lineSpace(start, stop, n, endpoint))
     
-def zeros(n):
-    return MIArray(ArrayUtil.zeros(n))
+def zeros(shape, dtype='float'):
+    shapelist = []
+    if isinstance(shape, int):
+        shapelist.append(shape)
+    else:
+        shapelist = shape
+    return MIArray(ArrayUtil.zeros(shapelist, dtype))
     
-def ones(n):
-    return MIArray(ArrayUtil.ones(n))
+def ones(shape, dtype='float'):
+    shapelist = []
+    if isinstance(shape, int):
+        shapelist.append(shape)
+    else:
+        shapelist = shape
+    return MIArray(ArrayUtil.ones(shapelist, dtype))
     
 def sqrt(a):
     if isinstance(a, DimArray) or isinstance(a, MIArray):

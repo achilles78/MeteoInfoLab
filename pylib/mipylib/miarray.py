@@ -258,8 +258,16 @@ class MIArray():
     def asarray(self):
         return self.array
         
+    def asgriddata(self, x, y, missingv=-9999.0):    
+        gdata = GridData(self.array, x.array, y.array, missingv)
+        return PyGridData(gdata)
+        
     def inpolygon(self, x, y, polygon):
-        return MIArray(ArrayMath.inPolygon(self.array, x, y, polygon))
+        return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
         
     def maskout(self, x, y, polygon, missingv):
-        return MIArray(ArrayMath.maskout(self.array, x, y, polygon, missingv))
+        return MIArray(ArrayMath.maskout(self.array, x.aslist(), y.aslist(), polygon, missingv))
+        
+    def savegrid(self, x, y, fname):
+        gdata = GridData(self.array, x.array, y.array, -9999.0)
+        gdata.saveAsSurferASCIIFile(fname)

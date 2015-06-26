@@ -7,15 +7,10 @@ package org.meteoinfo.laboratory.gui;
 
 import bibliothek.gui.Dockable;
 import bibliothek.gui.dock.ScreenDockStation;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.CGrid;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.intern.DefaultCommonDockable;
 import bibliothek.gui.dock.station.screen.ScreenDockWindow;
 import bibliothek.gui.dock.station.screen.window.ScreenDockFrame;
 import bibliothek.gui.dock.station.screen.window.WindowConfiguration;
 import java.awt.BorderLayout;
-import java.awt.LayoutManager;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -34,16 +29,8 @@ public class FrmCustom extends ScreenDockFrame implements ScreenDockWindow {
     
     @Override
     public void setDockable(Dockable dockable){                
-        init(dockable);
+        //init(dockable);
         super.setDockable(dockable);
-        
-//        //Add dockable panels
-//        JFrame window = getFrame();
-//        CControl control = new CControl(window);
-//        window.add(control.getContentArea());
-//        CGrid grid = new CGrid(control);
-//        grid.add(0, 0, 1, 1, dockable);
-//        control.getContentArea().deploy(grid);
     }
     
     private void init(Dockable dockable){
@@ -69,26 +56,28 @@ public class FrmCustom extends ScreenDockFrame implements ScreenDockWindow {
 
         window.setJMenuBar(menuBar);
         
-//        JToolBar toolBar = new JToolBar();
-//        JButton jButton_ZoomIn = new JButton();
-//        jButton_ZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_ZoomIn.Image.png"))); // NOI18N
-//        jButton_ZoomIn.setToolTipText("Zoom In"); // NOI18N
-//        jButton_ZoomIn.setFocusable(false);
-//        jButton_ZoomIn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-//        jButton_ZoomIn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-//        jButton_ZoomIn.addActionListener(new java.awt.event.ActionListener() {
-//            @Override
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                //jButton_ZoomInActionPerformed(evt);
-//            }
-//        });
-//        toolBar.add(jButton_ZoomIn);
-//        
-//        JButton jButton_ZoomOut = new JButton();
-//        JButton jButton_Pan = new JButton();
-//        JButton jButton_FullExtent = new JButton();
-//        
-//        window.getContentPane().add(toolBar, BorderLayout.PAGE_START);
+        JToolBar toolBar = new JToolBar();
+        JButton jButton_ZoomIn = new JButton();
+        jButton_ZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_ZoomIn.Image.png"))); // NOI18N
+        jButton_ZoomIn.setToolTipText("Zoom In"); // NOI18N
+        jButton_ZoomIn.setFocusable(false);
+        jButton_ZoomIn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton_ZoomIn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton_ZoomIn.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                //jButton_ZoomInActionPerformed(evt);
+            }
+        });
+        toolBar.add(jButton_ZoomIn);
+        
+        JButton jButton_ZoomOut = new JButton();
+        JButton jButton_Pan = new JButton();
+        JButton jButton_FullExtent = new JButton();
+                
+        //window.getContentPane().setLayout(new GridLayout(2, 1));
+        //window.add(toolBar);
+        window.getContentPane().add(toolBar, BorderLayout.PAGE_START);
     }
     
     private void init_Editor() {
