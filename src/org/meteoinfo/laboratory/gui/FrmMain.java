@@ -9,6 +9,7 @@ import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import com.l2fprod.common.swing.JFontChooser;
+import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -96,9 +97,9 @@ public class FrmMain extends javax.swing.JFrame {
         //Add dockable panels
         CControl control = new CControl(this);
         this.add(control.getContentArea());
-        
+
         control.putProperty(ScreenDockStation.WINDOW_FACTORY, new CustomWindowFactory());
-        
+
         CGrid grid = new CGrid(control);
         //this.outputDock = new OutputDockable("Output", "Output");
         editorDock = new EditorDockable("Editor", "Editor");
@@ -149,10 +150,10 @@ public class FrmMain extends javax.swing.JFrame {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int row = ((JTable) e.getSource()).getSelectedRow();
-                    if (row >= 0){
-                        if (((JTable) e.getSource()).getValueAt(row, 2).toString().equals("py")) {                        
-                            File file = new File(FrmMain.this.fileDock.getFileExplorer().getPath().getAbsoluteFile() +
-                                    File.separator + ((JTable)e.getSource()).getValueAt(row, 0).toString());
+                    if (row >= 0) {
+                        if (((JTable) e.getSource()).getValueAt(row, 2).toString().equals("py")) {
+                            File file = new File(FrmMain.this.fileDock.getFileExplorer().getPath().getAbsoluteFile()
+                                    + File.separator + ((JTable) e.getSource()).getValueAt(row, 0).toString());
                             FrmMain.this.editorDock.openFile(file);
                         }
                     }
@@ -218,7 +219,7 @@ public class FrmMain extends javax.swing.JFrame {
         jPanel_Toolbar.setLayout(new java.awt.BorderLayout());
 
         jToolBar_Editor.setRollover(true);
-        jToolBar_Editor.setPreferredSize(new java.awt.Dimension(220, 25));
+        jToolBar_Editor.setPreferredSize(new java.awt.Dimension(250, 25));
 
         jButton_NewFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_NewFile.Image.png"))); // NOI18N
         jButton_NewFile.setToolTipText("New File");
@@ -466,7 +467,7 @@ public class FrmMain extends javax.swing.JFrame {
         if (!te.getFileName().isEmpty()) {
             te.saveFile(te.getFile());
         }
-        
+
         String code = te.getTextArea().getText();
         //this.consoleDock.runfile(te.getTextArea().getText());
         //this.consoleDock.exec(te.getTextArea().getText());
@@ -567,6 +568,42 @@ public class FrmMain extends javax.swing.JFrame {
             this.setCurrentPath(path);
             this.fileDock.setPath(new File(this.options.getCurrentFolder()));
         }
+
+//        String os = System.getProperty("os.name").toLowerCase();
+//        //Mac  
+//        if (os.contains("mac")) {
+//            System.setProperty("apple.awt.fileDialogForDirectories", "true");
+//            FileDialog fd = new FileDialog(this, "Choose a folder", FileDialog.LOAD);
+//            File pathDir = new File(this.jComboBox_CurrentFolder.getSelectedItem().toString());
+//            if (pathDir.isDirectory()) {
+//                fd.setDirectory(pathDir.getAbsolutePath());
+//            }
+//            fd.setVisible(true);
+//            if (fd.getFile() != null){
+//                this.setCurrentPath(fd.getDirectory());
+//                this.fileDock.setPath(new File(this.options.getCurrentFolder()));                
+//            }
+////            String fileName = fd.getDirectory();
+////            if (fileName != null) {
+////                this.setCurrentPath(fileName);
+////                this.fileDock.setPath(new File(this.options.getCurrentFolder()));
+////            }
+//            System.setProperty("apple.awt.fileDialogForDirectories", "false");
+//        } else {
+//            JFileChooser aDlg = new JFileChooser();
+//            //String path = System.getProperty("user.dir");
+//            File pathDir = new File(this.jComboBox_CurrentFolder.getSelectedItem().toString());
+//            if (pathDir.isDirectory()) {
+//                aDlg.setCurrentDirectory(pathDir);
+//            }
+//            aDlg.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//            if (JFileChooser.APPROVE_OPTION == aDlg.showDialog(this, "Open")) {
+//                File aFile = aDlg.getSelectedFile();
+//                String path = aFile.getAbsolutePath();
+//                this.setCurrentPath(path);
+//                this.fileDock.setPath(new File(this.options.getCurrentFolder()));
+//            }
+//        }
     }//GEN-LAST:event_jButton_CurrentFolderActionPerformed
 
     private void jMenuItem_ExistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_ExistActionPerformed
@@ -582,12 +619,13 @@ public class FrmMain extends javax.swing.JFrame {
     public FigureDockable getFigureDock() {
         return this.figuresDock;
     }
-    
+
     /**
      * Get current folder
+     *
      * @return Current folder
      */
-    public String getCurrentFolder(){
+    public String getCurrentFolder() {
         return this.options.getCurrentFolder();
     }
 
@@ -646,7 +684,7 @@ public class FrmMain extends javax.swing.JFrame {
             this.jComboBox_CurrentFolder.addItem(path);
         }
         this.jComboBox_CurrentFolder.setSelectedItem(path);
-        
+
         PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
         try {
             interp.exec("mipylib.midata.currentfolder = '" + path + "'");

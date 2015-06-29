@@ -192,7 +192,7 @@ public class FileExplorer extends JPanel implements MouseListener{
                 //Judge if the path is root path
                 if (currentPath.split("\\\\").length > 1)
                 {
-                    this.path = new File(currentPath + File.separator + ((JTable)e.getSource()).getValueAt(row, 0).toString());
+                    this.path = new File(currentPath + "/" + ((JTable)e.getSource()).getValueAt(row, 0).toString());
                 }
                 else
                 {                    
