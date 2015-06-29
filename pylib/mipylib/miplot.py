@@ -340,6 +340,95 @@ def axes(**kwargs):
     global c_plot
     c_plot = plot
     return plot
+
+def axesm(projinfo=None, proj='longlat', **kwargs):    
+    if chartpanel is None:
+        figure()
+        
+    position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
+    bottomaxis = kwargs.pop('bottomaxis', True)
+    leftaxis = kwargs.pop('leftaxis', True)
+    topaxis = kwargs.pop('topaxis', True)
+    rightaxis = kwargs.pop('rightaxis', True)
+    xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
+    yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
+    xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
+    ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
+    xscale = kwargs.pop('xscale', 'linear')    #or 'log'
+    yscale = kwargs.pop('yscale', 'linear')    #or 'log'
+    xtick = kwargs.pop('xtick', [])
+    ytick = kwargs.pop('ytick', [])
+    xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
+    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'        
+    if projinfo == None:
+        origin = kwargs.pop('origin', (0, 0, 0))    
+        lat_0 = origin[0]
+        lon_0 = origin[1]
+        lat_0 = kwargs.pop('lat_0', lat_0)
+        lon_0 = kwargs.pop('lon_0', lon_0)
+        lat_ts = kwargs.pop('truescalelat', 0)
+        lat_ts = kwargs.pop('lat_ts', lat_ts)
+        k = kwargs.pop('scalefactor', 1)
+        k = kwargs.pop('k', k)
+        paralles = kwargs.pop('paralles', (30, 60))
+        lat_1 = paralles[0]
+        if len(paralles) == 2:
+            lat_2 = paralles[1]
+        else:
+            lat_2 = lat_1
+        lat_1 = kwargs.pop('lat_1', lat_1)
+        lat_2 = kwargs.pop('lat_2', lat_2)
+        x_0 = kwargs.pop('falseeasting', 0)
+        y_0 = kwargs.pop('falsenorthing', 0)
+        x_0 = kwargs.pop('x_0', x_0)
+        y_0 = kwargs.pop('y_0', y_0)
+        h = kwargs.pop('h', 0)
+        projstr = '+proj=' + proj \
+            + ' +lat_0=' + str(lat_0) \
+            + ' +lon_0=' + str(lon_0) \
+            + ' +lat_1=' + str(lat_1) \
+            + ' +lat_2=' + str(lat_2) \
+            + ' +lat_ts=' + str(lat_ts) \
+            + ' +k=' + str(k) \
+            + ' +x_0=' + str(x_0) \
+            + ' +y_0=' + str(y_0) \
+            + ' +h=' + str(h)
+        projinfo = ProjectionInfo(projstr)   
+        
+    gridlabel = kwargs.pop('gridlabel', True)
+    gridline = kwargs.pop('gridline', False)
+    griddx = kwargs.pop('griddx', 10)
+    griddy = kwargs.pop('griddy', 10)
+    frameon = kwargs.pop('frameon', True)
+    axison = kwargs.pop('axison', None)
+    
+    global c_plot
+    mapview = MapView()
+    mapview.setXYScaleFactor(1.0)
+    c_plot = MapPlot(mapview)    
+    c_plot.setPosition(position[0], position[1], position[2], position[3])
+    if not axison is None:
+        c_plot.setAxisOn(axison)
+    else:
+        if bottomaxis == False:
+            c_plot.getAxis(Location.BOTTOM).setVisible(False)
+        if leftaxis == False:
+            c_plot.getAxis(Location.LEFT).setVisible(False)
+        if topaxis == False:
+            c_plot.getAxis(Location.TOP).setVisible(False)
+        if rightaxis == False:
+            c_plot.getAxis(Location.RIGHT).setVisible(False)
+    mapframe = c_plot.getMapFrame()
+    mapframe.setDrawGridLabel(gridlabel)
+    mapframe.setDrawGridTickLine(gridlabel)
+    mapframe.setDrawGridLine(gridline)
+    mapframe.setGridXDelt(griddx)
+    mapframe.setGridYDelt(griddy)
+    c_plot.setDrawNeatLine(frameon)
+    c_plot.getMapView().projectLayers(projinfo)
+    chart = chartpanel.getChart()
+    chart.addPlot(c_plot)
+    return c_plot, projinfo
     
 def twinx(ax):
     ax.getAxis(Location.RIGHT).setVisible(False)
@@ -649,6 +738,15 @@ def axis(limits):
         ymax = limits[3]
         c_plot.setDrawExtent(Extent(xmin, xmax, ymin, ymax))
         draw_if_interactive()
+        
+def axism(limits):
+    if len(limits) == 4:
+        xmin = limits[0]
+        xmax = limits[1]
+        ymin = limits[2]
+        ymax = limits[3]
+        c_plot.setLonLatExtent(Extent(xmin, xmax, ymin, ymax))
+        draw_if_interactive()
 
 def grid(b=None, which='major', axis='both', **kwargs):
     plot = c_plot
@@ -747,7 +845,7 @@ def __getcolormap(**kwargs):
         if isinstance(colors, str):
             c = __getcolor(colors)
             cmap = ColorMap(c)
-        elif isinstance(colors, tuple):
+        elif isinstance(colors, tuple) or isinstance(colors, list):
             cs = []
             for cc in colors:
                 cs.append(__getcolor(cc))
@@ -969,7 +1067,8 @@ def imshowm(*args, **kwargs):
     
 def contourm(*args, **kwargs):  
     plot = c_plot
-    missingv = kwargs.pop('missingv', -9999.0)        
+    missingv = kwargs.pop('missingv', -9999.0)      
+    proj = kwargs.pop('proj', None)
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -981,7 +1080,7 @@ def contourm(*args, **kwargs):
         gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
-    layer = __plot_griddata_m(plot, gdata, ls, 'contour')
+    layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj)
     gdata = None
     return layer
         
@@ -989,6 +1088,7 @@ def contourfm(*args, **kwargs):
     plot = c_plot
     missingv = kwargs.pop('missingv', -9999.0)
     interpolate = kwargs.pop('interpolate', False)
+    proj = kwargs.pop('proj', None)
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -1002,7 +1102,7 @@ def contourfm(*args, **kwargs):
     ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
     if interpolate:
         gdata = gdata.interpolate()
-    layer = __plot_griddata_m(plot, gdata, ls, 'contourf')
+    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj)
     gdata = None
     return layer
     
@@ -1010,6 +1110,7 @@ def quiverm(*args, **kwargs):
     plot = c_plot
     cmap = __getcolormap(**kwargs)
     missingv = kwargs.pop('missingv', -9999.0)
+    proj = kwargs.pop('proj', None)
     isuv = kwargs.pop('isuv', True)
     size = kwargs.pop('size', 10)
     n = len(args) 
@@ -1053,7 +1154,7 @@ def quiverm(*args, **kwargs):
         else:
             c = Color.black
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, size)
-    layer = __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, 'quiver', isuv)
+    layer = __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, 'quiver', isuv, proj=proj)
     udata = None
     vdata = None
     cdata = None
@@ -1119,13 +1220,17 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
     draw_if_interactive()
     return layer
     
-def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv):
+def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None):
     #print 'GridData...'
     if type == 'quiver':
         if cdata == None:
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
         else:
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
+    
+    if (proj != None):
+        layer.setProjInfo(proj)
+    
     shapetype = layer.getShapeType()
     plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent())
@@ -1163,69 +1268,7 @@ def worldmap():
     chart.setPlot(plot)
     global c_plot
     c_plot = plot
-    return plot
-    
-def axesm(projinfo=None, proj='longlat', **kwargs):    
-    if chartpanel is None:
-        figure()
-        
-    if projinfo == None:
-        origin = kwargs.pop('origin', (0, 0, 0))    
-        lat_0 = origin[0]
-        lon_0 = origin[1]
-        lat_0 = kwargs.pop('lat_0', lat_0)
-        lon_0 = kwargs.pop('lon_0', lon_0)
-        lat_ts = kwargs.pop('truescalelat', 0)
-        lat_ts = kwargs.pop('lat_ts', lat_ts)
-        k = kwargs.pop('scalefactor', 1)
-        k = kwargs.pop('k', k)
-        paralles = kwargs.pop('paralles', (30, 60))
-        lat_1 = paralles[0]
-        if len(paralles) == 2:
-            lat_2 = paralles[1]
-        else:
-            lat_2 = lat_1
-        lat_1 = kwargs.pop('lat_1', lat_1)
-        lat_2 = kwargs.pop('lat_2', lat_2)
-        x_0 = kwargs.pop('falseeasting', 0)
-        y_0 = kwargs.pop('falsenorthing', 0)
-        x_0 = kwargs.pop('x_0', x_0)
-        y_0 = kwargs.pop('y_0', y_0)
-        h = kwargs.pop('h', 0)
-        projstr = '+proj=' + proj \
-            + ' +lat_0=' + str(lat_0) \
-            + ' +lon_0=' + str(lon_0) \
-            + ' +lat_1=' + str(lat_1) \
-            + ' +lat_2=' + str(lat_2) \
-            + ' +lat_ts=' + str(lat_ts) \
-            + ' +k=' + str(k) \
-            + ' +x_0=' + str(x_0) \
-            + ' +y_0=' + str(y_0) \
-            + ' +h=' + str(h)
-        projinfo = ProjectionInfo(projstr)   
-        
-    gridlabel = kwargs.pop('gridlabel', True)
-    gridline = kwargs.pop('gridline', False)
-    griddx = kwargs.pop('griddx', 10)
-    griddy = kwargs.pop('griddy', 10)
-    frameon = kwargs.pop('frameon', True)
-    
-    global c_plot
-    mapview = MapView()
-    mapview.setXYScaleFactor(1.0)
-    c_plot = MapPlot(mapview)    
-    mapframe = c_plot.getMapFrame()
-    mapframe.setDrawGridLabel(gridlabel)
-    mapframe.setDrawGridTickLine(gridlabel)
-    mapframe.setDrawGridLine(gridline)
-    mapframe.setGridXDelt(griddx)
-    mapframe.setGridYDelt(griddy)
-    c_plot.setDrawNeatLine(frameon)
-    c_plot.getMapView().projectLayers(projinfo)
-    chart = chartpanel.getChart()
-    chart.clearPlots()
-    chart.setPlot(c_plot)
-    return c_plot, projinfo
+    return plot    
         
 def geoshow(layer, **kwargs):
     plot = c_plot
@@ -1250,9 +1293,9 @@ def geoshow(layer, **kwargs):
     lb = layer.getLegendScheme().getLegendBreaks().get(0)
     lb.setColor(facecolor)
     btype = lb.getBreakType()
-    if btype == BreakTypes.PointBreak:
+    if btype == BreakTypes.PointBreak:        
         lb.setDrawOutline(drawline)
-        lb.setOutlineColor(edgecolor)
+        lb.setOutlineColor(edgecolor)        
     elif btype == BreakTypes.PolylineBreak:
         lb.setSize(size)
     elif btype == BreakTypes.PolygonBreak:
@@ -1261,6 +1304,23 @@ def geoshow(layer, **kwargs):
         lb.setOutlineColor(edgecolor)
         lb.setOutlineSize(size)
     plot.addLayer(layer)
+    labelfield = kwargs.pop('labelfield', None)
+    if not labelfield is None:
+        labelset = layer.getLabelSet()
+        labelset.setFieldName(labelfield)
+        fontname = kwargs.pop('fontname', 'Arial')
+        fontsize = kwargs.pop('fontsize', 14)
+        bold = kwargs.pop('bold', False)
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        labelset.setLabelFont(font)
+        xoffset = kwargs.pop('xoffset', 0)
+        labelset.setXOffset(xoffset)
+        yoffset = kwargs.pop('yoffset', 0)
+        labelset.setYOffset(yoffset)
+        layer.addLabels()    
     draw_if_interactive()
 
 def makesymbolspec(geometry, *args, **kwargs):    

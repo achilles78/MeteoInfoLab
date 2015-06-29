@@ -419,9 +419,9 @@ def asstationdata(data, x, y, missingv=-9999.0):
         
 def shaperead(fn):
     layer = MapDataManage.loadLayer(fn)
-    pgb = layer.getLegendScheme().getLegendBreaks().get(0)
-    pgb.setDrawFill(False)
-    pgb.setOutlineColor(Color.darkGray) 
+    #lb = layer.getLegendScheme().getLegendBreaks().get(0)
+    #lb.setDrawFill(False)
+    #lb.setOutlineColor(Color.darkGray) 
     return layer
     
 def inpolygon(x, y, polygon):
