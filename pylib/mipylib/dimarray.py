@@ -221,7 +221,17 @@ class DimArray():
     def inpolygon(self, polygon):
         x = self.dims[1].getDimValue()
         y = self.dims[0].getDimValue()
-        r = DimArray(self.array.inpolygon(x, y, polygon), self.dims, self.missingvalue, self.proj)
+        if isinstance(polygon, tuple):
+            x_p = polygon[0]
+            y_p = polygon[1]
+            if isinstance(x_p, MIArray):
+                x_p = x_p.aslist()
+            if isinstance(y_p, MIArray):
+                y_p = y_p.aslist()
+            r = self.array.inpolygon(x, y, x_p, y_p)
+        else:
+            r = self.array.inpolygon(x, y, polygon)
+        r = DimArray(r, self.dims, self.missingvalue, self.proj)
         return r
         
     def maskout(self, polygon):
@@ -443,7 +453,49 @@ class PyStationData():
         return PyStationData(self.data.filter(stations))
         
     def join(self, other):
-        return PyStationData(self.data.join(other.data))        
+        return PyStationData(self.data.join(other.data))     
+
+    def ave(self):
+        return self.data.average()
+        
+    def sum(self):
+        return self.data.sum()
+        
+    def griddata(self, xi, **kwargs):
+        method = kwargs.pop('method', 'idw')
+        fill_value = self.data.missingValue
+        x_s = self.data.getXList()
+        y_s = self.data.getYList()
+        x_g = xi[0]
+        y_g = xi[1]
+        if isinstance(x_s, MIArray):
+            x_s = x_s.aslist()
+        if isinstance(y_s, MIArray):
+            y_s = y_s.aslist()    
+        if isinstance(x_g, MIArray):
+            x_g = x_g.aslist()
+        if isinstance(y_g, MIArray):
+            y_g = y_g.aslist()
+        if method == 'idw':
+            pnum = kwargs.pop('pointnum', 2)
+            radius = kwargs.pop('radius', None)
+            if radius is None:
+                r = self.data.interpolate_Neighbor(x_g, y_g, pnum, fill_value)
+                return PyGridData(r)
+            else:
+                r = self.data.interpolate_Radius(x_g, y_g, pnum, radius, fill_value)
+                return PyGridData(r)
+        elif method == 'cressman':
+            radius = kwargs.pop('radius', [10, 7, 4, 2, 1])
+            if isinstance(radius, MIArray):
+                radius = radius.aslist()
+            r = self.data.interpolate_Cressman(x_g, y_g, radius, fill_value)
+            return PyGridData(r)
+        elif method == 'neareast':
+            r = self.data.interpolate_Assign(x_g, y_g, fill_value)
+            return PyGridData(r)
+        else:
+            return None
         
     def savedata(self, filename, fieldname='data', savemissingv=False):
         self.data.saveAsCSVFile(filename, fieldname, savemissingv)

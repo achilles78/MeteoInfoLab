@@ -755,6 +755,9 @@ def __getcolormap(**kwargs):
     else:
         cmapstr = kwargs.pop('cmap', 'matlab_jet')
         cmap = ColorUtil.getColorMap(cmapstr)
+    reverse = kwargs.pop('cmapreverse', False)
+    if reverse:
+        cmap.reverse()
     return cmap
     
 def __getlegendscheme(args, min, max, **kwargs):

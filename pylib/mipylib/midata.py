@@ -29,6 +29,7 @@ from java.lang import Math, Double
 pi = Math.PI
 e = Math.E
 inf = Double.POSITIVE_INFINITY
+nan = Double.NaN
 meteodatalist = []
 c_meteodata = None
 currentfolder = None
@@ -425,6 +426,42 @@ def shaperead(fn):
     
 def inpolygon(x, y, polygon):
     return GeoComputation.pointInPolygon(polygon, x, y)
+    
+def griddata(points, values, xi, **kwargs):
+    method = kwargs.pop('method', 'idw')
+    fill_value = kwargs.pop('file_value', nan)
+    x_s = points[0]
+    y_s = points[1]
+    x_g = xi[0]
+    y_g = xi[1]
+    if isinstance(x_s, MIArray):
+        x_s = x_s.aslist()
+    if isinstance(y_s, MIArray):
+        y_s = y_s.aslist()    
+    if isinstance(x_g, MIArray):
+        x_g = x_g.aslist()
+    if isinstance(y_g, MIArray):
+        y_g = y_g.aslist()
+    if method == 'idw':
+        pnum = kwargs.pop('pointnum', 2)
+        radius = kwargs.pop('radius', None)
+        if radius is None:
+            r = ArrayUtil.interpolation_IDW_Neighbor(x_s, y_s, values, x_g, y_g, pnum, fill_value)
+            return MIArray(r)
+        else:
+            r = ArrayUtil.interpolation_IDW_Radius(x_s, y_s, values, x_g, y_g, pnum, radius, fill_value)
+            return MIArray(r)
+    elif method == 'cressman':
+        radius = kwargs.pop('radius', [10, 7, 4, 2, 1])
+        if isinstance(radius, MIArray):
+            radius = radius.aslist()
+        r = ArrayUtil.cressman(x_s, y_s, values, x_g, y_g, fill_value, radius)
+        return MIArray(r)
+    elif method == 'neareast':
+        r = ArrayUtil.interpolation_Nearest(x_s, y_s, values, x_g, y_g, fill_value)
+        return MIArray(r)
+    else:
+        return None
 
 def projinfo(proj='longlat', **kwargs):
     if proj == 'longlat' and len(kwargs) == 0:

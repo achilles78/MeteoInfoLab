@@ -263,10 +263,27 @@ class MIArray():
         return PyGridData(gdata)
         
     def inpolygon(self, x, y, polygon):
-        return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
+        if isinstance(polygon, tuple):
+            x_p = polygon[0]
+            y_p = polygon[1]
+            if isinstance(x_p, MIArray):
+                x_p = x_p.aslist()
+            if isinstance(y_p, MIArray):
+                y_p = y_p.aslist()
+            return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), x_p, y_p))
+        else:
+            return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
         
     def maskout(self, x, y, polygon, missingv):
-        return MIArray(ArrayMath.maskout(self.array, x.aslist(), y.aslist(), polygon, missingv))
+        if isinstance(x, MIArray):
+            xl = x.aslist()
+        else:
+            xl = x
+        if isinstance(y, MIArray):
+            yl = y.aslist()
+        else:
+            yl = y
+        return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, missingv))
         
     def savegrid(self, x, y, fname):
         gdata = GridData(self.array, x.array, y.array, -9999.0)
