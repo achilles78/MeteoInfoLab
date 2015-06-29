@@ -40,12 +40,14 @@ public class FigureDockable extends DefaultSingleCDockable {
                 if (tabbedPanel.getTabCount() == 0) {
                     try {
                         interp.exec("mipylib.miplot.chartpanel = None");
+                        interp.exec("mipylib.miplot.c_plot = None");
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 } else {
                     interp.set("cp", tabbedPanel.getSelectedComponent());
                     interp.exec("mipylib.miplot.chartpanel = cp");
+                    interp.exec("mipylib.miplot.c_plot = None");
                 }
             }
         });
@@ -127,12 +129,14 @@ public class FigureDockable extends DefaultSingleCDockable {
                 if (tabbedPanel.getTabCount() == 0) {
                     try {
                         interp.exec("mipylib.miplot.chartpanel = None");
+                        interp.exec("mipylib.miplot.c_plot = None");
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 } else {
                     interp.set("cp", tabbedPanel.getSelectedComponent());
                     interp.exec("mipylib.miplot.chartpanel = cp");
+                    interp.exec("mipylib.miplot.c_plot = None");
                 }
             }
         });
