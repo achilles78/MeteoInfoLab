@@ -607,6 +607,9 @@ def __getpointstyle(style):
     return pointStyle
     
 def __getcolor(style):
+    if isinstance(style, Color):
+        return style
+        
     c = Color.black
     if isinstance(style, str):
         if style == 'red':
@@ -845,7 +848,7 @@ def __getcolormap(**kwargs):
         if isinstance(colors, str):
             c = __getcolor(colors)
             cmap = ColorMap(c)
-        elif isinstance(colors, tuple) or isinstance(colors, list):
+        else:
             cs = []
             for cc in colors:
                 cs.append(__getcolor(cc))
@@ -1328,6 +1331,16 @@ def geoshow(layer, **kwargs):
         layer.addLabels()    
     draw_if_interactive()
 
+def makecolors(n, cmap='matlab_jet', reverse=False):
+    ocmap = ColorUtil.getColorMap(cmap)
+    if reverse:
+        ocmap.reverse()
+    cols = ocmap.getColorList(n)    
+    colors = []
+    for c in cols:
+        colors.append(c)
+    return colors
+    
 def makesymbolspec(geometry, *args, **kwargs):    
     if geometry == 'point':
         ls = LegendScheme(ShapeTypes.Point)
