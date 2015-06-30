@@ -1274,35 +1274,40 @@ def geoshow(layer, **kwargs):
     plot = c_plot
     visible = kwargs.pop('visible', True)
     layer.setVisible(visible)
-    fcobj = kwargs.pop('facecolor', None)
-    ecobj = kwargs.pop('edgecolor', 'k')
-    if fcobj is None:
-        facecolor = Color.lightGray
-        drawfill = False
+    #LegendScheme
+    ls = kwargs.pop('symbolspec', None)
+    if ls is None:
+        fcobj = kwargs.pop('facecolor', None)
+        ecobj = kwargs.pop('edgecolor', 'k')
+        if fcobj is None:
+            facecolor = Color.lightGray
+            drawfill = False
+        else:
+            facecolor = __getcolor(fcobj)
+            drawfill = True
+        if ecobj is None:
+            drawline = False  
+            edgecolor = Color.black
+        else:
+            drawline = True
+            edgecolor = __getcolor(ecobj)            
+        size = kwargs.pop('size', 1)
+        lb = layer.getLegendScheme().getLegendBreaks().get(0)
+        lb.setColor(facecolor)
+        btype = lb.getBreakType()
+        if btype == BreakTypes.PointBreak:        
+            lb.setDrawOutline(drawline)
+            lb.setOutlineColor(edgecolor)        
+        elif btype == BreakTypes.PolylineBreak:
+            lb.setSize(size)
+        elif btype == BreakTypes.PolygonBreak:
+            lb.setDrawFill(drawfill)
+            lb.setDrawOutline(drawline)
+            lb.setOutlineColor(edgecolor)
+            lb.setOutlineSize(size)
     else:
-        facecolor = __getcolor(fcobj)
-        drawfill = True
-    if ecobj is None:
-        drawline = False  
-        edgecolor = Color.black
-    else:
-        drawline = True
-        edgecolor = __getcolor(ecobj)
+        layer.setLegendScheme(ls)
         
-    size = kwargs.pop('size', 1)
-    lb = layer.getLegendScheme().getLegendBreaks().get(0)
-    lb.setColor(facecolor)
-    btype = lb.getBreakType()
-    if btype == BreakTypes.PointBreak:        
-        lb.setDrawOutline(drawline)
-        lb.setOutlineColor(edgecolor)        
-    elif btype == BreakTypes.PolylineBreak:
-        lb.setSize(size)
-    elif btype == BreakTypes.PolygonBreak:
-        lb.setDrawFill(drawfill)
-        lb.setDrawOutline(drawline)
-        lb.setOutlineColor(edgecolor)
-        lb.setOutlineSize(size)
     plot.addLayer(layer)
     labelfield = kwargs.pop('labelfield', None)
     if not labelfield is None:
