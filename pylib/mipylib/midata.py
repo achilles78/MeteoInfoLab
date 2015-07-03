@@ -264,6 +264,14 @@ def getstationdata(varname='var', timeindex=0, levelindex=0):
     else:
         return None
 
+def numasciirow(filename):
+    nrow = ArrayUtil.numASCIIRow(filename)
+    return nrow
+    
+def numasciicol(filename, delimiter=None, headerlines=0):
+    ncol = ArrayUtil.numASCIICol(filename, delimiter, headerlines)
+    return ncol
+        
 def asciiread(filename, **kwargs):
     delimiter = kwargs.pop('delimiter', None)
     datatype = kwargs.pop('datatype', None)

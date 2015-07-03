@@ -877,6 +877,23 @@ def __getlegendscheme(args, min, max, **kwargs):
         else:    
             ls = LegendManage.createLegendScheme(min, max, cmap)
     return ls
+    
+def __getlegendscheme_point(ls, **kwargs):
+    ls = ls.convertTo(ShapeTypes.Point)
+    size = kwargs.pop('size', 4)
+    marker = kwargs.pop('marker', 'o')
+    pstyle = __getpointstyle(marker)
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = __getcolor(ecobj)
+    fill = kwargs.pop('fill', True)
+    edge = kwargs.pop('edge', True)
+    for lb in ls.getLegendBreaks():
+        lb.setStyle(pstyle)
+        lb.setSize(size)        
+        lb.setOutlineColor(edgecolor)        
+        lb.setDrawFill(fill)        
+        lb.setDrawOutline(edge)
+    return ls
       
 def imshow(*args, **kwargs):
     n = len(args)
@@ -1030,6 +1047,9 @@ def scatterm(*args, **kwargs):
             gdata = midata.asgriddata(a, x, y, missingv)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
+    symbolspec = kwargs.pop('symbolspec', None)
+    if symbolspec is None:
+        ls = __getlegendscheme_point(ls, **kwargs)    
     if isinstance(gdata, PyGridData):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj)
     else:
