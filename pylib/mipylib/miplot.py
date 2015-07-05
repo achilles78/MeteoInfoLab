@@ -898,7 +898,7 @@ def __getlegendscheme_point(ls, **kwargs):
 def imshow(*args, **kwargs):
     n = len(args)
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     if n <= 2:
         gdata = midata.asgriddata(args[0])
         args = args[1:]
@@ -906,26 +906,26 @@ def imshow(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, missingv)
+        gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
         if isinstance(level_arg, int):
             cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
         else:
             if isinstance(level_arg, MIArray):
                 level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     layer = __plot_griddata(gdata, ls, 'imshow')
     return layer
       
 def contour(*args, **kwargs):
     n = len(args)
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     if n <= 2:
         gdata = midata.asgriddata(args[0])
         args = args[1:]
@@ -933,26 +933,26 @@ def contour(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, missingv)
+        gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
         if isinstance(level_arg, int):
             cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
         else:
             if isinstance(level_arg, MIArray):
                 level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     layer = __plot_griddata(gdata, ls, 'contour')
     return layer
 
 def contourf(*args, **kwargs):
     n = len(args)    
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     if n <= 2:
         gdata = midata.asgriddata(args[0])
         args = args[1:]
@@ -960,26 +960,26 @@ def contourf(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, missingv)
+        gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
         if isinstance(level_arg, int):
             cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
         else:
             if isinstance(level_arg, MIArray):
                 level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     layer = __plot_griddata(gdata, ls, 'contourf')
     return layer
 
 def quiver(*args, **kwargs):
     n = len(args)    
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     if n <= 2:
         gdata = midata.asgriddata(args[0])
         args = args[1:]
@@ -987,19 +987,19 @@ def quiver(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, missingv)
+        gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
         if isinstance(level_arg, int):
             cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
         else:
             if isinstance(level_arg, MIArray):
                 level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
-        ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     layer = __plot_griddata(gdata, ls, 'contourf')
     return layer
     
@@ -1028,7 +1028,7 @@ def __plot_griddata(gdata, ls, type):
     
 def scatterm(*args, **kwargs):
     plot = c_plot
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
     n = len(args) 
     if n <= 2:
@@ -1042,11 +1042,11 @@ def scatterm(*args, **kwargs):
         y = args[1]
         a = args[2]
         if a.rank == 1:
-            gdata = midata.asstationdata(a, x, y, missingv)
+            gdata = midata.asstationdata(a, x, y, fill_value)
         else:
-            gdata = midata.asgriddata(a, x, y, missingv)
+            gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
+    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     symbolspec = kwargs.pop('symbolspec', None)
     if symbolspec is None:
         ls = __getlegendscheme_point(ls, **kwargs)    
@@ -1060,7 +1060,7 @@ def scatterm(*args, **kwargs):
 def imshowm(*args, **kwargs):
     plot = c_plot
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
     n = len(args) 
     if n <= 2:
@@ -1070,17 +1070,17 @@ def imshowm(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, missingv)
+        gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
         if isinstance(level_arg, int):
             cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cn, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
         else:
             if isinstance(level_arg, MIArray):
                 level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), level_arg, cmap)
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
         #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
         ls = LegendManage.createImageLegend(gdata.data, cmap)
@@ -1090,7 +1090,7 @@ def imshowm(*args, **kwargs):
     
 def contourm(*args, **kwargs):  
     plot = c_plot
-    missingv = kwargs.pop('missingv', -9999.0)      
+    fill_value = kwargs.pop('fill_value', -9999.0)      
     proj = kwargs.pop('proj', None)
     n = len(args) 
     if n <= 2:
@@ -1100,16 +1100,16 @@ def contourm(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, missingv)
+        gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
+    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj)
     gdata = None
     return layer
         
 def contourfm(*args, **kwargs):
     plot = c_plot
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     interpolate = kwargs.pop('interpolate', False)
     proj = kwargs.pop('proj', None)
     n = len(args) 
@@ -1120,9 +1120,9 @@ def contourfm(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, missingv)
+        gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.getminvalue(), gdata.getmaxvalue(), **kwargs)
+    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if interpolate:
         gdata = gdata.interpolate()
     layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj)
@@ -1132,7 +1132,7 @@ def contourfm(*args, **kwargs):
 def quiverm(*args, **kwargs):
     plot = c_plot
     cmap = __getcolormap(**kwargs)
-    missingv = kwargs.pop('missingv', -9999.0)
+    fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
     isuv = kwargs.pop('isuv', True)
     size = kwargs.pop('size', 10)
@@ -1152,11 +1152,11 @@ def quiverm(*args, **kwargs):
         y = args[1]
         u = args[2]
         v = args[3]
-        udata = midata.asgriddata(u, x, y, missingv)
-        vdata = midata.asgriddata(v, x, y, missingv)
+        udata = midata.asgriddata(u, x, y, fill_value)
+        vdata = midata.asgriddata(v, x, y, fill_value)
         args = args[4:]
         if len(args) > 0:
-            cdata = midata.asgriddata(args[0], x, y, missingv)
+            cdata = midata.asgriddata(args[0], x, y, fill_value)
             iscolor = True
             args = args[1:]
     if iscolor:
@@ -1164,13 +1164,13 @@ def quiverm(*args, **kwargs):
             level_arg = args[0]
             if isinstance(level_arg, int):
                 cn = level_arg
-                ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), cn, cmap)
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
             else:
                 if isinstance(level_arg, MIArray):
                     level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), level_arg, cmap)
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
         else:
-            ls = LegendManage.createLegendScheme(cdata.getminvalue(), cdata.getmaxvalue(), cmap)
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
     else:    
         if cmap.getColorCount() == 1:
             c = cmap.getColor(0)

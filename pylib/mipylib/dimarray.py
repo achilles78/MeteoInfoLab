@@ -16,17 +16,17 @@ from miarray import MIArray
 class DimArray():
     
     # array must be MIArray
-    def __init__(self, array=None, dims=None, missingvalue=-9999.0, proj=None):
+    def __init__(self, array=None, dims=None, fill_value=-9999.0, proj=None):
         self.array = array        
         self.dims = dims
         self.ndim = len(dims)
-        self.missingvalue = missingvalue
+        self.fill_value = fill_value
         self.proj = proj
         
     def asgriddata(self):
         xdata = self.dims[1].getDimValue()
         ydata = self.dims[0].getDimValue()
-        gdata = GridData(self.array.array, xdata, ydata, self.missingvalue, self.proj)
+        gdata = GridData(self.array.array, xdata, ydata, self.fill_value, self.proj)
         return PyGridData(gdata)
         
     def __len__(self):
@@ -59,15 +59,32 @@ class DimArray():
         dims = []
         ranges = []
         flips = []
-        for i in range(0, self.ndim):   
+        for i in range(0, self.ndim):  
+            k = indices[i]
             if isinstance(indices[i], int):
-                sidx = indices[i]
-                eidx = indices[i]
-                step = 1
+                sidx = k
+                eidx = k
+                step = 1                
+            elif isinstance(k, slice):
+                sidx = 0 if k.start is None else k.start
+                eidx = k.stop is None and self.dims[i].getDimLength()-1 or k.stop
+                step = k.step is None and 1 or k.step
+            elif isinstance(k, tuple) or isinstance(k, list):
+                dim = self.dims[i]
+                sidx = dim.getValueIndex(k[0])
+                if len(k) == 1:
+                    eidx = sidx
+                    step = 1
+                else:                    
+                    eidx = dim.getValueIndex(k[1])
+                    if len(k) == 2:
+                        step = 1
+                    else:
+                        step = int(k[2] / dim.getDeltaValue)
             else:
-                sidx = 0 if indices[i].start is None else indices[i].start
-                eidx = indices[i].stop is None and self.dims[i].getDimLength()-1 or indices[i].stop
-                step = indices[i].step is None and 1 or indices[i].step
+                print k
+                return None
+                
             if step < 0:
                 step = abs(step)
                 flips.append(i)
@@ -88,15 +105,15 @@ class DimArray():
         rr = Array.factory(r.getDataType(), r.getShape());
         MAMath.copy(rr, r);
         array = MIArray(rr)
-        data = DimArray(array, dims, self.missingvalue, self.proj)
+        data = DimArray(array, dims, self.fill_value, self.proj)
         return data
         
     def __add__(self, other):
         r = None
         if isinstance(other, DimArray):      
-            r = DimArray(self.array.__add__(other.array), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__add__(other.array), self.dims, self.fill_value, self.proj)
         else:
-            r = DimArray(self.array.__add__(other), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__add__(other), self.dims, self.fill_value, self.proj)
         return r
         
     def __radd__(self, other):
@@ -105,25 +122,25 @@ class DimArray():
     def __sub__(self, other):
         r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__sub__(other.array), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__sub__(other.array), self.dims, self.fill_value, self.proj)
         else:
-            r = DimArray(self.array.__sub__(other), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__sub__(other), self.dims, self.fill_value, self.proj)
         return r
         
     def __rsub__(self, other):
         r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__rsub__(other.array), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__rsub__(other.array), self.dims, self.fill_value, self.proj)
         else:
-            r = DimArray(self.array.__rsub__(other), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__rsub__(other), self.dims, self.fill_value, self.proj)
         return r
         
     def __mul__(self, other):
         r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__mul__(other.array), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__mul__(other.array), self.dims, self.fill_value, self.proj)
         else:
-            r = DimArray(self.array.__mul__(other), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__mul__(other), self.dims, self.fill_value, self.proj)
         return r
         
     def __rmul__(self, other):
@@ -132,21 +149,21 @@ class DimArray():
     def __div__(self, other):
         r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__div__(other.array), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__div__(other.array), self.dims, self.fill_value, self.proj)
         else:
-            r = DimArray(self.array.__div__(other), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__div__(other), self.dims, self.fill_value, self.proj)
         return r
         
     def __rdiv__(self, other):
         r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__rdiv__(other.array), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__rdiv__(other.array), self.dims, self.fill_value, self.proj)
         else:
-            r = DimArray(self.array.__rdiv__(other), self.dims, self.missingvalue, self.proj)
+            r = DimArray(self.array.__rdiv__(other), self.dims, self.fill_value, self.proj)
         return r
         
     def __pow__(self, other):
-        r = DimArray(self.array.__pow__(other), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.__pow__(other), self.dims, self.fill_value, self.proj)
         return r
         
     # get dimension length
@@ -181,42 +198,40 @@ class DimArray():
             return False
         
     def sqrt(self):
-        r = DimArray(self.array.sqrt(), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.sqrt(), self.dims, self.fill_value, self.proj)
         return r
     
     def sin(self):
-        r = DimArray(self.array.sin(), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.sin(), self.dims, self.fill_value, self.proj)
         return r
         
     def cos(self):
-        r = DimArray(self.array.cos(), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.cos(), self.dims, self.fill_value, self.proj)
         return r
         
     def exp(self):
-        r = DimArray(self.array.exp(), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.exp(), self.dims, self.fill_value, self.proj)
         return r
         
     def log(self):
-        r = DimArray(self.array.log(), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.log(), self.dims, self.fill_value, self.proj)
         return r
         
     def log10(self):
-        r = DimArray(self.array.log10(), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.log10(), self.dims, self.fill_value, self.proj)
         return r
         
-    def getminvalue(self):
-        #return self.array.getminvalue(self.missingvalue)
-        return self.array.getminvalue()
+    def min(self):
+        return self.array.min(self.fill_value)
         
-    def getmaxvalue(self):
-        #return self.array.getmaxvalue(self.missingvalue)
-        return self.array.getminvalue()
+    def max(self):
+        return self.array.max(self.fill_value)
         
     def sum(self):
-        return self.array.sum(self.missingvalue)
+        return self.array.sum(self.fill_value)
         
     def ave(self):
-        return self.array.ave(self.missingvalue)
+        return self.array.ave(self.fill_value)
         
     def inpolygon(self, polygon):
         x = self.dims[1].getDimValue()
@@ -231,13 +246,13 @@ class DimArray():
             r = self.array.inpolygon(x, y, x_p, y_p)
         else:
             r = self.array.inpolygon(x, y, polygon)
-        r = DimArray(r, self.dims, self.missingvalue, self.proj)
+        r = DimArray(r, self.dims, self.fill_value, self.proj)
         return r
         
     def maskout(self, polygon):
         x = self.dims[1].getDimValue()
         y = self.dims[0].getDimValue()
-        r = DimArray(self.array.maskout(x, y, polygon, self.missingvalue), self.dims, self.missingvalue, self.proj)
+        r = DimArray(self.array.maskout(x, y, polygon, self.fill_value), self.dims, self.fill_value, self.proj)
         return r
      
     def aslist(self):
@@ -349,10 +364,10 @@ class PyGridData():
         gdata = PyGridData(self.data.pow(other))
         return gdata
         
-    def getminvalue(self):
+    def min(self):
         return self.data.getMinValue()
         
-    def getmaxvalue(self):
+    def max(self):
         return self.data.getMaxValue()  
 
     def interpolate(self):
@@ -437,10 +452,10 @@ class PyStationData():
         gdata = PyStationData(self.data.pow(other))
         return gdata        
         
-    def getminvalue(self):
+    def min(self):
         return self.data.getMinValue()
         
-    def getmaxvalue(self):
+    def max(self):
         return self.data.getMaxValue() 
         
     def maskout(self, polygon):

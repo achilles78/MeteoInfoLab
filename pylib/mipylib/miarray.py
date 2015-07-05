@@ -207,32 +207,32 @@ class MIArray():
             r = MIArray(ArrayMath.greaterThanOrEqual(self.array, other))
         return r
         
-    def getminvalue(self, missingv=None):
-        if missingv == None:
+    def min(self, fill_value=None):
+        if fill_value == None:
             return ArrayMath.getMinimum(self.array)
         else:
-            return ArrayMath.getMinimum(self.array, missingv)
+            return ArrayMath.getMinimum(self.array, fill_value)
         
-    def getmaxvalue(self, missingv=None):
-        if missingv == None:
+    def max(self, fill_value=None):
+        if fill_value == None:
             return ArrayMath.getMaximum(self.array)
         else:
-            return ArrayMath.getMaximum(self.array, missingv)
+            return ArrayMath.getMaximum(self.array, fill_value)
         
     def getshape(self):
         return self.array.getShape()
         
-    def sum(self, missingv=None):
-        if missingv == None:
+    def sum(self, fill_value=None):
+        if fill_value == None:
             return ArrayMath.sumDouble(self.array)
         else:
-            return ArrayMath.sumDouble(self.array, missingv)
+            return ArrayMath.sumDouble(self.array, fill_value)
             
-    def ave(self, missingv=None):
-        if missingv == None:
+    def ave(self, fill_value=None):
+        if fill_value == None:
             return ArrayMath.aveDouble(self.array)
         else:
-            return ArrayMath.aveDouble(self.array, missingv)
+            return ArrayMath.aveDouble(self.array, fill_value)
             
     def sqrt(self):
         return MIArray(ArrayMath.sqrt(self.array))

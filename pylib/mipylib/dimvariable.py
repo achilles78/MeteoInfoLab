@@ -77,9 +77,9 @@ class DimVariable():
                 dim = self.variable.getDimension(i)
                 dims.append(dim.extract(sidx, eidx, step))
         rr = self.dataset.read(self.name, origin, size, stride).reduce()
-        ArrayMath.missingToNaN(rr, self.dataset.missingvalue)
+        ArrayMath.missingToNaN(rr, self.dataset.fill_value)
         array = MIArray(rr)
-        data = DimArray(array, dims, self.dataset.missingvalue, self.dataset.proj)
+        data = DimArray(array, dims, self.dataset.fill_value, self.dataset.proj)
         return data
         
     # get dimension length

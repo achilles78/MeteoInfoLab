@@ -23,7 +23,7 @@ class DimDataFile():
         self.dataset = dataset
         self.filename = dataset.getFileName()
         self.nvar = dataset.getDataInfo().getVariableNum()
-        self.missingvalue = dataset.getMissingValue()
+        self.fill_value = dataset.getMissingValue()
         self.proj = dataset.getProjectionInfo()
         
     def __getitem__(self, key):
