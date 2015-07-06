@@ -742,14 +742,20 @@ def axis(limits):
         c_plot.setDrawExtent(Extent(xmin, xmax, ymin, ymax))
         draw_if_interactive()
         
-def axism(limits):
-    if len(limits) == 4:
-        xmin = limits[0]
-        xmax = limits[1]
-        ymin = limits[2]
-        ymax = limits[3]
-        c_plot.setLonLatExtent(Extent(xmin, xmax, ymin, ymax))
+def axism(limits=None):
+    if limits is None:
+        c_plot.setDrawExtent(c_plot.getMapView().getExtent())
         draw_if_interactive()
+    else:
+        if len(limits) == 4:
+            xmin = limits[0]
+            xmax = limits[1]
+            ymin = limits[2]
+            ymax = limits[3]
+            c_plot.setLonLatExtent(Extent(xmin, xmax, ymin, ymax))
+            draw_if_interactive()
+        else:
+            print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
 
 def grid(b=None, which='major', axis='both', **kwargs):
     plot = c_plot
@@ -1044,7 +1050,10 @@ def scatterm(*args, **kwargs):
         if a.rank == 1:
             gdata = midata.asstationdata(a, x, y, fill_value)
         else:
-            gdata = midata.asgriddata(a, x, y, fill_value)
+            if a.asarray().getSize() == x.asarray().getSize():
+                gdata = midata.asstationdata(a, x, y, fill_value)                
+            else:
+                gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     symbolspec = kwargs.pop('symbolspec', None)
@@ -1129,6 +1138,39 @@ def contourfm(*args, **kwargs):
     gdata = None
     return layer
     
+def surfacem(*args, **kwargs):
+    plot = c_plot
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    proj = kwargs.pop('proj', None)    
+    n = len(args) 
+    if n <= 2:
+        if isinstance(args[0], PyStationData):
+            gdata = args[0]
+        else:
+            gdata = midata.asgriddata(args[0])
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
+            gdata = midata.asgriddata(a, x, y, fill_value)
+        else:
+            x, y = midata.project(x, y, plot.getProjInfo())
+            a, x_g, y_g = midata.griddata([x, y], a, method='surface')
+            gdata = midata.asgriddata(a, x_g, y_g, fill_value)
+        
+        args = args[3:]
+    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    symbolspec = kwargs.pop('symbolspec', None)
+    if symbolspec is None:
+        ls = __getlegendscheme_point(ls, **kwargs)    
+          
+    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo())
+
+    gdata = None
+    return layer
+    
 def quiverm(*args, **kwargs):
     plot = c_plot
     cmap = __getcolormap(**kwargs)
@@ -1190,7 +1232,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None):
     elif type == 'contour':
         layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
     elif type == 'imshow':
-        layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)
+        layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)      
     elif type == 'scatter':
         layer = DrawMeteoData.createGridPointLayer(gdata.data, ls, 'layer', 'data')
     else:
@@ -1222,6 +1264,8 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
     #print 'GridData...'
     if type == 'scatter':
         layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
+    elif type == 'surface':
+        layer = DrawMeteoData
     else:
         layer = None
         return layer

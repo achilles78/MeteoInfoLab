@@ -5,19 +5,21 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.data import GridData, StationData, ArrayMath
+from org.meteoinfo.data import GridData, StationData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import DimensionType
 from org.meteoinfo.layer import VectorLayer
 from ucar.ma2 import Array, Range, MAMath
 import miarray
 from miarray import MIArray
+import math
 
 # Dimension array
 class DimArray():
     
     # array must be MIArray
     def __init__(self, array=None, dims=None, fill_value=-9999.0, proj=None):
-        self.array = array        
+        self.array = array
+        self.rank = array.rank
         self.dims = dims
         self.ndim = len(dims)
         self.fill_value = fill_value
@@ -476,13 +478,19 @@ class PyStationData():
     def sum(self):
         return self.data.sum()
         
-    def griddata(self, xi, **kwargs):
+    def griddata(self, xi=None, **kwargs):
         method = kwargs.pop('method', 'idw')
         fill_value = self.data.missingValue
-        x_s = self.data.getXList()
-        y_s = self.data.getYList()
-        x_g = xi[0]
-        y_g = xi[1]
+        x_s = MIArray(ArrayUtil.array(self.data.getXList()))
+        y_s = MIArray(ArrayUtil.array(self.data.getYList()))
+        if xi is None:            
+            xn = int(math.sqrt(len(x_s)))
+            yn = xn
+            x_g = MIArray(ArrayUtil.lineSpace(x_s.min(), x_s.max(), xn, True))
+            y_g = MIArray(ArrayUtil.lineSpace(y_s.min(), y_s.max(), yn, True))     
+        else:
+            x_g = xi[0]
+            y_g = xi[1]
         if isinstance(x_s, MIArray):
             x_s = x_s.aslist()
         if isinstance(y_s, MIArray):

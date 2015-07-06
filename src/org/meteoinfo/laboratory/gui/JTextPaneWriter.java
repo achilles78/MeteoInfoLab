@@ -16,7 +16,7 @@ public class JTextPaneWriter extends Writer {
     private final JTextPane _jta;
     private final int _maxBuffSize;
     private final StringBuffer _stringBuffer = new StringBuffer();
-    private final int _maxLength = 10000;
+    private final int _maxLength = 100000;
 
     public JTextPaneWriter(JTextPane ta) {
         this(ta, -1);

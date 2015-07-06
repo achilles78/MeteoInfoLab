@@ -364,6 +364,21 @@ def log10(a):
     else:
         return math.log10(a)
         
+def meshgrid(x, y):
+    if isinstance(x, list):
+        x = array(x)
+    if isinstance(y, list):
+        y = array(y)
+        
+    if x.rank != 1 or y.rank != 1:
+        print 'The paramters must be vector arrays!'
+        return None
+        
+    xa = x.asarray()
+    ya = y.asarray()
+    ra = ArrayUtil.meshgrid(xa, ya)
+    return MIArray(ra[0]), MIArray(ra[1])
+        
 def linregress(x, y):
     if isinstance(x, list):
         xl = x
@@ -418,11 +433,11 @@ def asgriddata(data, x=None, y=None, missingv=-9999.0):
         else:
             return None
     else:
-        gdata = GridData(data.asarray(), x.array, y.array, missingv)
+        gdata = GridData(data.asarray(), x.asarray(), y.asarray(), missingv)
         return PyGridData(gdata)
         
 def asstationdata(data, x, y, missingv=-9999.0):
-    stdata = StationData(data.array, x.array, y.array, missingv)
+    stdata = StationData(data.asarray(), x.asarray(), y.asarray(), missingv)
     return PyStationData(stdata)
         
 def shaperead(fn):
@@ -441,8 +456,8 @@ def griddata(points, values, xi=None, **kwargs):
     x_s = points[0]
     y_s = points[1]
     if xi is None:
-        xn = 1000
-        yn = 1000
+        xn = 500
+        yn = 500
         x_g = linspace(x_s.min(), x_s.max(), xn)
         y_g = linspace(y_s.min(), y_s.max(), yn)        
     else:
@@ -467,6 +482,9 @@ def griddata(points, values, xi=None, **kwargs):
         return MIArray(r), x_g, y_g
     elif method == 'neareast':
         r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), fill_value)
+        return MIArray(r), x_g, y_g
+    elif method == 'surface':        
+        r = ArrayUtil.interpolation_Surface(x_s.asarray(), y_s.asarray(), values, x_g.asarray(), y_g.asarray(), fill_value)
         return MIArray(r), x_g, y_g
     else:
         return None
@@ -518,9 +536,13 @@ def project(x, y, toproj, fromproj=None):
     else:        
         if isinstance(fromproj, str):
             fromproj = ProjectionInfo(fromproj)
-    inpt = PointD(x, y)
-    outpt = Reproject.reprojectPoint(inpt, fromproj, toproj)
-    return outpt.X, outpt.Y
+    if isinstance(x, MIArray) or isinstance(x, DimArray):
+        outxy = ArrayUtil.reproject(x.asarray(), y.asarray(), fromproj, toproj)
+        return MIArray(outxy[0]), MIArray(outxy[1])
+    else:
+        inpt = PointD(x, y)
+        outpt = Reproject.reprojectPoint(inpt, fromproj, toproj)
+        return outpt.X, outpt.Y
     
 def projectxy(lllon, lllat, xnum, ynum, dx, dy, toproj, fromproj=None):
     x, y = project(lllon, lllat, toproj, fromproj)
