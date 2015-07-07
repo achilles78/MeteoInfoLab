@@ -32,28 +32,29 @@ import org.python.util.PythonInterpreter;
  *
  * @author yaqiang
  */
-public class EditorDockable extends DefaultSingleCDockable{
+public class EditorDockable extends DefaultSingleCDockable {
 
     private String startupPath;
     private final JTabbedPane tabbedPanel;
     private Font textFont;
-    
+
     public EditorDockable(String id, String title, CAction... actions) {
         super(id, title, actions);
-        
-        tabbedPanel = new JTabbedPane(); 
+
+        tabbedPanel = new JTabbedPane();
         this.getContentPane().add(tabbedPanel);
         //this.setCloseable(false);
     }
-    
+
     /**
      * Set startup path
+     *
      * @param path Startup path
      */
-    public void setStartupPath(String path){
+    public void setStartupPath(String path) {
         this.startupPath = path;
     }
-    
+
     /**
      * Get font
      *
@@ -76,9 +77,10 @@ public class EditorDockable extends DefaultSingleCDockable{
             }
         }
     }
-    
+
     /**
      * Add a new text editor
+     *
      * @param title Title
      * @return Text editor
      */
@@ -103,9 +105,10 @@ public class EditorDockable extends DefaultSingleCDockable{
 
         return tab;
     }
-    
+
     /**
      * Get active text editor
+     *
      * @return Active text editor
      */
     public TextEditor getActiveTextEditor() {
@@ -115,7 +118,7 @@ public class EditorDockable extends DefaultSingleCDockable{
             return (TextEditor) this.tabbedPanel.getSelectedComponent();
         }
     }
-    
+
     private TextEditorPane getActiveTextArea() {
         TextEditor textEditor = getActiveTextEditor();
         if (textEditor != null) {
@@ -124,7 +127,7 @@ public class EditorDockable extends DefaultSingleCDockable{
             return null;
         }
     }
-    
+
     /**
      * Close file
      */
@@ -156,9 +159,22 @@ public class EditorDockable extends DefaultSingleCDockable{
             }
         }
     }
-    
+
+    /**
+     * Close all files
+     */
+    public void closeAllFiles() {
+        while (this.tabbedPanel.getTabCount() > 0){
+            this.closeFile();
+        }
+//        for (int i = 0; i < this.tabbedPanel.getTabCount(); i++) {
+//            this.closeFile((TextEditor) this.tabbedPanel.getComponentAt(0));
+//        }
+    }
+
     /**
      * Save file
+     *
      * @param editor The text editor
      * @return Boolean
      */
@@ -170,9 +186,10 @@ public class EditorDockable extends DefaultSingleCDockable{
             return true;
         }
     }
-    
+
     /**
      * Save as
+     *
      * @param editor The text editor
      * @return Boolean
      */
@@ -203,13 +220,14 @@ public class EditorDockable extends DefaultSingleCDockable{
         }
         return false;
     }
-    
+
     private void removeTextEditor(TextEditor editor) {
         this.tabbedPanel.remove(editor);
     }
-    
+
     /**
      * Open Jython script file
+     *
      * @param parent Parent frame
      */
     public void doOpen_Jython(JFrame parent) {
@@ -232,7 +250,7 @@ public class EditorDockable extends DefaultSingleCDockable{
             this.openFiles(files);
         }
     }
-    
+
     /**
      * Open script files
      *
@@ -249,11 +267,22 @@ public class EditorDockable extends DefaultSingleCDockable{
 
         // Open file(s)
         for (File file : files) {
+            boolean isExist = false;
+            for (int i = 0; i < this.tabbedPanel.getTabCount(); i++) {
+                TextEditor te = (TextEditor) this.tabbedPanel.getComponentAt(i);
+                if (file.getAbsolutePath().equals(te.getFileName())) {
+                    isExist = true;
+                    break;
+                }
+            }
+            if (isExist) {
+                continue;
+            }
             TextEditor editor = addNewTextEditor(file.getName());
             editor.openFile(file);
         }
     }
-    
+
     /**
      * Open script file
      *
@@ -269,12 +298,23 @@ public class EditorDockable extends DefaultSingleCDockable{
         }
 
         // Open file
-        TextEditor editor = addNewTextEditor(file.getName());
-        editor.openFile(file);
+        boolean isExist = false;
+        for (int i = 0; i < this.tabbedPanel.getTabCount(); i++) {
+            TextEditor te = (TextEditor) this.tabbedPanel.getComponentAt(i);
+            if (file.getAbsolutePath().equals(te.getFileName())) {
+                isExist = true;
+                break;
+            }
+        }
+        if (!isExist) {
+            TextEditor editor = addNewTextEditor(file.getName());
+            editor.openFile(file);
+        }
     }
-    
+
     /**
      * Run Jython script
+     *
      * @param jTextArea_Output
      */
     public void runPythonScript(final JTextArea jTextArea_Output) {
@@ -308,7 +348,6 @@ public class EditorDockable extends DefaultSingleCDockable{
 //                if (isDebug) {
 //                    path = "D:/MyProgram/Distribution/Java/MeteoInfo/MeteoInfo/pylib";
 //                }
-
                 try {
                     interp.exec("import sys");
                     //interp.set("mis", mis);

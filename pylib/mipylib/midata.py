@@ -396,9 +396,14 @@ def polyval(p, x):
 
 # Performs a centered difference operation on a grid data in the x or y direction    
 def cdiff(a, isx):
+    if isinstance(isx, str):
+        if isx.lower() == 'x':
+            isx = True
+        else:
+            isx = False
     if isinstance(a, DimArray):
         r = ArrayMath.cdiff(a.asarray(), isx)
-        return DimArray(MIArray(r), a.dims, a.missingvalue, a.proj)
+        return DimArray(MIArray(r), a.dims, a.fill_value, a.proj)
     else:
         return MIArray(ArrayMath.cdiff(a.asarray(), isx))
 
@@ -408,7 +413,7 @@ def hcurl(u, v):
         ydim = u.dims[0]
         xdim = u.dims[1]
         r = ArrayMath.hcurl(u.asarray(), v.asarray(), xdim.getDimValue(), ydim.getDimValue())
-        return DimArray(MIArray(r), u.dims, u.missingvalue, u.proj)
+        return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
 
 #  Calculates the horizontal divergence using finite differencing        
 def hdivg(u, v):
@@ -416,15 +421,15 @@ def hdivg(u, v):
         ydim = u.dims[0]
         xdim = u.dims[1]
         r = ArrayMath.hdivg(u.asarray(), v.asarray(), xdim.getDimValue(), ydim.getDimValue())
-        return DimArray(MIArray(r), u.dims, u.missingvalue, u.proj)
+        return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
         
 #  Calculates the horizontal divergence using finite differencing        
 def magnitude(u, v):
     if isinstance(u, DimArray) and isinstance(v, DimArray):
         r = ArrayMath.magnitude(u.asarray(), v.asarray())
-        return DimArray(MIArray(r), u.dims, u.missingvalue, u.proj)
+        return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
     
-def asgriddata(data, x=None, y=None, missingv=-9999.0):
+def asgriddata(data, x=None, y=None, fill_value=-9999.0):
     if x is None:    
         if isinstance(data, PyGridData):
             return data
@@ -433,11 +438,11 @@ def asgriddata(data, x=None, y=None, missingv=-9999.0):
         else:
             return None
     else:
-        gdata = GridData(data.asarray(), x.asarray(), y.asarray(), missingv)
+        gdata = GridData(data.asarray(), x.asarray(), y.asarray(), fill_value)
         return PyGridData(gdata)
         
-def asstationdata(data, x, y, missingv=-9999.0):
-    stdata = StationData(data.asarray(), x.asarray(), y.asarray(), missingv)
+def asstationdata(data, x, y, fill_value=-9999.0):
+    stdata = StationData(data.asarray(), x.asarray(), y.asarray(), fill_value)
     return PyStationData(stdata)
         
 def shaperead(fn):

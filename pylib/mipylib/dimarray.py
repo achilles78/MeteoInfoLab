@@ -20,6 +20,7 @@ class DimArray():
     def __init__(self, array=None, dims=None, fill_value=-9999.0, proj=None):
         self.array = array
         self.rank = array.rank
+        self.shape = array.shape
         self.dims = dims
         self.ndim = len(dims)
         self.fill_value = fill_value
@@ -110,8 +111,47 @@ class DimArray():
         data = DimArray(array, dims, self.fill_value, self.proj)
         return data
         
+    def __setitem__(self, indices, value):
+        #print type(indices) 
+        if isinstance(indices, MIArray):
+            ArrayMath.setValue(self.asarray(), indices.asarray(), value)
+            return None
+        
+        if not isinstance(indices, tuple):
+            inds = []
+            inds.append(indices)
+            indices = inds
+        
+        if self.rank == 0:
+            self.array.array.setObject(0, value)
+            return None
+        
+        if len(indices) != self.rank:
+            print 'indices must be ' + str(self.rank) + ' dimensions!'
+            return None
+
+        ranges = []
+        flips = []
+        for i in range(0, self.rank):   
+            if isinstance(indices[i], int):
+                sidx = indices[i]
+                eidx = indices[i]
+                step = 1
+            else:
+                sidx = 0 if indices[i].start is None else indices[i].start
+                eidx = indices[i].stop is None and self.shape[i]-1 or indices[i].stop
+                step = indices[i].step is None and 1 or indices[i].step
+            if step < 0:
+                step = abs(step)
+                flips.append(i)
+            rr = Range(sidx, eidx, step)
+            ranges.append(rr)
+
+        ArrayMath.setSection(self.array.array, ranges, value)
+        
     def __add__(self, other):
         r = None
+        ArrayMath.fill_value = self.fill_value
         if isinstance(other, DimArray):      
             r = DimArray(self.array.__add__(other.array), self.dims, self.fill_value, self.proj)
         else:
@@ -167,6 +207,34 @@ class DimArray():
     def __pow__(self, other):
         r = DimArray(self.array.__pow__(other), self.dims, self.fill_value, self.proj)
         return r
+        
+    def __neg__(self):
+        r = DimArray(self.array.__neg__(), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __lt__(self, other):
+        r = DimArray(self.array.__lt__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __le__(self, other):
+        r = DimArray(self.array.__le__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __eq__(self, other):
+        r = DimArray(self.array.__eq__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __ne__(self, other):
+        r = DimArray(self.array.__ne__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __gt__(self, other):
+        r = DimArray(self.array.__gt__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __ge__(self, other):
+        r = DimArray(self.array.__ge__(other), self.dims, self.fill_value, self.proj)
+        return r        
         
     # get dimension length
     def dimlen(self, idx):

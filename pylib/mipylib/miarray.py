@@ -16,6 +16,7 @@ class MIArray():
     def __init__(self, array):
         self.array = array
         self.rank = array.getRank()
+        self.shape = array.getShape()
         
     def __len__(self):
         return int(self.array.getSize())

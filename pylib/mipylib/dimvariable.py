@@ -20,6 +20,9 @@ class DimVariable():
         self.dataset = dataset
         self.name = variable.getName()
         self.ndim = variable.getDimNumber()
+        self.fill_value = variable.getFillValue()
+        self.scale_factor = variable.getScaleFactor()
+        self.add_offset = variable.getAddOffset()
         if not dataset is None:
             self.proj = dataset.proj
             
@@ -77,9 +80,9 @@ class DimVariable():
                 dim = self.variable.getDimension(i)
                 dims.append(dim.extract(sidx, eidx, step))
         rr = self.dataset.read(self.name, origin, size, stride).reduce()
-        ArrayMath.missingToNaN(rr, self.dataset.fill_value)
+        ArrayMath.missingToNaN(rr, self.fill_value)
         array = MIArray(rr)
-        data = DimArray(array, dims, self.dataset.fill_value, self.dataset.proj)
+        data = DimArray(array, dims, self.fill_value, self.dataset.proj)
         return data
         
     # get dimension length

@@ -9,7 +9,6 @@ import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import com.l2fprod.common.swing.JFontChooser;
-import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -198,6 +197,8 @@ public class FrmMain extends javax.swing.JFrame {
         jPanel_Status = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu_File = new javax.swing.JMenu();
+        jMenuItem_CloseAllFiles = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
         jMenuItem_Exist = new javax.swing.JMenuItem();
         jMenu_Editor = new javax.swing.JMenu();
         jMenuItem_Cut = new javax.swing.JMenuItem();
@@ -355,6 +356,15 @@ public class FrmMain extends javax.swing.JFrame {
         getContentPane().add(jPanel_Status, java.awt.BorderLayout.PAGE_END);
 
         jMenu_File.setText("File");
+
+        jMenuItem_CloseAllFiles.setText("Close All Files");
+        jMenuItem_CloseAllFiles.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_CloseAllFilesActionPerformed(evt);
+            }
+        });
+        jMenu_File.add(jMenuItem_CloseAllFiles);
+        jMenu_File.add(jSeparator3);
 
         jMenuItem_Exist.setText("Exist");
         jMenuItem_Exist.addActionListener(new java.awt.event.ActionListener() {
@@ -611,6 +621,11 @@ public class FrmMain extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_jMenuItem_ExistActionPerformed
 
+    private void jMenuItem_CloseAllFilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_CloseAllFilesActionPerformed
+        // TODO add your handling code here:
+        this.editorDock.closeAllFiles();
+    }//GEN-LAST:event_jMenuItem_CloseAllFilesActionPerformed
+
     /**
      * Get figure dockable
      *
@@ -743,6 +758,7 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem_About;
+    private javax.swing.JMenuItem jMenuItem_CloseAllFiles;
     private javax.swing.JMenuItem jMenuItem_Copy;
     private javax.swing.JMenuItem jMenuItem_Cut;
     private javax.swing.JMenuItem jMenuItem_Exist;
@@ -756,6 +772,7 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel_Toolbar;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JToolBar jToolBar_CurrentFolder;
     private javax.swing.JToolBar jToolBar_Editor;
     // End of variables declaration//GEN-END:variables
