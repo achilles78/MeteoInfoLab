@@ -122,36 +122,44 @@ class PyTableData():
 #################################################################  
 
 def __getfilename(fname):
+    s5 = fname[0:5]
+    isweb = False
+    if s5 == 'http:' or s5 == 'dods:' or s5 == 'dap4:':
+        isweb = True
+        return fname, isweb
     if os.path.exists(fname):
         if os.path.isabs(fname):
-            return fname
+            return fname, isweb
         else:
-            return os.path.join(currentfolder, fname)
+            return os.path.join(currentfolder, fname), isweb
     else:
         if currentfolder != None:
             fname = os.path.join(currentfolder, fname)
             if os.path.isfile(fname):
-                return fname
+                return fname, isweb
             else:
                 print 'File not exist: ' + fname
-                return None
+                return None, isweb
         else:
             print 'File not exist: ' + fname
-            return None
+            return None, isweb
           
 def addfile(fname):
-    if not os.path.exists(fname):
-        print 'The file does not exist: ' + fname
+    fname = fname.strip()
+    fname, isweb = __getfilename(fname)
+    if fname is None:
         return None
-        
-    fname = __getfilename(fname)
+
+    if isweb:
+        return addfile_nc(fname, False)
+    
     fsufix = os.path.splitext(fname)[1].lower()
     if fsufix == '.ctl':
-        return addfile_grads(fname)
+        return addfile_grads(fname, False)
     elif fsufix == '.tif':
-        return addfile_geotiff(fname)
+        return addfile_geotiff(fname, False)
     elif fsufix == '.awx':
-        return addfile_awx(fname)
+        return addfile_awx(fname, False)
     
     meteodata = MeteoDataInfo()
     meteodata.openData(fname)
@@ -159,7 +167,7 @@ def addfile(fname):
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_grads(fname):
+def addfile_grads(fname, getfn=True):
     fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openGrADSData(fname)
@@ -167,40 +175,45 @@ def addfile_grads(fname):
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_nc(fname):
-    fname = __getfilename(fname)
+def addfile_nc(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openNetCDFData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_arl(fname):
-    fname = __getfilename(fname)
+def addfile_arl(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openARLData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_surfer(fname):
-    fname = __getfilename(fname)
+def addfile_surfer(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openSurferGridData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_mm5(fname):
-    fname = __getfilename(fname)
+def addfile_mm5(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openMM5Data(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_lonlat(fname, missingv=-9999.0):
-    fname = __getfilename(fname)
+def addfile_lonlat(fname, getfn=True, missingv=-9999.0):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openLonLatData(fname)
     meteodata.getDataInfo().setMissingValue(missingv)
@@ -208,32 +221,36 @@ def addfile_lonlat(fname, missingv=-9999.0):
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_micaps(fname):
-    fname = __getfilename(fname)
+def addfile_micaps(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openMICAPSData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_hyconc(fname):
-    fname = __getfilename(fname)
+def addfile_hyconc(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openHYSPLITConcData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_geotiff(fname):
-    fname = __getfilename(fname)
+def addfile_geotiff(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openGeoTiffData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_awx(fname):
-    fname = __getfilename(fname)
+def addfile_awx(fname, getfn=True):
+    if getfn:
+        fname = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openAWXData(fname)
     __addmeteodata(meteodata)
