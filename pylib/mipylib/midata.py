@@ -393,6 +393,21 @@ def linregress(x, y):
     
 def polyval(p, x):
     return ArrayMath.polyVal(p, x.asarray())
+    
+def transpose(a, dim1=0, dim2=1):
+    r = ArrayMath.transpose(a.asarray(), dim1, dim2)
+    if isinstance(a, MIArray):
+        return MIArray(r)
+    else:
+        dims = []
+        for i in range(0, len(a.dims)):
+            if i == dim1:
+                dims.append(a.dims[dim2])
+            elif i == dim2:
+                dims.append(a.dims[dim1])
+            else:
+                dims.append(a.dims[i])
+        return DimArray(MIArray(r), dims, a.fill_value, a.proj) 
 
 # Performs a centered difference operation on a grid data in the x or y direction    
 def cdiff(a, isx):
