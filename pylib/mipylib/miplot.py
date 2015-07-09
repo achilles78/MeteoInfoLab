@@ -8,7 +8,7 @@ import os
 import inspect
 
 from org.meteoinfo.chart import ChartPanel, Location
-from org.meteoinfo.data import XYListDataset, GridData
+from org.meteoinfo.data import XYListDataset, GridData, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import XY1DPlot, XY2DPlot, MapPlot, ChartPlotMethod, PlotOrientation
@@ -1138,7 +1138,7 @@ def contourfm(*args, **kwargs):
     gdata = None
     return layer
     
-def surfacem(*args, **kwargs):
+def surfacem_1(*args, **kwargs):
     plot = c_plot
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
@@ -1156,7 +1156,8 @@ def surfacem(*args, **kwargs):
         if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
             gdata = midata.asgriddata(a, x, y, fill_value)
         else:
-            x, y = midata.project(x, y, plot.getProjInfo())
+            if not plot.getProjInfo().isLonLat():
+                x, y = midata.project(x, y, plot.getProjInfo())
             a, x_g, y_g = midata.griddata([x, y], a, method='surface')
             gdata = midata.asgriddata(a, x_g, y_g, fill_value)
         
@@ -1169,6 +1170,53 @@ def surfacem(*args, **kwargs):
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo())
 
     gdata = None
+    return layer
+    
+def surfacem(*args, **kwargs):
+    plot = c_plot
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    proj = kwargs.pop('proj', None)    
+    n = len(args) 
+    if n <= 2:
+        a = args[0]
+        y = midata.linspace(1, a.shape[1], 1)
+        x = midata.linspace(1, a.shape[0], 1)
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
+            x, y = midata.meshgrid(x, y)        
+        args = args[3:]
+    ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)
+    symbolspec = kwargs.pop('symbolspec', None)
+    if symbolspec is None:
+        ls = __getlegendscheme_point(ls, **kwargs)    
+    
+    if plot.getProjInfo().isLonLat():
+        lonlim = 90
+    else:
+        lonlim = 0
+        x, y = midata.project(x, y, plot.getProjInfo())
+    layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
+    layer.setProjInfo(plot.getProjInfo())
+    shapetype = layer.getShapeType()
+    if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
+        plot.addLayer(0, layer)
+    else:
+        plot.addLayer(layer)
+    plot.setDrawExtent(layer.getExtent())
+    
+    if chartpanel is None:
+        figure()
+    
+    chart = Chart(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    global c_plot
+    c_plot = plot
+    draw_if_interactive()
     return layer
     
 def quiverm(*args, **kwargs):

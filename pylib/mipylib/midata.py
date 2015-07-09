@@ -168,7 +168,8 @@ def addfile(fname):
     return datafile
     
 def addfile_grads(fname, getfn=True):
-    fname = __getfilename(fname)
+    if getfn:
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openGrADSData(fname)
     __addmeteodata(meteodata)
@@ -177,7 +178,7 @@ def addfile_grads(fname, getfn=True):
     
 def addfile_nc(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openNetCDFData(fname)
     __addmeteodata(meteodata)
@@ -186,7 +187,7 @@ def addfile_nc(fname, getfn=True):
     
 def addfile_arl(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openARLData(fname)
     __addmeteodata(meteodata)
@@ -195,7 +196,7 @@ def addfile_arl(fname, getfn=True):
     
 def addfile_surfer(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openSurferGridData(fname)
     __addmeteodata(meteodata)
@@ -204,7 +205,7 @@ def addfile_surfer(fname, getfn=True):
     
 def addfile_mm5(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openMM5Data(fname)
     __addmeteodata(meteodata)
@@ -213,7 +214,7 @@ def addfile_mm5(fname, getfn=True):
     
 def addfile_lonlat(fname, getfn=True, missingv=-9999.0):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openLonLatData(fname)
     meteodata.getDataInfo().setMissingValue(missingv)
@@ -223,7 +224,7 @@ def addfile_lonlat(fname, getfn=True, missingv=-9999.0):
     
 def addfile_micaps(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openMICAPSData(fname)
     __addmeteodata(meteodata)
@@ -232,7 +233,7 @@ def addfile_micaps(fname, getfn=True):
     
 def addfile_hyconc(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openHYSPLITConcData(fname)
     __addmeteodata(meteodata)
@@ -241,7 +242,7 @@ def addfile_hyconc(fname, getfn=True):
     
 def addfile_geotiff(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openGeoTiffData(fname)
     __addmeteodata(meteodata)
@@ -250,7 +251,7 @@ def addfile_geotiff(fname, getfn=True):
     
 def addfile_awx(fname, getfn=True):
     if getfn:
-        fname = __getfilename(fname)
+        fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openAWXData(fname)
     __addmeteodata(meteodata)
