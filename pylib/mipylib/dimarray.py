@@ -333,6 +333,10 @@ class DimArray():
      
     def tostation(self, x, y):
         gdata = self.asgriddata()
+        if isinstance(x, MIArray) or isinstance(x, DimArray):
+            x = x.aslist()
+        if isinstance(y, MIArray) or isinstance(y, DimArray):
+            y = y.aslist()
         r = gdata.data.toStation(x, y)
         return r
     
