@@ -76,15 +76,18 @@ public class MeteoInfoLab {
             }
         }
         PythonInterpreter interp = new PythonInterpreter(null, state);
-        String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
-        List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
+        //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
+        //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
         String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
         interp.exec("import sys");
+        interp.exec("import os");
         interp.exec("sys.path.append('" + path + "')");
-        for (String jarfn : jarfns) {
-            interp.exec("sys.path.append('" + jarfn + "')");
-            interp.exec("mipylib.miplot.batchmode = True");
-        }
+        interp.exec("from milab import *");
+        interp.exec("mipylib.miplot.batchmode = True");
+        interp.exec("mipylib.miplot.isinteractive = False");
+//        for (String jarfn : jarfns) {
+//            interp.exec("sys.path.append('" + jarfn + "')");            
+//        }
         interp.execfile(fn);
         System.exit(0);
     }
@@ -100,6 +103,7 @@ public class MeteoInfoLab {
         try {
             //console.set("mis", mis);
             console.exec("import sys");
+            console.exec("import os");
             console.exec("sys.path.append('" + path + "')");
             console.exec("from milab import *");
             //console.exec("import mipylib");
