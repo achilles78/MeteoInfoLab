@@ -14,7 +14,6 @@ import java.io.Reader;
 import javax.swing.event.EventListenerList;
 import org.meteoinfo.laboratory.event.ConsoleExecEvent;
 import org.meteoinfo.laboratory.event.IConsoleExecListener;
-import org.python.core.PyObject;
 import org.python.util.InteractiveConsole;
 
 /**

@@ -6,8 +6,11 @@
 package org.meteoinfo.laboratory;
 
 import java.awt.GraphicsEnvironment;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,10 +18,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.gui.FrmMain;
+import org.meteoinfo.laboratory.gui.MyPythonInterpreter;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveConsole;
-import org.python.util.PythonInterpreter;
 
 /**
  *
@@ -75,7 +78,10 @@ public class MeteoInfoLab {
                 state.argv.append(new PyString(args[i]));
             }
         }
-        PythonInterpreter interp = new PythonInterpreter(null, state);
+        //state.setdefaultencoding("utf-8");
+        //PythonInterpreter interp = new PythonInterpreter(null, state);
+        MyPythonInterpreter interp = new MyPythonInterpreter();
+        
         //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
         //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
         String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
@@ -85,11 +91,24 @@ public class MeteoInfoLab {
         interp.exec("from milab import *");
         interp.exec("mipylib.miplot.batchmode = True");
         interp.exec("mipylib.miplot.isinteractive = False");
-//        for (String jarfn : jarfns) {
-//            interp.exec("sys.path.append('" + jarfn + "')");            
+        //        for (String jarfn : jarfns) {
+//            interp.exec("sys.path.append('" + jarfn + "')");
 //        }
-        interp.execfile(fn);
-        System.exit(0);
+        try {            
+            File file = new File(fn);            
+            byte[] bytes = Files.readAllBytes(file.toPath());
+            String code = new String(bytes, "utf-8");
+            //ByteArrayInputStream bis = new ByteArrayInputStream(code.getBytes());
+            //interp.execfile(bis);
+            interp.exec(code);
+            //interp.execfile(fn);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MeteoInfoLab.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MeteoInfoLab.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            System.exit(0);
+        }
     }
 
     private static void runInteractive() {
