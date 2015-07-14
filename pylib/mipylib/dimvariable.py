@@ -55,8 +55,8 @@ class DimVariable():
                 step = 1
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
-                eidx = k.stop is None and self.dimlen(i)-1 or k.stop
-                step = k.step is None and 1 or k.step
+                eidx = self.dimlen(i)-1 if k.stop is None else k.stop
+                step = 1 if k.step is None else k.step
             elif isinstance(k, tuple) or isinstance(k, list):
                 dim = self.variable.getDimension(i)
                 sidx = dim.getValueIndex(k[0])

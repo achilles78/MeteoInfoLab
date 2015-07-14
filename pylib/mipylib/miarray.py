@@ -50,8 +50,8 @@ class MIArray():
                 step = 1
             else:
                 sidx = 0 if indices[i].start is None else indices[i].start
-                eidx = indices[i].stop is None and self.getshape()[i]-1 or indices[i].stop
-                step = indices[i].step is None and 1 or indices[i].step
+                eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop
+                step = 1 if indices[i].step is None else indices[i].step
             if step < 0:
                 step = abs(step)
                 flips.append(i)
@@ -90,8 +90,8 @@ class MIArray():
                 step = 1
             else:
                 sidx = 0 if indices[i].start is None else indices[i].start
-                eidx = indices[i].stop is None and self.getshape()[i]-1 or indices[i].stop
-                step = indices[i].step is None and 1 or indices[i].step
+                eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop
+                step = 1 if indices[i].step is None else indices[i].step
             if step < 0:
                 step = abs(step)
                 flips.append(i)
