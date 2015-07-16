@@ -447,7 +447,7 @@ def tf2tc(tf):
     if isinstance(tf, MIArray):
         return MIArray(ArrayMath.tf2tc(tf.asarray()))
     elif isinstance(tf, DimArray):
-        return DimArray(ArrayMath.tf2tc(tf.asarray()), tf.dims, tf.fill_value, tf.proj)
+        return DimArray(MIArray(ArrayMath.tf2tc(tf.asarray())), tf.dims, tf.fill_value, tf.proj)
     else:
         return MeteoMath.tf2tc(tf)
         
@@ -464,7 +464,7 @@ def tc2tf(tc):
     if isinstance(tc, MIArray):
         return MIArray(ArrayMath.tc2tf(tc.asarray()))
     elif isinstance(tc, DimArray):
-        return DimArray(ArrayMath.tc2tf(tc.asarray()), tc.dims, tc.fill_value, tc.proj)
+        return DimArray(MIArray(ArrayMath.tc2tf(tc.asarray())), tc.dims, tc.fill_value, tc.proj)
     else:
         return MeteoMath.tc2tf(tc)
 
@@ -489,7 +489,7 @@ def qair2rh(qair, temp, press=1013.25):
     if isinstance(qair, MIArray):
         return MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p))
     elif isinstance(qair, DimArray):
-        return DimArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p), qair.dims, qair.fill_value, qair.proj)
+        return DimArray(MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p)), qair.dims, qair.fill_value, qair.proj)
     else:
         return MeteoMath.qair2rh(qair, temp, press)
         
@@ -508,7 +508,7 @@ def dewpoint2rh(dewpoint, temp):
     if isinstance(dewpoint, MIArray):
         return MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray()))
     elif isinstance(dewpoint, DimArray):
-        return DimArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray()), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
+        return DimArray(MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray())), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
     else:
         return MeteoMath.dewpoint2rh(dewpoint, temp)
 
