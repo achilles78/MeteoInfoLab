@@ -6,7 +6,6 @@
 package org.meteoinfo.laboratory;
 
 import java.awt.GraphicsEnvironment;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -87,6 +86,7 @@ public class MeteoInfoLab {
         String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
         interp.exec("import sys");
         interp.exec("import os");
+        interp.exec("import datetime");
         interp.exec("sys.path.append('" + path + "')");
         interp.exec("from milab import *");
         interp.exec("mipylib.miplot.batchmode = True");
@@ -123,6 +123,7 @@ public class MeteoInfoLab {
             //console.set("mis", mis);
             console.exec("import sys");
             console.exec("import os");
+            console.exec("import datetime");
             console.exec("sys.path.append('" + path + "')");
             console.exec("from milab import *");
             //console.exec("import mipylib");

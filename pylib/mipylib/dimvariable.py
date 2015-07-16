@@ -19,6 +19,7 @@ class DimVariable():
         self.variable = variable
         self.dataset = dataset
         self.name = variable.getName()
+        self.dims = variable.getDimensions()
         self.ndim = variable.getDimNumber()
         self.fill_value = variable.getFillValue()
         self.scale_factor = variable.getScaleFactor()

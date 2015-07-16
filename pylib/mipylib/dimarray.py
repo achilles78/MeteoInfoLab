@@ -334,13 +334,12 @@ class DimArray():
     def tostation(self, x, y):
         gdata = self.asgriddata()
         if isinstance(x, MIArray) or isinstance(x, DimArray):
-            x = x.aslist()
-        if isinstance(y, MIArray) or isinstance(y, DimArray):
-            y = y.aslist()
-        r = gdata.data.toStation(x, y)
-        return r
+            r = gdata.data.toStation(x.aslist(), y.aslist())
+            return MIArray(ArrayUtil.array(r))
+        else:
+            return gdata.data.toStation(x, y)
     
-        
+       
 # The encapsulate class of GridData
 class PyGridData():
     
@@ -360,13 +359,23 @@ class PyGridData():
         if len(indices) != 2:
             print 'indices must be 2 dimension!'
             return None
-            
-        sxidx = 0 if indices[0].start is None else indices[0].start
-        exidx = indices[0].stop is None and self.data.getXNum() or indices[0].stop
-        xstep = indices[0].step is None and 1 or indices[0].step
-        syidx = 0 if indices[1].start is None else indices[1].start
-        eyidx = indices[1].stop is None and self.data.getYNum() or indices[1].stop
-        ystep = indices[1].step is None and 1 or indices[1].step
+
+        if isinstance(indices[0], int):
+            sxidx = indices[0]
+            exidx = indices[0]
+            xstep = 1
+        else:
+            sxidx = 0 if indices[0].start is None else indices[0].start
+            exidx = self.data.getXNum() if indices[0].stop is None else indices[0].stop
+            xstep = 1 if indices[0].step is None else indices[0].step
+        if isinstance(indices[1], int):
+            syidx = indices[1]
+            eyidx = indices[1]
+            ystep = 1
+        else:
+            syidx = 0 if indices[1].start is None else indices[1].start
+            eyidx = self.data.getYNum() if indices[1].stop is None else indices[1].stop
+            ystep = 1 if indices[1].step is None else indices[1].step
         gdata = PyGridData(self.data.extract(sxidx, exidx, xstep, syidx, eyidx, ystep))
         return gdata
     

@@ -9,6 +9,7 @@ import math
 from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
+from org.meteoinfo.data.analysis import MeteoMath
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
 from org.meteoinfo.global import PointD
@@ -98,8 +99,11 @@ class PyTableData():
     def join(self, other, colname):
         self.data.join(other.data, colname)
         
-    def savefile(self, filename):
-        self.data.saveAsCSVFile(filename)
+    def savefile(self, filename, delimiter=','):
+        if delimiter == ',':
+            self.data.saveAsCSVFile(filename)
+        else:
+            self.data.saveAsASCIIFile(filename)
         
     def ave_year(self, colnames):
         if not self.timedata:
@@ -118,6 +122,9 @@ class PyTableData():
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_YearMonth(cols, month)
             return PyTableData(TableData(dtable))
+            
+    def clone(self):
+        return PyTableData(self.data.clone())
 
 #################################################################  
 
@@ -427,6 +434,84 @@ def transpose(a, dim1=0, dim2=1):
                 dims.append(a.dims[i])
         return DimArray(MIArray(r), dims, a.fill_value, a.proj) 
 
+def tf2tc(tf):
+    """
+    Fahrenheit temperature to Celsius temperature
+        
+    tf: DimArray or MIArray or number 
+        Fahrenheit temperature - degree f   
+        
+    return: DimArray or MIArray or number
+        Celsius temperature - degree c
+    """    
+    if isinstance(tf, MIArray):
+        return MIArray(ArrayMath.tf2tc(tf.asarray()))
+    elif isinstance(tf, DimArray):
+        return DimArray(ArrayMath.tf2tc(tf.asarray()), tf.dims, tf.fill_value, tf.proj)
+    else:
+        return MeteoMath.tf2tc(tf)
+        
+def tc2tf(tc):
+    """
+    Celsius temperature to Fahrenheit temperature
+        
+    tc: DimArray or MIArray or number 
+        Celsius temperature - degree c    
+        
+    return: DimArray or MIArray or number
+        Fahrenheit temperature - degree f
+    """    
+    if isinstance(tc, MIArray):
+        return MIArray(ArrayMath.tc2tf(tc.asarray()))
+    elif isinstance(tc, DimArray):
+        return DimArray(ArrayMath.tc2tf(tc.asarray()), tc.dims, tc.fill_value, tc.proj)
+    else:
+        return MeteoMath.tc2tf(tc)
+
+def qair2rh(qair, temp, press=1013.25):
+    """
+    Specific humidity to relative humidity
+        
+    qair: DimArray or MIArray or number 
+        Specific humidity - dimensionless (e.g. kg/kg) ratio of water mass / total air mass
+    temp: DimArray or MIArray or number
+        Temperature - degree c
+    press: DimArray or MIArray or number
+        Pressure - hPa (mb)
+    
+    return: DimArray or MIArray or number
+        Relative humidity - %
+    """    
+    if isinstance(press, MIArray) or isinstance(press, DimArray):
+        p = press.asarray()
+    else:
+        p = press
+    if isinstance(qair, MIArray):
+        return MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p))
+    elif isinstance(qair, DimArray):
+        return DimArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p), qair.dims, qair.fill_value, qair.proj)
+    else:
+        return MeteoMath.qair2rh(qair, temp, press)
+        
+def dewpoint2rh(dewpoint, temp):    
+    """
+    Dew point to relative humidity
+        
+    dewpoint: DimArray or MIArray or number 
+        Dew point - degree c
+    temp: DimArray or MIArray or number
+        Temperature - degree c
+        
+    return: DimArray or MIArray or number
+        Relative humidity - %
+    """    
+    if isinstance(dewpoint, MIArray):
+        return MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray()))
+    elif isinstance(dewpoint, DimArray):
+        return DimArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray()), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
+    else:
+        return MeteoMath.dewpoint2rh(dewpoint, temp)
+
 # Performs a centered difference operation on a grid data in the x or y direction    
 def cdiff(a, isx):
     if isinstance(isx, str):
@@ -519,8 +604,12 @@ def griddata(points, values, xi=None, **kwargs):
         r = ArrayUtil.cressman(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), fill_value, radius)
         return MIArray(r), x_g, y_g
     elif method == 'neareast':
-        r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), fill_value)
+        radius = kwargs.pop('radius', inf)
+        r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius, fill_value)
         return MIArray(r), x_g, y_g
+    elif method == 'inside':
+        r = ArrayUtil.interpolation_Inside(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), fill_value)
+        return MIArray(r), x_g, y_g    
     elif method == 'surface':        
         r = ArrayUtil.interpolation_Surface(x_s.asarray(), y_s.asarray(), values, x_g.asarray(), y_g.asarray(), fill_value)
         return MIArray(r), x_g, y_g
