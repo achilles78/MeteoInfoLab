@@ -466,6 +466,22 @@ class PyStationData():
     
     def __len__(self):
         return self.data.getStNum()
+        
+    def __getitem__(self, indices):
+        if isinstance(indices, int):    #Data index
+            idx = indices
+            stid = self.data.getStid(idx)
+            x = self.data.getX(idx)
+            y = self.data.getY(idx)
+            return stid, x, y
+        elif isinstance(indices, str):    #Station identifer
+            stid = indices
+            idx = self.data.indexOf(stid)
+            x = self.data.getX(idx)
+            y = self.data.getY(idx)
+            return stid, x, y
+        else:
+            return None
     
     def add(self, other):
         gdata = None
@@ -538,8 +554,16 @@ class PyStationData():
     def min(self):
         return self.data.getMinValue()
         
+    def minloc(self):
+        minv = self.data.getMinValueIndex()
+        return minv[0], minv[1]
+        
     def max(self):
-        return self.data.getMaxValue() 
+        return self.data.getMaxValue()    
+
+    def maxloc(self):
+        maxv = self.data.getMaxValueIndex() 
+        return maxv[0], maxv[1]     
         
     def maskout(self, polygon):
         return PyStationData(self.data.maskout(polygon))
