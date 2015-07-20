@@ -13,6 +13,7 @@ from org.meteoinfo.data.analysis import MeteoMath
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
 from org.meteoinfo.global import PointD
+from org.meteoinfo.shape import ShapeUtil
 
 import dimdatafile
 import dimvariable
@@ -569,6 +570,19 @@ def shaperead(fn):
     #lb.setDrawFill(False)
     #lb.setOutlineColor(Color.darkGray) 
     return layer
+    
+def polygon(*args):
+    if len(args) == 1:
+        polygon = ShapeUtil.createPolygonShape(args[0])
+    else:
+        x = args[0]
+        y = args[1]
+        if isinstance(x, MIArray):
+            x = x.aslist()
+        if isinstance(y, MIArray):
+            y = y.aslist()
+        polygon = ShapeUtil.createPolygonShape(x, y)
+    return polygon
     
 def inpolygon(x, y, polygon):
     return GeoComputation.pointInPolygon(polygon, x, y)
