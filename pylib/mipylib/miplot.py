@@ -19,6 +19,7 @@ from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, P
 from org.meteoinfo.drawing import PointStyle
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
+from org.meteoinfo.layer import LayerTypes
 from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
 from org.meteoinfo.laboratory.gui import FrmMain
@@ -1036,6 +1037,7 @@ def scatterm(*args, **kwargs):
     plot = c_plot
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
+    order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
         if isinstance(args[0], PyStationData):
@@ -1060,9 +1062,9 @@ def scatterm(*args, **kwargs):
     if symbolspec is None:
         ls = __getlegendscheme_point(ls, **kwargs)    
     if isinstance(gdata, PyGridData):
-        layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj)
+        layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
     else:
-        layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj)
+        layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
     gdata = None
     return layer
         
@@ -1071,6 +1073,7 @@ def imshowm(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
+    order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -1093,7 +1096,7 @@ def imshowm(*args, **kwargs):
     else:    
         #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
         ls = LegendManage.createImageLegend(gdata.data, cmap)
-    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj)
+    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
     gdata = None
     return layer
     
@@ -1101,6 +1104,7 @@ def contourm(*args, **kwargs):
     plot = c_plot
     fill_value = kwargs.pop('fill_value', -9999.0)      
     proj = kwargs.pop('proj', None)
+    order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -1112,7 +1116,7 @@ def contourm(*args, **kwargs):
         gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj)
+    layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj, order=order)
     gdata = None
     return layer
         
@@ -1121,6 +1125,7 @@ def contourfm(*args, **kwargs):
     fill_value = kwargs.pop('fill_value', -9999.0)
     interpolate = kwargs.pop('interpolate', False)
     proj = kwargs.pop('proj', None)
+    order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
         gdata = midata.asgriddata(args[0])
@@ -1134,7 +1139,7 @@ def contourfm(*args, **kwargs):
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if interpolate:
         gdata = gdata.interpolate()
-    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj)
+    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order)
     gdata = None
     return layer
     
@@ -1142,6 +1147,7 @@ def surfacem_1(*args, **kwargs):
     plot = c_plot
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
+    order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
         if isinstance(args[0], PyStationData):
@@ -1167,7 +1173,7 @@ def surfacem_1(*args, **kwargs):
     if symbolspec is None:
         ls = __getlegendscheme_point(ls, **kwargs)    
           
-    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo())
+    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo(), order=order)
 
     gdata = None
     return layer
@@ -1176,6 +1182,7 @@ def surfacem(*args, **kwargs):
     plot = c_plot
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
+    order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
         a = args[0]
@@ -1202,10 +1209,13 @@ def surfacem(*args, **kwargs):
     layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
     layer.setProjInfo(plot.getProjInfo())
     shapetype = layer.getShapeType()
-    if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-        plot.addLayer(0, layer)
+    if order is None:
+        if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
+            plot.addLayer(0, layer)
+        else:
+            plot.addLayer(layer)
     else:
-        plot.addLayer(layer)
+        plot.addLayer(order, layer)
     plot.setDrawExtent(layer.getExtent())
     
     if chartpanel is None:
@@ -1224,6 +1234,7 @@ def quiverm(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
+    order = kwargs.pop('order', None)
     isuv = kwargs.pop('isuv', True)
     size = kwargs.pop('size', 10)
     n = len(args) 
@@ -1273,7 +1284,7 @@ def quiverm(*args, **kwargs):
     cdata = None
     return layer
         
-def __plot_griddata_m(plot, gdata, ls, type, proj=None):
+def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
     #print 'GridData...'
     if type == 'contourf':
         layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
@@ -1291,10 +1302,13 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None):
         layer.setProjInfo(proj)
         
     shapetype = layer.getShapeType()
-    if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-        plot.addLayer(0, layer)
+    if order is None:
+        if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
+            plot.addLayer(0, layer)
+        else:
+            plot.addLayer(layer)
     else:
-        plot.addLayer(layer)
+        plot.addLayer(order, layer)
     plot.setDrawExtent(layer.getExtent())
     
     if chartpanel is None:
@@ -1389,65 +1403,69 @@ def geoshow(layer, **kwargs):
     plot = c_plot
     visible = kwargs.pop('visible', True)
     layer.setVisible(visible)
-    #LegendScheme
-    ls = kwargs.pop('symbolspec', None)
-    if ls is None:
-        fcobj = kwargs.pop('facecolor', None)
-        ecobj = kwargs.pop('edgecolor', 'k')
-        if fcobj is None:
-            facecolor = Color.lightGray
-            drawfill = False
+    if layer.getLayerType() != LayerTypes.ImageLayer:        
+        #LegendScheme
+        ls = kwargs.pop('symbolspec', None)
+        if ls is None:
+            fcobj = kwargs.pop('facecolor', None)
+            ecobj = kwargs.pop('edgecolor', 'k')
+            if fcobj is None:
+                facecolor = Color.lightGray
+                drawfill = False
+            else:
+                facecolor = __getcolor(fcobj)
+                drawfill = True
+            if ecobj is None:
+                drawline = False  
+                edgecolor = Color.black
+            else:
+                drawline = True
+                edgecolor = __getcolor(ecobj)            
+            size = kwargs.pop('size', 1)
+            lb = layer.getLegendScheme().getLegendBreaks().get(0)
+            lb.setColor(facecolor)
+            btype = lb.getBreakType()
+            if btype == BreakTypes.PointBreak:        
+                lb.setDrawOutline(drawline)
+                lb.setOutlineColor(edgecolor)        
+            elif btype == BreakTypes.PolylineBreak:
+                lb.setSize(size)
+            elif btype == BreakTypes.PolygonBreak:
+                lb.setDrawFill(drawfill)
+                lb.setDrawOutline(drawline)
+                lb.setOutlineColor(edgecolor)
+                lb.setOutlineSize(size)
         else:
-            facecolor = __getcolor(fcobj)
-            drawfill = True
-        if ecobj is None:
-            drawline = False  
-            edgecolor = Color.black
-        else:
-            drawline = True
-            edgecolor = __getcolor(ecobj)            
-        size = kwargs.pop('size', 1)
-        lb = layer.getLegendScheme().getLegendBreaks().get(0)
-        lb.setColor(facecolor)
-        btype = lb.getBreakType()
-        if btype == BreakTypes.PointBreak:        
-            lb.setDrawOutline(drawline)
-            lb.setOutlineColor(edgecolor)        
-        elif btype == BreakTypes.PolylineBreak:
-            lb.setSize(size)
-        elif btype == BreakTypes.PolygonBreak:
-            lb.setDrawFill(drawfill)
-            lb.setDrawOutline(drawline)
-            lb.setOutlineColor(edgecolor)
-            lb.setOutlineSize(size)
-    else:
-        layer.setLegendScheme(ls)
-        
+            layer.setLegendScheme(ls)
+        #Labels        
+        labelfield = kwargs.pop('labelfield', None)
+        if not labelfield is None:
+            labelset = layer.getLabelSet()
+            labelset.setFieldName(labelfield)
+            fontname = kwargs.pop('fontname', 'Arial')
+            fontsize = kwargs.pop('fontsize', 14)
+            bold = kwargs.pop('bold', False)
+            if bold:
+                font = Font(fontname, Font.BOLD, fontsize)
+            else:
+                font = Font(fontname, Font.PLAIN, fontsize)
+            labelset.setLabelFont(font)
+            xoffset = kwargs.pop('xoffset', 0)
+            labelset.setXOffset(xoffset)
+            yoffset = kwargs.pop('yoffset', 0)
+            labelset.setYOffset(yoffset)
+            layer.addLabels()    
     plot.addLayer(layer)
-    labelfield = kwargs.pop('labelfield', None)
-    if not labelfield is None:
-        labelset = layer.getLabelSet()
-        labelset.setFieldName(labelfield)
-        fontname = kwargs.pop('fontname', 'Arial')
-        fontsize = kwargs.pop('fontsize', 14)
-        bold = kwargs.pop('bold', False)
-        if bold:
-            font = Font(fontname, Font.BOLD, fontsize)
-        else:
-            font = Font(fontname, Font.PLAIN, fontsize)
-        labelset.setLabelFont(font)
-        xoffset = kwargs.pop('xoffset', 0)
-        labelset.setXOffset(xoffset)
-        yoffset = kwargs.pop('yoffset', 0)
-        labelset.setYOffset(yoffset)
-        layer.addLabels()    
     draw_if_interactive()
 
-def makecolors(n, cmap='matlab_jet', reverse=False):
+def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     ocmap = ColorUtil.getColorMap(cmap)
     if reverse:
         ocmap.reverse()
-    cols = ocmap.getColorList(n)    
+    if alpha is None:
+        cols = ocmap.getColorList(n)    
+    else:
+        cols = ocmap.getColorList(n, alpha)
     colors = []
     for c in cols:
         colors.append(c)

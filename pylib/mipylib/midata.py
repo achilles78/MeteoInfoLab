@@ -565,10 +565,11 @@ def asstationdata(data, x, y, fill_value=-9999.0):
     return PyStationData(stdata)
         
 def shaperead(fn):
-    layer = MapDataManage.loadLayer(fn)
-    #lb = layer.getLegendScheme().getLegendBreaks().get(0)
-    #lb.setDrawFill(False)
-    #lb.setOutlineColor(Color.darkGray) 
+    layer = MapDataManage.loadLayer(fn) 
+    return layer
+    
+def georead(fn):
+    layer = MapDataManage.loadLayer(fn) 
     return layer
     
 def polygon(*args):
