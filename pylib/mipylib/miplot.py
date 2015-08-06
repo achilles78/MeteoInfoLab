@@ -1,7 +1,7 @@
 #-----------------------------------------------------
 # Author: Yaqiang Wang
 # Date: 2014-12-26
-# Purpose: MeteoInfo plot module
+# Purpose: MeteoInfoLab plot module
 # Note: Jython
 #-----------------------------------------------------
 import os
@@ -327,6 +327,8 @@ def axes(**kwargs):
     ytick = kwargs.pop('ytick', [])
     xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
     ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'
+    xreverse = kwargs.pop('xreverse', False)
+    yreverse = kwargs.pop('yreverse', False)
     plot = XY1DPlot()
     plot.setPosition(position[0], position[1], position[2], position[3])
     if bottomaxis == False:
@@ -337,6 +339,10 @@ def axes(**kwargs):
         plot.getAxis(Location.TOP).setVisible(False)
     if rightaxis == False:
         plot.getAxis(Location.RIGHT).setVisible(False)
+    if xreverse:
+        plot.getXAxis().setInverse(True)
+    if yreverse:
+        plot.getYAxis().setInverse(True)
     chartpanel.getChart().addPlot(plot)
     global c_plot
     c_plot = plot
@@ -795,7 +801,15 @@ def ylim(ymin, ymax):
     extent.minY = ymin
     extent.maxY = ymax
     plot.setDrawExtent(extent)
-    draw_if_interactive()        
+    draw_if_interactive()   
+
+def xreverse():
+    c_plot.getXAxis().setInverse(True)
+    draw_if_interactive()
+    
+def yreverse():
+    c_plot.getYAxis().setInverse(True)
+    draw_if_interactive()
             
 def legend(*args, **kwargs):
     plot = c_plot
@@ -872,6 +886,7 @@ def __getlegendscheme(args, min, max, **kwargs):
     ls = kwargs.pop('symbolspec', None)
     if ls is None:
         cmap = __getcolormap(**kwargs)
+        ecobj = kwargs.pop('edgecolor', None)
         if len(args) > 0:
             level_arg = args[0]
             if isinstance(level_arg, int):
@@ -883,6 +898,12 @@ def __getlegendscheme(args, min, max, **kwargs):
                 ls = LegendManage.createLegendScheme(min, max, level_arg, cmap)
         else:    
             ls = LegendManage.createLegendScheme(min, max, cmap)
+        if not ecobj is None:
+            edgecolor = __getcolor(ecobj)
+            ls = ls.convertTo(ShapeTypes.Polygon)
+            for lb in ls.getLegendBreaks():
+                lb.setDrawOutline(True)
+                lb.setOutlineColor(edgecolor)
     return ls
     
 def __getlegendscheme_point(ls, **kwargs):
@@ -984,30 +1005,57 @@ def contourf(*args, **kwargs):
     return layer
 
 def quiver(*args, **kwargs):
-    n = len(args)    
+    plot = c_plot
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
-    if n <= 2:
-        gdata = midata.asgriddata(args[0])
-        args = args[1:]
-    elif n <=4:
+    order = kwargs.pop('order', None)
+    isuv = kwargs.pop('isuv', True)
+    size = kwargs.pop('size', 10)
+    n = len(args) 
+    iscolor = False
+    cdata = None
+    if n <= 4:
+        udata = midata.asgriddata(args[0])
+        vdata = midata.asgriddata(args[1])
+        args = args[2:]
+        if len(args) > 0:
+            cdata = midata.asgriddata(args[0])
+            iscolor = True
+            args = args[1:]
+    elif n <= 6:
         x = args[0]
         y = args[1]
-        a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+        u = args[2]
+        v = args[3]
+        udata = midata.asgriddata(u, x, y, fill_value)
+        vdata = midata.asgriddata(v, x, y, fill_value)
+        args = args[4:]
+        if len(args) > 0:
+            cdata = midata.asgriddata(args[0], x, y, fill_value)
+            iscolor = True
+            args = args[1:]
+    if iscolor:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
         else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
     else:    
-        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-    layer = __plot_griddata(gdata, ls, 'contourf')
+        if cmap.getColorCount() == 1:
+            c = cmap.getColor(0)
+        else:
+            c = Color.black
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, size)
+    layer = __plot_uvgriddata(udata, vdata, cdata, ls, 'quiver', isuv)
+    udata = None
+    vdata = None
+    cdata = None
     return layer
     
 def __plot_griddata(gdata, ls, type):
@@ -1021,6 +1069,31 @@ def __plot_griddata(gdata, ls, type):
     mapview = MapView()
     plot = XY2DPlot(mapview)
     plot.addLayer(layer)
+    
+    if chartpanel is None:
+        figure()
+    
+    chart = Chart(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    global c_plot
+    c_plot = plot
+    draw_if_interactive()
+    return layer
+    
+def __plot_uvgriddata(udata, vdata, cdata, ls, type, isuv):
+    #print 'GridData...'
+    if type == 'quiver':
+        if cdata == None:
+            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
+        else:
+            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
+    
+    shapetype = layer.getShapeType()
+    mapview = MapView()
+    plot = XY2DPlot(mapview)
+    plot.addLayer(layer)
+    plot.setDrawExtent(layer.getExtent())
     
     if chartpanel is None:
         figure()
@@ -1322,7 +1395,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
     draw_if_interactive()
     return layer
     
-def __plot_stationdata_m(plot, stdata, ls, type, proj=None):
+def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
     #print 'GridData...'
     if type == 'scatter':
         layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
@@ -1374,8 +1447,6 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None):
     c_plot = plot
     draw_if_interactive()
     return layer
-
-
     
 def clabel(layer, **kwargs):
     font = __getfont(**kwargs)

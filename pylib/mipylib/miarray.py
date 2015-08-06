@@ -7,6 +7,7 @@
 #import math
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, ArrayMath, ArrayUtil
+from org.meteoinfo.data.meteodata import Dimension
 from ucar.ma2 import Array, Range
         
 # The encapsulate class of Array
@@ -259,9 +260,19 @@ class MIArray():
     def asarray(self):
         return self.array
         
-    def asgriddata(self, x, y, missingv=-9999.0):    
-        gdata = GridData(self.array, x.array, y.array, missingv)
+    def asgriddata(self, x, y, fill_value=-9999.0):    
+        gdata = GridData(self.array, x.array, y.array, fill_value)
         return PyGridData(gdata)
+        
+    def asdimarray(self, x, y, fill_value=-9999.0):
+        dims = []
+        ydim = Dimension(DimensionType.Y)
+        ydim.setDimValues(y.aslist())
+        dims.append(ydim)
+        xdim = Dimension(DimensionType.X)
+        xdim.setDimValues(x.aslist())
+        dims.append(xdim)        
+        return DimArray(self, dims, fill_value)
         
     def inpolygon(self, x, y, polygon):
         if isinstance(polygon, tuple):

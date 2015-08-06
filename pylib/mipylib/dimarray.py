@@ -455,6 +455,11 @@ class PyGridData():
 
     def interpolate(self):
         return PyGridData(self.data.interpolate())
+        
+    def asdimarray(self):
+        a = self.data.getArray()
+        dims = self.data.getDimensions()
+        return DimArray(MIArray(a), dims, self.data.missingValue, self.data.projInfo)
 
 ###############################################################         
 # The encapsulate class of StationData
