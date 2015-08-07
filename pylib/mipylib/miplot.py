@@ -269,10 +269,24 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     draw_if_interactive()
     return pb 
  
-def figure():
+def figure(bgcolor=None):
     global chartpanel
-    chartpanel = ChartPanel(Chart())
+    chart = Chart()
+    if not bgcolor is None:
+        chart.setDrawBackground(True)
+        chart.setBackground(__getcolor(bgcolor))
+    chartpanel = ChartPanel(chart)
     show()
+    
+# Set figure background color
+def bgcolor(color):
+    chart = chartpanel.getChart()
+    if color is None:
+        chart.setDrawBackground(False)
+    else:
+        chart.setDrawBackground(True)
+        chart.setBackground(__getcolor(color))
+    draw_if_interactive()
     
 def show():
     if milapp == None:
