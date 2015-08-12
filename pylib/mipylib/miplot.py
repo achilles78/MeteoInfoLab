@@ -1488,7 +1488,9 @@ def geoshow(layer, **kwargs):
     plot = c_plot
     visible = kwargs.pop('visible', True)
     layer.setVisible(visible)
-    if layer.getLayerType() != LayerTypes.ImageLayer:        
+    if layer.getLayerType() == LayerTypes.ImageLayer:     
+        plot.addLayer(layer)
+    else:
         #LegendScheme
         ls = kwargs.pop('symbolspec', None)
         if ls is None:
@@ -1522,6 +1524,7 @@ def geoshow(layer, **kwargs):
                 lb.setOutlineSize(size)
         else:
             layer.setLegendScheme(ls)
+        plot.addLayer(layer)
         #Labels        
         labelfield = kwargs.pop('labelfield', None)
         if not labelfield is None:
@@ -1539,8 +1542,7 @@ def geoshow(layer, **kwargs):
             labelset.setXOffset(xoffset)
             yoffset = kwargs.pop('yoffset', 0)
             labelset.setYOffset(yoffset)
-            layer.addLabels()    
-    plot.addLayer(layer)
+            layer.addLabels()        
     draw_if_interactive()
 
 def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
