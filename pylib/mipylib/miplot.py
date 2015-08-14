@@ -616,6 +616,8 @@ def __getpointstyle(style):
         pointStyle = PointStyle.Diamond
     elif '+' in style:
         pointStyle = PointStyle.Plus
+    elif '-' in style:
+        pointStyle = PointStyle.Minus
     elif 's' in style:
         pointStyle = PointStyle.Square
     elif '*' in style:
