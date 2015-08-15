@@ -670,14 +670,11 @@ def projinfo(proj='longlat', **kwargs):
         
     return ProjectionInfo(projstr)     
     
-def project(x, y, toproj, fromproj=None):
+def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, toproj=KnownCoordinateSystems.geographic.world.WGS1984):
+    if isinstance(fromproj, str):
+        fromproj = ProjectionInfo(fromproj)
     if isinstance(toproj, str):
         toproj = ProjectionInfo(toproj)
-    if fromproj is None:
-        fromproj = KnownCoordinateSystems.geographic.world.WGS1984
-    else:        
-        if isinstance(fromproj, str):
-            fromproj = ProjectionInfo(fromproj)
     if isinstance(x, MIArray) or isinstance(x, DimArray):
         outxy = ArrayUtil.reproject(x.asarray(), y.asarray(), fromproj, toproj)
         return MIArray(outxy[0]), MIArray(outxy[1])

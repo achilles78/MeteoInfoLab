@@ -44,6 +44,7 @@ class MIArray():
 
         ranges = []
         flips = []
+        iszerodim = True
         for i in range(0, self.rank):   
             if isinstance(indices[i], int):
                 sidx = indices[i]
@@ -53,15 +54,20 @@ class MIArray():
                 sidx = 0 if indices[i].start is None else indices[i].start
                 eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop
                 step = 1 if indices[i].step is None else indices[i].step
+            if sidx != eidx:
+                iszerodim = False
             if step < 0:
                 step = abs(step)
                 flips.append(i)
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
         r = ArrayMath.section(self.array, ranges)
-        for i in flips:
-            r = r.flip(i)
-        return MIArray(r)
+        if iszerodim:
+            return r.getObject(0)
+        else:
+            for i in flips:
+                r = r.flip(i)
+            return MIArray(r)
         
     def __setitem__(self, indices, value):
         #print type(indices) 

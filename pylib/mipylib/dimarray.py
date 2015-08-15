@@ -62,6 +62,7 @@ class DimArray():
         dims = []
         ranges = []
         flips = []
+        iszerodim = True
         for i in range(0, self.ndim):  
             k = indices[i]
             if isinstance(indices[i], int):
@@ -87,7 +88,9 @@ class DimArray():
             else:
                 print k
                 return None
-                
+            
+            if sidx != eidx:
+                iszerodim = False
             if step < 0:
                 step = abs(step)
                 flips.append(i)
@@ -103,13 +106,16 @@ class DimArray():
                     
         #r = ArrayMath.section(self.array.array, origin, size, stride)
         r = ArrayMath.section(self.array.array, ranges)
-        for i in flips:
-            r = r.flip(i)
-        rr = Array.factory(r.getDataType(), r.getShape());
-        MAMath.copy(rr, r);
-        array = MIArray(rr)
-        data = DimArray(array, dims, self.fill_value, self.proj)
-        return data
+        if iszerodim:
+            return r.getObject(0)
+        else:
+            for i in flips:
+                r = r.flip(i)
+            rr = Array.factory(r.getDataType(), r.getShape());
+            MAMath.copy(rr, r);
+            array = MIArray(rr)
+            data = DimArray(array, dims, self.fill_value, self.proj)
+            return data
         
     def __setitem__(self, indices, value):
         #print type(indices) 
@@ -131,7 +137,7 @@ class DimArray():
             return None
 
         ranges = []
-        flips = []
+        flips = []        
         for i in range(0, self.rank):   
             if isinstance(indices[i], int):
                 sidx = indices[i]
@@ -146,7 +152,7 @@ class DimArray():
                 flips.append(i)
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
-
+    
         ArrayMath.setSection(self.array.array, ranges, value)
         
     def __add__(self, other):
@@ -235,10 +241,76 @@ class DimArray():
     def __ge__(self, other):
         r = DimArray(self.array.__ge__(other), self.dims, self.fill_value, self.proj)
         return r        
+    
+    def value(self, indices):
+        #print type(indices)
+        if not isinstance(indices, tuple):
+            inds = []
+            inds.append(indices)
+            indices = inds
         
+        if len(indices) != self.ndim:
+            print 'indices must be ' + str(self.ndim) + ' dimensions!'
+            return None
+            
+        #origin = []
+        #size = []
+        #stride = []
+        dims = []
+        ranges = []
+        flips = []
+        for i in range(0, self.ndim):  
+            k = indices[i]
+            if isinstance(indices[i], int):
+                sidx = k
+                eidx = k
+                step = 1                
+            elif isinstance(k, slice):
+                sidx = 0 if k.start is None else k.start
+                eidx = self.dims[i].getDimLength()-1 if k.stop is None else k.stop
+                step = 1 if k.step is None else k.step
+            elif isinstance(k, tuple) or isinstance(k, list):
+                dim = self.dims[i]
+                sidx = dim.getValueIndex(k[0])
+                if len(k) == 1:
+                    eidx = sidx
+                    step = 1
+                else:                    
+                    eidx = dim.getValueIndex(k[1])
+                    if len(k) == 2:
+                        step = 1
+                    else:
+                        step = int(k[2] / dim.getDeltaValue)
+            else:
+                print k
+                return None
+                
+            if step < 0:
+                step = abs(step)
+                flips.append(i)
+            rr = Range(sidx, eidx, step)
+            ranges.append(rr)
+            #origin.append(sidx)
+            n = eidx - sidx + 1
+            #size.append(n)
+            #stride.append(step)
+            if n > 1:
+                dim = self.dims[i]
+                dims.append(dim.extract(sidx, eidx, step))
+                    
+        #r = ArrayMath.section(self.array.array, origin, size, stride)
+        r = ArrayMath.section(self.array.array, ranges)
+        for i in flips:
+            r = r.flip(i)
+        rr = Array.factory(r.getDataType(), r.getShape());
+        MAMath.copy(rr, r);
+        array = MIArray(rr)
+        data = DimArray(array, dims, self.fill_value, self.proj)
+        return data
+    
     # get dimension length
     def dimlen(self, idx):
-        return self.dims[idx].getDimLength(idx)
+        return self.dims[idx].getDimLength()
         
     def dimvalue(self, idx):
         return self.dims[idx].getDimValue()
