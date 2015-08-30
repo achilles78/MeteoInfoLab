@@ -65,6 +65,9 @@ class PyTableData():
             self.data.setColumnData(key, value.aslist())
         else:
             self.data.setColumnData(key, value)
+            
+    def __repr__(self):
+        return self.data.toString()
     
     def colnames(self):
         return self.data.getDataTable().getColumnNames()
@@ -124,6 +127,33 @@ class PyTableData():
             dtable = self.data.ave_YearMonth(cols, month)
             return PyTableData(TableData(dtable))
             
+    def ave_monthofyear(self, colnames):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_MonthOfYear(cols)
+            return PyTableData(TableData(dtable))
+            
+    def ave_seasonofyear(self, colnames):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_SeasonOfYear(cols)
+            return PyTableData(TableData(dtable))
+    
+    def ave_month(self, colnames):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_Month(cols)
+            return PyTableData(TableData(dtable))
+    
     def clone(self):
         return PyTableData(self.data.clone())
 
