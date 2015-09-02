@@ -71,7 +71,7 @@ class DimArray():
                 step = 1                
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
-                eidx = self.dims[i].getDimLength()-1 if k.stop is None else k.stop
+                eidx = self.dims[i].getDimLength()-1 if k.stop is None else k.stop-1
                 step = 1 if k.step is None else k.step
             elif isinstance(k, tuple) or isinstance(k, list):
                 dim = self.dims[i]

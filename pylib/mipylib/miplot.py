@@ -616,7 +616,7 @@ def __getpointstyle(style):
         pointStyle = PointStyle.Diamond
     elif '+' in style:
         pointStyle = PointStyle.Plus
-    elif '-' in style:
+    elif 'm' in style:
         pointStyle = PointStyle.Minus
     elif 's' in style:
         pointStyle = PointStyle.Square
@@ -737,6 +737,42 @@ def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     axis_r.setLabel(label)
     axis_r.setLabelFont(font)
     axis_r.setLabelColor(c)
+    draw_if_interactive()
+    
+def xticks(*args, **kwargs):
+    axis = c_plot.getXAxis()
+    axis_t = c_plot.getAxis(Location.TOP)
+    if len(args) > 0:
+        locs = args[0]
+        if isinstance(locs, MIArray):
+            locs = locs.aslist()
+        axis.setTickLocations(locs)
+        axis_t.setTickLocations(locs)
+        args = args[1:]
+    if len(args) > 0:
+        labels = args[0]
+        if isinstance(labels, MIArray):
+            labels = labels.aslist()
+        axis.setTickLabels(labels)
+        axis_t.setTickLabels(labels)
+    draw_if_interactive()
+    
+def yticks(*args, **kwargs):
+    axis = c_plot.getYAxis()
+    axis_r = c_plot.getAxis(Location.RIGHT)
+    if len(args) > 0:
+        locs = args[0]
+        if isinstance(locs, MIArray):
+            locs = locs.aslist()
+        axis.setTickLocations(locs)
+        axis_r.setTickLocations(locs)
+        args = args[1:]
+    if len(args) > 0:
+        labels = args[0]
+        if isinstance(labels, MIArray):
+            labels = labels.aslist()
+        axis.setTickLabels(labels)
+        axis_r.setTickLabels(labels)
     draw_if_interactive()
     
 def text(x, y, s, **kwargs):

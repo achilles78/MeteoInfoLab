@@ -52,7 +52,7 @@ class MIArray():
                 step = 1
             else:
                 sidx = 0 if indices[i].start is None else indices[i].start
-                eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop
+                eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop-1
                 step = 1 if indices[i].step is None else indices[i].step
             if sidx != eidx:
                 iszerodim = False
@@ -292,7 +292,7 @@ class MIArray():
         else:
             return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
         
-    def maskout(self, x, y, polygon, missingv):
+    def maskout(self, x, y, polygon, fill_value=-9999.0):
         if isinstance(x, MIArray):
             xl = x.aslist()
         else:
@@ -301,7 +301,7 @@ class MIArray():
             yl = y.aslist()
         else:
             yl = y
-        return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, missingv))
+        return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, fill_value))
         
     def savegrid(self, x, y, fname):
         gdata = GridData(self.array, x.array, y.array, -9999.0)

@@ -48,11 +48,12 @@ class PyTableData():
     # Must be a TableData object
     def __init__(self, data=None):
         self.data = data
+        if data is None:
+            self.data = TableData()
         self.timedata = isinstance(data, TimeTableData)
         
     def __getitem__(self, key):
-        if isinstance(key, str):
-            print key     
+        if isinstance(key, (str, unicode)):     
             coldata = self.data.getColumnData(key)
             if coldata.getDataType().isNumeric():
                 return MIArray(ArrayUtil.array(coldata.getDataValues()))
@@ -78,15 +79,37 @@ class PyTableData():
             values = self.data.getColumnData(key).getDataValues()
             return MIArray(ArrayUtil.array(values))
         return None
+        
+    def getvalue(self, row, col):
+        return self.data.getValue(row, col)
+
+    def setvalue(self, row, col, value):
+        self.data.setValue(row, col, value)
     
-    def addcol(self, colname, dtype, coldata):
+    def addcoldata(self, colname, dtype, coldata):
         if isinstance(coldata, MIArray):
             self.data.addColumnData(colname, dtype, coldata.aslist())
         else:
             self.data.addColumnData(colname, dtype, coldata)
-        
+
+    def addcol(self, colname, dtype, index=None):
+        dtype = TableUtil.toDataTypes(dtype)
+        if index is None:
+            self.data.addColumn(colname, dtype)
+        else:
+            self.data.addColumn(index, colname, dtype)
+    
     def delcol(self, colname):
         self.data.removeColumn(colname)
+        
+    def addrow(self, row=None):
+        if row is None:
+            self.data.addRow()
+        else:
+            self.data.addRow(row)
+        
+    def getrow(self, index):
+        return self.data.getRow(index)
         
     #Set time column
     def timecol(self, colname):
@@ -153,6 +176,9 @@ class PyTableData():
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_Month(cols)
             return PyTableData(TableData(dtable))
+            
+    def assinglerow(self):
+        return PyTableData(TableData(self.data.toSingleRowTable(self.data.getDataTable())))
     
     def clone(self):
         return PyTableData(self.data.clone())
