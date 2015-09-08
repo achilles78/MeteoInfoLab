@@ -15,6 +15,7 @@ from miarray import MIArray
 class DimVariable():
     
     # variable must be org.meteoinfo.data.meteodata.Variable
+    # dataset is DimDataFile
     def __init__(self, variable=None, dataset=None):
         self.variable = variable
         self.dataset = dataset
