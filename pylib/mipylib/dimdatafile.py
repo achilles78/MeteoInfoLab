@@ -28,7 +28,7 @@ class DimDataFile():
         
     def __getitem__(self, key):
         if isinstance(key, str):
-            print key
+            #print key
             return DimVariable(self.dataset.getDataInfo().getVariable(key), self)
         return None
         
@@ -74,3 +74,7 @@ class DimDataFile():
         second = cal.get(Calendar.SECOND)
         dt = datetime(year, month, day, hour, minute, second)
         return dt
+        
+    def bigendian(self, big_endian):
+        if self.dataset.getDataInfo().getDataType().isGrADS():
+            self.dataset.getDataInfo().setBigEndian(big_endian)
