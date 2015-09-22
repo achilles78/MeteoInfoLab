@@ -13,7 +13,7 @@ from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import XY1DPlot, XY2DPlot, MapPlot, ChartPlotMethod, PlotOrientation
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition
-from org.meteoinfo.chart.axis import LonLatAxis
+from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
 from org.meteoinfo.script import ChartForm, MapForm
 from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.drawing import PointStyle
@@ -113,6 +113,8 @@ def plot(*args, **kwargs):
             xdata = args[0].dimvalue(0)
             if args[0].islonlatdim(0):
                 xaxistype = 'lonlat'
+            elif args[0].istimedim(0):
+                xaxistype = 'time'
         else:
             xdata = []
             for i in range(0, len(args[0])):
@@ -126,6 +128,8 @@ def plot(*args, **kwargs):
                 xdata = args[0].dimvalue(0)
                 if args[0].islonlatdim(0):
                     xaxistype = 'lonlat'
+                elif args[0].istimedim(0):
+                    xaxistype = 'time'
             else:
                 xdata = []
                 for i in range(0, len(args[0])):
@@ -181,6 +185,8 @@ def plot(*args, **kwargs):
     
     if xaxistype == 'lonlat':
         plot.setXAxis(LonLatAxis('Longitude', True))
+    elif xaxistype == 'time':
+        plot.setXAxis(TimeAxis('Time', True))
     plot.setDataset(dataset)
             
     #Set plot data styles
@@ -620,6 +626,8 @@ def __getpointstyle(style):
         pointStyle = PointStyle.Minus
     elif 's' in style:
         pointStyle = PointStyle.Square
+    elif 'S' in style:
+        pointStyle = PointStyle.Star
     elif '*' in style:
         pointStyle = PointStyle.StarLines
     elif '^' in style:
@@ -1524,6 +1532,7 @@ def worldmap():
         
 def geoshow(layer, **kwargs):
     plot = c_plot
+    layer = layer.layer
     visible = kwargs.pop('visible', True)
     layer.setVisible(visible)
     if layer.getLayerType() == LayerTypes.ImageLayer:     

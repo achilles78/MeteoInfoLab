@@ -1,7 +1,7 @@
 #-----------------------------------------------------
 # Author: Yaqiang Wang
 # Date: 2014-12-27
-# Purpose: MeteoInfo Dataset module
+# Purpose: MeteoInfo data module
 # Note: Jython
 #-----------------------------------------------------
 import os
@@ -19,10 +19,12 @@ import dimdatafile
 import dimvariable
 import dimarray
 import miarray
+import milayer
 from dimdatafile import DimDataFile
 from dimvariable import DimVariable
 from dimarray import PyGridData, DimArray, PyStationData
 from miarray import MIArray
+from milayer import MILayer
 
 from java.awt import Color
 from java.lang import Math, Double
@@ -291,6 +293,15 @@ def addfile_micaps(fname, getfn=True):
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openMICAPSData(fname)
+    __addmeteodata(meteodata)
+    datafile = DimDataFile(meteodata)
+    return datafile
+
+def addfile_hytraj(fname, getfn=True):
+    if getfn:
+        fname, isweb = __getfilename(fname)
+    meteodata = MeteoDataInfo()
+    meteodata.openHYSPLITTrajData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
@@ -621,7 +632,7 @@ def asstationdata(data, x, y, fill_value=-9999.0):
     return PyStationData(stdata)
         
 def shaperead(fn):
-    layer = MapDataManage.loadLayer(fn) 
+    layer = MILayer(MapDataManage.loadLayer(fn))
     return layer
     
 def georead(fn):

@@ -62,6 +62,24 @@ class DimDataFile():
         else:
             return None
             
+    def trajlayer(self):
+        if self.dataset.isTrajData():
+            return self.dataset.getDataInfo().createTrajLineLayer()
+        else:
+            return None
+            
+    def trajplayer(self):
+        if self.dataset.isTrajData():
+            return self.dataset.getDataInfo().createTrajPointLayer()
+        else:
+            return None
+            
+    def trajsplayer(self):
+        if self.dataset.isTrajData():
+            return self.dataset.getDataInfo().createTrajStartPointLayer()
+        else:
+            return None
+            
     def gettime(self, idx):
         date = self.dataset.getDataInfo().getTimes().get(idx)
         cal = Calendar.getInstance()

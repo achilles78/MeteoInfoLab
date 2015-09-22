@@ -1,7 +1,7 @@
 #-----------------------------------------------------
 # Author: Yaqiang Wang
 # Date: 2014-12-27
-# Purpose: MeteoInfo Dataset module
+# Purpose: MeteoInfo dimarray module
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.projection import ProjectionInfo
@@ -309,30 +309,30 @@ class DimArray():
         return data
     
     # get dimension length
-    def dimlen(self, idx):
+    def dimlen(self, idx=0):
         return self.dims[idx].getDimLength()
         
-    def dimvalue(self, idx):
+    def dimvalue(self, idx=0):
         return self.dims[idx].getDimValue()
         
-    def islondim(self, idx):
+    def islondim(self, idx=0):
         dim = self.dims[idx]
         if dim.getDimType() == DimensionType.X and self.proj.isLonLat():
             return True
         else:
             return False
             
-    def islatdim(self, idx):
+    def islatdim(self, idx=0):
         dim = self.dims[idx]
         if dim.getDimType() == DimensionType.Y and self.proj.isLonLat():
             return True
         else:
             return False
             
-    def islonlatdim(self, idx):
+    def islonlatdim(self, idx=0):
         return self.islondim(idx) or self.islatdim(idx)
             
-    def istimedim(self, idx):
+    def istimedim(self, idx=0):
         dim = self.dims[idx]
         if dim.getDimType() == DimensionType.T:
             return True
