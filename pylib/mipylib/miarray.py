@@ -9,6 +9,9 @@ from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
 from ucar.ma2 import Array, Range
+
+import milayer
+from milayer import MILayer
         
 # The encapsulate class of Array
 class MIArray():
@@ -290,6 +293,8 @@ class MIArray():
                 y_p = y_p.aslist()
             return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), x_p, y_p))
         else:
+            if isinstance(polygon, MILayer):
+                polygon = polygon.layer
             return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
         
     def maskout(self, x, y, polygon, fill_value=-9999.0):
@@ -301,6 +306,8 @@ class MIArray():
             yl = y.aslist()
         else:
             yl = y
+        if isinstance(polygon, MILayer):
+            polygon = polygon.layer
         return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, fill_value))
         
     def savegrid(self, x, y, fname):

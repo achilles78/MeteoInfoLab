@@ -10,7 +10,9 @@ from org.meteoinfo.data.meteodata import DimensionType
 from org.meteoinfo.layer import VectorLayer
 from ucar.ma2 import Array, Range, MAMath
 import miarray
+import milayer
 from miarray import MIArray
+from milayer import MILayer
 import math
 
 # Dimension array
@@ -643,6 +645,8 @@ class PyStationData():
         return maxv[0], maxv[1]     
         
     def maskout(self, polygon):
+        if isinstance(polygon, MILayer):
+            polygon = polygon.layer
         return PyStationData(self.data.maskout(polygon))
         
     def maskin(self, polygon):
