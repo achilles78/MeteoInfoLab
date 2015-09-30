@@ -10,6 +10,8 @@ import dimvariable
 from dimvariable import DimVariable
 import dimarray
 from dimarray import PyGridData, PyStationData
+import milayer
+from milayer import MILayer, MIXYListData
 
 from datetime import datetime
 
@@ -64,19 +66,25 @@ class DimDataFile():
             
     def trajlayer(self):
         if self.dataset.isTrajData():
-            return self.dataset.getDataInfo().createTrajLineLayer()
+            return MILayer(self.dataset.getDataInfo().createTrajLineLayer())
         else:
             return None
             
     def trajplayer(self):
         if self.dataset.isTrajData():
-            return self.dataset.getDataInfo().createTrajPointLayer()
+            return MILayer(self.dataset.getDataInfo().createTrajPointLayer())
         else:
             return None
             
     def trajsplayer(self):
         if self.dataset.isTrajData():
-            return self.dataset.getDataInfo().createTrajStartPointLayer()
+            return MILayer(self.dataset.getDataInfo().createTrajStartPointLayer())
+        else:
+            return None
+            
+    def trajvardata(self, varidx):
+        if self.dataset.isTrajData():
+            return MIXYListData(self.dataset.getDataInfo().getXYDataset(varidx))
         else:
             return None
             

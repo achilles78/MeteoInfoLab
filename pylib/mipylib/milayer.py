@@ -33,3 +33,13 @@ class MILayer():
             
     def shapes(self):
         return self.layer.getShapes()
+        
+    def legend(self):
+        return self.layer.getLegendScheme()
+        
+class MIXYListData():
+    def __init__(self, data):
+        self.data = data
+        
+    def size(self):
+        return self.data.getSeriesCount()

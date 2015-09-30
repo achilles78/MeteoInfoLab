@@ -34,6 +34,8 @@ from dimarray import DimArray, PyGridData, PyStationData
 import miarray
 from miarray import MIArray
 import midata
+import milayer
+from milayer import MIXYListData
 
 ## Global ##
 milapp = None
@@ -85,8 +87,8 @@ def draw_if_interactive():
 		chartpanel.paintGraphics()
         
 def plot(*args, **kwargs):
-    if ismap:
-        map(False)
+    #if ismap:
+    #    map(False)
 
     #Parse args
     global c_plot
@@ -107,20 +109,26 @@ def plot(*args, **kwargs):
     ydatalist = []    
     styles = []
     xaxistype = None
+    isxylistdata = False
     if len(args) == 1:
-        ydata = __getplotdata(args[0])
-        if isinstance(args[0], DimArray):
-            xdata = args[0].dimvalue(0)
-            if args[0].islonlatdim(0):
-                xaxistype = 'lonlat'
-            elif args[0].istimedim(0):
-                xaxistype = 'time'
+        if isinstance(args[0], MIXYListData):
+            dataset = args[0].data
+            snum = args[0].size()
+            isxylistdata = True
         else:
-            xdata = []
-            for i in range(0, len(args[0])):
-                xdata.append(i)
-        xdatalist.append(xdata)
-        ydatalist.append(ydata)
+            ydata = __getplotdata(args[0])
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+                if args[0].islonlatdim(0):
+                    xaxistype = 'lonlat'
+                elif args[0].istimedim(0):
+                    xaxistype = 'time'
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            xdatalist.append(xdata)
+            ydatalist.append(ydata)
     elif len(args) == 2:
         if isinstance(args[1], basestring):
             ydata = __getplotdata(args[0])
@@ -166,13 +174,14 @@ def plot(*args, **kwargs):
         while len(styles) < len(xdatalist):
             styles.append('-')
     
-    #Add data series
-    snum = len(xdatalist)
-    for i in range(0, snum):
-        label = kwargs.pop('label', 'S_' + str(i + 1))
-        xdata = __getplotdata(xdatalist[i])
-        ydata = __getplotdata(ydatalist[i])
-        dataset.addSeries(label, xdata, ydata)
+    if not isxylistdata:
+        #Add data series
+        snum = len(xdatalist)
+        for i in range(0, snum):
+            label = kwargs.pop('label', 'S_' + str(i + 1))
+            xdata = __getplotdata(xdatalist[i])
+            ydata = __getplotdata(ydatalist[i])
+            dataset.addSeries(label, xdata, ydata)
     
     #Create XY1DPlot
     if c_plot is None:
@@ -191,17 +200,25 @@ def plot(*args, **kwargs):
             
     #Set plot data styles
     lines = []
-    if styles != None:
-        for i in range(0, len(styles)):
-            idx = dataset.getSeriesCount() - len(styles) + i
-            print 'Series index: ' + str(idx)
-            line = __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
+    legend = kwargs.pop('legend', None)
+    if not legend is None:
+        lbs = legend.getLegendBreaks()
+        for i in range(0, snum):
+            line = lbs[i]
+            plot.setLegendBreak(i, line)
             lines.append(line)
     else:
-        for i in range(0, snum):
-            idx = dataset.getSeriesCount() - snum + i
-            line = __setplotstyle(plot, idx, None, 1, **kwargs)
-            lines.append(line)
+        if styles != None:
+            for i in range(0, len(styles)):
+                idx = dataset.getSeriesCount() - len(styles) + i
+                print 'Series index: ' + str(idx)
+                line = __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
+                lines.append(line)
+        else:
+            for i in range(0, snum):
+                idx = dataset.getSeriesCount() - snum + i
+                line = __setplotstyle(plot, idx, None, 1, **kwargs)
+                lines.append(line)
     
     #Paint dataset
     if chartpanel is None:
@@ -315,17 +332,20 @@ def subplot(nrows, ncols, plot_number):
     chart = chartpanel.getChart()
     chart.setRowNum(nrows)
     chart.setColumnNum(ncols)
-    plot = chart.getPlot(plot_number)
-    if plot is None:
-        plot = XY1DPlot()
-        plot.isSubPlot = True
+    c_plot = chart.getPlot(plot_number)
+    chart.setCurrentPlot(plot_number - 1)
+    if c_plot is None:
+        c_plot = XY1DPlot()
+        c_plot.isSubPlot = True
         plot_number -= 1
         rowidx = plot_number / ncols
         colidx = plot_number % ncols
-        plot.rowIndex = rowidx
-        plot.columnIndex = colidx
-        chart.addPlot(plot)
-    c_plot = plot
+        c_plot.rowIndex = rowidx
+        c_plot.columnIndex = colidx
+        chart.addPlot(c_plot)
+        chart.setCurrentPlot(chart.getPlots().size() - 1)
+    #c_plot = plot
+    
     return plot
     
 def axes(**kwargs):
@@ -349,6 +369,7 @@ def axes(**kwargs):
     ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'
     xreverse = kwargs.pop('xreverse', False)
     yreverse = kwargs.pop('yreverse', False)
+    xaxistype = kwargs.pop('xaxistype', 'normal')
     plot = XY1DPlot()
     plot.setPosition(position[0], position[1], position[2], position[3])
     if bottomaxis == False:
@@ -363,7 +384,12 @@ def axes(**kwargs):
         plot.getXAxis().setInverse(True)
     if yreverse:
         plot.getYAxis().setInverse(True)
-    chartpanel.getChart().addPlot(plot)
+    if xaxistype == 'lonlat':
+        plot.setXAxis(LonLatAxis('Longitude', True))
+    elif xaxistype == 'time':
+        plot.setXAxis(TimeAxis('Time', True))
+    chart = chartpanel.getChart()
+    chart.setCurrentPlot(plot)
     global c_plot
     c_plot = plot
     return plot
@@ -454,7 +480,10 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     c_plot.setDrawNeatLine(frameon)
     c_plot.getMapView().projectLayers(projinfo)
     chart = chartpanel.getChart()
-    chart.addPlot(c_plot)
+    if chart.getPlot() is None:
+        chart.addPlot(c_plot)
+    else:
+        chart.setCurrentPlot(c_plot)
     return c_plot, projinfo
     
 def twinx(ax):
@@ -712,7 +741,7 @@ def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     c = __getcolor(color)
     ctitile = ChartText(title, font)
     ctitile.setColor(c)
-    chartpanel.getChart().getPlot().setTitle(ctitile)
+    c_plot.setTitle(ctitile)
     draw_if_interactive()
 
 def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
@@ -1126,18 +1155,30 @@ def __plot_griddata(gdata, ls, type):
         layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
     elif type == 'imshow':
         layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)
-    mapview = MapView()
-    plot = XY2DPlot(mapview)
+    
+    #Create XY1DPlot
+    global c_plot
+    if c_plot is None:
+        mapview = MapView()
+        plot = XY2DPlot(mapview)
+    else:
+        if isinstance(c_plot, XY2DPlot):
+            plot = c_plot
+        else:
+            mapview = MapView()
+            plot = XY2DPlot(mapview)
+    
     plot.addLayer(layer)
     
     if chartpanel is None:
         figure()
-    
-    chart = Chart(plot)
+        
+    chart = chartpanel.getChart()
+    if c_plot is None or (not isinstance(c_plot, XY2DPlot)):
+        chart.setCurrentPlot(plot)
+    c_plot = plot
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
-    global c_plot
-    c_plot = plot
     draw_if_interactive()
     return layer
     
@@ -1447,11 +1488,11 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
     if chartpanel is None:
         figure()
     
-    chart = Chart(plot)
+    #chart = Chart(plot)
     #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    global c_plot
-    c_plot = plot
+    #chartpanel.setChart(chart)
+    #global c_plot
+    #c_plot = plot
     draw_if_interactive()
     return layer
     
@@ -1474,11 +1515,11 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
     if chartpanel is None:
         figure()
     
-    chart = Chart(plot)
+    #chart = Chart(plot)
     #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    global c_plot
-    c_plot = plot
+    #chartpanel.setChart(chart)
+    #global c_plot
+    #c_plot = plot
     draw_if_interactive()
     return layer
     
@@ -1500,11 +1541,11 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None):
     if chartpanel is None:
         figure()
     
-    chart = Chart(plot)
+    #chart = Chart(plot)
     #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    global c_plot
-    c_plot = plot
+    #chartpanel.setChart(chart)
+    #global c_plot
+    #c_plot = plot
     draw_if_interactive()
     return layer
     
