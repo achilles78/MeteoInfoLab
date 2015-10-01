@@ -104,3 +104,12 @@ class DimDataFile():
     def bigendian(self, big_endian):
         if self.dataset.getDataInfo().getDataType().isGrADS():
             self.dataset.getDataInfo().setBigEndian(big_endian)
+            
+    def tostation(self, varname, x, y, z, t):
+        cal = Calendar.getInstance()
+        cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
+        nt = cal.getTime()
+        if z is None:
+            return self.dataset.toStation(varname, x, y, nt)
+        else:
+            return self.dataset.toStation(varname, x, y, z, nt)
