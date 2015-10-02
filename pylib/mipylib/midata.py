@@ -636,7 +636,7 @@ def shaperead(fn):
     return layer
     
 def georead(fn):
-    layer = MapDataManage.loadLayer(fn) 
+    layer = MILayer(MapDataManage.loadLayer(fn))
     return layer
     
 def polygon(*args):

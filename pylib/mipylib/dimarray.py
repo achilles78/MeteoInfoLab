@@ -535,6 +535,9 @@ class PyGridData():
         dims = self.data.getDimensions()
         return DimArray(MIArray(a), dims, self.data.missingValue, self.data.projInfo)
 
+    def savedata(self, filename):
+        self.data.saveAsSurferASCIIFile(filename)
+        
 ###############################################################         
 # The encapsulate class of StationData
 class PyStationData():
