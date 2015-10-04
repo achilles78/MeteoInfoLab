@@ -6,6 +6,8 @@
 #-----------------------------------------------------
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from ucar.ma2 import Section
+from ucar.nc2 import Attribute
+from ucar.ma2 import DataType
 import dimvariable
 from dimvariable import DimVariable
 import dimarray
@@ -16,17 +18,20 @@ from milayer import MILayer, MIXYListData
 from datetime import datetime
 
 from java.util import Calendar
+import jarray
 
 # Dimension dataset
 class DimDataFile():
     
     # dataset must be org.meteoinfo.data.meteodata.MeteoDataInfo
-    def __init__(self, dataset=None):
+    def __init__(self, dataset=None, ncfile=None):
         self.dataset = dataset
-        self.filename = dataset.getFileName()
-        self.nvar = dataset.getDataInfo().getVariableNum()
-        self.fill_value = dataset.getMissingValue()
-        self.proj = dataset.getProjectionInfo()
+        if not dataset is None:
+            self.filename = dataset.getFileName()
+            self.nvar = dataset.getDataInfo().getVariableNum()
+            self.fill_value = dataset.getMissingValue()
+            self.proj = dataset.getProjectionInfo()
+        self.ncfile = ncfile
         
     def __getitem__(self, key):
         if isinstance(key, str):
@@ -38,6 +43,8 @@ class DimDataFile():
         return self.dataset.getInfoText()
         
     def __repr__(self):
+        if self.dataset is None:
+            return 'None'
         return self.dataset.getInfoText()
         
     def read(self, varname, origin, size, stride):
@@ -113,3 +120,46 @@ class DimDataFile():
             return self.dataset.toStation(varname, x, y, nt)
         else:
             return self.dataset.toStation(varname, x, y, z, nt)
+            
+    def adddim(self, dimname, dimsize, group=None):
+        return self.ncfile.addDimension(group, dimname, dimsize)
+        
+    def addgroupattr(self, attrname, attrvalue, group=None):
+        return self.ncfile.addGroupAttribute(group, Attribute(attrname, attrvalue))
+ 
+    def __getdatatype(self, datatype):
+        if datatype == 'string':
+            dt = DataType.STRING
+        elif datatype == 'int':
+            dt = DataType.INT
+        elif datatype == 'float':
+            dt = DataType.FLOAT
+        elif datatype == 'double':
+            dt = DataType.DOUBLE
+        elif datatype == 'char':
+            dt = DataType.CHAR
+        else:
+            dt = DataType.STRING
+        return dt
+ 
+    def addvar(self, varname, datatype, dims, group=None):
+        dt = self.__getdatatype(datatype)
+        return DimVariable(ncvariable=self.ncfile.addVariable(group, varname, dt, dims))
+        
+    def create(self):
+        self.ncfile.create()
+        
+    def write(self, variable, value, origin=None):
+        if origin is None:
+            self.ncfile.write(variable.ncvariable, value.asarray())
+        else:
+            origin = jarray.array(origin, 'i')
+            self.ncfile.write(variable.ncvariable, origin, value.asarray())
+    def flush(self):
+        self.ncfile.flush()
+        
+    def close(self):
+        self.ncfile.close()
+        
+    def largefile(self, islarge=True):
+        self.ncfile.setLargeFile(islarge)

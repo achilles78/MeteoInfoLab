@@ -9,6 +9,7 @@ from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
 from ucar.ma2 import Array, Range
+import jarray
 
 import milayer
 from milayer import MILayer
@@ -268,6 +269,10 @@ class MIArray():
         
     def asarray(self):
         return self.array
+        
+    def reshape(self, shape):
+        shape = jarray.array(shape, 'i')
+        return MIArray(self.array.reshape(shape))
         
     def asgriddata(self, x, y, fill_value=-9999.0):    
         gdata = GridData(self.array, x.array, y.array, fill_value)

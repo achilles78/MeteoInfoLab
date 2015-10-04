@@ -8,12 +8,14 @@ import os
 import math
 from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil
 from org.meteoinfo.data.meteodata import MeteoDataInfo
+from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.analysis import MeteoMath
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
 from org.meteoinfo.global import PointD
 from org.meteoinfo.shape import ShapeUtil
+from ucar.nc2 import NetcdfFileWriter
 
 import dimdatafile
 import dimvariable
@@ -28,6 +30,7 @@ from milayer import MILayer
 
 from java.awt import Color
 from java.lang import Math, Double
+from java.util import Calendar
 
 # Global variables
 pi = Math.PI
@@ -210,28 +213,35 @@ def __getfilename(fname):
             print 'File not exist: ' + fname
             return None, isweb
           
-def addfile(fname):
-    fname = fname.strip()
-    fname, isweb = __getfilename(fname)
-    if fname is None:
-        return None
+def addfile(fname, access='r'):
+    if access == 'r':
+        fname = fname.strip()
+        fname, isweb = __getfilename(fname)
+        if fname is None:
+            return None
 
-    if isweb:
-        return addfile_nc(fname, False)
-    
-    fsufix = os.path.splitext(fname)[1].lower()
-    if fsufix == '.ctl':
-        return addfile_grads(fname, False)
-    elif fsufix == '.tif':
-        return addfile_geotiff(fname, False)
-    elif fsufix == '.awx':
-        return addfile_awx(fname, False)
-    
-    meteodata = MeteoDataInfo()
-    meteodata.openData(fname)
-    __addmeteodata(meteodata)
-    datafile = DimDataFile(meteodata)
-    return datafile
+        if isweb:
+            return addfile_nc(fname, False)
+        
+        fsufix = os.path.splitext(fname)[1].lower()
+        if fsufix == '.ctl':
+            return addfile_grads(fname, False)
+        elif fsufix == '.tif':
+            return addfile_geotiff(fname, False)
+        elif fsufix == '.awx':
+            return addfile_awx(fname, False)
+        
+        meteodata = MeteoDataInfo()
+        meteodata.openData(fname)
+        __addmeteodata(meteodata)
+        datafile = DimDataFile(meteodata)
+        return datafile
+    elif access == 'c':
+        ncfile = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, fname)
+        datafile = DimDataFile(ncfile=ncfile)
+        return datafile
+    else:
+        return None
     
 def addfile_grads(fname, getfn=True):
     if getfn:
@@ -755,3 +765,12 @@ def projectxy(lllon, lllat, xnum, ynum, dx, dy, toproj, fromproj=None):
     xx = arange1(x, xnum, dx)
     yy = arange1(y, ynum, dy)
     return xx, yy
+    
+def addtimedim(infn, outfn, t, tunit='hours'):
+        cal = Calendar.getInstance()
+        cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
+        nt = cal.getTime()
+        NetCDFDataInfo.addTimeDimension(infn, outfn, nt, tunit)
+        
+def joinncfile(infns, outfn, tdimname):
+        NetCDFDataInfo.joinDataFiles(infns, outfn, tdimname)

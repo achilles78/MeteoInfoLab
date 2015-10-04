@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\netcdf"/>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>

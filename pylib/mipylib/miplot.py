@@ -1725,7 +1725,7 @@ def masklayer(mobj, layers):
     plot = c_plot
     mapview = plot.getMapView()
     mapview.getMaskOut().setMask(True)
-    mapview.getMaskOut().setMaskLayer(mobj.getLayerName())
+    mapview.getMaskOut().setMaskLayer(mobj.layer.getLayerName())
     for layer in layers:
         layer.setMaskout(True)
     draw_if_interactive()

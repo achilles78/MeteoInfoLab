@@ -37,6 +37,9 @@ class MILayer():
     def legend(self):
         return self.layer.getLegendScheme()
         
+    def clone(self):
+        return MILayer(self.layer.clone())
+        
 class MIXYListData():
     def __init__(self, data):
         self.data = data

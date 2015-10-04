@@ -6,6 +6,7 @@
 #-----------------------------------------------------
 from org.meteoinfo.data.meteodata import Variable, Dimension
 from org.meteoinfo.data import ArrayMath
+from ucar.nc2 import Attribute
 import dimarray
 from dimarray import DimArray, PyGridData
 import miarray
@@ -16,22 +17,25 @@ class DimVariable():
     
     # variable must be org.meteoinfo.data.meteodata.Variable
     # dataset is DimDataFile
-    def __init__(self, variable=None, dataset=None):
+    def __init__(self, variable=None, dataset=None, ncvariable=None):
         self.variable = variable
         self.dataset = dataset
-        self.name = variable.getName()
-        self.dims = variable.getDimensions()
-        self.ndim = variable.getDimNumber()
-        self.fill_value = variable.getFillValue()
-        self.scale_factor = variable.getScaleFactor()
-        self.add_offset = variable.getAddOffset()
+        self.ncvariable = ncvariable
+        if not variable is None:
+            self.name = variable.getName()
+            self.dims = variable.getDimensions()
+            self.ndim = variable.getDimNumber()
+            self.fill_value = variable.getFillValue()
+            self.scale_factor = variable.getScaleFactor()
+            self.add_offset = variable.getAddOffset()
         if not dataset is None:
             self.proj = dataset.proj
             
     def __len__(self):
         len = 1;
-        for dim in self.variable.getDimensions():
-            len = len * dim.getDimLength()            
+        if not self.variable is None:
+            for dim in self.variable.getDimensions():
+                len = len * dim.getDimLength()            
         return len
         
     def __getitem__(self, indices):
@@ -104,3 +108,6 @@ class DimVariable():
         else:
             self.variable.setDimension(dimtype, dimvalue, index)
         self.ndim = self.variable.getDimNumber()
+        
+    def addattr(self, attrname, attrvalue):
+        self.ncvariable.addAttribute(Attribute(attrname, attrvalue))
