@@ -6,7 +6,7 @@
 #-----------------------------------------------------
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, StationData, ArrayMath, ArrayUtil
-from org.meteoinfo.data.meteodata import DimensionType
+from org.meteoinfo.data.meteodata import Dimension, DimensionType
 from org.meteoinfo.layer import VectorLayer
 from ucar.ma2 import Array, Range, MAMath
 import miarray
@@ -317,6 +317,11 @@ class DimArray():
     def dimvalue(self, idx=0):
         return self.dims[idx].getDimValue()
         
+    def setdimvalue(self, idx, dimvalue):
+        if isinstance(dimvalue, MIArray):
+            dimvalue = dimvalue.aslist()
+        self.dims[idx].setDimValues(dimvalue)
+        
     def islondim(self, idx=0):
         dim = self.dims[idx]
         if dim.getDimType() == DimensionType.X and self.proj.isLonLat():
@@ -412,6 +417,31 @@ class DimArray():
             return MIArray(ArrayUtil.array(r))
         else:
             return gdata.data.toStation(x, y)
+            
+    def join(self, b, dimidx):
+        r = ArrayMath.join(self.array.array, b.array.array, dimidx)
+        dima = self.dimvalue(dimidx)
+        dimb = b.dimvalue(dimidx)
+        dimr = []
+        if dima[0] < dimb[0]:
+            for v in dima:
+                dimr.append(v)
+            for v in dimb:
+                dimr.append(v)
+        else:
+            for v in dimb:
+                dimr.append(v)
+            for v in dima:
+                dimr.append(v)
+        rdims = []
+        for i in range(0, len(self.dims)):
+            if i == dimidx:
+                ndim = Dimension()
+                ndim.setDimValues(dimr)
+                rdims.append(ndim)
+            else:
+                rdims.append(self.dims[i])
+        return DimArray(MIArray(r), rdims, self.fill_value, self.proj)
     
        
 # The encapsulate class of GridData

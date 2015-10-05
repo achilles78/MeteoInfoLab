@@ -288,6 +288,10 @@ class MIArray():
         dims.append(xdim)        
         return DimArray(self, dims, fill_value)
         
+    def join(self, b, dimidx):
+        r = ArrayMath.join(self.array, b.array, dimidx)
+        return MIArray(r)
+        
     def inpolygon(self, x, y, polygon):
         if isinstance(polygon, tuple):
             x_p = polygon[0]
