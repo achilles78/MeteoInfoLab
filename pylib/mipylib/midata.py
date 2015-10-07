@@ -308,8 +308,9 @@ def addfile_micaps(fname, getfn=True):
     return datafile
 
 def addfile_hytraj(fname, getfn=True):
-    if getfn:
-        fname, isweb = __getfilename(fname)
+    if isinstance(fname, basestring):
+        if getfn:
+            fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openHYSPLITTrajData(fname)
     __addmeteodata(meteodata)

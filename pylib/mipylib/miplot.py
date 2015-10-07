@@ -902,29 +902,55 @@ def yreverse():
             
 def legend(*args, **kwargs):
     plot = c_plot
-    plot.setDrawLegend(True)
-    legend = plot.getLegend()   
-    if len(args) > 0:
-        lbs = args[0]
-        if len(args) == 2:
-            for i in range(0, len(lbs)):
-                labels = args[1]
-                lbs[i].setCaption(labels[i])
-        ls = LegendScheme()
-        ls.setLegendBreaks(lbs)
-        legend.setLegendScheme(ls)
+    plot.setDrawLegend(True)    
+    clegend = plot.getLegend()   
+    ls = kwargs.pop('legend', None)
+    if ls is None:
+        if len(args) > 0:
+            lbs = args[0]
+            if len(args) == 2:
+                for i in range(0, len(lbs)):
+                    labels = args[1]
+                    lbs[i].setCaption(labels[i])
+            ls = LegendScheme()
+            ls.setLegendBreaks(lbs)
+            if clegend is None:
+                clegend = ChartLegend(ls)
+                plot.setLegend(clegend)
+            else:
+                clegend.setLegendScheme(ls)
+    else:
+        if clegend is None:
+            clegend = ChartLegend(ls)
+            plot.setLegend(clegend)
+        else:
+            clegend.setLegendScheme(ls)
             
     loc = kwargs.pop('loc', 'upper right')    
     lp = LegendPosition.fromString(loc)
-    legend.setPosition(lp)
+    clegend.setPosition(lp)
     if lp == LegendPosition.CUSTOM:
         x = kwargs.pop('x', 0)
         y = kwargs.pop('y', 0)
-        legend.setX(x)
-        legend.setY(y)    
+        clegend.setX(x)
+        clegend.setY(y)    
     frameon = kwargs.pop('frameon', True)
-    legend.setDrawNeatLine(frameon)
+    clegend.setDrawNeatLine(frameon)
+    shadow = kwargs.pop('shadow', False)
+    clegend.setDrawBackground(shadow)
+    bcobj = kwargs.pop('background', 'w')
+    background = __getcolor(bcobj)
+    clegend.setBackground(background)
     draw_if_interactive()
+    
+def readlegend(fn):
+    if os.path.exists(fn):
+        ls = LegendScheme()
+        ls.importFromXMLFile(fn, False)
+        return ls
+    else:
+        print 'File not exists: ' + fn
+        return None
         
 def colorbar(layer, **kwargs):
     cmap = kwargs.pop('cmap', None)
@@ -1000,11 +1026,14 @@ def __getlegendscheme_point(ls, **kwargs):
     size = kwargs.pop('size', 4)
     marker = kwargs.pop('marker', 'o')
     pstyle = __getpointstyle(marker)
+    fcobj = kwargs.pop('facecolor', 'k')
+    facecolor = __getcolor(fcobj)
     ecobj = kwargs.pop('edgecolor', 'k')
     edgecolor = __getcolor(ecobj)
     fill = kwargs.pop('fill', True)
     edge = kwargs.pop('edge', True)
     for lb in ls.getLegendBreaks():
+        lb.setColor(facecolor)
         lb.setStyle(pstyle)
         lb.setSize(size)        
         lb.setOutlineColor(edgecolor)        
@@ -1223,6 +1252,12 @@ def scatterm(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
+        if isinstance(x, list):
+            x = midata.array(x)
+        if isinstance(y, list):
+            y = midata.array(y)
+        if isinstance(a, list):
+            a = midata.array(a)
         if a.rank == 1:
             gdata = midata.asstationdata(a, x, y, fill_value)
         else:
@@ -1232,8 +1267,7 @@ def scatterm(*args, **kwargs):
                 gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    symbolspec = kwargs.pop('symbolspec', None)
-    if symbolspec is None:
+    if not 'symbolspec' in kwargs:
         ls = __getlegendscheme_point(ls, **kwargs)    
     if isinstance(gdata, PyGridData):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
@@ -1582,34 +1616,35 @@ def geoshow(layer, **kwargs):
         #LegendScheme
         ls = kwargs.pop('symbolspec', None)
         if ls is None:
-            fcobj = kwargs.pop('facecolor', None)
-            ecobj = kwargs.pop('edgecolor', 'k')
-            if fcobj is None:
-                facecolor = Color.lightGray
-                drawfill = False
-            else:
-                facecolor = __getcolor(fcobj)
-                drawfill = True
-            if ecobj is None:
-                drawline = False  
-                edgecolor = Color.black
-            else:
-                drawline = True
-                edgecolor = __getcolor(ecobj)            
-            size = kwargs.pop('size', 1)
-            lb = layer.getLegendScheme().getLegendBreaks().get(0)
-            lb.setColor(facecolor)
-            btype = lb.getBreakType()
-            if btype == BreakTypes.PointBreak:        
-                lb.setDrawOutline(drawline)
-                lb.setOutlineColor(edgecolor)        
-            elif btype == BreakTypes.PolylineBreak:
-                lb.setSize(size)
-            elif btype == BreakTypes.PolygonBreak:
-                lb.setDrawFill(drawfill)
-                lb.setDrawOutline(drawline)
-                lb.setOutlineColor(edgecolor)
-                lb.setOutlineSize(size)
+            if 'facecolor' in kwargs or 'edgecolor' in kwargs or 'size' in kwargs:
+                fcobj = kwargs.pop('facecolor', None)
+                ecobj = kwargs.pop('edgecolor', None)
+                if fcobj is None:
+                    facecolor = Color.lightGray
+                    drawfill = False
+                else:
+                    facecolor = __getcolor(fcobj)
+                    drawfill = True
+                if ecobj is None:
+                    drawline = False  
+                    edgecolor = Color.black
+                else:
+                    drawline = True
+                    edgecolor = __getcolor(ecobj)            
+                size = kwargs.pop('size', 1)
+                lb = layer.getLegendScheme().getLegendBreaks().get(0)
+                lb.setColor(facecolor)
+                btype = lb.getBreakType()
+                if btype == BreakTypes.PointBreak:        
+                    lb.setDrawOutline(drawline)
+                    lb.setOutlineColor(edgecolor)        
+                elif btype == BreakTypes.PolylineBreak:
+                    lb.setSize(size)
+                elif btype == BreakTypes.PolygonBreak:
+                    lb.setDrawFill(drawfill)
+                    lb.setDrawOutline(drawline)
+                    lb.setOutlineColor(edgecolor)
+                    lb.setOutlineSize(size)
         else:
             layer.setLegendScheme(ls)
         plot.addLayer(layer)

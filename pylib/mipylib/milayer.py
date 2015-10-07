@@ -4,6 +4,7 @@
 # Purpose: MeteoInfoLab layer module
 # Note: Jython
 #-----------------------------------------------------
+from org.meteoinfo.data import TableUtil
 from java.util import Date, Calendar
 
 from datetime import datetime
@@ -31,11 +32,24 @@ class MILayer():
         else:
             return v
             
+    def setcellvalue(self, fieldname, shapeindex, value):
+        self.layer.editCellValue(fieldname, shapeindex, value)
+            
     def shapes(self):
         return self.layer.getShapes()
         
+    def shapenum(self):
+        return self.layer.getShapeNum()
+        
     def legend(self):
         return self.layer.getLegendScheme()
+        
+    def setlegend(self, legend):
+        self.layer.setLegendScheme(legend)
+    
+    def addfield(self, name, dtype):
+        dt = TableUtil.toDataTypes(dtype)
+        self.layer.editAddField(name, dt)
         
     def clone(self):
         return MILayer(self.layer.clone())
