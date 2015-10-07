@@ -450,6 +450,34 @@ def cos(a):
     else:
         return math.cos(a)
         
+def tan(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.tan()
+    else:
+        return math.tan(a)
+        
+def asin(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.asin()
+    else:
+        return math.asin(a)
+        
+def acos(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.acos()
+    else:
+        return math.acos(a)
+        
+def atan(a):
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return a.atan()
+    else:
+        return math.atan(a)
+        
+def atan2(a, b):
+    c = a / b
+    return atan(c)
+        
 def exp(a):
     if isinstance(a, DimArray) or isinstance(a, MIArray):
         return a.exp()
@@ -625,6 +653,12 @@ def magnitude(u, v):
     if isinstance(u, DimArray) and isinstance(v, DimArray):
         r = ArrayMath.magnitude(u.asarray(), v.asarray())
         return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
+    elif isinstance(u, MIArray) and isinstance(v, MIArray):
+        r = ArrayMath.magnitude(u.asarray(), v.asarray())
+        return MIArray(r)
+    else:
+        r = sqrt(u * u + v * v)
+        return r
     
 def asgriddata(data, x=None, y=None, fill_value=-9999.0):
     if x is None:    

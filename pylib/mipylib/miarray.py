@@ -255,6 +255,18 @@ class MIArray():
     def cos(self):
         return MIArray(ArrayMath.cos(self.array))
         
+    def tan(self):
+        return MIArray(ArrayMath.tan(self.array))
+        
+    def asin(self):
+        return MIArray(ArrayMath.asin(self.array))
+        
+    def acos(self):
+        return MIArray(ArrayMath.acos(self.array))
+        
+    def atan(self):
+        return MIArray(ArrayMath.atan(self.array))
+        
     def exp(self):
         return MIArray(ArrayMath.exp(self.array))
         

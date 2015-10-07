@@ -358,6 +358,22 @@ class DimArray():
         r = DimArray(self.array.cos(), self.dims, self.fill_value, self.proj)
         return r
         
+    def tan(self):
+        r = DimArray(self.array.tan(), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def asin(self):
+        r = DimArray(self.array.asin(), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def acos(self):
+        r = DimArray(self.array.acos(), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def atan(self):
+        r = DimArray(self.array.atan(), self.dims, self.fill_value, self.proj)
+        return r
+        
     def exp(self):
         r = DimArray(self.array.exp(), self.dims, self.fill_value, self.proj)
         return r
