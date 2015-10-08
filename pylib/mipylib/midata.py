@@ -475,8 +475,10 @@ def atan(a):
         return math.atan(a)
         
 def atan2(a, b):
-    c = a / b
-    return atan(c)
+    if isinstance(a, DimArray) or isinstance(a, MIArray):
+        return ArrayMath.atan2(a.asarray(), b.asarray())
+    else:
+        return math.atan2(a, b)
         
 def exp(a):
     if isinstance(a, DimArray) or isinstance(a, MIArray):
