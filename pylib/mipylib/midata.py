@@ -621,6 +621,23 @@ def dewpoint2rh(dewpoint, temp):
         return DimArray(MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray())), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
     else:
         return MeteoMath.dewpoint2rh(dewpoint, temp)
+        
+def p2h(press):
+    """
+    Pressure to height
+    
+    press: number
+        Pressure - hPa
+    
+    return: number
+        Height - meter
+    """
+    if isinstance(press, MIArray):
+        return MIArray(ArrayMath.press2Height(press.asarray()))
+    elif isinstance(press, DimArray):
+        return DimArray(MIArray(ArrayMath.press2Height(press.asarray())), press.dims, press.fill_value, press.proj)
+    else:
+        return MeteoMath.press2Height(press)
 
 # Performs a centered difference operation on a array in a specific direction    
 def cdiff(a, dimidx):
