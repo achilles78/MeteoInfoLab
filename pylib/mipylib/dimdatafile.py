@@ -14,6 +14,8 @@ import dimarray
 from dimarray import PyGridData, PyStationData
 import milayer
 from milayer import MILayer, MIXYListData
+import miarray
+from miarray import MIArray
 
 from datetime import datetime
 
@@ -46,6 +48,13 @@ class DimDataFile():
         if self.dataset is None:
             return 'None'
         return self.dataset.getInfoText()
+        
+    def attrvalue(self, key):
+        attr = self.dataset.getDataInfo().findGlobalAttribute(key)
+        if attr is None:
+            return None
+        v = MIArray(attr.getValues())
+        return v
         
     def read(self, varname, origin, size, stride):
         return self.dataset.read(varname, origin, size, stride)

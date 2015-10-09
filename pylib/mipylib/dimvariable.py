@@ -93,13 +93,24 @@ class DimVariable():
         
     # get dimension length
     def dimlen(self, idx):
-        return self.variable.getDimLength(idx)
+        return self.dims[idx].getDimLength()
+        
+    def dimvalue(self, idx):
+        return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
+        
+    def attrvalue(self, key):
+        attr = self.variable.findAttribute(key)
+        if attr is None:
+            return None
+        v = MIArray(attr.attValue)
+        return v
         
     def adddim(self, dimtype, dimvalue):
         if isinstance(dimvalue, MIArray):
             dimvalue = dimvalue.aslist()
         self.variable.addDimension(dimtype, dimvalue)
         self.ndim = self.variable.getDimNumber()
+        
     def setdim(self, dimtype, dimvalue, index=None):
         if isinstance(dimvalue, MIArray):
             dimvalue = dimvalue.aslist()

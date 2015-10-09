@@ -1029,17 +1029,21 @@ def __getlegendscheme(args, min, max, **kwargs):
     
 def __getlegendscheme_point(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Point)
-    size = kwargs.pop('size', 4)
+    size = kwargs.pop('size', 6)
     marker = kwargs.pop('marker', 'o')
     pstyle = __getpointstyle(marker)
-    fcobj = kwargs.pop('facecolor', 'k')
-    facecolor = __getcolor(fcobj)
+    fcobj = kwargs.pop('facecolor', None)
+    if fcobj is None:
+        facecolor = None
+    else:
+        facecolor = __getcolor(fcobj)
     ecobj = kwargs.pop('edgecolor', 'k')
     edgecolor = __getcolor(ecobj)
     fill = kwargs.pop('fill', True)
     edge = kwargs.pop('edge', True)
     for lb in ls.getLegendBreaks():
-        lb.setColor(facecolor)
+        if not facecolor is None:
+            lb.setColor(facecolor)
         lb.setStyle(pstyle)
         lb.setSize(size)        
         lb.setOutlineColor(edgecolor)        

@@ -464,15 +464,15 @@ class DimArray():
         dimb = b.dimvalue(dimidx)
         dimr = []
         if dima[0] < dimb[0]:
-            for v in dima:
-                dimr.append(v)
-            for v in dimb:
-                dimr.append(v)
+            for i in range(0, len(dima)):
+                dimr.append(dima[i])
+            for i in range(0, len(dimb)):
+                dimr.append(dimb[i])
         else:
-            for v in dimb:
-                dimr.append(v)
-            for v in dima:
-                dimr.append(v)
+            for i in range(0, len(dimb)):
+                dimr.append(dimb[i])
+            for i in range(0, len(dima)):
+                dimr.append(dima[i])
         rdims = []
         for i in range(0, len(self.dims)):
             if i == dimidx:
