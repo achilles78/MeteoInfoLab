@@ -63,6 +63,8 @@ class MIArray():
             if step < 0:
                 step = abs(step)
                 flips.append(i)
+            if sidx >= self.shape[i]:
+                return None
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
         r = ArrayMath.section(self.array, ranges)

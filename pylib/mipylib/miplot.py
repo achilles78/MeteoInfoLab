@@ -119,8 +119,10 @@ def plot(*args, **kwargs):
             ydata = __getplotdata(args[0])
             if isinstance(args[0], DimArray):
                 xdata = args[0].dimvalue(0)
-                if args[0].islonlatdim(0):
-                    xaxistype = 'lonlat'
+                if args[0].islondim(0):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(0):
+                    xaxistype = 'lat'
                 elif args[0].istimedim(0):
                     xaxistype = 'time'
             else:
@@ -134,8 +136,10 @@ def plot(*args, **kwargs):
             ydata = __getplotdata(args[0])
             if isinstance(args[0], DimArray):
                 xdata = args[0].dimvalue(0)
-                if args[0].islonlatdim(0):
-                    xaxistype = 'lonlat'
+                if args[0].islondim(0):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(0):
+                    xaxistype = 'lat'
                 elif args[0].istimedim(0):
                     xaxistype = 'time'
             else:
@@ -192,8 +196,10 @@ def plot(*args, **kwargs):
         else:
             plot = XY1DPlot()
     
-    if xaxistype == 'lonlat':
-        plot.setXAxis(LonLatAxis('Longitude', True))
+    if xaxistype == 'lon':
+        plot.setXAxis(LonLatAxis('Longitude', True, True))
+    elif xaxistype == 'lat':
+        plot.setXAxis(LonLatAxis('Latitude', True, False))
     elif xaxistype == 'time':
         plot.setXAxis(TimeAxis('Time', True))
     plot.setDataset(dataset)
@@ -1072,8 +1078,15 @@ def contour(*args, **kwargs):
     n = len(args)
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
+    xaxistype = None
     if n <= 2:
         gdata = midata.asgriddata(args[0])
+        if args[0].islondim(1):
+            xaxistype = 'lon'
+        elif args[0].islatdim(1):
+            xaxistype = 'lat'
+        elif args[0].istimedim(1):
+            xaxistype = 'time'
         args = args[1:]
     elif n <=4:
         x = args[0]
@@ -1092,7 +1105,8 @@ def contour(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-    layer = __plot_griddata(gdata, ls, 'contour')
+    layer = __plot_griddata(gdata, ls, 'contour', xaxistype=xaxistype)        
+    
     return layer
 
 def contourf(*args, **kwargs):
@@ -1101,6 +1115,12 @@ def contourf(*args, **kwargs):
     fill_value = kwargs.pop('fill_value', -9999.0)
     if n <= 2:
         gdata = midata.asgriddata(args[0])
+        if args[0].islondim(1):
+            xaxistype = 'lon'
+        elif args[0].islatdim(1):
+            xaxistype = 'lat'
+        elif args[0].istimedim(1):
+            xaxistype = 'time'
         args = args[1:]
     elif n <=4:
         x = args[0]
@@ -1119,7 +1139,7 @@ def contourf(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-    layer = __plot_griddata(gdata, ls, 'contourf')
+    layer = __plot_griddata(gdata, ls, 'contourf', xaxistype=xaxistype)
     return layer
 
 def quiver(*args, **kwargs):
@@ -1176,7 +1196,7 @@ def quiver(*args, **kwargs):
     cdata = None
     return layer
     
-def __plot_griddata(gdata, ls, type):
+def __plot_griddata(gdata, ls, type, xaxistype=None):
     #print 'GridData...'
     if type == 'contourf':
         layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
@@ -1196,6 +1216,13 @@ def __plot_griddata(gdata, ls, type):
         else:
             mapview = MapView()
             plot = XY2DPlot(mapview)
+    
+    if xaxistype == 'lon':
+        plot.setXAxis(LonLatAxis('Longitude', True, True))
+    elif xaxistype == 'lat':
+        plot.setXAxis(LonLatAxis('Latitude', True, False))
+    elif xaxistype == 'time':
+        plot.setXAxis(TimeAxis('Time', True))
     
     plot.addLayer(layer)
     
@@ -1404,10 +1431,7 @@ def surfacem(*args, **kwargs):
         if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
             x, y = midata.meshgrid(x, y)        
         args = args[3:]
-    ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)
-    symbolspec = kwargs.pop('symbolspec', None)
-    if symbolspec is None:
-        ls = __getlegendscheme_point(ls, **kwargs)    
+    ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)   
     
     if plot.getProjInfo().isLonLat():
         lonlim = 90

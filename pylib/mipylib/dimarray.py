@@ -28,12 +28,6 @@ class DimArray():
         self.fill_value = fill_value
         self.proj = proj
         
-    def asgriddata(self):
-        xdata = self.dims[1].getDimValue()
-        ydata = self.dims[0].getDimValue()
-        gdata = GridData(self.array.array, xdata, ydata, self.fill_value, self.proj)
-        return PyGridData(gdata)
-        
     def __len__(self):
         shape = self.array.getshape()
         len = 1
@@ -315,12 +309,36 @@ class DimArray():
         return self.dims[idx].getDimLength()
         
     def dimvalue(self, idx=0):
-        return self.dims[idx].getDimValue()
+        return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
         
     def setdimvalue(self, idx, dimvalue):
         if isinstance(dimvalue, MIArray):
             dimvalue = dimvalue.aslist()
         self.dims[idx].setDimValues(dimvalue)
+        
+    def xdim(self):
+        for dim in self.dims:
+            if dim.getDimType() == DimensionType.X:
+                return dim        
+        return None
+        
+    def ydim(self):
+        for dim in self.dims:
+            if dim.getDimType() == DimensionType.Y:
+                return dim        
+        return None
+        
+    def zdim(self):
+        for dim in self.dims:
+            if dim.getDimType() == DimensionType.Z:
+                return dim        
+        return None
+        
+    def tdim(self):
+        for dim in self.dims:
+            if dim.getDimType() == DimensionType.T:
+                return dim        
+        return None
         
     def islondim(self, idx=0):
         dim = self.dims[idx]
@@ -345,6 +363,12 @@ class DimArray():
             return True
         else:
             return False
+                   
+    def asgriddata(self):
+        xdata = self.dims[1].getDimValue()
+        ydata = self.dims[0].getDimValue()
+        gdata = GridData(self.array.array, xdata, ydata, self.fill_value, self.proj)
+        return PyGridData(gdata)
         
     def sqrt(self):
         r = DimArray(self.array.sqrt(), self.dims, self.fill_value, self.proj)

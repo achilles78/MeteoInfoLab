@@ -15,6 +15,7 @@ from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
 from org.meteoinfo.global import PointD
 from org.meteoinfo.shape import ShapeUtil
+from org.meteoinfo.legend import BreakTypes
 from ucar.nc2 import NetcdfFileWriter
 
 import dimdatafile
@@ -621,32 +622,27 @@ def dewpoint2rh(dewpoint, temp):
     else:
         return MeteoMath.dewpoint2rh(dewpoint, temp)
 
-# Performs a centered difference operation on a grid data in the x or y direction    
-def cdiff(a, isx):
-    if isinstance(isx, str):
-        if isx.lower() == 'x':
-            isx = True
-        else:
-            isx = False
+# Performs a centered difference operation on a array in a specific direction    
+def cdiff(a, dimidx):
     if isinstance(a, DimArray):
-        r = ArrayMath.cdiff(a.asarray(), isx)
+        r = ArrayMath.cdiff(a.asarray(), dimidx)
         return DimArray(MIArray(r), a.dims, a.fill_value, a.proj)
     else:
-        return MIArray(ArrayMath.cdiff(a.asarray(), isx))
+        return MIArray(ArrayMath.cdiff(a.asarray(), dimidx))
 
 # Calculates the vertical component of the curl (ie, vorticity)    
 def hcurl(u, v):
     if isinstance(u, DimArray) and isinstance(v, DimArray):
-        ydim = u.dims[0]
-        xdim = u.dims[1]
+        ydim = u.ydim()
+        xdim = u.xdim()
         r = ArrayMath.hcurl(u.asarray(), v.asarray(), xdim.getDimValue(), ydim.getDimValue())
         return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
 
 #  Calculates the horizontal divergence using finite differencing        
 def hdivg(u, v):
     if isinstance(u, DimArray) and isinstance(v, DimArray):
-        ydim = u.dims[0]
-        xdim = u.dims[1]
+        ydim = u.ydim()
+        xdim = u.xdim()
         r = ArrayMath.hdivg(u.asarray(), v.asarray(), xdim.getDimValue(), ydim.getDimValue())
         return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
         
@@ -680,6 +676,9 @@ def asstationdata(data, x, y, fill_value=-9999.0):
         
 def shaperead(fn):
     layer = MILayer(MapDataManage.loadLayer(fn))
+    lb = layer.legend().getLegendBreaks()[0]
+    if lb.getBreakType() == BreakTypes.PolygonBreak:
+        lb.setDrawFill(False)
     return layer
     
 def georead(fn):
