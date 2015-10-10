@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.xml.parsers.ParserConfigurationException;
+import org.meteoinfo.chart.ChartPanel;
 import org.meteoinfo.laboratory.Options;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.event.ConsoleExecEvent;
@@ -479,26 +480,7 @@ public class FrmMain extends javax.swing.JFrame {
         }
 
         String code = te.getTextArea().getText();
-        //this.consoleDock.runfile(te.getTextArea().getText());
-        //this.consoleDock.exec(te.getTextArea().getText());
         this.consoleDock.runPythonScript(code);
-//        if (!te.getFileName().isEmpty()) {
-//            te.saveFile(te.getFile());
-//            try {
-//                String fn = te.getFile().getCanonicalPath();
-//                String backslash= System.getProperty("file.separator") ;
-//                fn = fn.replace(backslash,"/");
-//                //fn = fn.replaceAll("\\", "/");
-//                this.consoleDock.run("execfile('" + fn + "')");
-//            } catch (IOException ex) {
-//                Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-//            }            
-//        } else {
-//            //this.consoleDock.exec(te.getTextArea().getText());
-//            this.consoleDock.runfile(te.getTextArea().getText());
-//        }
-
-        //this.editor.runPythonScript();        
     }//GEN-LAST:event_jButton_RunScriptActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing

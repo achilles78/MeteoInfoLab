@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
+import org.meteoinfo.chart.ChartPanel;
 import org.python.core.Py;
 
 /**
@@ -272,7 +273,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
                 String encoding = "utf-8";
                 try {
-                    interp.exec("mipylib.miplot.isinteractive = True");    //False - how to update figure after running
+                    interp.exec("mipylib.miplot.isinteractive = False");    //False - how to update figure after running
                     interp.exec("clf()");
                     interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
                     interp.exec("mipylib.miplot.isinteractive = True");
@@ -311,6 +312,10 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             protected void done() {
                 System.setOut(oout);
                 System.setErr(oerr);
+                ChartPanel cp = parent.getFigureDock().getCurrentFigure();
+                if (cp != null){
+                    cp.paintGraphics();
+                }
             }
         };
         worker.execute();

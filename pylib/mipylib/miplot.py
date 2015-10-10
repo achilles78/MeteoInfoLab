@@ -35,7 +35,7 @@ import miarray
 from miarray import MIArray
 import midata
 import milayer
-from milayer import MIXYListData
+from milayer import MILayer, MIXYListData
 
 ## Global ##
 milapp = None
@@ -1357,7 +1357,7 @@ def contourm(*args, **kwargs):
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj, order=order)
     gdata = None
-    return layer
+    return MILayer(layer)
         
 def contourfm(*args, **kwargs):
     plot = c_plot
@@ -1380,7 +1380,7 @@ def contourfm(*args, **kwargs):
         gdata = gdata.interpolate()
     layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order)
     gdata = None
-    return layer
+    return MILayer(layer)
     
 def surfacem_1(*args, **kwargs):
     plot = c_plot
@@ -1790,7 +1790,7 @@ def masklayer(mobj, layers):
     mapview.getMaskOut().setMask(True)
     mapview.getMaskOut().setMaskLayer(mobj.layer.getLayerName())
     for layer in layers:
-        layer.setMaskout(True)
+        layer.layer.setMaskout(True)
     draw_if_interactive()
     
 def display(data):

@@ -91,9 +91,7 @@ public class MeteoInfoLab {
         interp.exec("from milab import *");
         interp.exec("mipylib.miplot.batchmode = True");
         interp.exec("mipylib.miplot.isinteractive = False");
-        //        for (String jarfn : jarfns) {
-//            interp.exec("sys.path.append('" + jarfn + "')");
-//        }
+        System.out.println("mipylib is loaded...");
         try {            
             File file = new File(fn);            
             byte[] bytes = Files.readAllBytes(file.toPath());
