@@ -80,6 +80,15 @@ class DimDataFile():
         else:
             return None
             
+    def smodeldata(self, timeindex=0, levelindex=0):
+        if self.dataset.isStationData():
+            self.dataset.setTimeIndex(timeindex)
+            self.dataset.setLevelIndex(levelindex)
+            smdata = self.dataset.getStationModelData()
+            return smdata
+        else:
+            return None
+            
     def trajlayer(self):
         if self.dataset.isTrajData():
             return MILayer(self.dataset.getDataInfo().createTrajLineLayer())

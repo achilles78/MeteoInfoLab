@@ -376,6 +376,7 @@ def axes(**kwargs):
     xreverse = kwargs.pop('xreverse', False)
     yreverse = kwargs.pop('yreverse', False)
     xaxistype = kwargs.pop('xaxistype', 'normal')
+    bgcobj = kwargs.pop('bgcolor', None)    
     plot = XY1DPlot()
     plot.setPosition(position[0], position[1], position[2], position[3])
     if bottomaxis == False:
@@ -394,6 +395,10 @@ def axes(**kwargs):
         plot.setXAxis(LonLatAxis('Longitude', True))
     elif xaxistype == 'time':
         plot.setXAxis(TimeAxis('Time', True))
+    if not bgcobj is None:
+        bgcolor = __getcolor(bgcobj)
+        plot.setDrawBackground(True)
+        plot.setBackground(bgcolor)
     chart = chartpanel.getChart()
     chart.setCurrentPlot(plot)
     global c_plot
@@ -460,6 +465,7 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     griddy = kwargs.pop('griddy', 10)
     frameon = kwargs.pop('frameon', True)
     axison = kwargs.pop('axison', None)
+    bgcobj = kwargs.pop('bgcolor', None)
     
     global c_plot
     mapview = MapView()
@@ -484,6 +490,10 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     mapframe.setGridXDelt(griddx)
     mapframe.setGridYDelt(griddy)
     c_plot.setDrawNeatLine(frameon)
+    if not bgcobj is None:
+        bgcolor = __getcolor(bgcobj)
+        c_plot.setDrawBackground(True)
+        c_plot.setBackground(bgcolor)
     c_plot.getMapView().projectLayers(projinfo)
     chart = chartpanel.getChart()
     if chart.getPlot() is None:
@@ -519,7 +529,7 @@ def yaxis(ax, **kwargs):
     axis_r.setColor_All(c)    
     draw_if_interactive
     
-def antialias(b):
+def antialias(b=True):
     if chartpanel is None:
         figure()
         
@@ -964,7 +974,7 @@ def colorbar(layer, **kwargs):
     orientation = kwargs.pop('orientation', 'vertical')
     aspect = kwargs.pop('aspect', 20)
     plot = c_plot
-    ls = layer.getLegendScheme()
+    ls = layer.legend()
     legend = plot.getLegend()
     if legend == None:
         legend = ChartLegend(ls)
@@ -981,6 +991,8 @@ def colorbar(layer, **kwargs):
         legend.setPlotOrientation(PlotOrientation.VERTICAL)
         legend.setPosition(LegendPosition.RIGHT_OUTSIDE)
     legend.setDrawNeatLine(False)
+    extendrect = kwargs.pop('extendrect', True)
+    legend.setExtendRect(extendrect)
     plot.setDrawLegend(True)
     draw_if_interactive()
 
@@ -1076,7 +1088,7 @@ def imshow(*args, **kwargs):
     else:    
         ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     layer = __plot_griddata(gdata, ls, 'imshow')
-    return layer
+    return MILayer(layer)
       
 def contour(*args, **kwargs):
     n = len(args)
@@ -1111,12 +1123,13 @@ def contour(*args, **kwargs):
         ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     layer = __plot_griddata(gdata, ls, 'contour', xaxistype=xaxistype)        
     
-    return layer
+    return MILayer(layer)
 
 def contourf(*args, **kwargs):
     n = len(args)    
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
+    xaxistype = None
     if n <= 2:
         gdata = midata.asgriddata(args[0])
         if args[0].islondim(1):
@@ -1144,7 +1157,7 @@ def contourf(*args, **kwargs):
     else:    
         ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     layer = __plot_griddata(gdata, ls, 'contourf', xaxistype=xaxistype)
-    return layer
+    return MILayer(layer)
 
 def quiver(*args, **kwargs):
     plot = c_plot
@@ -1198,7 +1211,7 @@ def quiver(*args, **kwargs):
     udata = None
     vdata = None
     cdata = None
-    return layer
+    return MILayer(layer)
     
 def __plot_griddata(gdata, ls, type, xaxistype=None):
     #print 'GridData...'
@@ -1305,7 +1318,26 @@ def scatterm(*args, **kwargs):
     else:
         layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
     gdata = None
-    return layer
+    return MILayer(layer)
+    
+def stationmodel(*args, **kwargs):
+    smdata = args[0]
+    proj = kwargs.pop('proj', None)
+    size = kwargs.pop('size', 12)
+    surface = kwargs.pop('surface', True)
+    ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, Color.blue, size)
+    layer = DrawMeteoData.createStationModelLayer(smdata, ls, 'stationmodel', surface)
+    if (proj != None):
+        layer.setProjInfo(proj)
+ 
+    c_plot.addLayer(layer)
+    c_plot.setDrawExtent(layer.getExtent())
+    
+    if chartpanel is None:
+        figure()
+
+    draw_if_interactive()
+    return MILayer(layer)
         
 def imshowm(*args, **kwargs):
     plot = c_plot
@@ -1337,7 +1369,7 @@ def imshowm(*args, **kwargs):
         ls = LegendManage.createImageLegend(gdata.data, cmap)
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
     gdata = None
-    return layer
+    return MILayer(layer)
     
 def contourm(*args, **kwargs):  
     plot = c_plot
@@ -1415,7 +1447,7 @@ def surfacem_1(*args, **kwargs):
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo(), order=order)
 
     gdata = None
-    return layer
+    return MILayer(layer)
     
 def surfacem(*args, **kwargs):
     plot = c_plot
@@ -1463,7 +1495,7 @@ def surfacem(*args, **kwargs):
     global c_plot
     c_plot = plot
     draw_if_interactive()
-    return layer
+    return MILayer(layer)
     
 def quiverm(*args, **kwargs):
     plot = c_plot
@@ -1518,7 +1550,35 @@ def quiverm(*args, **kwargs):
     udata = None
     vdata = None
     cdata = None
-    return layer
+    return MILayer(layer)
+    
+def streamplotm(*args, **kwargs):
+    plot = c_plot
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    proj = kwargs.pop('proj', None)
+    cobj = kwargs.pop('color', 'b')
+    color = __getcolor(cobj)
+    isuv = kwargs.pop('isuv', True)
+    density = kwargs.pop('density', 4)
+    n = len(args)
+    if n <= 4:
+        udata = midata.asgriddata(args[0])
+        vdata = midata.asgriddata(args[1])
+        args = args[2:]
+    elif n <= 6:
+        x = args[0]
+        y = args[1]
+        u = args[2]
+        v = args[3]
+        udata = midata.asgriddata(u, x, y, fill_value)
+        vdata = midata.asgriddata(v, x, y, fill_value)
+        args = args[4:]  
+    ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Polyline, color, 1)
+    layer = __plot_uvgriddata_m(plot, udata, vdata, None, ls, 'streamplot', isuv, proj=proj, density=density)
+    udata = None
+    vdata = None
+    return MILayer(layer)
         
 def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
     #print 'GridData...'
@@ -1585,13 +1645,15 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
     draw_if_interactive()
     return layer
     
-def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None):
+def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None, density=4):
     #print 'GridData...'
     if type == 'quiver':
         if cdata == None:
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
         else:
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
+    elif type == 'streamplot':
+        layer = DrawMeteoData.createStreamlineLayer(udata.data, vdata.data, density, ls, 'layer', isuv)
     
     if (proj != None):
         layer.setProjInfo(proj)
@@ -1735,6 +1797,14 @@ def makesymbolspec(geometry, *args, **kwargs):
             ls.setLegendType(LegendType.GraduatedColor)
             
     return ls
+    
+def weatherspec(weather='all', size=20, color='b'):
+    if isinstance(weather, str):
+        wlist = DrawMeteoData.getWeatherTypes(weather)
+    else:
+        wlist = weather
+    c = __getcolor(color)
+    return DrawMeteoData.createWeatherLegendScheme(wlist, size, c)
 
 def __getlegendbreak(geometry, rule):        
     if geometry == 'point':
