@@ -51,6 +51,12 @@ class MILayer():
         dt = TableUtil.toDataTypes(dtype)
         self.layer.editAddField(name, dt)
         
+    def getlabel(self, text):
+        return self.layer.getLabel(text)
+        
+    def movelabel(self, label, x=0, y=0):
+        self.layer.moveLabel(label, x, y)
+        
     def clone(self):
         return MILayer(self.layer.clone())
         

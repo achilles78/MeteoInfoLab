@@ -298,13 +298,16 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     draw_if_interactive()
     return pb 
  
-def figure(bgcolor=None):
+def figure(bgcolor=None, figsize=None):
     global chartpanel
     chart = Chart()
     if not bgcolor is None:
         chart.setDrawBackground(True)
         chart.setBackground(__getcolor(bgcolor))
-    chartpanel = ChartPanel(chart)
+    if figsize is None:
+        chartpanel = ChartPanel(chart)
+    else:
+        chartpanel = ChartPanel(chart, figsize[0], figsize[1])
     show()
     
 # Set figure background color
@@ -1755,6 +1758,8 @@ def geoshow(layer, **kwargs):
             labelset.setXOffset(xoffset)
             yoffset = kwargs.pop('yoffset', 0)
             labelset.setYOffset(yoffset)
+            avoidcoll = kwargs.pop('avoidcoll', True)
+            labelset.setAvoidCollision(avoidcoll)
             layer.addLabels()        
     draw_if_interactive()
 
