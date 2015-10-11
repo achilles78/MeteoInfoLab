@@ -700,6 +700,10 @@ def shaperead(fn):
     
 def georead(fn):
     layer = MILayer(MapDataManage.loadLayer(fn))
+    if layer.isvectorlayer():
+        lb = layer.legend().getLegendBreaks()[0]
+        if lb.getBreakType() == BreakTypes.PolygonBreak:
+            lb.setDrawFill(False)
     return layer
     
 def polygon(*args):

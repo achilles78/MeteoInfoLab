@@ -298,7 +298,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     draw_if_interactive()
     return pb 
  
-def figure(bgcolor=None, figsize=None):
+def figure(bgcolor=None, figsize=None, newfig=True):
     global chartpanel
     chart = Chart()
     if not bgcolor is None:
@@ -308,19 +308,10 @@ def figure(bgcolor=None, figsize=None):
         chartpanel = ChartPanel(chart)
     else:
         chartpanel = ChartPanel(chart, figsize[0], figsize[1])
-    show()
-    
-# Set figure background color
-def bgcolor(color):
-    chart = chartpanel.getChart()
-    if color is None:
-        chart.setDrawBackground(False)
-    else:
-        chart.setDrawBackground(True)
-        chart.setBackground(__getcolor(color))
-    draw_if_interactive()
-    
-def show():
+    if not batchmode:
+        show(newfig)
+        
+def show(newfig=True):
     if milapp == None:
         if not batchmode:            
             form = ChartForm(chartpanel)
@@ -331,7 +322,23 @@ def show():
             form.setVisible(True)     
     else:
         figureDock = milapp.getFigureDock()
-        figureDock.addFigure(chartpanel)
+        if newfig:
+            figureDock.addFigure(chartpanel)
+        else:
+            if figureDock.getCurrentFigure() is None:
+                figureDock.addFigure(chartpanel)
+            else:
+                figureDock.setCurrentFigure(chartpanel)
+    
+# Set figure background color
+def bgcolor(color):
+    chart = chartpanel.getChart()
+    if color is None:
+        chart.setDrawBackground(False)
+    else:
+        chart.setDrawBackground(True)
+        chart.setBackground(__getcolor(color))
+    draw_if_interactive()    
     
 def subplot(nrows, ncols, plot_number):
     if chartpanel is None:
@@ -1008,7 +1015,8 @@ def __getcolormap(**kwargs):
         else:
             cs = []
             for cc in colors:
-                cs.append(__getcolor(cc))
+                c = __getcolor(cc)
+                cs.append(c)
             cmap = ColorMap(cs)
     else:
         cmapstr = kwargs.pop('cmap', 'matlab_jet')

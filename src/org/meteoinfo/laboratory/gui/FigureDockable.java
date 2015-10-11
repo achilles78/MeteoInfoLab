@@ -172,4 +172,13 @@ public class FigureDockable extends DefaultSingleCDockable {
         }
     }
 
+    /**
+     * Set current figure
+     * @param cp ChartPanel
+     */
+    public void setCurrentFigure(ChartPanel cp){
+        if (this.tabbedPanel.getTabCount() > 0){
+            this.tabbedPanel.setComponentAt(this.tabbedPanel.getSelectedIndex(), cp);
+        }
+    }
 }

@@ -5,6 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.data import TableUtil
+from org.meteoinfo.layer import LayerTypes
 from java.util import Date, Calendar
 
 from datetime import datetime
@@ -15,6 +16,9 @@ class MILayer():
     
     def __repr__(self):
         return self.layer.getLayerInfo()
+    
+    def isvectorlayer(self):
+        return self.layer.getLayerType() == LayerTypes.VectorLayer
     
     def cellvalue(self, fieldname, shapeindex):
         v = self.layer.getCellValue(fieldname, shapeindex)
