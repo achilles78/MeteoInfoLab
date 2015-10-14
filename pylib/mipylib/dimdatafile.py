@@ -5,13 +5,12 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.data.meteodata import MeteoDataInfo
-from ucar.ma2 import Section
+from ucar.ma2 import Section, DataType
 from ucar.nc2 import Attribute
-from ucar.ma2 import DataType
 import dimvariable
 from dimvariable import DimVariable
 import dimarray
-from dimarray import PyGridData, PyStationData
+from dimarray import DimArray, PyGridData, PyStationData
 import milayer
 from milayer import MILayer, MIXYListData
 import miarray
@@ -168,11 +167,13 @@ class DimDataFile():
         self.ncfile.create()
         
     def write(self, variable, value, origin=None):
+        if isinstance(value, (DimArray, MIArray)):
+            value = value.asarray()
         if origin is None:
-            self.ncfile.write(variable.ncvariable, value.asarray())
+            self.ncfile.write(variable.ncvariable, value)
         else:
             origin = jarray.array(origin, 'i')
-            self.ncfile.write(variable.ncvariable, origin, value.asarray())
+            self.ncfile.write(variable.ncvariable, origin, value)
     def flush(self):
         self.ncfile.flush()
         

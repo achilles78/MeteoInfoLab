@@ -17,6 +17,7 @@ from org.meteoinfo.global import PointD
 from org.meteoinfo.shape import ShapeUtil
 from org.meteoinfo.legend import BreakTypes
 from ucar.nc2 import NetcdfFileWriter
+from ucar.ma2 import Array
 
 import dimdatafile
 import dimvariable
@@ -674,7 +675,15 @@ def magnitude(u, v):
     else:
         r = sqrt(u * u + v * v)
         return r
-    
+
+def asarray(data):
+    if isinstance(data, Array):
+        return data
+    elif isinstance(data, (DimArray, MIArray)):
+        return data.asarray()
+    else:
+        return array(data).asarray()
+        
 def asgriddata(data, x=None, y=None, fill_value=-9999.0):
     if x is None:    
         if isinstance(data, PyGridData):

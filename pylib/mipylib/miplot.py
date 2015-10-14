@@ -217,7 +217,7 @@ def plot(*args, **kwargs):
         if styles != None:
             for i in range(0, len(styles)):
                 idx = dataset.getSeriesCount() - len(styles) + i
-                print 'Series index: ' + str(idx)
+                #print 'Series index: ' + str(idx)
                 line = __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
                 lines.append(line)
         else:
@@ -593,7 +593,51 @@ def cll():
         elif isinstance(c_plot, XY2DPlot):
             c_plot.removeLastLayer()
         draw_if_interactive()
- 	
+
+def __getplotstyle(style, caption, **kwargs):    
+    linewidth = kwargs.pop('linewidth', 1.0)
+    if style is None:
+        color = kwargs.pop('color', 'red')
+        c = __getcolor(color)
+    else:
+        c = __getcolor(style)
+    pointStyle = __getpointstyle(style)
+    lineStyle = __getlinestyle(style)
+    if not pointStyle is None:
+        if lineStyle is None:           
+            pb = PointBreak()
+            pb.setCaption(caption)
+            if '.' in style:
+                pb.setSize(4)
+                pb.setDrawOutline(False)
+            else:
+                pb.setSize(8)
+            pb.setStyle(pointStyle)
+            if not c is None:
+                pb.setColor(c)
+            return pb
+        else:
+            plb = PolylineBreak()
+            plb.setCaption(caption)
+            plb.setSize(linewidth)
+            plb.setStyle(lineStyle)
+            plb.setDrawSymbol(True)
+            plb.setSymbolStyle(pointStyle)
+            plb.setSymbolInterval(__getsymbolinterval(n))
+            if not c is None:
+                plb.setColor(c)
+                plb.setSymbolColor(c)
+            return plb
+    else:
+        plb = PolylineBreak()
+        plb.setCaption(caption)
+        plb.setSize(linewidth)
+        if not c is None:
+            plb.setColor(c)
+        if not lineStyle is None:
+            plb.setStyle(lineStyle)
+        return plb
+        
 def __setplotstyle(plot, idx, style, n, **kwargs):    
     linewidth = kwargs.pop('linewidth', 1.0)
     color = kwargs.pop('color', 'red')
@@ -1297,22 +1341,27 @@ def scatterm(*args, **kwargs):
     proj = kwargs.pop('proj', None)    
     order = kwargs.pop('order', None)
     n = len(args) 
-    if n <= 2:
+    if n == 1:
         if isinstance(args[0], PyStationData):
             gdata = args[0]
         else:
             gdata = midata.asgriddata(args[0])
-        args = args[1:]
+        args = []
     elif n <=4:
         x = args[0]
         y = args[1]
-        a = args[2]
-        if isinstance(x, list):
+        if not isinstance(x, (DimArray, MIArray)):
             x = midata.array(x)
-        if isinstance(y, list):
+        if not isinstance(y, (DimArray, MIArray)):
             y = midata.array(y)
-        if isinstance(a, list):
-            a = midata.array(a)
+        if n == 2:
+            a = x
+            args = []
+        else:
+            a = args[2]
+            if not isinstance(a, (DimArray, MIArray)):
+                a = midata.array(a)
+            args = args[3:]                
         if a.rank == 1:
             gdata = midata.asstationdata(a, x, y, fill_value)
         else:
@@ -1320,7 +1369,7 @@ def scatterm(*args, **kwargs):
                 gdata = midata.asstationdata(a, x, y, fill_value)                
             else:
                 gdata = midata.asgriddata(a, x, y, fill_value)
-        args = args[3:]
+        
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if not 'symbolspec' in kwargs:
         ls = __getlegendscheme_point(ls, **kwargs)    
@@ -1329,6 +1378,91 @@ def scatterm(*args, **kwargs):
     else:
         layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
     gdata = None
+    return MILayer(layer)
+    
+def plotm(*args, **kwargs):
+    plot = c_plot
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    proj = kwargs.pop('proj', None)    
+    order = kwargs.pop('order', None)
+    n = len(args) 
+    xdatalist = []
+    ydatalist = []    
+    styles = []
+    if n == 1:
+        ydata = __getplotdata(args[0])
+        if isinstance(args[0], DimArray):
+            xdata = args[0].dimvalue(0)
+        else:
+            xdata = []
+            for i in range(0, len(args[0])):
+                xdata.append(i)
+        xdatalist.append(midata.asarray(xdata))
+        ydatalist.append(midata.asarray(ydata))
+    elif n == 2:
+        if isinstance(args[1], basestring):
+            ydata = __getplotdata(args[0])
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            styles.append(args[1])
+        else:
+            xdata = __getplotdata(args[0])
+            ydata = __getplotdata(args[1])
+        xdatalist.append(midata.asarray(xdata))
+        ydatalist.append(midata.asarray(ydata))
+    else:
+        c = 'x'
+        for arg in args: 
+            if c == 'x':    
+                xdatalist.append(midata.asarray(arg))
+                c = 'y'
+            elif c == 'y':
+                ydatalist.append(midata.asarray(arg))
+                c = 's'
+            elif c == 's':
+                if isinstance(arg, basestring):
+                    styles.append(arg)
+                    c = 'x'
+                else:
+                    styles.append('-')
+                    xdatalist.append(midata.asarray(arg))
+                    c = 'y'
+    if len(styles) == 0:
+        styles = None
+    else:
+        while len(styles) < len(xdatalist):
+            styles.append('-')
+    
+    #Get plot data styles - Legend
+    lines = []
+    ls = kwargs.pop('legend', None) 
+    if ls is None:
+        if styles != None:
+            for i in range(0, len(styles)):
+                line = __getplotstyle(styles[i], str(i), **kwargs)
+                lines.append(line)
+        else:
+            for i in range(0, snum):
+                line = __getplotstyle(None, str(i), **kwargs)
+                lines.append(line)
+        ls = LegendScheme(lines)
+    
+    layer = DrawMeteoData.createPolylineLayer(xdatalist, ydatalist, ls, \
+        'Plot_lines', 'ID', -180, 180)
+    if (proj != None):
+        layer.setProjInfo(proj)
+ 
+    c_plot.addLayer(layer)
+    c_plot.setDrawExtent(layer.getExtent())
+    
+    if chartpanel is None:
+        figure()
+
+    draw_if_interactive()
     return MILayer(layer)
     
 def stationmodel(*args, **kwargs):
