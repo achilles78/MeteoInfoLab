@@ -106,9 +106,12 @@ class DimDataFile():
         else:
             return None
             
-    def trajvardata(self, varidx):
+    def trajvardata(self, varidx, hourx=False):
         if self.dataset.isTrajData():
-            return MIXYListData(self.dataset.getDataInfo().getXYDataset(varidx))
+            if hourx:
+                return MIXYListData(self.dataset.getDataInfo().getXYDataset_HourX(varidx))
+            else:
+                return MIXYListData(self.dataset.getDataInfo().getXYDataset(varidx))
         else:
             return None
             

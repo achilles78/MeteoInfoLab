@@ -68,5 +68,22 @@ class MIXYListData():
     def __init__(self, data):
         self.data = data
         
-    def size(self):
-        return self.data.getSeriesCount()
+    def __getitem__(self, indices):
+        if not isinstance(indices, tuple):
+            inds = []
+            inds.append(indices)
+            indices = inds
+            
+        if isinstance(indices[0], int):
+            if isinstance(indices[1], int):
+                x = self.data.getX(indices[0], indices[1])
+                y = self.data.getY(indices[0], indices[1])
+                return x, y
+            else:
+                return self.data.getXValues(indices[0]), self.data.getXValues(indices[0])           
+        
+    def size(self, series=None):
+        if series is None:
+            return self.data.getSeriesCount()
+        else:
+            return self.data.getItemCount(series)

@@ -80,7 +80,7 @@ def __getplotdata(data):
     elif isinstance(data, list):
         return data
     else:
-        return data
+        return [data]
 
 def draw_if_interactive():
     if isinteractive:
@@ -282,7 +282,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     pb.setSize(s)
     pb.setStyle(pointStyle)
     pb.setColor(color)
-    plot.setLegendBreak(0, pb)
+    plot.setLegendBreak(dataset.getSeriesCount() - 1, pb)
     
     #Paint dataset
     if chartpanel is None:
@@ -1917,6 +1917,10 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     for c in cols:
         colors.append(c)
     return colors
+
+def makelegend(lbreaks):
+    ls = LegendScheme(lbreaks)
+    return ls
     
 def makesymbolspec(geometry, *args, **kwargs):    
     if geometry == 'point':
