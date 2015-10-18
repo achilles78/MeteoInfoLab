@@ -116,7 +116,7 @@ def plot(*args, **kwargs):
             snum = args[0].size()
             isxylistdata = True
         else:
-            ydata = __getplotdata(args[0])
+            ydata = args[0]
             if isinstance(args[0], DimArray):
                 xdata = args[0].dimvalue(0)
                 if args[0].islondim(0):
@@ -133,7 +133,7 @@ def plot(*args, **kwargs):
             ydatalist.append(ydata)
     elif len(args) == 2:
         if isinstance(args[1], basestring):
-            ydata = __getplotdata(args[0])
+            ydata = args[0]
             if isinstance(args[0], DimArray):
                 xdata = args[0].dimvalue(0)
                 if args[0].islondim(0):
@@ -148,8 +148,8 @@ def plot(*args, **kwargs):
                     xdata.append(i)
             styles.append(args[1])
         else:
-            xdata = __getplotdata(args[0])
-            ydata = __getplotdata(args[1])
+            xdata = args[0]
+            ydata = args[1]
         xdatalist.append(xdata)
         ydatalist.append(ydata)
     else:
@@ -1559,6 +1559,29 @@ def contourfm(*args, **kwargs):
     gdata = None
     return MILayer(layer)
     
+def gridfm(*args, **kwargs):
+    plot = c_plot
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    interpolate = kwargs.pop('interpolate', False)
+    proj = kwargs.pop('proj', None)
+    order = kwargs.pop('order', None)
+    n = len(args) 
+    if n <= 2:
+        gdata = midata.asgriddata(args[0])
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        gdata = midata.asgriddata(a, x, y, fill_value)
+        args = args[3:]
+    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    if interpolate:
+        gdata = gdata.interpolate()
+    layer = __plot_griddata_m(plot, gdata, ls, 'gridf', proj=proj, order=order)
+    gdata = None
+    return MILayer(layer)
+    
 def surfacem_1(*args, **kwargs):
     plot = c_plot
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -1735,6 +1758,8 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
         layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)      
     elif type == 'scatter':
         layer = DrawMeteoData.createGridPointLayer(gdata.data, ls, 'layer', 'data')
+    elif type == 'gridf':
+        layer = DrawMeteoData.createGridFillLayer(gdata.data, ls, 'layer', 'data')
     else:
         layer = None
         return layer
@@ -1822,10 +1847,10 @@ def clabel(layer, **kwargs):
     font = __getfont(**kwargs)
     cstr = kwargs.pop('color', 'black')
     color = __getcolor(cstr)
-    labelset = layer.getLabelSet()
+    labelset = layer.layer.getLabelSet()
     labelset.setLabelFont(font)
     labelset.setLabelColor(color)
-    layer.addLabelsContourDynamic(layer.getExtent())
+    layer.layer.addLabelsContourDynamic(layer.layer.getExtent())
     draw_if_interactive()
         
 def worldmap():
