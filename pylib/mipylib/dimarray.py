@@ -85,6 +85,9 @@ class DimArray():
                 print k
                 return None
             
+            if sidx >= self.dims[i].getDimLength():
+                raise IndexError()
+                
             if sidx != eidx:
                 iszerodim = False
             if step < 0:

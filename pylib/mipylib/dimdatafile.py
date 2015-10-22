@@ -133,13 +133,14 @@ class DimDataFile():
             self.dataset.getDataInfo().setBigEndian(big_endian)
             
     def tostation(self, varname, x, y, z, t):
-        cal = Calendar.getInstance()
-        cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
-        nt = cal.getTime()
+        if isinstance(t, datetime):
+            cal = Calendar.getInstance()
+            cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
+            t = cal.getTime()
         if z is None:
-            return self.dataset.toStation(varname, x, y, nt)
+            return self.dataset.toStation(varname, x, y, t)
         else:
-            return self.dataset.toStation(varname, x, y, z, nt)
+            return self.dataset.toStation(varname, x, y, z, t)
             
     def adddim(self, dimname, dimsize, group=None):
         return self.ncfile.addDimension(group, dimname, dimsize)

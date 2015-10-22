@@ -4,7 +4,7 @@
 # Purpose: MeteoInfoLab layer module
 # Note: Jython
 #-----------------------------------------------------
-from org.meteoinfo.data import TableUtil
+from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes
 from java.util import Date, Calendar
 
@@ -65,8 +65,11 @@ class MILayer():
         return MILayer(self.layer.clone())
         
 class MIXYListData():
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, data=None):
+        if data is None:
+            self.data = XYListDataset()
+        else:
+            self.data = data
         
     def __getitem__(self, indices):
         if not isinstance(indices, tuple):
@@ -87,3 +90,11 @@ class MIXYListData():
             return self.data.getSeriesCount()
         else:
             return self.data.getItemCount(series)
+            
+    def addseries(self, xdata, ydata, key=None):
+        if key is None:
+            key = 'Series_' + str(self.size())
+        if isinstance(xdata, list):
+            self.data.addSeries(key, xdata, ydata)
+        else:
+            self.data.addSeries(key, xdata.asarray(), ydata.asarray())   

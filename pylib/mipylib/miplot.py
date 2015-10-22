@@ -699,6 +699,9 @@ def __setplotstyle(plot, idx, style, n, **kwargs):
         return plb
     
 def __getlinestyle(style):
+    if style is None:
+        return None
+        
     lineStyle = None
     if '--' in style:
         lineStyle = LineStyles.Dash
@@ -712,6 +715,9 @@ def __getlinestyle(style):
     return lineStyle
     
 def __getpointstyle(style):
+    if style is None:
+        return None
+        
     pointStyle = None
     if 'o' in style:
         pointStyle = PointStyle.Circle
@@ -1389,16 +1395,22 @@ def plotm(*args, **kwargs):
     xdatalist = []
     ydatalist = []    
     styles = []
+    isxylistdata = False
     if n == 1:
-        ydata = __getplotdata(args[0])
-        if isinstance(args[0], DimArray):
-            xdata = args[0].dimvalue(0)
+        if isinstance(args[0], MIXYListData):
+            dataset = args[0]
+            snum = args[0].size()
+            isxylistdata = True
         else:
-            xdata = []
-            for i in range(0, len(args[0])):
-                xdata.append(i)
-        xdatalist.append(midata.asarray(xdata))
-        ydatalist.append(midata.asarray(ydata))
+            ydata = __getplotdata(args[0])
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            xdatalist.append(midata.asarray(xdata))
+            ydatalist.append(midata.asarray(ydata))
     elif n == 2:
         if isinstance(args[1], basestring):
             ydata = __getplotdata(args[0])
@@ -1431,10 +1443,14 @@ def plotm(*args, **kwargs):
                     styles.append('-')
                     xdatalist.append(midata.asarray(arg))
                     c = 'y'
+    
+    if not isxylistdata:
+        snum = len(xdatalist)
+        
     if len(styles) == 0:
         styles = None
     else:
-        while len(styles) < len(xdatalist):
+        while len(styles) < snum:
             styles.append('-')
     
     #Get plot data styles - Legend
@@ -1451,8 +1467,12 @@ def plotm(*args, **kwargs):
                 lines.append(line)
         ls = LegendScheme(lines)
     
-    layer = DrawMeteoData.createPolylineLayer(xdatalist, ydatalist, ls, \
-        'Plot_lines', 'ID', -180, 180)
+    if isxylistdata:
+        layer = DrawMeteoData.createPolylineLayer(dataset.data, ls, \
+            'Plot_lines', 'ID', -180, 180)
+    else:
+        layer = DrawMeteoData.createPolylineLayer(xdatalist, ydatalist, ls, \
+            'Plot_lines', 'ID', -180, 180)
     if (proj != None):
         layer.setProjInfo(proj)
  
@@ -1641,7 +1661,7 @@ def surfacem(*args, **kwargs):
         lonlim = 90
     else:
         lonlim = 0
-        x, y = midata.project(x, y, plot.getProjInfo())
+        x, y = midata.project(x, y, toproj=plot.getProjInfo())
     layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
     layer.setProjInfo(plot.getProjInfo())
     shapetype = layer.getShapeType()
