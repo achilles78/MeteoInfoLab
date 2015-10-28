@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj"/>
+  <Path OpenPath="D:\KeyData\PMMUL\script"/>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="61,12" MainFormSize="1196,728"/>
+  <Startup MainFormLocation="57,23" MainFormSize="1333,880"/>
 </MeteoInfo>

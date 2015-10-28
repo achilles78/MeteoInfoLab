@@ -79,6 +79,9 @@ class PyTableData():
     
     def colnames(self):
         return self.data.getDataTable().getColumnNames()
+        
+    def setcolname(self, col, colname):
+        return self.data.getDataTable().renameColumn(col, colname)
     
     def coldata(self, key):
         if isinstance(key, str):
@@ -173,6 +176,15 @@ class PyTableData():
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_SeasonOfYear(cols)
+            return PyTableData(TableData(dtable))
+            
+    def ave_hourofday(self, colnames):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_HourOfDay(cols)
             return PyTableData(TableData(dtable))
     
     def ave_month(self, colnames):
@@ -528,7 +540,7 @@ def linregress(x, y):
     return r[0], r[1], r[2]
     
 def polyval(p, x):
-    return ArrayMath.polyVal(p, x.asarray())
+    return MIArray(ArrayMath.polyVal(p, x.asarray()))
     
 def transpose(a, dim1=0, dim2=1):
     r = ArrayMath.transpose(a.asarray(), dim1, dim2)
