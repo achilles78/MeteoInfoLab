@@ -461,6 +461,29 @@ class DimArray():
         else:
             return gdata.data.toStation(x, y)
             
+    def project(self, x, y, toproj):
+        """
+        Project array
+        
+        :param x: To x coordinates.
+        :param y: To y coordinates.
+        :param toproj: To projection.
+        
+        :returns: (*MIArray*) Projected array
+        """
+        xx = self.dims[self.ndim - 2].getDimValue()
+        yy = self.dims[self.ndim - 1].getDimValue()
+        if isinstance(x, list):
+            r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value)
+        elif isinstance(x, MIArray):
+            if x.rank == 1:
+                r = ArrayUtil.reproject(self.array.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value)
+            else:
+                r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value)
+        else:
+            r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value)
+        return MIArray(r)
+            
     def join(self, b, dimidx):
         r = ArrayMath.join(self.array.array, b.array.array, dimidx)
         dima = self.dimvalue(dimidx)

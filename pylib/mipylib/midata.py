@@ -406,18 +406,73 @@ def readtable(filename, **kwargs):
     tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
     return PyTableData(tdata)
 
-def array(data):
-    return MIArray(ArrayUtil.array(data))
+def array(object):
+    """
+    Create an array.
+    
+    :param object: (array_like) A Jython list or digital object.
+                        
+    :returns: (MIArray object) An array object satisfying the specified requirements.
+                    
+    Examples
+    
+    ::
+    
+        >>> array([1,2,3])
+        array([1, 2, 3])
+        >>> array(25.6)
+        array([25.6])
+        
+    More than one dimensions:
+    
+    ::
+    
+        >>> array([[1,2], [3,4]])
+        array([[1.0, 2.0]
+              [3.0, 4.0]])
+    """
+    return MIArray(ArrayUtil.array(object))
     
 def arange(*args):
+    """
+    Return evenly spaced values within a given interval
+    
+    Values are generated within the half-open interval ``[start, stop]`` (in other words,
+    the interval including *start* but excluding *stop*).
+    
+    When using a non-integer step, such as 0.1, the results will often not be consistent.
+    It is better to use ``linespace`` for these cases.
+    
+    :param start: (*number, optional*) Start of interval. The interval includes this value.
+        The default start value is 0.
+    :param stop: (*number*) End of interval. The interval does not include this value,
+        except in some cases where *step* is not an integer and floating point round-off
+        affects the length of *out*.
+    :param step: (*number, optional*) Spacing between values. For any output *out*, this
+        is the distance between two adjacent values, ``out[i+1] - out[i]``. The default
+        step size is 1. If *step* is specified. *start* must also be given.
+    :param dtype: (*dtype*) The type of output array. If dtype is not given, infer the data
+        type from the other input arguments.
+        
+    :returns: (*MIArray*) Array of evenly spaced values.
+    
+    Examples
+    
+    ::
+    
+        >>> arange(3)
+        array([0, 1, 2])
+        >>> arange(3,7,2)
+        array([3, 5])
+    """
     if len(args) == 1:
         start = 0
         stop = args[0]
         step = 1
     elif len(args) == 2:
-        start = 0
-        stop = args[0]
-        step = args[1]
+        start = args[0]
+        stop = args[1]
+        step = 1
     else:
         start = args[0]
         stop = args[1]
@@ -427,10 +482,59 @@ def arange(*args):
 def arange1(start, n, step):
     return MIArray(ArrayUtil.arrayRange1(start, n, step))
     
-def linspace(start=0, stop=1, n=100, endpoint=True, retstep=False, dtype=None):
-    return MIArray(ArrayUtil.lineSpace(start, stop, n, endpoint))
+def linspace(tart, stop, num=50, endpoint=True, retstep=False, dtype=None):
+    """
+    Return evenly spaced numbers over a specified interval.
+
+    Returns *num* evenly spaced samples, calculated over the interval [*start, stop*].
+
+    The endpoint of the interval can optionally be excluded.
+    
+    :param start: (*number*) Start of interval. The interval includes this value.
+    :param stop: (*number*) The end value of the sequence, unless endpoint is set to 
+        False. In that case, the sequence consists of all but the last of ``num + 1`` 
+        evenly spaced samples, so that stop is excluded. Note that the step size changes 
+        when endpoint is False.
+    :param num: (*number, optional*) Number of samples to generate. Default is 50. Must 
+        be non-negative.
+    :param dtype: (*dtype*) The type of output array. If dtype is not given, infer the data
+        type from the other input arguments.
+        
+    :returns: (*MIArray*) Array of evenly spaced values.
+    
+    Examples
+    
+    ::
+    
+        >>> linspace(2.0, 3.0, num=5)
+        array([2.0, 2.25, 2.5, 2.75, 3.0])
+        >>> linspace(2.0, 3.0, num=5, endpoint=False)
+        array([2.0, 2.25, 2.5, 2.75])
+    """
+    return MIArray(ArrayUtil.lineSpace(args[0], args[1], num, endpoint))
     
 def zeros(shape, dtype='float'):
+    """
+    Create a new aray of given shape and type, filled with zeros.
+
+    :param shape: (int or sequence of ints) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+    :param dtype: (data-type, optional) The desired data-type for the array, including 'int', 
+        'float' and 'double'.
+        
+    :returns: (MIArray object) Array of zeros with the given shape and dtype.
+                    
+    Examples
+    
+    ::
+    
+        >>> zeros(5)
+        array([0.0, 0.0, 0.0, 0.0, 0.0])
+        >>> zeros(5, dtype='int')
+        array([0, 0, 0, 0, 0])
+        >>> zeros((2, 1))
+        array([[0.0]
+              [0.0]])
+    """
     shapelist = []
     if isinstance(shape, int):
         shapelist.append(shape)
@@ -439,6 +543,27 @@ def zeros(shape, dtype='float'):
     return MIArray(ArrayUtil.zeros(shapelist, dtype))
     
 def ones(shape, dtype='float'):
+    """
+    Create a new aray of given shape and type, filled with ones.
+
+    :param shape: (int or sequence of ints) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+    :param dtype: (data-type, optional) The desired data-type for the array, including 'int', 
+        'float' and 'double'.
+        
+    :returns: (MIArray object) Array of ones with the given shape and dtype.
+                    
+    Examples
+    
+    ::
+    
+        >>> ones(5)
+        array([1.0, 1.0, 1.0, 1.0, 1.0])
+        >>> ones(5, dtype='int')
+        array([1, 1, 1, 1, 1])
+        >>> ones((2, 1))
+        array([[1.0]
+              [1.0]])
+    """
     shapelist = []
     if isinstance(shape, int):
         shapelist.append(shape)
