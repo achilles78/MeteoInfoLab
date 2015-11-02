@@ -471,8 +471,8 @@ class DimArray():
         
         :returns: (*MIArray*) Projected array
         """
-        xx = self.dims[self.ndim - 2].getDimValue()
-        yy = self.dims[self.ndim - 1].getDimValue()
+        yy = self.dims[self.ndim - 2].getDimValue()
+        xx = self.dims[self.ndim - 1].getDimValue()
         if isinstance(x, list):
             r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value)
         elif isinstance(x, MIArray):

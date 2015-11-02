@@ -19,6 +19,7 @@ from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, P
 from org.meteoinfo.drawing import PointStyle
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
+from org.meteoinfo.global.image import AnimatedGifEncoder
 from org.meteoinfo.layer import LayerTypes
 from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
@@ -476,12 +477,21 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     frameon = kwargs.pop('frameon', True)
     axison = kwargs.pop('axison', None)
     bgcobj = kwargs.pop('bgcolor', None)
+    xyscale = kwargs.pop('xyscale', 1)
     
     global c_plot
     mapview = MapView()
-    mapview.setXYScaleFactor(1.0)
+    mapview.setXYScaleFactor(xyscale)
     c_plot = MapPlot(mapview)    
     c_plot.setPosition(position[0], position[1], position[2], position[3])
+    tickfontname = kwargs.pop('tickfontname', 'Arial')
+    tickfontsize = kwargs.pop('tickfontsize', 14)
+    tickbold = kwargs.pop('tickbold', False)
+    if tickbold:
+        font = Font(tickfontname, Font.BOLD, tickfontsize)
+    else:
+        font = Font(tickfontname, Font.PLAIN, tickfontsize)
+    c_plot.setAxisLabelFont(font)
     if not axison is None:
         c_plot.setAxisOn(axison)
     else:
@@ -1033,6 +1043,13 @@ def colorbar(layer, **kwargs):
     shrink = kwargs.pop('shrink', 1)
     orientation = kwargs.pop('orientation', 'vertical')
     aspect = kwargs.pop('aspect', 20)
+    fontname = kwargs.pop('fontname', 'Arial')
+    fontsize = kwargs.pop('fontsize', 14)
+    bold = kwargs.pop('bold', False)
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
     plot = c_plot
     ls = layer.legend()
     legend = plot.getLegend()
@@ -1044,6 +1061,7 @@ def colorbar(layer, **kwargs):
     legend.setColorbar(True)   
     legend.setShrink(shrink)
     legend.setAspect(aspect)
+    legend.setLabelFont(font)
     if orientation == 'horizontal':
         legend.setPlotOrientation(PlotOrientation.HORIZONTAL)
         legend.setPosition(LegendPosition.LOWER_CENTER_OUTSIDE)
@@ -1158,12 +1176,13 @@ def contour(*args, **kwargs):
     xaxistype = None
     if n <= 2:
         gdata = midata.asgriddata(args[0])
-        if args[0].islondim(1):
-            xaxistype = 'lon'
-        elif args[0].islatdim(1):
-            xaxistype = 'lat'
-        elif args[0].istimedim(1):
-            xaxistype = 'time'
+        if isinstance(args[0], DimArray):
+            if args[0].islondim(1):
+                xaxistype = 'lon'
+            elif args[0].islatdim(1):
+                xaxistype = 'lat'
+            elif args[0].istimedim(1):
+                xaxistype = 'time'
         args = args[1:]
     elif n <=4:
         x = args[0]
@@ -1193,12 +1212,13 @@ def contourf(*args, **kwargs):
     xaxistype = None
     if n <= 2:
         gdata = midata.asgriddata(args[0])
-        if args[0].islondim(1):
-            xaxistype = 'lon'
-        elif args[0].islatdim(1):
-            xaxistype = 'lat'
-        elif args[0].istimedim(1):
-            xaxistype = 'time'
+        if isinstance(args[0], DimArray):
+            if args[0].islondim(1):
+                xaxistype = 'lon'
+            elif args[0].islatdim(1):
+                xaxistype = 'lat'
+            elif args[0].istimedim(1):
+                xaxistype = 'time'
         args = args[1:]
     elif n <=4:
         x = args[0]
@@ -2097,3 +2117,33 @@ def display(data):
     else:
         print 'Unkown data type!'
         print type(data)
+        
+def gifanimation(filename, repeat=0, delay=1000):
+    """
+    Create a gif animation file
+    
+    :param: repeat: (*int, Default 0*) Animation repeat time number. 0 means repeat forever.
+    :param: delay: (*int, Default 1000*) Animation frame delay time with units of millsecond.
+    
+    :returns: Gif animation object.
+    """
+    encoder = AnimatedGifEncoder()
+    encoder.setRepeat(repeat)
+    encoder.setDelay(delay)
+    encoder.start(filename)
+    return encoder
+
+def gifaddframe(animation):
+    """
+    Add a frame to an gif animation object
+    
+    :param animation: Gif animation object
+    """
+    chartpanel.paintGraphics()
+    animation.addFrame(chartpanel.getViewImage())
+    
+def giffinish(animation):
+    """
+    Finish a gif animation object and write gif animation image file
+    """
+    animation.finish()

@@ -410,9 +410,9 @@ def array(object):
     """
     Create an array.
     
-    :param object: (array_like) A Jython list or digital object.
+    :param object: (*array_like*) A Jython list or digital object.
                         
-    :returns: (MIArray object) An array object satisfying the specified requirements.
+    :returns: (*MIArray*) An array object satisfying the specified requirements.
                     
     Examples
     
@@ -517,11 +517,11 @@ def zeros(shape, dtype='float'):
     """
     Create a new aray of given shape and type, filled with zeros.
 
-    :param shape: (int or sequence of ints) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
-    :param dtype: (data-type, optional) The desired data-type for the array, including 'int', 
+    :param shape: (*int or sequence of ints*) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+    :param dtype: (*data-type, optional*) The desired data-type for the array, including 'int', 
         'float' and 'double'.
         
-    :returns: (MIArray object) Array of zeros with the given shape and dtype.
+    :returns: (*MIArray*) Array of zeros with the given shape and dtype.
                     
     Examples
     
@@ -546,11 +546,11 @@ def ones(shape, dtype='float'):
     """
     Create a new aray of given shape and type, filled with ones.
 
-    :param shape: (int or sequence of ints) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
-    :param dtype: (data-type, optional) The desired data-type for the array, including 'int', 
+    :param shape: (*int or sequence of ints*) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+    :param dtype: (*data-type, optional*) The desired data-type for the array, including 'int', 
         'float' and 'double'.
         
-    :returns: (MIArray object) Array of ones with the given shape and dtype.
+    :returns: (*MIArray*) Array of ones with the given shape and dtype.
                     
     Examples
     
@@ -827,6 +827,13 @@ def asgriddata(data, x=None, y=None, fill_value=-9999.0):
             return data
         elif isinstance(data, DimArray):
             return data.asgriddata()
+        elif isinstance(data, MIArray):
+            if x is None:
+                x = arange(0, data.shape[1])
+            if y is None:
+                y = arange(0, data.shape[0])
+            gdata = GridData(data.array, x.array, y.array, fill_value)
+            return PyGridData(gdata)
         else:
             return None
     else:
@@ -970,10 +977,61 @@ def projectxy(lllon, lllat, xnum, ynum, dx, dy, toproj, fromproj=None):
     return xx, yy
     
 def addtimedim(infn, outfn, t, tunit='hours'):
-        cal = Calendar.getInstance()
-        cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
-        nt = cal.getTime()
-        NetCDFDataInfo.addTimeDimension(infn, outfn, nt, tunit)
+    cal = Calendar.getInstance()
+    cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
+    nt = cal.getTime()
+    NetCDFDataInfo.addTimeDimension(infn, outfn, nt, tunit)
         
 def joinncfile(infns, outfn, tdimname):
-        NetCDFDataInfo.joinDataFiles(infns, outfn, tdimname)
+    NetCDFDataInfo.joinDataFiles(infns, outfn, tdimname)
+    
+def binread(fn, dim, datatype=None):
+    """
+    Read data array from a binary file.
+    
+    :param dim: (*list*) Dimensions.
+    :param datatype: (*string*) Data type string.
+    
+    :returns: (*MIArray*) Data array
+    """
+    r = ArrayUtil.readBinFile(fn, dim, datatype);
+    return MIArray(r)
+        
+def binwrite(fn, data):
+    """
+    Create a binary data file from an array variable.
+    
+    :param fn: (*string*) Path needed to locate binary file.
+    :param data: (*DimArray or MIArray*) A numeric array variable of any dimensionality.
+    """
+    ArrayUtil.saveBinFile(fn, data.asarray())
+    
+# Get month abstract English name
+def monthname(m):  
+    mmm = 'jan'
+    if m == 1:
+        mmm = 'jan'
+    elif m == 2:
+        mmm = 'feb'
+    elif m == 3:
+        mmm = 'mar'
+    elif m == 4:
+        mmm = 'apr'
+    elif m == 5:
+        mmm = 'may'
+    elif m == 6:
+        mmm = 'jun'
+    elif m == 7:
+        mmm = 'jul'
+    elif m == 8:
+        mmm = 'aug'
+    elif m == 9:
+        mmm = 'sep'
+    elif m == 10:
+        mmm = 'oct'
+    elif m == 11:
+        mmm = 'nov'
+    elif m == 12:
+        mmm = 'dec'
+
+    return mmm

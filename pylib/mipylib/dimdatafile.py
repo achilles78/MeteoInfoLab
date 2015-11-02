@@ -114,7 +114,15 @@ class DimDataFile():
                 return MIXYListData(self.dataset.getDataInfo().getXYDataset(varidx))
         else:
             return None
-            
+    
+    def timenum(self):
+        """
+        Get time dimension length
+        
+        :returns: (*int*) Time dimension length.
+        """
+        return self.dataset.getDataInfo().getTimeNum()
+    
     def gettime(self, idx):
         date = self.dataset.getDataInfo().getTimes().get(idx)
         cal = Calendar.getInstance()

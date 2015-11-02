@@ -287,11 +287,7 @@ class MIArray():
     def reshape(self, shape):
         shape = jarray.array(shape, 'i')
         return MIArray(self.array.reshape(shape))
-        
-    def asgriddata(self, x, y, fill_value=-9999.0):    
-        gdata = GridData(self.array, x.array, y.array, fill_value)
-        return PyGridData(gdata)
-        
+    
     def asdimarray(self, x, y, fill_value=-9999.0):
         dims = []
         ydim = Dimension(DimensionType.Y)
