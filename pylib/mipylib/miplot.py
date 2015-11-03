@@ -1071,6 +1071,9 @@ def colorbar(layer, **kwargs):
     legend.setDrawNeatLine(False)
     extendrect = kwargs.pop('extendrect', True)
     legend.setExtendRect(extendrect)
+    extendfrac = kwargs.pop('extendfrac', None)
+    if extendfrac == 'auto':
+        legend.setAutoExtendFrac(True)
     plot.setDrawLegend(True)
     draw_if_interactive()
 
@@ -2139,8 +2142,8 @@ def gifaddframe(animation):
     
     :param animation: Gif animation object
     """
-    chartpanel.paintGraphics()
-    animation.addFrame(chartpanel.getViewImage())
+    #chartpanel.paintGraphics()
+    animation.addFrame(chartpanel.paintViewImage())
     
 def giffinish(animation):
     """

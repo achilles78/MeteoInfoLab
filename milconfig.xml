@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\2015\International\SDS_Asian_Region_Center\Model_Verification\script"/>
+  <Path OpenPath="D:\Working\2015\International\SDS_Asian_Region_Center\Model_Verification"/>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>

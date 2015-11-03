@@ -461,7 +461,7 @@ class DimArray():
         else:
             return gdata.data.toStation(x, y)
             
-    def project(self, x, y, toproj):
+    def project(self, x, y, toproj=None):
         """
         Project array
         
@@ -473,6 +473,8 @@ class DimArray():
         """
         yy = self.dims[self.ndim - 2].getDimValue()
         xx = self.dims[self.ndim - 1].getDimValue()
+        if toproj is None:
+            toproj = self.proj
         if isinstance(x, list):
             r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value)
         elif isinstance(x, MIArray):
