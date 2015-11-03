@@ -7,6 +7,7 @@
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, StationData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
+from org.meteoinfo.geoprocess.analysis import ResampleMethods
 from org.meteoinfo.layer import VectorLayer
 from ucar.ma2 import Array, Range, MAMath
 import miarray
@@ -461,7 +462,7 @@ class DimArray():
         else:
             return gdata.data.toStation(x, y)
             
-    def project(self, x, y, toproj=None):
+    def project(self, x, y, toproj=None, method='bilinear'):
         """
         Project array
         
@@ -475,15 +476,19 @@ class DimArray():
         xx = self.dims[self.ndim - 1].getDimValue()
         if toproj is None:
             toproj = self.proj
+        if method == 'bilinear':
+            method = ResampleMethods.Bilinear
+        else:
+            method = ResampleMethods.NearestNeighbor
         if isinstance(x, list):
-            r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value)
+            r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value, method)
         elif isinstance(x, MIArray):
             if x.rank == 1:
-                r = ArrayUtil.reproject(self.array.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value)
+                r = ArrayUtil.reproject(self.array.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value, method)
             else:
-                r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value)
+                r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
         else:
-            r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value)
+            r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
         return MIArray(r)
             
     def join(self, b, dimidx):
