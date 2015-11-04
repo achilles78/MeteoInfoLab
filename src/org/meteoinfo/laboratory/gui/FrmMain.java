@@ -56,7 +56,7 @@ public class FrmMain extends javax.swing.JFrame {
      */
     public FrmMain() {
         initComponents();
-
+        
         boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
                 getInputArguments().toString().contains("jdwp");
         if (isDebug) {
@@ -85,21 +85,27 @@ public class FrmMain extends javax.swing.JFrame {
 
         //Current folder
         this.jComboBox_CurrentFolder.removeAllItems();
-        String cf = this.options.getCurrentFolder();
-        if (new File(cf).isDirectory()) {
-            this.jComboBox_CurrentFolder.addItem(this.options.getCurrentFolder());
-        } else {
-            this.jComboBox_CurrentFolder.addItem(this.startupPath);
-            this.options.setCurrentFolder(startupPath);
-            cf = this.startupPath;
+        for (String cf : this.options.getRecentFolders()) {
+            if (new File(cf).isDirectory()) {
+                this.jComboBox_CurrentFolder.addItem(cf);
+            }
         }
+        String cf = this.options.getCurrentFolder();
+        if (!new File(cf).isDirectory()) {
+            cf = this.startupPath;
+            this.options.setCurrentFolder(cf);
+        }
+        if (!this.options.getRecentFolders().contains(cf)) {
+            this.jComboBox_CurrentFolder.addItem(cf);
+        }
+        this.jComboBox_CurrentFolder.setSelectedItem(cf);
 
         //Add dockable panels
         CControl control = new CControl(this);
         this.add(control.getContentArea());
-
+        
         control.putProperty(ScreenDockStation.WINDOW_FACTORY, new CustomWindowFactory());
-
+        
         CGrid grid = new CGrid(control);
         //this.outputDock = new OutputDockable("Output", "Output");
         editorDock = new EditorDockable("Editor", "Editor");
@@ -111,7 +117,7 @@ public class FrmMain extends javax.swing.JFrame {
         interp.addConsoleExecListener(new IConsoleExecListener() {
             @Override
             public void consoleExecEvent(ConsoleExecEvent event) {
-
+                
                 PyStringMap locals = (PyStringMap) interp.getLocals();
                 PyList items = locals.items();
                 String name;
@@ -131,7 +137,7 @@ public class FrmMain extends javax.swing.JFrame {
                     FrmMain.this.variableDock.getVariableExplorer().updateVariables(vars);
                 }
             }
-
+            
         });
         figuresDock = new FigureDockable(this, "Figures", "Figures");
         this.variableDock = new VariableDockable("Variables", "Variable explorer");
@@ -142,10 +148,10 @@ public class FrmMain extends javax.swing.JFrame {
             public void currentPathChangedEvent(CurrentPathChangedEvent event) {
                 FrmMain.this.setCurrentPath(FrmMain.this.fileDock.getFileExplorer().getPath().getAbsolutePath());
             }
-
+            
         });
         this.fileDock.getFileExplorer().getTable().addMouseListener(new MouseAdapter() {
-
+            
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -159,7 +165,7 @@ public class FrmMain extends javax.swing.JFrame {
                     }
                 }
             }
-
+            
         });
         //grid.add(0, 0, 5, 5, this.outputDock);
         grid.add(0, 0, 5, 5, editorDock);
@@ -478,7 +484,7 @@ public class FrmMain extends javax.swing.JFrame {
         if (!te.getFileName().isEmpty()) {
             te.saveFile(te.getFile());
         }
-
+        
         String code = te.getTextArea().getText();
         this.consoleDock.runPythonScript(code);
     }//GEN-LAST:event_jButton_RunScriptActionPerformed
@@ -536,7 +542,7 @@ public class FrmMain extends javax.swing.JFrame {
         if (this.fileDock == null) {
             return;
         }
-
+        
         if (this.jComboBox_CurrentFolder.getItemCount() > 0) {
             String path = this.jComboBox_CurrentFolder.getSelectedItem().toString();
             if (new File(path).isDirectory()) {
@@ -655,6 +661,13 @@ public class FrmMain extends javax.swing.JFrame {
     public final void saveConfigureFile() {
         String fn = this.options.getFileName();
         try {
+            List<String> cfolders = new ArrayList<>();
+            for (int i = 0; i < 10; i++){
+                if (i >= this.jComboBox_CurrentFolder.getItemCount())
+                    break;
+                cfolders.add(this.jComboBox_CurrentFolder.getItemAt(i).toString());
+            }
+            this.options.setRecentFolders(cfolders);
             this.options.setMainFormLocation(this.getLocation());
             this.options.setMainFormSize(this.getSize());
             this.options.saveConfigFile(fn);
@@ -681,7 +694,7 @@ public class FrmMain extends javax.swing.JFrame {
             this.jComboBox_CurrentFolder.addItem(path);
         }
         this.jComboBox_CurrentFolder.setSelectedItem(path);
-
+        
         PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
         try {
             interp.exec("mipylib.midata.currentfolder = '" + path + "'");

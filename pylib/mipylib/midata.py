@@ -456,9 +456,7 @@ def arange(*args):
         
     :returns: (*MIArray*) Array of evenly spaced values.
     
-    Examples
-    
-    ::
+    Examples::
     
         >>> arange(3)
         array([0, 1, 2])
@@ -479,10 +477,29 @@ def arange(*args):
         step = args[2]
     return MIArray(ArrayUtil.arrayRange(start, stop, step))
     
-def arange1(start, n, step):
-    return MIArray(ArrayUtil.arrayRange1(start, n, step))
+def arange1(start, num=50, step=1):
+    """
+    Return evenly spaced values within a given interval.
     
-def linspace(tart, stop, num=50, endpoint=True, retstep=False, dtype=None):
+    :param start: (*number*) Start of interval. The interval includes this value.
+    :param num: (*int*) Number of samples to generate. Default is 50. Must 
+        be non-negative.
+    :param step: (*number*) Spacing between values. For any output *out*, this
+        is the distance between two adjacent values, ``out[i+1] - out[i]``. The default
+        step size is 1.
+        
+    :returns: (*MIArray*) Array of evenly spaced values.
+    
+    Examples::
+    
+        >>> arange1(2, 5)
+        array([2, 3, 4, 5, 6])
+        >>> arange1(2, 5, 0.1)
+        array([2.0, 2.1, 2.2, 2.3, 2.4])
+    """
+    return MIArray(ArrayUtil.arrayRange1(start, num, step))
+    
+def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None):
     """
     Return evenly spaced numbers over a specified interval.
 
@@ -495,23 +512,21 @@ def linspace(tart, stop, num=50, endpoint=True, retstep=False, dtype=None):
         False. In that case, the sequence consists of all but the last of ``num + 1`` 
         evenly spaced samples, so that stop is excluded. Note that the step size changes 
         when endpoint is False.
-    :param num: (*number, optional*) Number of samples to generate. Default is 50. Must 
+    :param num: (*int, optional*) Number of samples to generate. Default is 50. Must 
         be non-negative.
     :param dtype: (*dtype*) The type of output array. If dtype is not given, infer the data
         type from the other input arguments.
         
     :returns: (*MIArray*) Array of evenly spaced values.
     
-    Examples
-    
-    ::
+    Examples::
     
         >>> linspace(2.0, 3.0, num=5)
         array([2.0, 2.25, 2.5, 2.75, 3.0])
         >>> linspace(2.0, 3.0, num=5, endpoint=False)
         array([2.0, 2.25, 2.5, 2.75])
     """
-    return MIArray(ArrayUtil.lineSpace(args[0], args[1], num, endpoint))
+    return MIArray(ArrayUtil.lineSpace(start, stop, num, endpoint))
     
 def zeros(shape, dtype='float'):
     """
@@ -523,9 +538,7 @@ def zeros(shape, dtype='float'):
         
     :returns: (*MIArray*) Array of zeros with the given shape and dtype.
                     
-    Examples
-    
-    ::
+    Examples::
     
         >>> zeros(5)
         array([0.0, 0.0, 0.0, 0.0, 0.0])
@@ -552,9 +565,7 @@ def ones(shape, dtype='float'):
         
     :returns: (*MIArray*) Array of ones with the given shape and dtype.
                     
-    Examples
-    
-    ::
+    Examples::
     
         >>> ones(5)
         array([1.0, 1.0, 1.0, 1.0, 1.0])
@@ -571,47 +582,125 @@ def ones(shape, dtype='float'):
         shapelist = shape
     return MIArray(ArrayUtil.ones(shapelist, dtype))
     
-def sqrt(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.sqrt()
-    else:
-        return math.sqrt(a)
-
-def sin(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.sin()
-    else:
-        return math.sin(a)
+def sqrt(x):
+    """
+    Return the positive square-root of an array, element-wise.
     
-def cos(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.cos()
-    else:
-        return math.cos(a)
+    :param x: (*array_like*) The values whose square-roots are required.
+    
+    :returns y: (*array_like**) An array of the same shape as *x*, containing the positive
+        square-root of each element in *x*.
         
-def tan(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.tan()
+    Examples::
+    
+        >>> sqrt([1,4,9])
+        array([1.0, 2.0, 3.0])
+    """
+    if isinstance(x, list):
+        return array(x).sqrt()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.sqrt()
     else:
-        return math.tan(a)
+        return math.sqrt(x)
+
+def sin(x):
+    """
+    Trigonometric sine, element-wise.
+    
+    :param x: (*array_like*) Angle, in radians.
+    
+    :returns: (*array_like*) The sine of each element of x.
+    
+    Examples::
+    
+        >>> sin(pi/2.)
+        1.0
+        >>> sin(array([0., 30., 45., 60., 90.]) * pi / 180)
+        array([0.0, 0.49999999999999994, 0.7071067811865475, 0.8660254037844386, 1.0])
+    """
+    if isinstance(x, list):
+        return array(x).sin()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.sin()
+    else:
+        return math.sin(x)
+    
+def cos(x):
+    """
+    Trigonometric cosine, element-wise.
+    
+    :param x: (*array_like*) Angle, in radians.
+    
+    :returns: (*array_like*) The cosine of each element of x.
+    
+    Examples::
+    
+        >>> cos(array([0, pi/2, pi]))
+        array([1.0, 6.123233995736766E-17, -1.0])
+    """
+    if isinstance(x, list):
+        return array(x).cos()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.cos()
+    else:
+        return math.cos(x)
         
-def asin(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.asin()
+def tan(x):
+    """
+    Trigonometric tangent, element-wise.
+    
+    :param x: (*array_like*) Angle, in radians.
+    
+    :returns: (*array_like*) The tangent of each element of x.
+    
+    Examples::
+    
+        >>> tan(array([-pi,pi/2,pi]))
+        array([1.2246467991473532E-16, 1.633123935319537E16, -1.2246467991473532E-16])
+    """
+    if isinstance(x, list):
+        return array(x).tan()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.tan()
     else:
-        return math.asin(a)
+        return math.tan(x)
         
-def acos(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.acos()
+def asin(x):
+    """
+    Trigonometric inverse sine, element-wise.
+    
+    :param x: (*array_like*) *y*-coordinate on the unit circle.
+    
+    :returns: (*array_like*) The inverse sine of each element of *x*, in radians and in the
+        closed interval ``[-pi/2, pi/2]``.
+    
+    Examples::
+    
+        >>> asin(array([1,-1,0]))
+        array([1.5707964, -1.5707964, 0.0])
+    """
+    if isinstance(x, list):
+        return array(x).asin()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.asin()
     else:
-        return math.acos(a)
+        return math.asin(x)
         
-def atan(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.atan()
+def acos(x):
+    if isinstance(x, list):
+        return array(x).acos()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.acos()
     else:
-        return math.atan(a)
+        return math.acos(x)
+        
+def atan(x):
+    if isinstance(x, list):
+        return array(x).atan()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.atan()
+    else:
+        return math.atan(x)
         
 def atan2(a, b):
     if isinstance(a, DimArray) or isinstance(a, MIArray):
@@ -619,23 +708,27 @@ def atan2(a, b):
     else:
         return math.atan2(a, b)
         
-def exp(a):
+def exp(x):
     if isinstance(a, DimArray) or isinstance(a, MIArray):
         return a.exp()
     else:
         return math.exp(a)
         
-def log(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.log()
+def log(x):
+    if isinstance(x, list):
+        return array(x).log()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.log()
     else:
-        return math.log(a)
+        return math.log(x)
         
-def log10(a):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.log10()
+def log10(x):
+    if isinstance(x, list):
+        return array(x).log10()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.log10()
     else:
-        return math.log10(a)
+        return math.log10(x)
         
 def meshgrid(x, y):
     if isinstance(x, list):

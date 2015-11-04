@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,10 +35,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -52,6 +54,7 @@ public class Options {
     private Point mainFormLocation = new Point(0, 0);
     private Dimension mainFormSize = new Dimension(1000, 650);
     private String currentFolder;
+    private List<String> recentFolders = new ArrayList<>();
     // </editor-fold>
     // <editor-fold desc="Constructor">
     
@@ -132,6 +135,22 @@ public class Options {
         this.currentFolder = value;
         System.setProperty("user.dir", value);
     }
+    
+    /**
+     * Get recent used folders
+     * @return Recent used folders
+     */
+    public List<String> getRecentFolders(){
+        return this.recentFolders;
+    }
+    
+    /**
+     * Set recent used folders
+     * @param value Recent used folders
+     */
+    public void setRecentFolders(List<String> value){
+        this.recentFolders = value;
+    }
     // </editor-fold>
     // <editor-fold desc="Methods">
 
@@ -161,6 +180,13 @@ public class Options {
         pAttr.setValue(this.currentFolder);
         path.setAttributeNode(pAttr);
         root.appendChild(path);
+        for (String folder : this.recentFolders){
+            Element folderElem = doc.createElement("RecentFolder");
+            Attr fAttr = doc.createAttribute("Folder");
+            fAttr.setValue(folder);
+            folderElem.setAttributeNode(fAttr);
+            path.appendChild(folderElem);
+        }
 
         //Font
         Element font = doc.createElement("Font");
@@ -227,13 +253,22 @@ public class Options {
         Element root = doc.getDocumentElement();        
         try {
             //Path
-            Node path = root.getElementsByTagName("Path").item(0);
+            Element path = (Element)root.getElementsByTagName("Path").item(0);
             String currentPath = path.getAttributes().getNamedItem("OpenPath").getNodeValue();
             if (new File(currentPath).isDirectory()) {
                 this.currentFolder = currentPath;
                 System.setProperty("user.dir", currentPath);
             } else {
                 this.currentFolder = System.getProperty("user.dir");
+            }
+            this.recentFolders = new ArrayList<>();
+            NodeList rfolders = (path).getElementsByTagName("RecentFolder");
+            if (rfolders != null){
+                for (int i = 0; i < rfolders.getLength(); i++){
+                    Node rfolder = rfolders.item(i);
+                    String folder = rfolder.getAttributes().getNamedItem("Folder").getNodeValue();
+                    this.recentFolders.add(folder);
+                }
             }
 
             //Font

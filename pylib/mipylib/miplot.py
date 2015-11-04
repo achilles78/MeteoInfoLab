@@ -2058,6 +2058,9 @@ def __getlegendbreak(geometry, rule):
         lb.setDrawOutline(edge)
     else:
         lb = ColorBreak()
+    caption = rule.pop('caption', None)
+    if not caption is None:
+        lb.setCaption(caption)
     cobj = rule.pop('color', 'k')
     color = __getcolor(cobj)
     lb.setColor(color)
