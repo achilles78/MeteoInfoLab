@@ -63,11 +63,13 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         Py.getSystemState().setdefaultencoding("utf-8");
         interp = new PythonInteractiveInterpreter(console);
         String path = this.startupPath + File.separator + "pylib";
-        String toolboxPath = this.startupPath + File.separator + "toolbox";
+        String toolboxPath = this.startupPath + "/toolbox";
         if (isDebug) {
             path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfoLab/pylib";
             toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
         }        
+        //console.println(path);
+        //console.println(toolboxPath);
 
         //this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
@@ -79,6 +81,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("sys.path.append('" + path + "')");
             interp.exec("from milab import *");
             interp.exec("sys.path.append('" + toolboxPath + "')");
+            interp.exec("import startup");
             interp.exec("from startup import *");            
             //interp.exec("import mipylib");
             //interp.exec("from mipylib.miscript import *");
