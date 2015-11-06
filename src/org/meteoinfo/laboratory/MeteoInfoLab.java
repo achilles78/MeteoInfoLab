@@ -84,11 +84,14 @@ public class MeteoInfoLab {
         //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
         //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
         String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
+        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "toolbox";
         interp.exec("import sys");
         interp.exec("import os");
         interp.exec("import datetime");
         interp.exec("sys.path.append('" + path + "')");
         interp.exec("from milab import *");
+        interp.exec("sys.path.append('" + toolboxPath + "')");
+        interp.exec("from startup import *");
         interp.exec("mipylib.miplot.batchmode = True");
         interp.exec("mipylib.miplot.isinteractive = False");
         System.out.println("mipylib is loaded...");
@@ -115,6 +118,7 @@ public class MeteoInfoLab {
 //        plotForm.setVisible(true);
 //        MeteoInfoScript mis = new MeteoInfoScript(plotForm);
         String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
+        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "toolbox";
         //MeteoInfoScript mis = new MeteoInfoScript(path);
         InteractiveConsole console = new InteractiveConsole();
         try {
@@ -124,6 +128,8 @@ public class MeteoInfoLab {
             console.exec("import datetime");
             console.exec("sys.path.append('" + path + "')");
             console.exec("from milab import *");
+            console.exec("sys.path.append('" + toolboxPath + "')");
+            console.exec("from startup import *");
             //console.exec("import mipylib");
             //console.exec("from mipylib.miscript import *");
             console.exec("mipylib.miplot.isinteractive = True");

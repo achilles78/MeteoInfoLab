@@ -32,7 +32,7 @@ from milayer import MILayer
 
 from java.awt import Color
 from java.lang import Math, Double
-from java.util import Calendar
+from java.util import Calendar, ArrayList
 
 # Global variables
 pi = Math.PI
@@ -709,10 +709,12 @@ def atan2(a, b):
         return math.atan2(a, b)
         
 def exp(x):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return a.exp()
+    if isinstance(x, list):
+        return array(x).exp()
+    elif isinstance(x, (DimArray, MIArray)):
+        return x.exp()
     else:
-        return math.exp(a)
+        return math.exp(x)
         
 def log(x):
     if isinstance(x, list):
@@ -967,6 +969,46 @@ def polygon(*args):
     
 def inpolygon(x, y, polygon):
     return GeoComputation.pointInPolygon(polygon, x, y)
+    
+def maskout(data, x=None, y=None, mask=None):
+    """
+    Maskout data by polygons - NaN values of elements outside polygons.
+    
+    :param data: (*array_like*) Array data for maskout.
+    :param x: (*array_like*) X coordinate array.
+    :param y: (*array_like*) Y coordinate array.
+    :param mask: (*list*) Polygon list as maskout borders.
+
+    :returns: (*array_like*) Maskouted data array.
+    """
+    if mask is None:
+        return data
+    if x is None or y is None:
+        if isinstance(data, DimArray):
+            return data.maskout(mask)
+        else:
+            return null
+    else:
+        if not isinstance(mask, (list, ArrayList)):
+            mask = [mask]
+        r = ArrayMath.maskout(data.asarray(), x.asarray(), y.asarray(), mask)
+        return MIArray(r)
+        
+def rmaskout(data, x, y, mask):
+    """
+    Maskout data by polygons - the elements outside polygons will be removed
+    
+    :param data: (*array_like*) Array data for maskout.
+    :param x: (*array_like*) X coordinate array.
+    :param y: (*array_like*) Y coordinate array.
+    :param mask: (*list*) Polygon list as maskout borders.
+    
+    :returns: (*list*) Maskouted data, x and y array list.
+    """
+    if not isinstance(mask, (list, ArrayList)):
+        mask = [mask]
+    r = ArrayMath.maskout_Remove(data.asarray(), x.asarray(), y.asarray(), mask)
+    return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])    
     
 def griddata(points, values, xi=None, **kwargs):
     method = kwargs.pop('method', 'idw')
