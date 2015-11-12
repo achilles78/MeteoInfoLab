@@ -6,7 +6,8 @@
 #-----------------------------------------------------
 import os
 import math
-from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil
+import datetime
+from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
@@ -64,6 +65,21 @@ class PyTableData():
             coldata = self.data.getColumnData(key)
             if coldata.getDataType().isNumeric():
                 return MIArray(ArrayUtil.array(coldata.getDataValues()))
+            elif coldata.getDataType() == DataTypes.Date:
+                vv = coldata.getData()
+                r = []
+                cal = Calendar.getInstance()
+                for v in vv:
+                    cal.setTime(v)
+                    year = cal.get(Calendar.YEAR)
+                    month = cal.get(Calendar.MONTH) + 1
+                    day = cal.get(Calendar.DAY_OF_MONTH)
+                    hour = cal.get(Calendar.HOUR_OF_DAY)
+                    minute = cal.get(Calendar.MINUTE)
+                    second = cal.get(Calendar.SECOND)
+                    dt = datetime.datetime(year, month, day, hour, minute, second)
+                    r.append(dt)
+                return r
             else:
                 return coldata.getData()
         return None
@@ -159,7 +175,7 @@ class PyTableData():
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_YearMonth(cols, month)
             return PyTableData(TableData(dtable))
-            
+                  
     def ave_monthofyear(self, colnames):
         if not self.timedata:
             print 'There is no time column!'
@@ -194,6 +210,15 @@ class PyTableData():
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_Month(cols)
+            return PyTableData(TableData(dtable))
+            
+    def ave_day(self, colnames, day):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_Day(cols)
             return PyTableData(TableData(dtable))
             
     def assinglerow(self):
@@ -669,7 +694,7 @@ def asin(x):
     """
     Trigonometric inverse sine, element-wise.
     
-    :param x: (*array_like*) *y*-coordinate on the unit circle.
+    :param x: (*array_like*) *x*-coordinate on the unit circle.
     
     :returns: (*array_like*) The inverse sine of each element of *x*, in radians and in the
         closed interval ``[-pi/2, pi/2]``.
@@ -687,6 +712,20 @@ def asin(x):
         return math.asin(x)
         
 def acos(x):
+    """
+    Trigonometric inverse cosine, element-wise.
+    
+    :param x: (*array_like*) *x*-coordinate on the unit circle. For real arguments, the domain
+        is ``[-1, 1]``.
+    
+    :returns: (*array_like*) The inverse cosine of each element of *x*, in radians and in the
+        closed interval ``[0, pi]``.
+    
+    Examples::
+    
+        >>> acos([1, -1])
+        array([0.0, 3.1415927])
+    """
     if isinstance(x, list):
         return array(x).acos()
     elif isinstance(x, (DimArray, MIArray)):
@@ -695,6 +734,21 @@ def acos(x):
         return math.acos(x)
         
 def atan(x):
+    """
+    Trigonometric inverse tangent, element-wise.
+    
+    The inverse of tan, so that if ``y = tan(x)`` then ``x = atan(y)``.
+    
+    :param x: (*array_like*) Input values, ``atan`` is applied to each element of *x*.
+    
+    :returns: (*array_like*) Out has the same shape as *x*. Its real part is in
+        ``[-pi/2, pi/2]`` .
+    
+    Examples::
+    
+        >>> atan([0, 1])
+        array([0.0, 0.7853982])
+    """
     if isinstance(x, list):
         return array(x).atan()
     elif isinstance(x, (DimArray, MIArray)):
@@ -702,13 +756,44 @@ def atan(x):
     else:
         return math.atan(x)
         
-def atan2(a, b):
-    if isinstance(a, DimArray) or isinstance(a, MIArray):
-        return ArrayMath.atan2(a.asarray(), b.asarray())
+def atan2(x1, x2):
+    """
+    Element-wise arc tangent of ``x1/x2`` choosing the quadrant correctly.
+
+    :param x1: (*array_like*) *y*-coordinates.
+    :param x2: (*array_like*) *x*-coordinates. *x2* must be broadcastable to match the 
+        shape of *x1* or vice versa.
+        
+    :returns: (*array_like*) Array of angles in radians, in the range ``[-pi, pi]`` .
+    
+    Examples::
+    
+        >>> x = array([-1, +1, +1, -1])
+        >>> y = array([-1, -1, +1, +1])
+        >>> atan2(y, x) * 180 / pi
+        array([-135.00000398439022, -45.000001328130075, 45.000001328130075, 135.00000398439022])
+    """    
+    if isinstance(x1, DimArray) or isinstance(x1, MIArray):
+        return MIArray(ArrayMath.atan2(x1.asarray(), x2.asarray()))
     else:
-        return math.atan2(a, b)
+        return math.atan2(x1, x2)
         
 def exp(x):
+    """
+    Calculate the exponential of all elements in the input array.
+    
+    :param x: (*array_like*) Input values.
+    
+    :returns: (*array_like*) Output array, element-wise exponential of *x* .
+    
+    Examples::
+    
+        >>> x = linspace(-2*pi, 2*pi, 10)
+        >>> exp(x)
+        array([0.0018674424051939472, 0.007544609964764651, 0.030480793298392952, 
+            0.12314470389303135, 0.4975139510383202, 2.0099938864286777, 
+            8.120527869949177, 32.80754507307142, 132.54495655444984, 535.4917491531113])
+    """
     if isinstance(x, list):
         return array(x).exp()
     elif isinstance(x, (DimArray, MIArray)):
@@ -717,6 +802,21 @@ def exp(x):
         return math.exp(x)
         
 def log(x):
+    """
+    Natural logarithm, element-wise.
+    
+    The natural logarithm log is the inverse of the exponential function, so that 
+    *log(exp(x))* = *x* . The natural logarithm is logarithm in base e.
+    
+    :param x: (*array_like*) Input values.
+    
+    :returns: (*array_like*) The natural logarithm of *x* , element-wise.
+    
+    Examples::
+    
+        >>> log([1, e, e**2, 0])
+        array([0.0, 1.0, 2.0, -Infinity])
+    """
     if isinstance(x, list):
         return array(x).log()
     elif isinstance(x, (DimArray, MIArray)):
@@ -725,6 +825,18 @@ def log(x):
         return math.log(x)
         
 def log10(x):
+    """
+    Return the base 10 logarithm of the input array, element-wise.
+    
+    :param x: (*array_like*) Input values.
+    
+    :returns: (*array_like*) The logarithm to the base 10 of *x* , element-wise.
+    
+    Examples::
+    
+        >>> log10([1e-15, -3.])
+        array([-15.,  NaN])
+    """
     if isinstance(x, list):
         return array(x).log10()
     elif isinstance(x, (DimArray, MIArray)):

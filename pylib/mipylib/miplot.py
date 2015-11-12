@@ -1027,6 +1027,17 @@ def legend(*args, **kwargs):
     bcobj = kwargs.pop('background', 'w')
     background = __getcolor(bcobj)
     clegend.setBackground(background)
+    fontname = kwargs.pop('fontname', 'Arial')
+    fontsize = kwargs.pop('fontsize', 14)
+    bold = kwargs.pop('bold', False)
+    labcolor = kwargs.pop('labcolor', 'black')
+    labcolor = __getcolor(labcolor)
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    clegend.setLabelFont(font)
+    clegend.setLabelColor(labcolor)
     draw_if_interactive()
     
 def readlegend(fn):
@@ -1326,6 +1337,7 @@ def __plot_griddata(gdata, ls, type, xaxistype=None):
         plot.setXAxis(TimeAxis('Time', True))
     
     plot.addLayer(layer)
+    plot.setDrawExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -1351,7 +1363,7 @@ def __plot_uvgriddata(udata, vdata, cdata, ls, type, isuv):
     mapview = MapView()
     plot = XY2DPlot(mapview)
     plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent())
+    plot.setDrawExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -1818,7 +1830,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
             plot.addLayer(layer)
     else:
         plot.addLayer(order, layer)
-    plot.setDrawExtent(layer.getExtent())
+    plot.setDrawExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -1845,7 +1857,7 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
         layer.setProjInfo(proj)
  
     plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent())
+    plot.setDrawExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -1873,7 +1885,7 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None, de
     
     shapetype = layer.getShapeType()
     plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent())
+    plot.setDrawExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
