@@ -6,6 +6,7 @@
 #-----------------------------------------------------
 from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes
+from org.meteoinfo.projection import ProjectionManage
 from java.util import Date, Calendar
 
 from datetime import datetime
@@ -60,6 +61,10 @@ class MILayer():
         
     def movelabel(self, label, x=0, y=0):
         self.layer.moveLabel(label, x, y)
+        
+    def project(self, toproj):
+        r = ProjectionManage.projectLayer(self.layer, toproj)
+        return MILayer(r)
         
     def clone(self):
         return MILayer(self.layer.clone())
