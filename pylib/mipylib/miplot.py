@@ -11,7 +11,7 @@ from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, GridData, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import XY1DPlot, XY2DPlot, MapPlot, ChartPlotMethod, PlotOrientation
+from org.meteoinfo.chart.plot import XY1DPlot, BarPlot, XY2DPlot, MapPlot, ChartPlotMethod, PlotOrientation
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
 from org.meteoinfo.script import ChartForm, MapForm
@@ -243,7 +243,88 @@ def plot(*args, **kwargs):
         return lines
     else:
         return lines[0]
- 
+
+def bar(*args, **kwargs):
+    #Get dataset
+    global c_plot
+    if c_plot is None:
+        dataset = XYListDataset()
+    else:
+        dataset = c_plot.getDataset()
+        if dataset is None:
+            dataset = XYListDataset()
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    xdata = None
+    autowidth = True
+    width = 0.8
+    if len(args) == 1:
+        ydata = args[0]
+    elif len(args) == 2:
+        if isinstance(args[1], (int, float)):
+            ydata = args[0]
+            width = args[1]
+            autowidth = False
+        else:
+            xdata = args[0]
+            ydata = args[1]
+    else:
+        xdata = args[0]
+        ydata = args[1]
+        width = args[2]
+        autowidth = False
+        
+    if xdata is None:
+        xdata = []
+        for i in range(1, len(args[0]) + 1):
+            xdata.append(i)
+    else:
+        xdata = __getplotdata(xdata)
+    ydata = __getplotdata(ydata)
+    dataset.addSeries(label, xdata, ydata)   
+
+    #Create bar plot
+    if c_plot is None:
+        plot = BarPlot()
+    else:
+        if isinstance(c_plot, BarPlot):
+            plot = c_plot
+        else:
+            plot = BarPlot()
+    plot.setDataset(dataset)
+    if not autowidth:
+        plot.setAutoWidth(autowidth)
+        plot.setBarWidth(width)
+    
+    #Set plot data styles
+    fcobj = kwargs.pop('facecolor', 'b')
+    color = __getcolor(fcobj)
+    lb = PolygonBreak()
+    lb.setCaption(label)
+    lb.setColor(color)
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = __getcolor(ecobj)
+    lb.setOutlineColor(edgecolor)
+    linewidth = kwargs.pop('linewidth', 1.0)
+    lb.setOutlineSize(linewidth)
+    plot.setLegendBreak(dataset.getSeriesCount() - 1, lb)
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if c_plot is None:
+        chart.clearPlots()
+        chart.setPlot(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    c_plot = plot
+    draw_if_interactive()
+    return lb
+        
 def hist(x, bins=10, range=None, normed=False, cumulative=False,
     bottom=None, histtype='bar', align='mid',
     orientation='vertical', rwidth=None, log=False, **kwargs):
@@ -1713,10 +1794,6 @@ def surfacem(*args, **kwargs):
         figure()
     
     chart = Chart(plot)
-    #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    global c_plot
-    c_plot = plot
     draw_if_interactive()
     return MILayer(layer)
     

@@ -428,6 +428,8 @@ def readtable(filename, **kwargs):
     format = kwargs.pop('format', None)
     headerlines = kwargs.pop('headerlines', 0)
     encoding = kwargs.pop('encoding', 'UTF8')
+    readvarnames = kwargs.pop('readvarnames', True)
+    readrownames = kwargs.pop('readrownames', False)
     tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
     return PyTableData(tdata)
 

@@ -84,7 +84,7 @@ public class MeteoInfoLab {
         //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
         //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
         String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
-        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "toolbox";
+        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + "/toolbox";
         interp.exec("import sys");
         interp.exec("import os");
         interp.exec("import datetime");
@@ -118,7 +118,7 @@ public class MeteoInfoLab {
 //        plotForm.setVisible(true);
 //        MeteoInfoScript mis = new MeteoInfoScript(plotForm);
         String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
-        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "toolbox";
+        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + "/toolbox";
         //MeteoInfoScript mis = new MeteoInfoScript(path);
         InteractiveConsole console = new InteractiveConsole();
         try {
