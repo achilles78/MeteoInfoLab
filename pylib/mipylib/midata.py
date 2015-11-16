@@ -846,6 +846,9 @@ def log10(x):
     else:
         return math.log10(x)
         
+def reshape(a, shape):
+    return a.reshape(shape)
+        
 def meshgrid(x, y):
     if isinstance(x, list):
         x = array(x)

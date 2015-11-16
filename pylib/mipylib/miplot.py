@@ -298,7 +298,9 @@ def bar(*args, **kwargs):
         plot.setBarWidth(width)
     
     #Set plot data styles
-    fcobj = kwargs.pop('facecolor', 'b')
+    fcobj = kwargs.pop('color', None)
+    if fcobj is None:
+        fcobj = kwargs.pop('facecolor', 'b')
     color = __getcolor(fcobj)
     lb = PolygonBreak()
     lb.setCaption(label)
@@ -1166,6 +1168,9 @@ def colorbar(layer, **kwargs):
     extendfrac = kwargs.pop('extendfrac', None)
     if extendfrac == 'auto':
         legend.setAutoExtendFrac(True)
+    ticklabel = kwargs.pop('ticklabel', None)
+    if not ticklabel is None:
+        legend.setTickLabels(ticklabel)
     plot.setDrawLegend(True)
     draw_if_interactive()
 
@@ -1213,7 +1218,26 @@ def __getlegendscheme(args, min, max, **kwargs):
                 lb.setOutlineColor(edgecolor)
     return ls
     
-def __getlegendscheme_point(ls, **kwargs):
+def __setlegendscheme(ls, **kwargs):
+    st = ls.getShapeType()
+    if st == ShapeTypes.Point:
+        __setlegendscheme_point(ls, **kwargs)
+    elif st == ShapeTypes.Polyline:
+        __setlegendscheme_line(ls, **kwargs)
+    elif st == ShapeTypes.Polygon:
+        __setlegendscheme_polygon(ls, **kwargs)
+    else:
+        __setlegendscheme_image(ls, **kwargs)
+
+def __setlegendscheme_image(ls, **kwargs):
+    cobj = kwargs.pop('color', None)
+    if not cobj is None:
+        color = __getcolor(cobj)    
+        for lb in ls.getLegendBreaks():
+            lb.setColor(color)
+    return ls
+        
+def __setlegendscheme_point(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Point)
     size = kwargs.pop('size', 6)
     marker = kwargs.pop('marker', 'o')
@@ -1236,6 +1260,40 @@ def __getlegendscheme_point(ls, **kwargs):
         lb.setDrawFill(fill)        
         lb.setDrawOutline(edge)
     return ls
+    
+def __setlegendscheme_line(ls, **kwargs):
+    ls = ls.convertTo(ShapeTypes.Polyline)
+    size = kwargs.pop('size', 1)
+    lsobj = kwargs.pop('linestyle', '-')
+    linestyle = __getlinestyle(lsobj)
+    cobj = kwargs.pop('color', 'k')
+    color = __getcolor(cobj)    
+    for lb in ls.getLegendBreaks():
+        lb.setColor(facecolor)
+        lb.setStyle(linestyle)
+        lb.setSize(size)
+    return ls
+    
+def __setlegendscheme_polygon(ls, **kwargs):
+    ls = ls.convertTo(ShapeTypes.Polygon)
+    fcobj = kwargs.pop('facecolor', None)
+    if fcobj is None:
+        facecolor = None
+    else:
+        facecolor = __getcolor(fcobj)
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = __getcolor(ecobj)
+    edgesize = kwargs.pop('edgesize', 1)
+    fill = kwargs.pop('fill', True)
+    edge = kwargs.pop('edge', True)
+    for lb in ls.getLegendBreaks():
+        if not facecolor is None:
+            lb.setColor(facecolor)
+        lb.setOutlineSize(size)        
+        lb.setOutlineColor(edgecolor)        
+        lb.setDrawFill(fill)        
+        lb.setDrawOutline(edge)
+    return ls
       
 def imshow(*args, **kwargs):
     n = len(args)
@@ -1250,17 +1308,7 @@ def imshow(*args, **kwargs):
         a = args[2]
         gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     layer = __plot_griddata(gdata, ls, 'imshow')
     return MILayer(layer)
       
@@ -1493,8 +1541,10 @@ def scatterm(*args, **kwargs):
                 gdata = midata.asgriddata(a, x, y, fill_value)
         
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    if not 'symbolspec' in kwargs:
-        ls = __getlegendscheme_point(ls, **kwargs)    
+    if 'symbolspec' in kwargs:
+        __setlegendscheme(ls, **kwargs)
+    else:
+        ls = __setlegendscheme_point(ls, **kwargs)    
     if isinstance(gdata, PyGridData):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
     else:
@@ -1746,7 +1796,7 @@ def surfacem_1(*args, **kwargs):
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     symbolspec = kwargs.pop('symbolspec', None)
     if symbolspec is None:
-        ls = __getlegendscheme_point(ls, **kwargs)    
+        ls = __setlegendscheme_point(ls, **kwargs)    
           
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo(), order=order)
 
@@ -2079,15 +2129,30 @@ def makelegend(lbreaks):
     ls = LegendScheme(lbreaks)
     return ls
     
-def makesymbolspec(geometry, *args, **kwargs):    
+def makesymbolspec(geometry, *args, **kwargs):
+    shapetype = ShapeTypes.Image
     if geometry == 'point':
-        ls = LegendScheme(ShapeTypes.Point)
+        shapetype = ShapeTypes.Point
     elif geometry == 'line':
-        ls = LegendScheme(ShapeTypes.Polyline)
+        shapetype = ShapeTypes.Polyline
     elif geometry == 'polygon':
-        ls = LegendScheme(ShapeTypes.Polygon)
+        shapetype = ShapeTypes.Polygon  
     else:
-        ls = LegendScheme()    
+        shapetype = ShapeTypes.Image
+        
+    levels = kwargs.pop('levels', None)
+    cols = kwargs.pop('colors', None)
+    if not levels is None and not cols is None:
+        if isinstance(levels, MIArray):
+            levels = levels.aslist()
+        colors = []
+        for cobj in cols:
+            colors.append(__getcolor(cobj))
+        ls = LegendManage.createLegendScheme(shapetype, levels, colors)
+        __setlegendscheme(ls, **kwargs)
+        return ls
+    
+    ls = LegendScheme(shapetype)
     field = kwargs.pop('field', '')    
     ls.setFieldName(field)
     n = len(args)
@@ -2131,7 +2196,7 @@ def __getlegendbreak(geometry, rule):
         lb.setDrawOutline(edge)
     elif geometry == 'line':
         lb = PolylineBreak()
-        size = rule.pop('size', 6)
+        size = rule.pop('size', 1)
         lb.setSize(size)
         lsobj = rule.pop('linestyle', '-')
         linestyle = __getlinestyle(lsobj)

@@ -240,7 +240,15 @@ class DimArray():
         
     def __ge__(self, other):
         r = DimArray(self.array.__ge__(other), self.dims, self.fill_value, self.proj)
-        return r        
+        return r   
+
+    def __and__(self, other):
+        r = DimArray(self.array.__and__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def astype(self, dtype):
+        r = DimArray(self.array.astype(dtype), self.dims, self.fill_value, self.proj)
+        return r
     
     def value(self, indices):
         #print type(indices)
@@ -453,6 +461,9 @@ class DimArray():
         
     def asarray(self):
         return self.array.array
+        
+    def reshape(self, shape):
+        return self.array.reshape(shape)
      
     def tostation(self, x, y):
         gdata = self.asgriddata()
@@ -469,6 +480,7 @@ class DimArray():
         :param x: To x coordinates.
         :param y: To y coordinates.
         :param toproj: To projection.
+        :param method: Interpolation method: ``bilinear`` or ``neareast`` .
         
         :returns: (*MIArray*) Projected array
         """

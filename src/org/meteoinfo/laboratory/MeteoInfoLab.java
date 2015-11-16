@@ -79,7 +79,7 @@ public class MeteoInfoLab {
         }
         //state.setdefaultencoding("utf-8");
         //PythonInterpreter interp = new PythonInterpreter(null, state);
-        MyPythonInterpreter interp = new MyPythonInterpreter();
+        MyPythonInterpreter interp = new MyPythonInterpreter(null, state);
         
         //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
         //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");

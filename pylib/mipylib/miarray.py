@@ -221,6 +221,19 @@ class MIArray():
             r = MIArray(ArrayMath.greaterThanOrEqual(self.array, other))
         return r
         
+    def __and__(self, other):
+        r = MIArray(ArrayMath.bitAnd(self.array, other))
+        return r
+        
+    def astype(self, dtype):
+        if dtype == 'int' or dtype is int:
+            r = MIArray(ArrayUtil.toInteger(self.array))
+        elif dtype == 'float' or dtype is float:
+            r = MIArray(ArrayUtil.toFloat(self.array))
+        else:
+            r = self
+        return r
+        
     def min(self, fill_value=None):
         if fill_value == None:
             return ArrayMath.getMinimum(self.array)
