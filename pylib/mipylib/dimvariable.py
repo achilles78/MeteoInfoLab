@@ -5,7 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.data.meteodata import Variable, Dimension
-from org.meteoinfo.data import ArrayMath
+from org.meteoinfo.data import ArrayMath, ArrayUtil
 from ucar.nc2 import Attribute
 import dimarray
 from dimarray import DimArray, PyGridData

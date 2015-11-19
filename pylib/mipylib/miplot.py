@@ -485,8 +485,10 @@ def axes(**kwargs):
         plot.getXAxis().setInverse(True)
     if yreverse:
         plot.getYAxis().setInverse(True)
-    if xaxistype == 'lonlat':
-        plot.setXAxis(LonLatAxis('Longitude', True))
+    if xaxistype == 'lon':
+        plot.setXAxis(LonLatAxis('Longitude', True, True))
+    elif xaxistype == 'lat':
+        plot.setXAxis(LonLatAxis('Latitude', True, False))
     elif xaxistype == 'time':
         plot.setXAxis(TimeAxis('Time', True))
     if not bgcobj is None:

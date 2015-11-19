@@ -22,10 +22,12 @@ class DimArray():
     # array must be MIArray
     def __init__(self, array=None, dims=None, fill_value=-9999.0, proj=None):
         self.array = array
-        self.rank = array.rank
-        self.shape = array.shape
+        if not array is None:
+            self.rank = array.rank
+            self.shape = array.shape
         self.dims = dims
-        self.ndim = len(dims)
+        if not dims is None:
+            self.ndim = len(dims)
         self.fill_value = fill_value
         self.proj = proj
         
