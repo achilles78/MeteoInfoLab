@@ -1241,26 +1241,31 @@ def __setlegendscheme_image(ls, **kwargs):
         
 def __setlegendscheme_point(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Point)
-    size = kwargs.pop('size', 6)
-    marker = kwargs.pop('marker', 'o')
-    pstyle = __getpointstyle(marker)
+    size = kwargs.pop('size', None)
+    marker = kwargs.pop('marker', None)
+    if not marker is None:
+        pstyle = __getpointstyle(marker)
     fcobj = kwargs.pop('facecolor', None)
-    if fcobj is None:
-        facecolor = None
-    else:
+    if not fcobj is None:
         facecolor = __getcolor(fcobj)
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = __getcolor(ecobj)
-    fill = kwargs.pop('fill', True)
-    edge = kwargs.pop('edge', True)
+    ecobj = kwargs.pop('edgecolor', None)
+    if not ecobj is None:
+        edgecolor = __getcolor(ecobj)
+    fill = kwargs.pop('fill', None)
+    edge = kwargs.pop('edge', None)
     for lb in ls.getLegendBreaks():
-        if not facecolor is None:
+        if not fcobj is None:
             lb.setColor(facecolor)
-        lb.setStyle(pstyle)
-        lb.setSize(size)        
-        lb.setOutlineColor(edgecolor)        
-        lb.setDrawFill(fill)        
-        lb.setDrawOutline(edge)
+        if not marker is None:
+            lb.setStyle(pstyle)
+        if not size is None:
+            lb.setSize(size)      
+        if not ecobj is None:
+            lb.setOutlineColor(edgecolor)  
+        if not fill is None:
+            lb.setDrawFill(fill)  
+        if not edge is None:
+            lb.setDrawOutline(edge)
     return ls
     
 def __setlegendscheme_line(ls, **kwargs):
