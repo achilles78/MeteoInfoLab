@@ -29,5 +29,6 @@ public class MyPythonInterpreter extends PythonInterpreter{
      */
     public MyPythonInterpreter(PyObject obj, PySystemState state){
         super(obj, state);
+        this.cflags.source_is_utf8 = true;
     }
 }

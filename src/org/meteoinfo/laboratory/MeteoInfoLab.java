@@ -6,9 +6,13 @@
 package org.meteoinfo.laboratory;
 
 import java.awt.GraphicsEnvironment;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -21,6 +25,7 @@ import org.meteoinfo.laboratory.gui.MyPythonInterpreter;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveConsole;
+import org.python.util.PythonInterpreter;
 
 /**
  *
@@ -68,6 +73,55 @@ public class MeteoInfoLab {
         }
     }
 
+    private static void runScript_back(String args[], String fn, int idx) {
+        String ext = GlobalUtil.getFileExtension(fn);
+        System.out.println("Running Jython script...");
+        PySystemState state = new PySystemState();
+        if (args.length > idx + 1) {
+            for (int i = idx + 1; i < args.length; i++) {
+                state.argv.append(new PyString(args[i]));
+            }
+        }
+        //state.setdefaultencoding("utf-8");
+        //PythonInterpreter interp = new PythonInterpreter(null, state);
+        MyPythonInterpreter interp = new MyPythonInterpreter(null, state);
+        
+        //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
+        //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
+        String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
+        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + "/toolbox";
+        interp.exec("import sys");
+        interp.exec("import os");
+        interp.exec("import datetime");
+        interp.exec("sys.path.append('" + path + "')");
+        interp.exec("from milab import *");
+        interp.exec("sys.path.append('" + toolboxPath + "')");
+        interp.exec("from startup import *");
+        interp.exec("mipylib.miplot.batchmode = True");
+        interp.exec("mipylib.miplot.isinteractive = False");
+        System.out.println("mipylib is loaded...");
+        try {            
+//            File file = new File(fn);    
+//            BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+//            StringBuilder sb = new StringBuilder();
+//            String line;
+//            while((line = r.readLine()) != null){
+//                sb.append(line);
+//                sb.append("\n");
+//            }
+//            String code = sb.toString();
+//            System.out.print(code);
+//            ByteArrayInputStream bis = new ByteArrayInputStream(code.getBytes("utf-8"));
+            interp.execfile(new FileInputStream(new File(fn)), "utf-8");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MeteoInfoLab.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IOException ex) {
+//            Logger.getLogger(MeteoInfoLab.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            System.exit(0);
+        }
+    }
+    
     private static void runScript(String args[], String fn, int idx) {
         String ext = GlobalUtil.getFileExtension(fn);
         System.out.println("Running Jython script...");

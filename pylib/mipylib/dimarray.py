@@ -494,15 +494,16 @@ class DimArray():
             method = ResampleMethods.Bilinear
         else:
             method = ResampleMethods.NearestNeighbor
-        if isinstance(x, list):
-            r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value, method)
-        elif isinstance(x, MIArray):
-            if x.rank == 1:
-                r = ArrayUtil.reproject(self.array.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value, method)
-            else:
-                r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
-        else:
-            r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
+        #if isinstance(x, list):
+        #    r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value, method)
+        #elif isinstance(x, MIArray):
+        #    if x.rank == 1:
+        #        r = ArrayUtil.reproject(self.array.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value, method)
+        #    else:
+        #        r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
+        #else:
+        #    r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
+        r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
         return MIArray(r)
             
     def join(self, b, dimidx):

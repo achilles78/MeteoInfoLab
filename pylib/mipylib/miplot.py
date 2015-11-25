@@ -88,10 +88,49 @@ def draw_if_interactive():
 		chartpanel.paintGraphics()
         
 def plot(*args, **kwargs):
-    #if ismap:
-    #    map(False)
-
-    #Parse args
+    """
+    Plot lines and/or markers to the axes. *args* is a variable length argument, allowing
+    for multiple *x, y* pairs with an optional format string.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param style: (*string*) Line style for plot.
+    
+    :returns: Legend breaks of the lines.
+    
+    The following format string characters are accepted to control the line style or marker:
+      ==========  ===================================
+      Character   Description
+      ==========  ===================================
+      '-'         solid line style
+      '--'        dashed line style
+      '-.'        dash-dot line style
+      ':'         dotted line style
+      '.'         point marker
+      ','         pixel marker
+      'o'         circle marker
+      'v'         triangle_down marker
+      '^'         triangle_up marker
+      '<'         triangle_left marker
+      '>'         triangle_right marker
+      's'         square marker
+      'p'         pentagon marker
+      '*'         star marker
+      'x'         x marker
+      'D'         diamond marker
+      =========   ===================================
+      
+    The following color abbreviations are supported:
+      =========   ===================================
+      'b'         blue
+      'g'         green
+      'r'         red
+      'c'         cyan
+      'm'         magenta
+      'y'         yellow
+      'k'         black
+      ==========  ====================================
+    """
     global c_plot
     if isholdon:
         if c_plot == None:
@@ -245,6 +284,23 @@ def plot(*args, **kwargs):
         return lines[0]
 
 def bar(*args, **kwargs):
+    """
+    Make a bar plot.
+    
+    Make a bar plot with rectangles bounded by:
+        left, left + width, bottom, bottom + height
+    
+    :param left: (*array_like*) The x coordinates of the left sides of the bars.
+    :param height: (*array_like*) The height of the bars.
+    :param width: (*array_like*) Optional, the widths of the bars default: 0.8.
+    :param bottom: (*array_like*) Optional, the y coordinates of the bars default: None
+    :param color: (*Color*) Optional, the color of the bar faces.
+    :param edgecolor: (*Color*) Optional, the color of the bar edge.
+    :param linewidth: (*int*) Optional, width of bar edge.
+    :param label: (*string*) Label of the bar series.
+    
+    :returns: Bar legend break.
+    """
     #Get dataset
     global c_plot
     if c_plot is None:
@@ -328,13 +384,25 @@ def bar(*args, **kwargs):
     return lb
         
 def hist(x, bins=10, range=None, normed=False, cumulative=False,
-    bottom=None, histtype='bar', align='mid',
-    orientation='vertical', rwidth=None, log=False, **kwargs):
+        bottom=None, histtype='bar', align='mid',
+        orientation='vertical', rwidth=None, log=False, **kwargs):
     
     return None
     
 def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
-            alpha=None, linewidths=None, verts=None, hold=None, **kwargs):
+            alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
+    """
+    Make a scatter plot of x vs y, where x and y are sequence like objects of the same lengths.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param s: (*int*) Size of points.
+    :param c: (*Color*) Color of the points.
+    :param marker: (*string*) Marker of the points.
+    :param label: (*string*) Label of the points series.
+    
+    :returns: Points legend break.
+    """
     #Get dataset
     global c_plot
     if c_plot is None:
@@ -383,6 +451,14 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     return pb 
  
 def figure(bgcolor=None, figsize=None, newfig=True):
+    """
+    Creates a figure.
+    
+    :param bgcolor: (*Color*) Optional, background color of the figure. Default is ``None`` .
+    :param figsize: (*list*) Optional, width and height of the figure such as ``[600, 400]`` .
+        Default is ``None`` with changable size same as *Figures* window.
+    :param newfig: (*boolean*) Optional, if creates a new figure. Default is ``True`` .
+    """
     global chartpanel
     chart = Chart()
     if not bgcolor is None:
@@ -425,6 +501,17 @@ def bgcolor(color):
     draw_if_interactive()    
     
 def subplot(nrows, ncols, plot_number):
+    """
+    Returen a subplot axes positioned by the given grid definition.
+    
+    :param nrows, nrows: (*int*) Whree *nrows* and *ncols* are used to notionally spli the 
+        figure into ``nrows * ncols`` sub-axes.
+    :param plot_number: (*int) Is used to identify the particular subplot that this function
+        is to create within the notional gird. It starts at 1, increments across rows first
+        and has a maximum of ``nrows * ncols`` .
+    
+    :returns: Current axes specified by ``plot_number`` .
+    """
     if chartpanel is None:
         figure()
         
@@ -449,6 +536,22 @@ def subplot(nrows, ncols, plot_number):
     return plot
     
 def axes(**kwargs):
+    """
+    Add an axes to the figure.
+    
+    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param bgcolor: (*Color*) Optional, axes background color.
+    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
+    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
+    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
+    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
+    :param xaxistype: (*string*) Optional, set x axis type as 'normal', 'lon', 'lat' or 'time'.
+    :param xreverse: (*boolean*) Optional, set x axis reverse or not. Default is ``False`` .
+    :param yreverse: (*boolean*) Optional, set yaxis reverse or not. Default is ``False`` .
+    
+    :returns: The axes.
+    """
     if chartpanel is None:
         figure()
         
@@ -642,6 +745,17 @@ def antialias(b=True):
     draw_if_interactive()
     
 def savefig(fname, width=None, height=None, dpi=None):
+    """
+    Save the current figure.
+    
+    :param fname: (*string*) A string containing a path to a filename. The output format
+        is deduced from the extention of the filename. Supported format: 'png', 'bmp',
+        'jpg', 'eps' and 'pdf'.
+    :param width: (*int*) Optional, width of the output figure with pixel units. Default
+        is None, the output figure size is same as *figures* window.
+    :param height: (*int*) Optional, height of the output figure with pixel units. Default
+        is None, the output figure size is same as *figures* window.
+    """
     if (not width is None) and (not height is None):
         chartpanel.setSize(width, height)
     chartpanel.paintGraphics()
