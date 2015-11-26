@@ -693,7 +693,6 @@ class PyStationData():
     
     def __add__(self, other):
         gdata = None
-        print isinstance(other, PyStationData)
         if isinstance(other, PyStationData):            
             gdata = PyStationData(self.data.add(other.data))
         else:
@@ -750,6 +749,10 @@ class PyStationData():
     def __pow__(self, other):
         gdata = PyStationData(self.data.pow(other))
         return gdata        
+        
+    def toarray(self):
+        r = ArrayUtil.getArraysFromStationData(self.data)
+        return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])
         
     def min(self):
         return self.data.getMinValue()
