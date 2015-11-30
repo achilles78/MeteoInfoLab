@@ -25,7 +25,7 @@ import jarray
 class DimDataFile():
     
     # dataset must be org.meteoinfo.data.meteodata.MeteoDataInfo
-    def __init__(self, dataset=None, ncfile=None):
+    def __init__(self, dataset=None, ncfile=None, arldata=None):
         self.dataset = dataset
         if not dataset is None:
             self.filename = dataset.getFileName()
@@ -33,6 +33,7 @@ class DimDataFile():
             self.fill_value = dataset.getMissingValue()
             self.proj = dataset.getProjectionInfo()
         self.ncfile = ncfile
+        self.arldata = arldata
         
     def __getitem__(self, key):
         if isinstance(key, str):
@@ -190,7 +191,45 @@ class DimDataFile():
         self.ncfile.flush()
         
     def close(self):
-        self.ncfile.close()
+        if not self.ncfile is None:
+            self.ncfile.close()
+        elif not self.arldata is None:
+            self.arldata.closeDataFile()
         
     def largefile(self, islarge=True):
         self.ncfile.setLargeFile(islarge)
+        
+    # Write ARL data
+    def setx(self, x):
+        self.arldata.setX(x.aslist())
+        
+    def sety(self, y):
+        self.arldata.setY(y.aslist())
+        
+    def setlevels(self, levels):
+        if isinstance(levels, MIArray):
+            levels = levels.aslist()
+        if levels[0] != 1:
+            levels.insert(0, 1)
+        self.arldata.levels = levels
+        
+    def set2dvar(self, vnames):
+        self.arldata.LevelVarList.add(vnames)
+        
+    def set3dvar(self, vnames):
+        self.arldata.LevelVarList.add(vnames)
+    
+    def getdatahead(self, proj, model, vertical):
+        return self.arldata.getDataHead(proj, model, vertical)
+        
+    def writeindexrec(self, t, datahead):
+        cal = Calendar.getInstance()
+        cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
+        t = cal.getTime()
+        self.arldata.writeIndexRecord(t, datahead)
+        
+    def writedatarec(self, t, lidx, vname, fhour, grid, data):
+        cal = Calendar.getInstance()
+        cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
+        t = cal.getTime()
+        self.arldata.writeGridData(t, lidx, vname, fhour, grid, data.asarray())

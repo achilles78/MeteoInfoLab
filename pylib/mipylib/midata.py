@@ -10,6 +10,7 @@ import datetime
 from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
+from org.meteoinfo.data.meteodata.arl import ARLDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.analysis import MeteoMath
 from org.meteoinfo.geoprocess import GeoComputation
@@ -252,7 +253,7 @@ def __getfilename(fname):
             print 'File not exist: ' + fname
             return None, isweb
           
-def addfile(fname, access='r'):
+def addfile(fname, access='r', dtype='netcdf'):
     if access == 'r':
         fname = fname.strip()
         fname, isweb = __getfilename(fname)
@@ -276,8 +277,13 @@ def addfile(fname, access='r'):
         datafile = DimDataFile(meteodata)
         return datafile
     elif access == 'c':
-        ncfile = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, fname)
-        datafile = DimDataFile(ncfile=ncfile)
+        if dtype == 'arl':
+            arldata = ARLDataInfo()
+            arldata.createDataFile(fname)
+            datafile = DimDataFile(arldata=arldata)
+        else:
+            ncfile = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, fname)
+            datafile = DimDataFile(ncfile=ncfile)
         return datafile
     else:
         return None

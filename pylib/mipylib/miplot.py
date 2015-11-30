@@ -374,10 +374,8 @@ def bar(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if c_plot is None:
-        chart.clearPlots()
-        chart.setPlot(plot)
-    #chart.setAntiAlias(True)
+    if c_plot is None or (not isinstance(c_plot, BarPlot)):
+        chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     c_plot = plot
     draw_if_interactive()
@@ -532,6 +530,17 @@ def subplot(nrows, ncols, plot_number):
         chart.addPlot(c_plot)
         chart.setCurrentPlot(chart.getPlots().size() - 1)
     #c_plot = plot
+    
+    return plot
+    
+def currentplot(plot_number):
+    if chartpanel is None:
+        figure()
+        
+    global c_plot
+    chart = chartpanel.getChart()
+    c_plot = chart.getPlot(plot_number)
+    chart.setCurrentPlot(plot_number - 1)
     
     return plot
     
