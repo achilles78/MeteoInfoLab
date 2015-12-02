@@ -219,17 +219,18 @@ class DimDataFile():
     def set3dvar(self, vnames):
         self.arldata.LevelVarList.add(vnames)
     
-    def getdatahead(self, proj, model, vertical):
-        return self.arldata.getDataHead(proj, model, vertical)
+    def getdatahead(self, proj, model, vertical, icx=0, mn=0):
+        return self.arldata.getDataHead(proj, model, vertical, icx, mn)
         
-    def writeindexrec(self, t, datahead):
+    def writeindexrec(self, t, datahead, ksums=None):
         cal = Calendar.getInstance()
         cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
         t = cal.getTime()
-        self.arldata.writeIndexRecord(t, datahead)
+        self.arldata.writeIndexRecord(t, datahead, ksums)
         
     def writedatarec(self, t, lidx, vname, fhour, grid, data):
         cal = Calendar.getInstance()
         cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
         t = cal.getTime()
-        self.arldata.writeGridData(t, lidx, vname, fhour, grid, data.asarray())
+        ksum = self.arldata.writeGridData(t, lidx, vname, fhour, grid, data.asarray())
+        return ksum
