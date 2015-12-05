@@ -613,7 +613,31 @@ def axes(**kwargs):
     c_plot = plot
     return plot
 
-def axesm(projinfo=None, proj='longlat', **kwargs):    
+def axesm(**kwargs):  
+    """
+    Add an map axes to the figure.
+    
+    :param projinfo: (*ProjectionInfo*) Optional, map projection, default is longlat projection.
+    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param bgcolor: (*Color*) Optional, axes background color.
+    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
+    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
+    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
+    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
+    :param xyscale: (*int*) Optional, set scale of x and y axis, default is 1. It is only
+        valid in longlat projection.
+    :param gridlabel: (*boolean*) Optional, set axis tick labels visible or not. Default is ``True`` .
+    :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
+    :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
+    :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
+    :param frameon: (*boolean*) Optional, set frome visible or not. Default is ``True`` .
+    :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
+    :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
+    :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
+    
+    :returns: The map axes.
+    """
     if chartpanel is None:
         figure()
         
@@ -631,8 +655,10 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     xtick = kwargs.pop('xtick', [])
     ytick = kwargs.pop('ytick', [])
     xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
-    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'        
+    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'  
+    projinfo = kwargs.pop('projinfo', None)
     if projinfo == None:
+        proj = kwargs.pop('proj', 'longlat')
         origin = kwargs.pop('origin', (0, 0, 0))    
         lat_0 = origin[0]
         lon_0 = origin[1]
@@ -720,8 +746,18 @@ def axesm(projinfo=None, proj='longlat', **kwargs):
     return c_plot, projinfo
     
 def twinx(ax):
+    """
+    Make a second axes that shares the x-axis. The new axes will overlay *ax*. The ticks 
+    for *ax2* will be placed on the right, and the *ax2* instance is returned.
+    
+    :param ax: Existing axes.
+    
+    :returns: The second axes
+    """
     ax.getAxis(Location.RIGHT).setVisible(False)
+    ax.setSameShrink(True)
     plot = XY1DPlot()
+    plot.setSameShrink(True)
     plot.setPosition(ax.getPosition())
     plot.getAxis(Location.BOTTOM).setVisible(False)
     plot.getAxis(Location.LEFT).setVisible(False)
@@ -735,6 +771,13 @@ def twinx(ax):
     return plot
     
 def yaxis(ax, **kwargs):
+    """
+    Set y axis of the axes.
+    
+    :param ax: The axes.
+    :param color: (*Color*) Color of the y axis. Default is 'black'.
+    :param shift: (*int) Y axis shif along x direction. Units is pixel. Default is 0.
+    """
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
@@ -747,6 +790,11 @@ def yaxis(ax, **kwargs):
     draw_if_interactive
     
 def antialias(b=True):
+    """
+    Set figure antialias or not.
+    
+    :param b: (*boolean*) Set figure antialias or not. Default is ``False`` .
+    """
     if chartpanel is None:
         figure()
         
@@ -797,7 +845,8 @@ def clf():
     
     if chartpanel.getChart() is None:
         return
-        
+    
+    chartpanel.getChart().setTitle(None)
     chartpanel.getChart().clearPlots()
     global c_plot
     c_plot = None
@@ -1037,6 +1086,17 @@ def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     ctitile.setColor(c)
     c_plot.setTitle(ctitile)
     draw_if_interactive()
+    
+def suptitle(title, fontname='Arial', fontsize=14, bold=True, color='black'):
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    c = __getcolor(color)
+    ctitile = ChartText(title, font)
+    ctitile.setColor(c)
+    chartpanel.getChart().setTitle(ctitile)
+    draw_if_interactive()
 
 def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     if bold:
@@ -1131,6 +1191,8 @@ def axis(limits):
         ymax = limits[3]
         c_plot.setDrawExtent(Extent(xmin, xmax, ymin, ymax))
         draw_if_interactive()
+    else:
+        print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
         
 def axism(limits=None):
     if limits is None:

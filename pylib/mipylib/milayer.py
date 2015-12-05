@@ -8,6 +8,7 @@ from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes
 from org.meteoinfo.projection import ProjectionManage
 from java.util import Date, Calendar
+from java.awt import Font
 
 from datetime import datetime
 
@@ -52,9 +53,33 @@ class MILayer():
     def setlegend(self, legend):
         self.layer.setLegendScheme(legend)
     
-    def addfield(self, name, dtype):
+    def addfield(self, fieldname, dtype, values=None):
         dt = TableUtil.toDataTypes(dtype)
-        self.layer.editAddField(name, dt)
+        self.layer.editAddField(fieldname, dt)
+        if not values is None:
+            n = self.shapenum()
+            for i in range(n):
+                if i < len(values):
+                    self.layer.editCellValue(fieldname, i, values[i])
+                    
+    def addlabels(self, fieldname, **kwargs):
+        labelset = self.layer.getLabelSet()
+        labelset.setFieldName(fieldname)
+        fontname = kwargs.pop('fontname', 'Arial')
+        fontsize = kwargs.pop('fontsize', 14)
+        bold = kwargs.pop('bold', False)
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        labelset.setLabelFont(font)
+        xoffset = kwargs.pop('xoffset', 0)
+        labelset.setXOffset(xoffset)
+        yoffset = kwargs.pop('yoffset', 0)
+        labelset.setYOffset(yoffset)
+        avoidcoll = kwargs.pop('avoidcoll', True)
+        labelset.setAvoidCollision(avoidcoll)
+        self.layer.addLabels()
         
     def getlabel(self, text):
         return self.layer.getLabel(text)
