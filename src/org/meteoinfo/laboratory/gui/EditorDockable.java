@@ -34,25 +34,35 @@ import org.python.util.PythonInterpreter;
  */
 public class EditorDockable extends DefaultSingleCDockable {
 
-    private String startupPath;
+    private FrmMain parent;
+    //private String startupPath;
     private final JTabbedPane tabbedPanel;
     private Font textFont;
 
-    public EditorDockable(String id, String title, CAction... actions) {
+    public EditorDockable(FrmMain parent, String id, String title, CAction... actions) {
         super(id, title, actions);
 
+        this.parent = parent;
         tabbedPanel = new JTabbedPane();
         this.getContentPane().add(tabbedPanel);
         //this.setCloseable(false);
     }
 
+//    /**
+//     * Set startup path
+//     *
+//     * @param path Startup path
+//     */
+//    public void setStartupPath(String path) {
+//        this.startupPath = path;
+//    }
+    
     /**
-     * Set startup path
-     *
-     * @param path Startup path
+     * Get tabbed pane
+     * @return Tabbed pane
      */
-    public void setStartupPath(String path) {
-        this.startupPath = path;
+    public JTabbedPane getTabbedPane(){
+        return this.tabbedPanel;
     }
 
     /**
@@ -206,7 +216,7 @@ public class EditorDockable extends DefaultSingleCDockable {
                 aDlg.setCurrentDirectory(dir);
             }
         }
-        if (aDlg.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if (aDlg.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
             File file = aDlg.getSelectedFile();
             System.setProperty("user.dir", file.getParent());
             String extent = ((GenericFileFilter) aDlg.getFileFilter()).getFileExtent();
@@ -227,10 +237,8 @@ public class EditorDockable extends DefaultSingleCDockable {
 
     /**
      * Open Jython script file
-     *
-     * @param parent Parent frame
      */
-    public void doOpen_Jython(JFrame parent) {
+    public void doOpen_Jython() {
         // TODO add your handling code here:          
         JFileChooser aDlg = new JFileChooser();
         aDlg.setMultiSelectionEnabled(true);

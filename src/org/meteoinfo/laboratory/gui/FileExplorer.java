@@ -13,10 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -132,56 +130,6 @@ public class FileExplorer extends JPanel implements MouseListener{
         }
     }
 
-    //处理路径的选择事件
-//    @Override
-//    public void actionPerformed(ActionEvent e) {
-//        if (e.getSource()==jbUp && jtFile.getValueAt(0, 0).toString().equals("返回上级")
-//                && jtFile.getValueAt(0, 2).toString().equals(""))
-//        {
-//            listFiles(new File(currentPath).getParentFile());
-//            return;
-//        }
-//        if (init == false)
-//        {
-//            return;
-//        }
-//        int index = jcbPath.getSelectedIndex();
-//        String item = (String)jcbPath.getSelectedItem();
-//        if (item.startsWith("  "))
-//        {
-//            int root = index - 1;
-//            while (((String)jcbPath.getItemAt(root)).startsWith("  "))
-//            {
-//                root--;
-//            }
-//            String path = (String)jcbPath.getItemAt(root);
-//            while (root < index)
-//            {
-//                path += ((String)jcbPath.getItemAt(++root)).trim();;
-//                path += "\\";
-//            }
-//            if (listFiles(new File(path)) == false)
-//            {
-//                jcbPath.setSelectedIndex(currentIndex);
-//            }
-//            else
-//            {
-//                currentIndex = index;
-//            }
-//        }
-//        else
-//        {
-//            if (listFiles(new File(item)) == false)
-//            {
-//                jcbPath.setSelectedIndex(currentIndex);
-//            }
-//            else
-//            {
-//                currentIndex = index;
-//            }
-//        }
-//    }
-
     //JTable mouse click event
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -189,17 +137,15 @@ public class FileExplorer extends JPanel implements MouseListener{
             int row = ((JTable)e.getSource()).getSelectedRow();
             if (((JTable)e.getSource()).getValueAt(row, 2).toString().equals("Folder"))
             {
-                //Judge if the path is root path
-                if (currentPath.split("\\\\").length > 1)
-                {
-                    this.path = new File(currentPath + "/" + ((JTable)e.getSource()).getValueAt(row, 0).toString());
-                }
-                else
-                {                    
+                this.path = new File(currentPath + "/" + ((JTable)e.getSource()).getValueAt(row, 0).toString());
+                if (!this.path.exists()) {
+                    //Root path
                     this.path = new File(currentPath + ((JTable)e.getSource()).getValueAt(row, 0).toString());
                 }
-                listFiles(this.path);
-                this.fireCurrentPathChangedEvent();
+                if (this.path.isDirectory()){
+                    listFiles(this.path);
+                    this.fireCurrentPathChangedEvent();
+                }
             }
             else if (((JTable)e.getSource()).getValueAt(row, 0).toString().equals("")
                     && ((JTable)e.getSource()).getValueAt(row, 2).toString().equals(""))
@@ -231,41 +177,12 @@ public class FileExplorer extends JPanel implements MouseListener{
         
         currentPath = path.getAbsolutePath();
         init = false;
-        //jcbPath.removeAllItems();
-//        File[] roots = File.listRoots();
-//        int index = 0;
-//        for (int i=0; i<roots.length; i++)
-//        {
-//            String rootPath = roots[i].getAbsolutePath();
-//            //jcbPath.addItem(rootPath);
-//            if (currentPath.contains(rootPath))
-//            {
-//                String[] bufPath = currentPath.split("\\\\");
-//                for (int j=1; j<bufPath.length; j++)
-//                {
-//                    String buf = "  ";
-//                    for (int k=1; k<j; k++)
-//                    {
-//                        buf += "  ";
-//                    }
-//                    //jcbPath.addItem(buf + bufPath[j]);
-//                    index = i + j;
-//                }
-//                if (bufPath.length == 1)
-//                {
-//                    index = i;
-//                }
-//            }
-//        }
-        //jcbPath.setSelectedIndex(index);
-        //init = true;
-        //currentIndex = index;
 
         //Clear
         dtmFile.setRowCount(0);
 
         //Add "To Parent" line if the path is not root path
-        if (strPath.split("\\\\").length > 1)
+        if (path.getParent() != null)
         {
             java.net.URL imgURL = this.getClass().getResource("/org/meteoinfo/laboratory/resources/previous.png");
             ImageIcon icon = new ImageIcon(imgURL);

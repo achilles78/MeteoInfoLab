@@ -6,26 +6,23 @@
 package org.meteoinfo.laboratory;
 
 import java.awt.GraphicsEnvironment;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.gui.FrmMain;
 import org.meteoinfo.laboratory.gui.MyPythonInterpreter;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveConsole;
-import org.python.util.PythonInterpreter;
 
 /**
  *
@@ -265,7 +262,7 @@ public class MeteoInfoLab {
                 //registerFonts();
                 org.meteoinfo.global.util.FontUtil.registerWeatherFont();
                 FrmMain frame = new FrmMain();
-                //frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 //frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
                 if (sw != null) {

@@ -15,13 +15,16 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.WindowConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import org.meteoinfo.chart.ChartPanel;
 import org.meteoinfo.laboratory.Options;
@@ -108,8 +111,8 @@ public class FrmMain extends javax.swing.JFrame {
         
         CGrid grid = new CGrid(control);
         //this.outputDock = new OutputDockable("Output", "Output");
-        editorDock = new EditorDockable("Editor", "Editor");
-        this.editorDock.setStartupPath(startupPath);
+        editorDock = new EditorDockable(this, "Editor", "Editor");
+        //this.editorDock.setStartupPath(startupPath);
         this.editorDock.setTextFont(this.options.getTextFont());
         this.editorDock.addNewTextEditor("New file");
         consoleDock = new ConsoleDockable(this, this.startupPath, "Console", "Console");
@@ -456,7 +459,7 @@ public class FrmMain extends javax.swing.JFrame {
 
     private void jButton_OpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_OpenFileActionPerformed
         // TODO add your handling code here:
-        this.editorDock.doOpen_Jython(this);
+        this.editorDock.doOpen_Jython();
     }//GEN-LAST:event_jButton_OpenFileActionPerformed
 
     private void jButton_SaveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SaveFileActionPerformed
@@ -492,6 +495,34 @@ public class FrmMain extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         this.saveConfigureFile();
+        boolean isDispose = true;
+        for (int i = 0; i < this.editorDock.getTabbedPane().getTabCount(); i++) {
+            TextEditor textEditor = (TextEditor) this.editorDock.getTabbedPane().getComponentAt(i);
+            if (textEditor != null) {
+                boolean ifClose = true;
+                if (textEditor.getTextArea().isDirty()) {
+                    String fName = textEditor.getFileName();
+                    if (fName.isEmpty()) {
+                        fName = "New file";
+                    }
+                    int result = JOptionPane.showConfirmDialog(null, MessageFormat.format("Save changes to \"{0}\"", fName), "Save?", JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (result == JOptionPane.YES_OPTION) {
+                        if (!this.editorDock.doSave(textEditor)) {
+                            ifClose = false;
+                        }
+                    } else if (result == JOptionPane.CANCEL_OPTION) {
+                        ifClose = false;
+                    }
+                }
+
+                if (!ifClose) {
+                    isDispose = false;
+                    break;
+                }
+            }
+        }
+        if (isDispose)
+            System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton_SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SaveAsActionPerformed
@@ -734,7 +765,11 @@ public class FrmMain extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new FrmMain().setVisible(true);
+                //new FrmMain().setVisible(true);
+                FrmMain frame = new FrmMain();
+                frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
             }
         });
     }
