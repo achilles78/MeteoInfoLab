@@ -261,6 +261,12 @@ class MIArray():
         else:
             return ArrayMath.aveDouble(self.array, fill_value)
             
+    def mean(self, fill_value=None):
+        if fill_value == None:
+            return ArrayMath.aveDouble(self.array)
+        else:
+            return ArrayMath.aveDouble(self.array, fill_value)
+            
     def sqrt(self):
         return MIArray(ArrayMath.sqrt(self.array))
     

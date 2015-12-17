@@ -785,6 +785,9 @@ class PyStationData():
     def ave(self):
         return self.data.average()
         
+    def mean(self):
+        return self.data.average()
+        
     def sum(self):
         return self.data.sum()
         

@@ -852,6 +852,32 @@ def log10(x):
     else:
         return math.log10(x)
         
+def mean(x):
+    """
+    Compute tha arithmetic mean
+    
+    :param x: (*array_like or list*) Input values.
+    
+    returns: (*array_like*) Mean result
+    """
+    if isinstance(x, list):
+        if isinstance(list[0], (MIArray, DimArray)):
+            a = []
+            for xx in x:
+                a.append(xx.asarray())
+            r = ArrayMath.mean(a)
+            return MIArray(r)
+        elif isinstance(list[0], PyStationData):
+            a = []
+            for xx in x:
+                a.append(xx.data)
+            r = DataMath.mean(a)
+            return PyStationData(r)
+        else:
+            return None
+    else:
+        return None
+        
 def reshape(a, shape):
     return a.reshape(shape)
         

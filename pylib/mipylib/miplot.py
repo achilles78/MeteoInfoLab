@@ -2371,7 +2371,9 @@ def weatherspec(weather='all', size=20, color='b'):
     c = __getcolor(color)
     return DrawMeteoData.createWeatherLegendScheme(wlist, size, c)
 
-def __getlegendbreak(geometry, rule):        
+def __getlegendbreak(geometry, rule): 
+    cobj = rule.pop('color', 'k')
+    color = __getcolor(cobj)
     if geometry == 'point':
         lb = PointBreak()        
         marker = rule.pop('marker', 'o')
@@ -2393,6 +2395,27 @@ def __getlegendbreak(geometry, rule):
         lsobj = rule.pop('linestyle', '-')
         linestyle = __getlinestyle(lsobj)
         lb.setStyle(linestyle)
+        marker = rule.pop('marker', None)
+        if not marker is None:
+            pstyle = __getpointstyle(marker)
+            lb.setDrawSymbol(True)
+            lb.setSymbolStyle(pstyle)
+            markersize = rule.pop('markersize', 8)
+            lb.setSymbolSize(markersize)
+            markercolor = rule.pop('markercolor', None)
+            if markercolor is None:
+                makercolor = color
+            else:
+                makercolor = __getcolor(makercolor)
+            lb.setSymbolColor(makercolor)
+            fillcolor = rule.pop('makerfillcolor', None)
+            if not fillcolor is None:
+                lb.setFillSymbol(True)
+                lb.setSymbolFillColor(__getcolor(fillcolor))
+            else:
+                lb.setSymbolFillColor(markercolor)
+            interval = rule.pop('markerinterval', 1)
+            lb.setSymbolInterval(interval)
     elif geometry == 'polygon':
         lb = PolygonBreak()
         ecobj = rule.pop('edgecolor', 'k')
@@ -2406,9 +2429,7 @@ def __getlegendbreak(geometry, rule):
         lb = ColorBreak()
     caption = rule.pop('caption', None)
     if not caption is None:
-        lb.setCaption(caption)
-    cobj = rule.pop('color', 'k')
-    color = __getcolor(cobj)
+        lb.setCaption(caption)    
     lb.setColor(color)
     value = rule.pop('value', None)
     isunique = True
