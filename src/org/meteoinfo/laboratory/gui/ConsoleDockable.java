@@ -280,7 +280,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
                 String encoding = "utf-8";
                 try {
-                    interp.exec("mipylib.miplot.isinteractive = False");    //False - how to update figure after running
+                    interp.exec("mipylib.miplot.isinteractive = False");
                     interp.exec("clf()");
                     interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
                     interp.exec("mipylib.miplot.isinteractive = True");
