@@ -458,7 +458,7 @@ def bar(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, BarPlot)):
+    if gca is None or (not isinstance(gca, XY1DPlot)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
