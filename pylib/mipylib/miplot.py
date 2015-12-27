@@ -1363,6 +1363,18 @@ def yticks(*args, **kwargs):
     draw_if_interactive()
     
 def text(x, y, s, **kwargs):
+    """
+    Add text to the axes. Add text in string *s* to axis at location *x* , *y* , data
+    coordinates.
+    
+    :param x: (*float*) Data x coordinate.
+    :param y: (*float*) Data y coordinate.
+    :param s: (*string*) Text.
+    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+    :param color: (*color*) Tick label string color. Default is ``black`` .
+    """
     fontname = kwargs.pop('fontname', 'Arial')
     fontsize = kwargs.pop('fontsize', 14)
     bold = kwargs.pop('bold', False)
@@ -1380,6 +1392,11 @@ def text(x, y, s, **kwargs):
     draw_if_interactive()
     
 def axis(limits):
+    """
+    Sets the min and max of the x and y axes, with ``[xmin, xmax, ymin, ymax]`` .
+    
+    :param limits: (*list*) Min and max of the x and y axes.
+    """
     if len(limits) == 4:
         xmin = limits[0]
         xmax = limits[1]
@@ -1391,6 +1408,11 @@ def axis(limits):
         print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
         
 def axism(limits=None):
+    """
+    Sets the min and max of the x and y map axes, with ``[xmin, xmax, ymin, ymax]`` .
+    
+    :param limits: (*list*) Min and max of the x and y map axes.
+    """
     if limits is None:
         gca.setDrawExtent(gca.getMapView().getExtent())
         draw_if_interactive()
@@ -1406,6 +1428,17 @@ def axism(limits=None):
             print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
 
 def grid(b=None, which='major', axis='both', **kwargs):
+    """
+    Turn the aexs grids on or off.
+    
+    :param b: If b is *None* and *len(kwargs)==0* , toggle the grid state. If *kwargs*
+        are supplied, it is assumed that you want a grid and *b* is thus set to *True* .
+    :param which: *which* can be 'major' (default), 'minor', or 'both' to control
+        whether major tick grids, minor tick grids, or both are affected.
+    :param axis: *axis* can be 'both' (default), 'x', or 'y' to control which set of
+        gridlines are drawn.
+    :param kwargs: *kwargs* are used to set the grid line properties.
+    """
     plot = gca
     gridline = plot.getGridLine()
     isDraw = gridline.isDrawXLine()
@@ -1415,8 +1448,13 @@ def grid(b=None, which='major', axis='both', **kwargs):
         isDraw = True
     elif b == False or b == 'on':
         isDraw = False
-    gridline.setDrawXLine(isDraw)
-    gridline.setDrawYLine(isDraw)
+    if axis == 'both':
+        gridline.setDrawXLine(isDraw)
+        gridline.setDrawYLine(isDraw)
+    elif axis == 'x':
+        gridline.setDrawXLine(isDraw)
+    elif axis == 'y':
+        gridline.setDrawYLine(isDraw)
     color = kwargs.pop('color', None)
     if not color is None:
         c = __getcolor(color)
@@ -1429,6 +1467,12 @@ def grid(b=None, which='major', axis='both', **kwargs):
     draw_if_interactive()
     
 def xlim(xmin, xmax):
+    """
+    Set the *x* limits of the current axes.
+    
+    :param xmin: (*float*) Minimum limit of the x axis.
+    :param xmax: (*float*) Maximum limit of the x axis.
+    """
     plot = gca
     extent = plot.getDrawExtent()
     extent.minX = xmin
@@ -1437,6 +1481,12 @@ def xlim(xmin, xmax):
     draw_if_interactive()
             
 def ylim(ymin, ymax):
+    """
+    Set the *y* limits of the current axes.
+    
+    :param xmin: (*float*) Minimum limit of the y axis.
+    :param xmax: (*float*) Maximum limit of the yaxis.
+    """
     plot = gca
     extent = plot.getDrawExtent()
     extent.minY = ymin
