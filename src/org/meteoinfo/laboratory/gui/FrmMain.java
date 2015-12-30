@@ -9,30 +9,58 @@ import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import com.l2fprod.common.swing.JFontChooser;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.xml.parsers.ParserConfigurationException;
-import org.meteoinfo.chart.ChartPanel;
+import org.meteoinfo.global.colors.ColorMap;
+import org.meteoinfo.global.colors.ColorUtil;
 import org.meteoinfo.laboratory.Options;
 import org.meteoinfo.global.util.GlobalUtil;
+import org.meteoinfo.laboratory.application.AppCollection;
+import org.meteoinfo.laboratory.application.Application;
 import org.meteoinfo.laboratory.event.ConsoleExecEvent;
 import org.meteoinfo.laboratory.event.CurrentPathChangedEvent;
 import org.meteoinfo.laboratory.event.IConsoleExecListener;
 import org.meteoinfo.laboratory.event.ICurrentPathChangedListener;
+import org.meteoinfo.legend.LayersLegend;
+import org.meteoinfo.map.MapView;
+import org.meteoinfo.plugin.IApplication;
+import org.meteoinfo.plugin.IPlugin;
+import org.meteoinfo.ui.ColorListCellRender;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
@@ -43,7 +71,7 @@ import org.xml.sax.SAXException;
  *
  * @author wyq
  */
-public class FrmMain extends javax.swing.JFrame {
+public class FrmMain extends javax.swing.JFrame implements IApplication {
 
     //private final OutputDockable outputDock;
     private final EditorDockable editorDock;
@@ -53,13 +81,14 @@ public class FrmMain extends javax.swing.JFrame {
     private final FileDockable fileDock;
     private String startupPath;
     private Options options = new Options();
+    private AppCollection apps = new AppCollection();
 
     /**
      * Creates new form FrmMain
      */
     public FrmMain() {
         initComponents();
-        
+
         boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
                 getInputArguments().toString().contains("jdwp");
         if (isDebug) {
@@ -106,9 +135,9 @@ public class FrmMain extends javax.swing.JFrame {
         //Add dockable panels
         CControl control = new CControl(this);
         this.add(control.getContentArea());
-        
+
         control.putProperty(ScreenDockStation.WINDOW_FACTORY, new CustomWindowFactory());
-        
+
         CGrid grid = new CGrid(control);
         //this.outputDock = new OutputDockable("Output", "Output");
         editorDock = new EditorDockable(this, "Editor", "Editor");
@@ -120,7 +149,7 @@ public class FrmMain extends javax.swing.JFrame {
         interp.addConsoleExecListener(new IConsoleExecListener() {
             @Override
             public void consoleExecEvent(ConsoleExecEvent event) {
-                
+
                 PyStringMap locals = (PyStringMap) interp.getLocals();
                 PyList items = locals.items();
                 String name;
@@ -140,7 +169,7 @@ public class FrmMain extends javax.swing.JFrame {
                     FrmMain.this.variableDock.getVariableExplorer().updateVariables(vars);
                 }
             }
-            
+
         });
         figuresDock = new FigureDockable(this, "Figures", "Figures");
         this.variableDock = new VariableDockable("Variables", "Variable explorer");
@@ -151,10 +180,10 @@ public class FrmMain extends javax.swing.JFrame {
             public void currentPathChangedEvent(CurrentPathChangedEvent event) {
                 FrmMain.this.setCurrentPath(FrmMain.this.fileDock.getFileExplorer().getPath().getAbsolutePath());
             }
-            
+
         });
         this.fileDock.getFileExplorer().getTable().addMouseListener(new MouseAdapter() {
-            
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -168,7 +197,7 @@ public class FrmMain extends javax.swing.JFrame {
                     }
                 }
             }
-            
+
         });
         //grid.add(0, 0, 5, 5, this.outputDock);
         grid.add(0, 0, 5, 5, editorDock);
@@ -177,6 +206,90 @@ public class FrmMain extends javax.swing.JFrame {
         grid.add(5, 0, 5, 5, this.fileDock);
         grid.add(5, 5, 5, 5, figuresDock);
         control.getContentArea().deploy(grid);
+
+        //Load applications        
+        String toolboxPath = this.startupPath + File.separator + "toolbox";
+        if (isDebug)
+            toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
+        String appConfFn = toolboxPath + File.separator + "apps.xml";
+        try {
+            this.apps.setPluginPath(toolboxPath);
+            this.apps.loadConfigFile(appConfFn);
+            if (this.apps.size() > 0){
+                for (Application app : apps){
+                    this.loadApplication(app);
+                }
+            }
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Get applications
+     *
+     * @return Applications
+     */
+    public AppCollection getApplications() {
+        return this.apps;
+    }
+    
+    /**
+     * Get startup path
+     * @return Startup path
+     */
+    public String getStartupPath(){
+        return this.startupPath;
+    }
+
+    /**
+     * Load an application
+     *
+     * @param plugin Application
+     */
+    public void loadApplication(Application plugin) {
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        URL url = null;
+        try {
+            url = new URL("file:" + plugin.getJarFileName());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{url});
+        try {
+            Class<?> clazz = urlClassLoader.loadClass(plugin.getClassName());
+            IPlugin instance = (IPlugin) clazz.newInstance();
+            instance.setApplication(FrmMain.this);
+            instance.setName(plugin.getName());
+            plugin.setPluginObject(instance);
+            plugin.setLoad(true);
+            instance.load();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.setCursor(Cursor.getDefaultCursor());
+    }
+
+    /**
+     * Unload an application
+     * @param plugin Application
+     */
+    public void unloadApplication(Application plugin) {
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        plugin.getPluginObject().unload();
+        plugin.setPluginObject(null);
+        plugin.setLoad(false);
+        this.setCursor(Cursor.getDefaultCursor());
     }
 
     /**
@@ -216,6 +329,10 @@ public class FrmMain extends javax.swing.JFrame {
         jMenuItem_Paste = new javax.swing.JMenuItem();
         jMenu_Options = new javax.swing.JMenu();
         jMenuItem_SetFont = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem_ColorMaps = new javax.swing.JMenuItem();
+        jMenu_Apps = new javax.swing.JMenu();
+        jMenuItem_AppsManager = new javax.swing.JMenuItem();
         jMenu_Help = new javax.swing.JMenu();
         jMenuItem_About = new javax.swing.JMenuItem();
 
@@ -432,8 +549,30 @@ public class FrmMain extends javax.swing.JFrame {
             }
         });
         jMenu_Options.add(jMenuItem_SetFont);
+        jMenu_Options.add(jSeparator4);
+
+        jMenuItem_ColorMaps.setText("Color Maps");
+        jMenuItem_ColorMaps.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_ColorMapsActionPerformed(evt);
+            }
+        });
+        jMenu_Options.add(jMenuItem_ColorMaps);
 
         jMenuBar1.add(jMenu_Options);
+
+        jMenu_Apps.setText("Apps");
+
+        jMenuItem_AppsManager.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/plugin_edit_green.png"))); // NOI18N
+        jMenuItem_AppsManager.setText("Application Manager");
+        jMenuItem_AppsManager.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_AppsManagerActionPerformed(evt);
+            }
+        });
+        jMenu_Apps.add(jMenuItem_AppsManager);
+
+        jMenuBar1.add(jMenu_Apps);
 
         jMenu_Help.setText("Help");
 
@@ -487,7 +626,7 @@ public class FrmMain extends javax.swing.JFrame {
         if (!te.getFileName().isEmpty()) {
             te.saveFile(te.getFile());
         }
-        
+
         String code = te.getTextArea().getText();
         this.consoleDock.runPythonScript(code);
     }//GEN-LAST:event_jButton_RunScriptActionPerformed
@@ -521,8 +660,9 @@ public class FrmMain extends javax.swing.JFrame {
                 }
             }
         }
-        if (isDispose)
+        if (isDispose) {
             System.exit(0);
+        }
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton_SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SaveAsActionPerformed
@@ -573,7 +713,7 @@ public class FrmMain extends javax.swing.JFrame {
         if (this.fileDock == null) {
             return;
         }
-        
+
         if (this.jComboBox_CurrentFolder.getItemCount() > 0) {
             String path = this.jComboBox_CurrentFolder.getSelectedItem().toString();
             if (new File(path).isDirectory()) {
@@ -645,6 +785,62 @@ public class FrmMain extends javax.swing.JFrame {
         this.editorDock.closeAllFiles();
     }//GEN-LAST:event_jMenuItem_CloseAllFilesActionPerformed
 
+    private void jMenuItem_ColorMapsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_ColorMapsActionPerformed
+        // TODO add your handling code here:        
+        try {
+            ColorMap[] colorTables = ColorUtil.getColorTables();
+            ColorListCellRender render = new ColorListCellRender();
+            render.setPreferredSize(new Dimension(62, 21));
+            Object[][] elements = new Object[colorTables.length][2];
+            for (int i = 0; i < colorTables.length; i++) {
+                elements[i][0] = colorTables[i];
+                elements[i][1] = String.valueOf(i);
+            }
+            final JList jlist = new JList(elements);
+            jlist.setCellRenderer(render);
+            jlist.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                        int idx = jlist.getSelectedIndex();
+                        if (idx >= 0) {
+                            idx += 1;
+                            if (idx == jlist.getModel().getSize() - 1) {
+                                idx = 0;
+                            }
+                            jlist.setSelectedIndex(idx);
+                        }
+                    }
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                }
+
+                @Override
+                public void keyTyped(KeyEvent e) {
+                }
+
+            });
+            JDialog colorMapDialog = new JDialog(this, false);
+            colorMapDialog.setTitle("Color Map");
+            colorMapDialog.setFocusableWindowState(false);
+            colorMapDialog.add(new JScrollPane(jlist));
+            colorMapDialog.setSize(this.getWidth() / 2, this.getHeight() * 2 / 3);
+            colorMapDialog.setLocationRelativeTo(this);
+            colorMapDialog.setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem_ColorMapsActionPerformed
+
+    private void jMenuItem_AppsManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_AppsManagerActionPerformed
+        // TODO add your handling code here:
+        FrmAppsManager frm = new FrmAppsManager(this, true);
+        frm.setLocationRelativeTo(this);
+        frm.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_AppsManagerActionPerformed
+
     /**
      * Get figure dockable
      *
@@ -693,9 +889,10 @@ public class FrmMain extends javax.swing.JFrame {
         String fn = this.options.getFileName();
         try {
             List<String> cfolders = new ArrayList<>();
-            for (int i = 0; i < 10; i++){
-                if (i >= this.jComboBox_CurrentFolder.getItemCount())
+            for (int i = 0; i < 10; i++) {
+                if (i >= this.jComboBox_CurrentFolder.getItemCount()) {
                     break;
+                }
                 cfolders.add(this.jComboBox_CurrentFolder.getItemAt(i).toString());
             }
             this.options.setRecentFolders(cfolders);
@@ -725,13 +922,63 @@ public class FrmMain extends javax.swing.JFrame {
             this.jComboBox_CurrentFolder.addItem(path);
         }
         this.jComboBox_CurrentFolder.setSelectedItem(path);
-        
+
         PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
         try {
             interp.exec("mipylib.midata.currentfolder = '" + path + "'");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public MapView getMapView() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public LayersLegend getMapDocument() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JMenuBar getMainMenuBar() {
+        return this.jMenuBar1;
+    }
+    
+    @Override
+    public JMenu getPluginMenu() {
+        return this.jMenu_Apps;
+    }
+
+    @Override
+    public JPanel getToolBarPanel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JButton getCurrentTool() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setCurrentTool(JButton value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JProgressBar getProgressBar() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JLabel getProgressBarLabel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void openProjectFile(String fileName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**
@@ -788,12 +1035,15 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem_About;
+    private javax.swing.JMenuItem jMenuItem_AppsManager;
     private javax.swing.JMenuItem jMenuItem_CloseAllFiles;
+    private javax.swing.JMenuItem jMenuItem_ColorMaps;
     private javax.swing.JMenuItem jMenuItem_Copy;
     private javax.swing.JMenuItem jMenuItem_Cut;
     private javax.swing.JMenuItem jMenuItem_Exist;
     private javax.swing.JMenuItem jMenuItem_Paste;
     private javax.swing.JMenuItem jMenuItem_SetFont;
+    private javax.swing.JMenu jMenu_Apps;
     private javax.swing.JMenu jMenu_Editor;
     private javax.swing.JMenu jMenu_File;
     private javax.swing.JMenu jMenu_Help;
@@ -803,7 +1053,9 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JToolBar jToolBar_CurrentFolder;
     private javax.swing.JToolBar jToolBar_Editor;
     // End of variables declaration//GEN-END:variables
+
 }

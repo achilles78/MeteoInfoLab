@@ -93,7 +93,7 @@ public class MeteoInfoLab {
         interp.exec("sys.path.append('" + path + "')");
         interp.exec("from milab import *");
         interp.exec("sys.path.append('" + toolboxPath + "')");
-        interp.exec("from startup import *");
+        interp.exec("from toolbox import *");
         interp.exec("mipylib.miplot.batchmode = True");
         interp.exec("mipylib.miplot.isinteractive = False");
         System.out.println("mipylib is loaded...");
@@ -142,7 +142,7 @@ public class MeteoInfoLab {
         interp.exec("sys.path.append('" + path + "')");
         interp.exec("from milab import *");
         interp.exec("sys.path.append('" + toolboxPath + "')");
-        interp.exec("from startup import *");
+        interp.exec("from toolbox import *");
         interp.exec("mipylib.miplot.batchmode = True");
         interp.exec("mipylib.miplot.isinteractive = False");
         System.out.println("mipylib is loaded...");
@@ -180,7 +180,7 @@ public class MeteoInfoLab {
             console.exec("sys.path.append('" + path + "')");
             console.exec("from milab import *");
             console.exec("sys.path.append('" + toolboxPath + "')");
-            console.exec("from startup import *");
+            console.exec("from toolbox import *");
             //console.exec("import mipylib");
             //console.exec("from mipylib.miscript import *");
             console.exec("mipylib.miplot.isinteractive = True");

@@ -81,8 +81,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("sys.path.append('" + path + "')");
             interp.exec("from milab import *");
             interp.exec("sys.path.append('" + toolboxPath + "')");
-            interp.exec("import startup");
-            interp.exec("from startup import *");            
+            interp.exec("import toolbox");
+            interp.exec("from toolbox import *");            
             //interp.exec("import mipylib");
             //interp.exec("from mipylib.miscript import *");
             //interp.set("mipylib.miplot.milapp", parent);                        
