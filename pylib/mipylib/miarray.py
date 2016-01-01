@@ -111,6 +111,8 @@ class MIArray():
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
 
+        if isinstance(value, MIArray):
+            value = value.asarray()
         ArrayMath.setSection(self.array, ranges, value)
     
     def __abs__(self):

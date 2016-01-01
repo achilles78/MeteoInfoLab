@@ -852,7 +852,7 @@ def log10(x):
     else:
         return math.log10(x)
         
-def mean(x):
+def mean(x, axis=None):
     """
     Compute tha arithmetic mean
     
@@ -861,13 +861,13 @@ def mean(x):
     returns: (*array_like*) Mean result
     """
     if isinstance(x, list):
-        if isinstance(list[0], (MIArray, DimArray)):
+        if isinstance(x[0], (MIArray, DimArray)):
             a = []
             for xx in x:
                 a.append(xx.asarray())
             r = ArrayMath.mean(a)
             return MIArray(r)
-        elif isinstance(list[0], PyStationData):
+        elif isinstance(x[0], PyStationData):
             a = []
             for xx in x:
                 a.append(xx.data)
@@ -876,7 +876,35 @@ def mean(x):
         else:
             return None
     else:
-        return None
+        if axis is None:
+            r = ArrayMath.mean(x.asarray())
+            return r
+        else:
+            r = ArrayMath.mean(x.asarray(), axis)
+            if isinstance(x, MIArray):
+                return MIArray(r)
+            else:
+                dims = []
+                for i in range(0, x.ndim):
+                    if i != axis:
+                        dims.append(x.dims[i])
+                return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+                
+def dot(a, b):
+    """
+    Matrix multiplication.
+    
+    :param a: (*2D Array*) Matrix a.
+    :param b: (*2D Array*) Matrix b.
+    
+    :returns: Result Matrix.
+    """
+    if isinstance(a, list):
+        a = array(a)
+    if isinstance(b, list):
+        b = array(b)
+    r = ArrayMath.dot(a.asarray(), b.asarray())
+    return MIArray(r)
         
 def reshape(a, shape):
     return a.reshape(shape)

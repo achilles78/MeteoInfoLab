@@ -668,7 +668,7 @@ def axes(**kwargs):
     xaxistype = kwargs.pop('xaxistype', 'normal')
     bgcobj = kwargs.pop('bgcolor', None)    
     plot = XY1DPlot()
-    plot.setPosition(position[0], position[1], position[2], position[3])
+    plot.setPosition(position[0], position[1], position[2], position[3])    
     if bottomaxis == False:
         plot.getAxis(Location.BOTTOM).setVisible(False)
     if leftaxis == False:
@@ -691,6 +691,14 @@ def axes(**kwargs):
         bgcolor = __getcolor(bgcobj)
         plot.setDrawBackground(True)
         plot.setBackground(bgcolor)
+    tickfontname = kwargs.pop('tickfontname', 'Arial')
+    tickfontsize = kwargs.pop('tickfontsize', 14)
+    tickbold = kwargs.pop('tickbold', False)
+    if tickbold:
+        font = Font(tickfontname, Font.BOLD, tickfontsize)
+    else:
+        font = Font(tickfontname, Font.PLAIN, tickfontsize)
+    plot.setAxisLabelFont(font)
     chart = chartpanel.getChart()
     chart.setCurrentPlot(plot)
     global gca
@@ -2501,69 +2509,93 @@ def worldmap():
     gca = plot
     return plot    
         
-def geoshow(layer, **kwargs):
+def geoshow(*args, **kwargs):
     plot = gca
-    layer = layer.layer
-    visible = kwargs.pop('visible', True)
-    layer.setVisible(visible)
-    if layer.getLayerType() == LayerTypes.ImageLayer:     
-        plot.addLayer(layer)
-    else:
-        #LegendScheme
-        ls = kwargs.pop('symbolspec', None)
-        if ls is None:
-            if 'facecolor' in kwargs or 'edgecolor' in kwargs or 'size' in kwargs:
-                fcobj = kwargs.pop('facecolor', None)
-                ecobj = kwargs.pop('edgecolor', None)
-                if fcobj is None:
-                    facecolor = Color.lightGray
-                    drawfill = False
-                else:
-                    facecolor = __getcolor(fcobj)
-                    drawfill = True
-                if ecobj is None:
-                    drawline = False  
-                    edgecolor = Color.black
-                else:
-                    drawline = True
-                    edgecolor = __getcolor(ecobj)            
-                size = kwargs.pop('size', 1)
-                lb = layer.getLegendScheme().getLegendBreaks().get(0)
-                lb.setColor(facecolor)
-                btype = lb.getBreakType()
-                if btype == BreakTypes.PointBreak:        
-                    lb.setDrawOutline(drawline)
-                    lb.setOutlineColor(edgecolor)        
-                elif btype == BreakTypes.PolylineBreak:
-                    lb.setSize(size)
-                elif btype == BreakTypes.PolygonBreak:
-                    lb.setDrawFill(drawfill)
-                    lb.setDrawOutline(drawline)
-                    lb.setOutlineColor(edgecolor)
-                    lb.setOutlineSize(size)
+    if len(args) == 1:
+        layer = args[0]
+        layer = layer.layer   
+        visible = kwargs.pop('visible', True)
+        layer.setVisible(visible)
+        if layer.getLayerType() == LayerTypes.ImageLayer:     
+            plot.addLayer(layer)
         else:
-            layer.setLegendScheme(ls)
-        plot.addLayer(layer)
-        #Labels        
-        labelfield = kwargs.pop('labelfield', None)
-        if not labelfield is None:
-            labelset = layer.getLabelSet()
-            labelset.setFieldName(labelfield)
-            fontname = kwargs.pop('fontname', 'Arial')
-            fontsize = kwargs.pop('fontsize', 14)
-            bold = kwargs.pop('bold', False)
-            if bold:
-                font = Font(fontname, Font.BOLD, fontsize)
+            #LegendScheme
+            ls = kwargs.pop('symbolspec', None)
+            if ls is None:
+                if 'facecolor' in kwargs or 'edgecolor' in kwargs or 'size' in kwargs:
+                    fcobj = kwargs.pop('facecolor', None)
+                    ecobj = kwargs.pop('edgecolor', None)
+                    if fcobj is None:
+                        facecolor = Color.lightGray
+                        drawfill = False
+                    else:
+                        facecolor = __getcolor(fcobj)
+                        drawfill = True
+                    if ecobj is None:
+                        drawline = False  
+                        edgecolor = Color.black
+                    else:
+                        drawline = True
+                        edgecolor = __getcolor(ecobj)            
+                    size = kwargs.pop('size', 1)
+                    lb = layer.getLegendScheme().getLegendBreaks().get(0)
+                    lb.setColor(facecolor)
+                    btype = lb.getBreakType()
+                    if btype == BreakTypes.PointBreak:        
+                        lb.setDrawOutline(drawline)
+                        lb.setOutlineColor(edgecolor)        
+                    elif btype == BreakTypes.PolylineBreak:
+                        lb.setSize(size)
+                    elif btype == BreakTypes.PolygonBreak:
+                        lb.setDrawFill(drawfill)
+                        lb.setDrawOutline(drawline)
+                        lb.setOutlineColor(edgecolor)
+                        lb.setOutlineSize(size)
             else:
-                font = Font(fontname, Font.PLAIN, fontsize)
-            labelset.setLabelFont(font)
-            xoffset = kwargs.pop('xoffset', 0)
-            labelset.setXOffset(xoffset)
-            yoffset = kwargs.pop('yoffset', 0)
-            labelset.setYOffset(yoffset)
-            avoidcoll = kwargs.pop('avoidcoll', True)
-            labelset.setAvoidCollision(avoidcoll)
-            layer.addLabels()        
+                layer.setLegendScheme(ls)
+            plot.addLayer(layer)
+            #Labels        
+            labelfield = kwargs.pop('labelfield', None)
+            if not labelfield is None:
+                labelset = layer.getLabelSet()
+                labelset.setFieldName(labelfield)
+                fontname = kwargs.pop('fontname', 'Arial')
+                fontsize = kwargs.pop('fontsize', 14)
+                bold = kwargs.pop('bold', False)
+                if bold:
+                    font = Font(fontname, Font.BOLD, fontsize)
+                else:
+                    font = Font(fontname, Font.PLAIN, fontsize)
+                labelset.setLabelFont(font)
+                xoffset = kwargs.pop('xoffset', 0)
+                labelset.setXOffset(xoffset)
+                yoffset = kwargs.pop('yoffset', 0)
+                labelset.setYOffset(yoffset)
+                avoidcoll = kwargs.pop('avoidcoll', True)
+                labelset.setAvoidCollision(avoidcoll)
+                layer.addLabels()   
+    elif len(args) == 2:
+        lat = args[0]
+        lon = args[1]
+        displaytype = kwargs.pop('displaytype', 'line')
+        if isinstance(lat, (int, float)):
+            displaytype = 'point'
+        else:
+            if len(lat) == 1:
+                displaytype = 'point'
+            else:
+                if isinstance(lon, (MIArray, DimArray)):
+                    lon = lon.aslist()
+                if isinstance(lat, (MIArray, DimArray)):
+                    lat = lat.aslist()
+
+        lbreak, isunique = __getlegendbreak(displaytype, kwargs)
+        if displaytype == 'point':
+            plot.addPoint(lat, lon, lbreak)
+        elif displaytype == 'polyline' or displaytype == 'line':
+            plot.addPolyline(lat, lon, lbreak)
+        elif displaytype == 'polygon':
+            plot.addPolygon(lat, lon, lbreak)
     draw_if_interactive()
 
 def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
@@ -2687,6 +2719,8 @@ def __getlegendbreak(geometry, rule):
         lb.setDrawFill(fill)
         edge = rule.pop('edge', True)
         lb.setDrawOutline(edge)
+        size = rule.pop('size', 1)
+        lb.setOutlineSize(size)
     else:
         lb = ColorBreak()
     caption = rule.pop('caption', None)

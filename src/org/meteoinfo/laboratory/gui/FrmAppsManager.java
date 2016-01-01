@@ -74,9 +74,9 @@ public class FrmAppsManager extends javax.swing.JDialog {
         jTextArea_PluginDetails = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Plugin Manager");
+        setTitle("Application Manager");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plugins"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Applications"));
 
         checkBoxList_Plugin.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -120,7 +120,7 @@ public class FrmAppsManager extends javax.swing.JDialog {
                 .addComponent(jButton_UpdateList))
         );
 
-        jLabel1.setText("Plugin:");
+        jLabel1.setText("Application:");
 
         jTextArea_PluginDetails.setColumns(20);
         jTextArea_PluginDetails.setRows(5);
@@ -149,6 +149,8 @@ public class FrmAppsManager extends javax.swing.JDialog {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        jPanel1.getAccessibleContext().setAccessibleName("Applications");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

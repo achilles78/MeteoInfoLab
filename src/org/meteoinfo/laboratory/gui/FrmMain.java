@@ -12,8 +12,6 @@ import com.l2fprod.common.swing.JFontChooser;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -30,7 +28,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -38,7 +35,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -333,6 +329,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         jMenuItem_ColorMaps = new javax.swing.JMenuItem();
         jMenu_Apps = new javax.swing.JMenu();
         jMenuItem_AppsManager = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMenu_Help = new javax.swing.JMenu();
         jMenuItem_About = new javax.swing.JMenuItem();
 
@@ -571,6 +568,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
             }
         });
         jMenu_Apps.add(jMenuItem_AppsManager);
+        jMenu_Apps.add(jSeparator5);
 
         jMenuBar1.add(jMenu_Apps);
 
@@ -1054,6 +1052,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JToolBar jToolBar_CurrentFolder;
     private javax.swing.JToolBar jToolBar_Editor;
     // End of variables declaration//GEN-END:variables
