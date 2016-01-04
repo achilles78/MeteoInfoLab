@@ -503,7 +503,7 @@ class DimArray():
         #        r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
         #else:
         #    r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
-        r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, method)
+        r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
         return MIArray(r)
             
     def join(self, b, dimidx):

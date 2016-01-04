@@ -890,6 +890,21 @@ def mean(x, axis=None):
                         dims.append(x.dims[i])
                 return DimArray(MIArray(r), dims, x.fill_value, x.proj)
                 
+def sort(a, axis=-1):
+    """
+    Return a sorted copy of an array.
+    
+    :param a: (*array_like*) Array to be sorted.
+    :param axis: (*int or None*) Optional. Axis along which to sort. If None, the array is
+        flattened after sorting. The default is ``-1`` , which sorts along the last axis.
+        
+    :returns: (*MIArray*) Sorted array.
+    """
+    if isinstance(a, list):
+        a = array(a)
+    r = ArrayUtil.sort(a.asarray(), axis)
+    return MIArray(r)
+                
 def dot(a, b):
     """
     Matrix multiplication.

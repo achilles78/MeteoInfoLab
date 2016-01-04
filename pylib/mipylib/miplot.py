@@ -508,14 +508,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
         plot.setDataset(dataset)
     
     #Set plot data styles
-    pointStyle = __getpointstyle(marker)
-    c = kwargs.pop('color', c)
-    color = __getcolor(c)
-    pb = PointBreak()
-    pb.setCaption(label)
-    pb.setSize(s)
-    pb.setStyle(pointStyle)
-    pb.setColor(color)
+    pb, isunique = __getlegendbreak('point', kwargs)
     plot.setLegendBreak(dataset.getSeriesCount() - 1, pb)
     
     #Paint dataset
@@ -1511,6 +1504,25 @@ def yreverse():
     draw_if_interactive()
             
 def legend(*args, **kwargs):
+    """
+    Places a legend on the axes.
+    
+    :param breaks: (*ColorBreak*) Legend breaks (optional).
+    :param labels: (*list of string*) Legend labels (optional).
+    :param loc: (*string*) The location of the legend, including: 'upper right', upper left',
+        'lower left', 'lower right', 'right', 'ceter left', 'center right', lower center',
+        'upper center', 'center' and 'custom'. Default is 'upper right'.
+    :param x: (*float*) Location x in normalized (0, 1) units when ``loc=custom`` .
+    :param y: (*float*) Location y in normalized (0, 1) units when ``loc=custom`` .
+    :param framon: (*boolean*) Control whether a frame should be drawn around the legend. Default
+        is True.
+    :param background: (*None or color*) Set draw background or not and/or background color.
+        Default is None which set not draw background.
+    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+    :param labcolor: (*color*) Tick label string color. Default is ``black`` .
+    """
     plot = gca
     plot.setDrawLegend(True)    
     clegend = plot.getLegend()   
@@ -1546,11 +1558,13 @@ def legend(*args, **kwargs):
         clegend.setY(y)    
     frameon = kwargs.pop('frameon', True)
     clegend.setDrawNeatLine(frameon)
-    shadow = kwargs.pop('shadow', False)
-    clegend.setDrawBackground(shadow)
-    bcobj = kwargs.pop('background', 'w')
-    background = __getcolor(bcobj)
-    clegend.setBackground(background)
+    bcobj = kwargs.pop('background', None)
+    if bcobj is None:
+        clegend.setDrawBackground(False)
+    else:
+        clegend.setDrawBackground(True)
+        background = __getcolor(bcobj)
+        clegend.setBackground(background)
     fontname = kwargs.pop('fontname', 'Arial')
     fontsize = kwargs.pop('fontsize', 14)
     bold = kwargs.pop('bold', False)
