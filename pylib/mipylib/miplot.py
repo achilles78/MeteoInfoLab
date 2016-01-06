@@ -509,6 +509,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     
     #Set plot data styles
     pb, isunique = __getlegendbreak('point', kwargs)
+    pb.setCaption(label)
     plot.setLegendBreak(dataset.getSeriesCount() - 1, pb)
     
     #Paint dataset

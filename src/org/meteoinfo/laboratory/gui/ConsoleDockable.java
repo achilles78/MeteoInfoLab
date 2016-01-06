@@ -60,7 +60,12 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         //String pluginPath = this.startupPath + File.separator + "plugins";
         //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
 
-        Py.getSystemState().setdefaultencoding("utf-8");
+        //Issue java.lang.IllegalArgumentException: Cannot create PyString with non-byte value
+        try {
+            Py.getSystemState().setdefaultencoding("utf-8");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         interp = new PythonInteractiveInterpreter(console);
         String path = this.startupPath + File.separator + "pylib";
         String toolboxPath = this.startupPath + "/toolbox";
