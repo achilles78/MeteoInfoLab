@@ -1,3 +1,4 @@
+# coding=utf-8
 #-----------------------------------------------------
 # Author: Yaqiang Wang
 # Date: 2014-12-26
@@ -1580,6 +1581,13 @@ def legend(*args, **kwargs):
     draw_if_interactive()
     
 def readlegend(fn):
+    """
+    Read legend from a legend file (.lgs).
+    
+    :param fn: (*string*) Legend file name.
+    
+    :returns: (*LegendScheme*) Legend.
+    """
     if os.path.exists(fn):
         ls = LegendScheme()
         ls.importFromXMLFile(fn, False)
@@ -1589,6 +1597,26 @@ def readlegend(fn):
         return None
         
 def colorbar(layer, **kwargs):
+    """
+    Add a colorbar to a plot.
+    
+    :param layer: (*MapLayer*) The layer in plot.
+    :param cmap: (*string*) Color map name. Default is None.
+    :param shrink: (*float*) Fraction by which to shrink the colorbar. Default is 1.0.
+    :param orientation: (*string*) Colorbar orientation: ``vertical`` or ``horizontal``.
+    :param aspect: (*int*) Ratio of long to short dimensions.
+    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+    :param extendrect: (*boolean*) If ``True`` the minimum and maximum colorbar extensions will be
+        rectangular (the default). If ``False`` the extensions will be triangular.
+    :param extendfrac: [None | 'auto' | length] If set to *None*, both the minimum and maximum triangular
+        colorbar extensions with have a length of 5% of the interior colorbar length (the default). If
+        set to 'auto', makes the triangular colorbar extensions the same lengths as the interior boxes
+        . If a scalar, indicates the length of both the minimum and maximum triangle colorbar extensions
+        as a fraction of the interior colorbar length.
+    :param ticks: [None | list of ticks] If None, ticks are determined automatically from the input.
+    """
     cmap = kwargs.pop('cmap', None)
     shrink = kwargs.pop('shrink', 1)
     orientation = kwargs.pop('orientation', 'vertical')
@@ -1624,9 +1652,9 @@ def colorbar(layer, **kwargs):
     extendfrac = kwargs.pop('extendfrac', None)
     if extendfrac == 'auto':
         legend.setAutoExtendFrac(True)
-    ticklabel = kwargs.pop('ticklabel', None)
-    if not ticklabel is None:
-        legend.setTickLabels(ticklabel)
+    ticks = kwargs.pop('ticks', None)
+    if not ticks is None:
+        legend.setTickLabels(ticks)
     plot.setDrawLegend(True)
     draw_if_interactive()
 
@@ -1773,6 +1801,22 @@ def __setlegendscheme_polygon(ls, **kwargs):
     return ls
       
 def imshow(*args, **kwargs):
+    """
+    Display an image on the axes.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    
+    :returns: (*RasterLayer*) RasterLayer created from array data.
+    """
     n = len(args)
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -1790,6 +1834,22 @@ def imshow(*args, **kwargs):
     return MILayer(layer)
       
 def contour(*args, **kwargs):
+    """
+    Plot contours.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    
+    :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
+    """
     n = len(args)
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -1826,6 +1886,22 @@ def contour(*args, **kwargs):
     return MILayer(layer)
 
 def contourf(*args, **kwargs):
+    """
+    Plot filled contours.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    
+    :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
+    """
     n = len(args)    
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -1861,6 +1937,22 @@ def contourf(*args, **kwargs):
     return MILayer(layer)
 
 def quiver(*args, **kwargs):
+    """
+    Plot a 2-D field of arrows.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+    :param z: (*array_like*) Optional, 2-D z value array.
+    :param cmap: (*string*) Color map string.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+    :param size: (*float*) Base size of the arrows.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Created quiver VectoryLayer.
+    """
     plot = gca
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -1983,6 +2075,31 @@ def __plot_uvgriddata(udata, vdata, cdata, ls, type, isuv):
     return layer
     
 def scatterm(*args, **kwargs):
+    """
+    Make a scatter plot on a map.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param z: (*array_like*) Input z data.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param size: (*int*) Marker size.
+    :param marker: (*string*) Marker of the points.
+    :param fill: (*boolean*) Fill markers or not. Default is True.
+    :param edge: (*boolean*) Draw edge of markers or not. Default is True.
+    :param facecolor: (*Color*) Fill color of markers. Default is black.
+    :param edgecolor: (*Color*) Edge color of markers. Default is black.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Point VectoryLayer.
+    """
     plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
@@ -2030,6 +2147,17 @@ def scatterm(*args, **kwargs):
     return MILayer(layer)
     
 def plotm(*args, **kwargs):
+    """
+    Plot lines and/or markers to the map.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param style: (*string*) Line style for plot.
+    :param linewidth: (*float*) Line width.
+    :param color: (*Color*) Line color.
+    
+    :returns: (*VectoryLayer*) Line VectoryLayer.
+    """
     plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
@@ -2128,8 +2256,18 @@ def plotm(*args, **kwargs):
     draw_if_interactive()
     return MILayer(layer)
     
-def stationmodel(*args, **kwargs):
-    smdata = args[0]
+def stationmodel(smdata, **kwargs):
+    """
+    Plot station model data on the map.
+    
+    :param smdata: (*StationModelData*) Station model data.
+    :param surface: (*boolean*) Is surface data or not. Default is True.
+    :param size: (*float*) Size of the station model symbols. Default is 12.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Station model VectoryLayer.
+    """
     proj = kwargs.pop('proj', None)
     size = kwargs.pop('size', 12)
     surface = kwargs.pop('surface', True)
@@ -2148,6 +2286,25 @@ def stationmodel(*args, **kwargs):
     return MILayer(layer)
         
 def imshowm(*args, **kwargs):
+    """
+    Display an image on the map.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*RasterLayer*) RasterLayer created from array data.
+    """
     plot = gca
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -2167,11 +2324,11 @@ def imshowm(*args, **kwargs):
         level_arg = args[0]
         if isinstance(level_arg, int):
             cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+            ls = LegendManage.createImageLegend(gdata.data, cn, cmap)
         else:
             if isinstance(level_arg, MIArray):
                 level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+            ls = LegendManage.createImageLegend(gdata.data, level_arg, cmap)
     else:    
         #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
         ls = LegendManage.createImageLegend(gdata.data, cmap)
@@ -2180,6 +2337,25 @@ def imshowm(*args, **kwargs):
     return MILayer(layer)
     
 def contourm(*args, **kwargs):  
+    """
+    Plot contours on the map.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
+    """
     plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)      
     proj = kwargs.pop('proj', None)
@@ -2200,6 +2376,25 @@ def contourm(*args, **kwargs):
     return MILayer(layer)
         
 def contourfm(*args, **kwargs):
+    """
+    Plot filled contours.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
+    """
     plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)
     interpolate = kwargs.pop('interpolate', False)
@@ -2325,6 +2520,23 @@ def surfacem(*args, **kwargs):
     return MILayer(layer)
     
 def quiverm(*args, **kwargs):
+    """
+    Plot a 2-D field of arrows in a map.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+    :param z: (*array_like*) Optional, 2-D z value array.
+    :param cmap: (*string*) Color map string.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+    :param size: (*float*) Base size of the arrows.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Created quiver VectoryLayer.
+    """
     plot = gca
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -2380,6 +2592,23 @@ def quiverm(*args, **kwargs):
     return MILayer(layer)
     
 def streamplotm(*args, **kwargs):
+    """
+    Plot streamline in a map.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+    :param z: (*array_like*) Optional, 2-D z value array.
+    :param color: (*Color*) Streamline color. Default is blue.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+    :param density: (*int*) Streamline density. Default is 4.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Created streamline VectoryLayer.
+    """
     plot = gca
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
