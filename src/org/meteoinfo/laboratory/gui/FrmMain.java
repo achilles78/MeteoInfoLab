@@ -9,6 +9,7 @@ import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import com.l2fprod.common.swing.JFontChooser;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -29,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -205,14 +207,15 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
         //Load applications        
         String toolboxPath = this.startupPath + File.separator + "toolbox";
-        if (isDebug)
+        if (isDebug) {
             toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
+        }
         String appConfFn = toolboxPath + File.separator + "apps.xml";
         try {
             this.apps.setPluginPath(toolboxPath);
             this.apps.loadConfigFile(appConfFn);
-            if (this.apps.size() > 0){
-                for (Application app : apps){
+            if (this.apps.size() > 0) {
+                for (Application app : apps) {
                     this.loadApplication(app);
                 }
             }
@@ -235,12 +238,13 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public AppCollection getApplications() {
         return this.apps;
     }
-    
+
     /**
      * Get startup path
+     *
      * @return Startup path
      */
-    public String getStartupPath(){
+    public String getStartupPath() {
         return this.startupPath;
     }
 
@@ -278,6 +282,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
     /**
      * Unload an application
+     *
      * @param plugin Application
      */
     public void unloadApplication(Application plugin) {
@@ -327,6 +332,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         jMenuItem_SetFont = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         jMenuItem_ColorMaps = new javax.swing.JMenuItem();
+        jMenuItem_ColorDialog = new javax.swing.JMenuItem();
         jMenu_Apps = new javax.swing.JMenu();
         jMenuItem_AppsManager = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
@@ -555,6 +561,14 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
             }
         });
         jMenu_Options.add(jMenuItem_ColorMaps);
+
+        jMenuItem_ColorDialog.setText("Color Dialog");
+        jMenuItem_ColorDialog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_ColorDialogActionPerformed(evt);
+            }
+        });
+        jMenu_Options.add(jMenuItem_ColorDialog);
 
         jMenuBar1.add(jMenu_Options);
 
@@ -839,6 +853,17 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         frm.setVisible(true);
     }//GEN-LAST:event_jMenuItem_AppsManagerActionPerformed
 
+    private void jMenuItem_ColorDialogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_ColorDialogActionPerformed
+        // TODO add your handling code here:
+        JDialog colorMapDialog = new JDialog(this, false);
+        colorMapDialog.setTitle("Color Dialog");
+        colorMapDialog.setFocusableWindowState(false);
+        colorMapDialog.add(new JColorChooser(Color.black));
+        colorMapDialog.setSize(600, 400);
+        colorMapDialog.setLocationRelativeTo(this);
+        colorMapDialog.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_ColorDialogActionPerformed
+
     /**
      * Get figure dockable
      *
@@ -943,7 +968,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public JMenuBar getMainMenuBar() {
         return this.jMenuBar1;
     }
-    
+
     @Override
     public JMenu getPluginMenu() {
         return this.jMenu_Apps;
@@ -1035,6 +1060,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     private javax.swing.JMenuItem jMenuItem_About;
     private javax.swing.JMenuItem jMenuItem_AppsManager;
     private javax.swing.JMenuItem jMenuItem_CloseAllFiles;
+    private javax.swing.JMenuItem jMenuItem_ColorDialog;
     private javax.swing.JMenuItem jMenuItem_ColorMaps;
     private javax.swing.JMenuItem jMenuItem_Copy;
     private javax.swing.JMenuItem jMenuItem_Cut;

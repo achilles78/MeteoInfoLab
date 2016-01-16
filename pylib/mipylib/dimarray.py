@@ -5,7 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.data import GridData, StationData, ArrayMath, ArrayUtil
+from org.meteoinfo.data import GridData, GridArray, StationData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 from org.meteoinfo.geoprocess.analysis import ResampleMethods
 from org.meteoinfo.layer import VectorLayer
@@ -383,6 +383,12 @@ class DimArray():
         ydata = self.dims[0].getDimValue()
         gdata = GridData(self.array.array, xdata, ydata, self.fill_value, self.proj)
         return PyGridData(gdata)
+        
+    def asgridarray(self):
+        xdata = self.dims[1].getDimValue()
+        ydata = self.dims[0].getDimValue()
+        gdata = GridArray(self.array.array, xdata, ydata, self.fill_value, self.proj)
+        return gdata
         
     def sqrt(self):
         r = DimArray(self.array.sqrt(), self.dims, self.fill_value, self.proj)

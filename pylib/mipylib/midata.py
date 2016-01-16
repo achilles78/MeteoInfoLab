@@ -7,11 +7,12 @@
 import os
 import math
 import datetime
-from org.meteoinfo.data import GridData, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
+from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
 from org.meteoinfo.data.meteodata import MeteoDataInfo
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
 from org.meteoinfo.data.meteodata.arl import ARLDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
+from org.meteoinfo.data.mapdata.geotiff import GeoTiff
 from org.meteoinfo.data.analysis import MeteoMath
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
@@ -438,6 +439,12 @@ def readtable(filename, **kwargs):
     readrownames = kwargs.pop('readrownames', False)
     tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
     return PyTableData(tdata)
+    
+def geotiffread(filename):
+    geotiff = GeoTiff(filename)
+    geotiff.read()
+    r = geotiff.readArray()
+    return MIArray(r)
 
 def array(object):
     """
@@ -1126,6 +1133,25 @@ def asgriddata(data, x=None, y=None, fill_value=-9999.0):
     else:
         gdata = GridData(data.asarray(), x.asarray(), y.asarray(), fill_value)
         return PyGridData(gdata)
+        
+def asgridarray(data, x=None, y=None, fill_value=-9999.0):
+    if x is None:    
+        if isinstance(data, PyGridData):
+            return data.data.toGridArray()
+        elif isinstance(data, DimArray):
+            return data.asgridarray()
+        elif isinstance(data, MIArray):
+            if x is None:
+                x = arange(0, data.shape[1])
+            if y is None:
+                y = arange(0, data.shape[0])
+            gdata = GridArray(data.array, x.array, y.array, fill_value)
+            return gdata
+        else:
+            return None
+    else:
+        gdata = GridArray(data.asarray(), x.asarray(), y.asarray(), fill_value)
+        return gdata
         
 def asstationdata(data, x, y, fill_value=-9999.0):
     stdata = StationData(data.asarray(), x.asarray(), y.asarray(), fill_value)

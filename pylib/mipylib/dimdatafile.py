@@ -56,8 +56,11 @@ class DimDataFile():
         v = MIArray(attr.getValues())
         return v
         
-    def read(self, varname, origin, size, stride):
-        return self.dataset.read(varname, origin, size, stride)
+    def read(self, varname, origin=None, size=None, stride=None):
+        if origin is None:
+            return self.dataset.read(varname)
+        else:
+            return self.dataset.read(varname, origin, size, stride)
         
     def dump(self):
         print self.dataset.getInfoText()

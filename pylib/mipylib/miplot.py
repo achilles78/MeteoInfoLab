@@ -1806,7 +1806,7 @@ def imshow(*args, **kwargs):
     
     :param x: (*array_like*) Optional. X coordinate array.
     :param y: (*array_like*) Optional. Y coordinate array.
-    :param z: (*array_like*) 2-D z value array.
+    :param z: (*array_like*) 2-D or 3-D (RGB) z value array.
     :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
         to draw, in increasing order.
     :param cmap: (*string*) Color map string.
@@ -1821,13 +1821,13 @@ def imshow(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     if n <= 2:
-        gdata = midata.asgriddata(args[0])
+        gdata = midata.asgridarray(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
+        gdata = midata.asgridarray(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     layer = __plot_griddata(gdata, ls, 'imshow')
@@ -2013,9 +2013,9 @@ def __plot_griddata(gdata, ls, type, xaxistype=None):
     elif type == 'contour':
         layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
     elif type == 'imshow':
-        layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)
+        layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls)
     
-    #Create XY1DPlot
+    #Create XY2DPlot
     global gca
     if gca is None:
         mapview = MapView()
@@ -2312,26 +2312,26 @@ def imshowm(*args, **kwargs):
     order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
-        gdata = midata.asgriddata(args[0])
+        gdata = midata.asgridarray(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
+        gdata = midata.asgridarray(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
         if isinstance(level_arg, int):
             cn = level_arg
-            ls = LegendManage.createImageLegend(gdata.data, cn, cmap)
+            ls = LegendManage.createImageLegend(gdata, cn, cmap)
         else:
             if isinstance(level_arg, MIArray):
                 level_arg = level_arg.aslist()
-            ls = LegendManage.createImageLegend(gdata.data, level_arg, cmap)
+            ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
     else:    
         #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-        ls = LegendManage.createImageLegend(gdata.data, cmap)
+        ls = LegendManage.createImageLegend(gdata, cmap)
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
     gdata = None
     return MILayer(layer)
@@ -2643,7 +2643,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
     elif type == 'contour':
         layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
     elif type == 'imshow':
-        layer = DrawMeteoData.createRasterLayer(gdata.data, 'layer', ls)      
+        layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls)      
     elif type == 'scatter':
         layer = DrawMeteoData.createGridPointLayer(gdata.data, ls, 'layer', 'data')
     elif type == 'gridf':
