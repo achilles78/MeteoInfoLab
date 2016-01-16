@@ -234,7 +234,7 @@ class PyTableData():
 def __getfilename(fname):
     s5 = fname[0:5]
     isweb = False
-    if s5 == 'http:' or s5 == 'dods:' or s5 == 'dap4:':
+    if s5 == 'http:' or s5 == 'https' or s5 == 'dods:' or s5 == 'dap4:':
         isweb = True
         return fname, isweb
     if os.path.exists(fname):
