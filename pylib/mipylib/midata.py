@@ -135,9 +135,15 @@ class PyTableData():
             self.data.addRow()
         else:
             self.data.addRow(row)
+            
+    def addrows(self, rows):
+        self.data.addRows(rows)
         
     def getrow(self, index):
         return self.data.getRow(index)
+        
+    def getrows(self):
+        return self.data.getRows()
         
     #Set time column
     def timecol(self, colname):
@@ -1114,6 +1120,16 @@ def asarray(data):
         return data.asarray()
     else:
         return array(data).asarray()
+
+def asmiarray(data):
+    if isinstance(data, Array):
+        return MIArray(data)
+    elif isinstance(data, DimArray):
+        return data.array
+    elif isinstance(data, MIArray):
+        return data
+    else:
+        return array(data)       
         
 def asgriddata(data, x=None, y=None, fill_value=-9999.0):
     if x is None:    

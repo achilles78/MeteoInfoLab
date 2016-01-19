@@ -2547,24 +2547,28 @@ def quiverm(*args, **kwargs):
     n = len(args) 
     iscolor = False
     cdata = None
-    if n <= 4:
-        udata = midata.asgriddata(args[0])
-        vdata = midata.asgriddata(args[1])
+    onlyuv = True
+    if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
+        onlyuv = False
+    if onlyuv:
+        u = midata.asmiarray(args[0])
+        v = midata.asmiarray(args[1])
+        xx = args[0].dimvalue(1)
+        yy = args[0].dimvalue(0)
+        x, y = midata.meshgrid(xx, yy)
         args = args[2:]
         if len(args) > 0:
-            cdata = midata.asgriddata(args[0])
+            cdata = midata.asmiarray(args[0])
             iscolor = True
             args = args[1:]
-    elif n <= 6:
-        x = args[0]
-        y = args[1]
-        u = args[2]
-        v = args[3]
-        udata = midata.asgriddata(u, x, y, fill_value)
-        vdata = midata.asgriddata(v, x, y, fill_value)
+    else:
+        x = midata.asmiarray(args[0])
+        y = midata.asmiarray(args[1])
+        u = midata.asmiarray(args[2])
+        v = midata.asmiarray(args[3])
         args = args[4:]
         if len(args) > 0:
-            cdata = midata.asgriddata(args[0], x, y, fill_value)
+            cdata = midata.asmiarray(args[0])
             iscolor = True
             args = args[1:]
     if iscolor:
@@ -2585,7 +2589,7 @@ def quiverm(*args, **kwargs):
         else:
             c = Color.black
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, size)
-    layer = __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, 'quiver', isuv, proj=proj)
+    layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'quiver', isuv, proj=proj)
     udata = None
     vdata = None
     cdata = None
@@ -2700,6 +2704,27 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
     #chartpanel.setChart(chart)
     #global gca
     #gca = plot
+    draw_if_interactive()
+    return layer
+
+def __plot_uvdata_m(plot, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
+    #print 'GridData...'
+    zv = z
+    if not z is None:
+        zv = z.array
+    if type == 'quiver':
+        layer = DrawMeteoData.createVectorLayer(x.array, y.array, u.array, v.array, zv, ls, 'layer', isuv)
+    
+    if (proj != None):
+        layer.setProjInfo(proj)
+    
+    shapetype = layer.getShapeType()
+    plot.addLayer(layer)
+    plot.setDrawExtent(layer.getExtent().clone())
+    
+    if chartpanel is None:
+        figure()
+
     draw_if_interactive()
     return layer
     
