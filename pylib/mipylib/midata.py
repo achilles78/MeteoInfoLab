@@ -981,6 +981,31 @@ def transpose(a, dim1=0, dim2=1):
             else:
                 dims.append(a.dims[i])
         return DimArray(MIArray(r), dims, a.fill_value, a.proj) 
+        
+def rot90(a, k=1):
+    """
+    Rotate an array by 90 degrees in the counter-clockwise direction. The first two dimensions
+    are rotated if the array has more than 2 dimensions.
+    
+    :param a: (*array_like*) Array for rotate.
+    :param k: (*int*) Number of times the array is rotated by 90 degrees
+    
+    :returns: (*array_like*) Rotated array.
+    """
+    r = ArrayMath.rot90(a.asarray(), k)
+    if isinstance(a, MIArray):
+        return MIArray(r)
+    else:
+        dims = []
+        if Math.abs(k) == 1 or Math.abs(k) == 3:
+            dims.append(a.dims[1])
+            dims.append(a.dims[0])
+            for i in range(2, len(a.dims)):            
+                dims.append(a.dims[i])
+        else:
+            for i in range(0, len(a.dims)):
+                dims.append(a.dims[i])
+        return DimArray(MIArray(r), dims, a.fill_value, a.proj) 
 
 def tf2tc(tf):
     """
@@ -1058,7 +1083,7 @@ def dewpoint2rh(dewpoint, temp):
     elif isinstance(dewpoint, DimArray):
         return DimArray(MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray())), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
     else:
-        return MeteoMath.dewpoint2rh(dewpoint, temp)
+        return MeteoMath.dewpoint2rh(temp, dewpoint)
         
 def p2h(press):
     """
