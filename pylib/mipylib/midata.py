@@ -94,6 +94,12 @@ class PyTableData():
             
     def __repr__(self):
         return self.data.toString()
+        
+    def rownum(self):
+        return self.data.getDataTable().getRowCount()
+        
+    def colnum(self):
+        return self.data.getDataTable().getColumnCount()
     
     def colnames(self):
         return self.data.getDataTable().getColumnNames()
@@ -166,13 +172,16 @@ class PyTableData():
         else:
             self.data.saveAsASCIIFile(filename)
         
-    def ave_year(self, colnames):
+    def ave_year(self, colnames, year=None):
         if not self.timedata:
             print 'There is no time column!'
             return None
         else:
             cols = self.data.findColumns(colnames)
-            dtable = self.data.ave_Year(cols)
+            if year is None:
+                dtable = self.data.ave_Year(cols)
+            else:
+                dtable = self.data.ave_Year(cols, year)
             return PyTableData(TableData(dtable))
             
     def ave_yearmonth(self, colnames, month):
@@ -220,7 +229,7 @@ class PyTableData():
             dtable = self.data.ave_Month(cols)
             return PyTableData(TableData(dtable))
             
-    def ave_day(self, colnames, day):
+    def ave_day(self, colnames, day=None):
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -1364,10 +1373,16 @@ def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, topr
         outpt = Reproject.reprojectPoint(inpt, fromproj, toproj)
         return outpt.X, outpt.Y
     
-def projectxy(lllon, lllat, xnum, ynum, dx, dy, toproj, fromproj=None):
-    x, y = project(lllon, lllat, toproj, fromproj)
-    xx = arange1(x, xnum, dx)
-    yy = arange1(y, ynum, dy)
+def projectxy(lon, lat, xnum, ynum, dx, dy, toproj, fromproj=None, pos='lowerleft'):
+    x, y = project(lon, lat, toproj, fromproj)
+    if pos == 'lowerleft':
+        xx = arange1(x, xnum, dx)
+        yy = arange1(y, ynum, dy)
+    else:
+        llx = x - ((xnum - 1) * 0.5 * dx)
+        lly = y - ((ynum - 1) * 0.5 * dy)
+        xx = arange1(llx, xnum, dx)
+        yy = arange1(lly, ynum, dy)
     return xx, yy
     
 def addtimedim(infn, outfn, t, tunit='hours'):
