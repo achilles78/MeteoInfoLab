@@ -69,7 +69,7 @@ class DimVariable():
                 sidx = 0 if k.start is None else k.start
                 eidx = self.dimlen(i)-1 if k.stop is None else k.stop
                 step = 1 if k.step is None else k.step
-            elif isinstance(k, tuple) or isinstance(k, list):
+            elif isinstance(k, (tuple, list)):
                 dim = self.variable.getDimension(i)
                 sidx = dim.getValueIndex(k[0])
                 if len(k) == 1:
@@ -81,16 +81,22 @@ class DimVariable():
                         step = 1
                     else:
                         step = int(k[2] / dim.getDeltaValue)
+                    if sidx > eidx:
+                        iidx = eidx
+                        eidx = sidx
+                        sidx = iidx
             else:
                 print k
                 return None
             origin.append(sidx)
             n = eidx - sidx + 1
-            size.append(n)
-            stride.append(step)            
+            size.append(n)                   
             if n > 1:
                 dim = self.variable.getDimension(i)
+                if dim.isReverse():
+                    step = -step
                 dims.append(dim.extract(sidx, eidx, step))
+            stride.append(step) 
         rr = self.dataset.read(self.name, origin, size, stride).reduce()
         ArrayMath.missingToNaN(rr, self.fill_value)
         array = MIArray(rr)

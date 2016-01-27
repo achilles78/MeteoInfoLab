@@ -2763,7 +2763,11 @@ def clabel(layer, **kwargs):
     labelset = layer.layer.getLabelSet()
     labelset.setLabelFont(font)
     labelset.setLabelColor(color)
-    layer.layer.addLabelsContourDynamic(layer.layer.getExtent())
+    dynamic = kwargs.pop('dynamic', True)
+    if dynamic:
+        layer.layer.addLabelsContourDynamic(layer.layer.getExtent())
+    else:
+        layer.layer.addLabels()
     draw_if_interactive()
         
 def worldmap():
