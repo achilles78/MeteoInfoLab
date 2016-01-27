@@ -1829,7 +1829,16 @@ def imshow(*args, **kwargs):
         a = args[2]
         gdata = midata.asgridarray(a, x, y, fill_value)
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    #ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createImageLegend(gdata, cn, cmap)
+        else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
+            ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
     layer = __plot_griddata(gdata, ls, 'imshow')
     return MILayer(layer)
       
