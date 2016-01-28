@@ -1318,26 +1318,26 @@ def griddata(points, values, xi=None, **kwargs):
         pnum = kwargs.pop('pointnum', 2)
         radius = kwargs.pop('radius', None)
         if radius is None:
-            r = ArrayUtil.interpolation_IDW_Neighbor(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), pnum, fill_value)
+            r = ArrayUtil.interpolation_IDW_Neighbor(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), pnum)
             return MIArray(r), x_g, y_g
         else:
-            r = ArrayUtil.interpolation_IDW_Radius(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), pnum, radius, fill_value)
+            r = ArrayUtil.interpolation_IDW_Radius(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), pnum, radius)
             return MIArray(r), x_g, y_g
     elif method == 'cressman':
         radius = kwargs.pop('radius', [10, 7, 4, 2, 1])
         if isinstance(radius, MIArray):
             radius = radius.aslist()
-        r = ArrayUtil.cressman(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), fill_value, radius)
+        r = ArrayUtil.cressman(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
         return MIArray(r), x_g, y_g
     elif method == 'neareast':
         radius = kwargs.pop('radius', inf)
-        r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius, fill_value)
+        r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
         return MIArray(r), x_g, y_g
     elif method == 'inside':
-        r = ArrayUtil.interpolation_Inside(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), fill_value)
+        r = ArrayUtil.interpolation_Inside(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist())
         return MIArray(r), x_g, y_g    
     elif method == 'surface':        
-        r = ArrayUtil.interpolation_Surface(x_s.asarray(), y_s.asarray(), values, x_g.asarray(), y_g.asarray(), fill_value)
+        r = ArrayUtil.interpolation_Surface(x_s.asarray(), y_s.asarray(), values, x_g.asarray(), y_g.asarray())
         return MIArray(r), x_g, y_g
     else:
         return None

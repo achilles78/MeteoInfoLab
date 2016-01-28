@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\hdf">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
-    <RecentFolder Folder="D:\Working\MIScript"/>
+  <Path OpenPath="D:\Working\MIScript\mywork\micaps">
     <RecentFolder Folder="D:\Working"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\current"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
@@ -11,6 +9,8 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\cawdata"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
+    <RecentFolder Folder="D:\Working\MIScript\mywork"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
