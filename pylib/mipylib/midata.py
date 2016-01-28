@@ -27,6 +27,7 @@ import dimvariable
 import dimarray
 import miarray
 import milayer
+import miutil
 from dimdatafile import DimDataFile
 from dimvariable import DimVariable
 from dimarray import PyGridData, DimArray, PyStationData
@@ -911,6 +912,26 @@ def mean(x, axis=None):
                     if i != axis:
                         dims.append(x.dims[i])
                 return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+
+def ave_month(data, colnames, t):
+    """
+    Average data month by month.
+    
+    :param data: (*list of Array*) Data array list.
+    :param colnames: (*list of string*) Column name list.
+    :param t: (*list of datetime*) Datetime list.
+    
+    :returns: (*PyTableData*) Averaged table data.
+    """
+    jt = miutil.jdate(t)
+    if isinstance(data, MIArray):
+        a = [data.asarray()]
+    else:
+        a = []
+        for d in data:
+            a.append(d.asarray())
+    r = TableUtil.ave_Month(a, colnames, jt)
+    return PyTableData(TableData(r))
                 
 def sort(a, axis=-1):
     """

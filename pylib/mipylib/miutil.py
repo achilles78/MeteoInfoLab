@@ -37,8 +37,15 @@ def jdate(t):
     :returns: Java date
     """
     cal = Calendar.getInstance()
-    cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
-    return cal.getTime()
+    if isinstance(t, list):
+        r = []
+        for tt in t:
+            cal.set(tt.year, tt.month - 1, tt.day, tt.hour, tt.minute, tt.second)
+            r.append(cal.getTime())
+        return r
+    else:
+        cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
+        return cal.getTime()
     
 def date2num(t):
     """
