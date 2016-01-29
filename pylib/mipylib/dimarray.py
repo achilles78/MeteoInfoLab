@@ -443,8 +443,10 @@ class DimArray():
         return self.array.ave(self.fill_value)
         
     def inpolygon(self, polygon):
-        x = self.dims[1].getDimValue()
-        y = self.dims[0].getDimValue()
+        #x = self.dims[1].getDimValue()
+        #y = self.dims[0].getDimValue()
+        x = self.dimvalue(1)
+        y = self.dimvalue(0)
         if isinstance(polygon, tuple):
             x_p = polygon[0]
             y_p = polygon[1]

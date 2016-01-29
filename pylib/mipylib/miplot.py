@@ -2820,19 +2820,26 @@ def geoshow(*args, **kwargs):
                     else:
                         drawline = True
                         edgecolor = __getcolor(ecobj)            
-                    size = kwargs.pop('size', 1)
+                    size = kwargs.pop('size', None)
                     lb = layer.getLegendScheme().getLegendBreaks().get(0)
                     lb.setColor(facecolor)
                     btype = lb.getBreakType()
-                    if btype == BreakTypes.PointBreak:        
+                    if btype == BreakTypes.PointBreak:
+                        if size is None:
+                            size = 6
+                        lb.setSize(size)
                         lb.setDrawOutline(drawline)
                         lb.setOutlineColor(edgecolor)        
                     elif btype == BreakTypes.PolylineBreak:
+                        if size is None:
+                            size = 1
                         lb.setSize(size)
                     elif btype == BreakTypes.PolygonBreak:
                         lb.setDrawFill(drawfill)
                         lb.setDrawOutline(drawline)
                         lb.setOutlineColor(edgecolor)
+                        if size is None:
+                            size = 1
                         lb.setOutlineSize(size)
             else:
                 layer.setLegendScheme(ls)
