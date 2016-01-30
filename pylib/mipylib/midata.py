@@ -280,6 +280,10 @@ def addfile(fname, access='r', dtype='netcdf'):
         if isweb:
             return addfile_nc(fname, False)
         
+        if not os.path.exists(fname):
+            print 'File not exist: ' + fname
+            return None
+        
         fsufix = os.path.splitext(fname)[1].lower()
         if fsufix == '.ctl':
             return addfile_grads(fname, False)
@@ -402,6 +406,18 @@ def addfile_awx(fname, getfn=True):
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
     meteodata.openAWXData(fname)
+    __addmeteodata(meteodata)
+    datafile = DimDataFile(meteodata)
+    return datafile
+    
+def addfile_ascii_grid(fname, getfn=True):
+    if getfn:
+        fname, isweb = __getfilename(fname)
+    if not os.path.exists(fname):
+        print 'File not exist: ' + fname
+        return None
+    meteodata = MeteoDataInfo()
+    meteodata.openASCIIGridData(fname)
     __addmeteodata(meteodata)
     datafile = DimDataFile(meteodata)
     return datafile
@@ -1258,6 +1274,23 @@ def polygon(*args):
     
 def inpolygon(x, y, polygon):
     return GeoComputation.pointInPolygon(polygon, x, y)
+    
+def polyarea(*args, **kwargs):
+    islonlat = kwargs.pop('islonlat', False)
+    if len(args) == 1:
+        if islonlat:
+            r = args[0].getSphericalArea()
+        else:
+            r = args[0].getArea()
+    else:
+        x = args[0]
+        y = args[1]
+        if isinstance(x, MIArray):
+            x = x.aslist()
+        if isinstance(y, MIArray):
+            y = y.aslist()
+        r = GeoComputation.getArea(x, y, islonlat)
+    return r
     
 def maskout(data, x=None, y=None, mask=None):
     """
