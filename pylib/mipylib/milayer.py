@@ -93,6 +93,15 @@ class MILayer():
         
     def clone(self):
         return MILayer(self.layer.clone())
+    
+    def save(self, fn=None):
+        if fn is None:
+            if self.layer.getFileName().strip() == '':
+                print 'File name is needed to save the layer!'
+            else:
+                self.layer.saveFile()    
+        else:
+            self.layer.saveFile(fn)
         
 class MIXYListData():
     def __init__(self, data=None):

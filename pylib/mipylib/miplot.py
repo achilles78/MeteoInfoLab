@@ -2362,11 +2362,11 @@ def contourm(*args, **kwargs):
         the order specified.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
     :param order: (*int*) Z-order of created layer for display.
     
     :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
     """
-    plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)      
     proj = kwargs.pop('proj', None)
     order = kwargs.pop('order', None)
@@ -2381,6 +2381,11 @@ def contourm(*args, **kwargs):
         gdata = midata.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    isplot = kwargs.pop('isplot', True)
+    if isplot:
+        plot = gca
+    else:
+        plot = None
     layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj, order=order)
     gdata = None
     return MILayer(layer)
@@ -2401,11 +2406,11 @@ def contourfm(*args, **kwargs):
         the order specified.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
     :param order: (*int*) Z-order of created layer for display.
     
     :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
-    """
-    plot = gca
+    """    
     fill_value = kwargs.pop('fill_value', -9999.0)
     interpolate = kwargs.pop('interpolate', False)
     proj = kwargs.pop('proj', None)
@@ -2423,6 +2428,11 @@ def contourfm(*args, **kwargs):
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if interpolate:
         gdata = gdata.interpolate()
+    isplot = kwargs.pop('isplot', True)
+    if isplot:
+        plot = gca
+    else:
+        plot = None
     layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order)
     gdata = None
     return MILayer(layer)
@@ -2669,25 +2679,26 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
     if (proj != None):
         layer.setProjInfo(proj)
         
-    shapetype = layer.getShapeType()
-    if order is None:
-        if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-            plot.addLayer(0, layer)
+    if not plot is None:
+        shapetype = layer.getShapeType()
+        if order is None:
+            if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
+                plot.addLayer(0, layer)
+            else:
+                plot.addLayer(layer)
         else:
-            plot.addLayer(layer)
-    else:
-        plot.addLayer(order, layer)
-    plot.setDrawExtent(layer.getExtent().clone())
-    
-    if chartpanel is None:
-        figure()
-    
-    #chart = Chart(plot)
-    #chart.setAntiAlias(True)
-    #chartpanel.setChart(chart)
-    #global gca
-    #gca = plot
-    draw_if_interactive()
+            plot.addLayer(order, layer)
+        plot.setDrawExtent(layer.getExtent().clone())
+        
+        if chartpanel is None:
+            figure()
+        
+        #chart = Chart(plot)
+        #chart.setAntiAlias(True)
+        #chartpanel.setChart(chart)
+        #global gca
+        #gca = plot
+        draw_if_interactive()
     return layer
     
 def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
