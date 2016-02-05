@@ -59,7 +59,8 @@ class DimVariable():
         size = []
         stride = []
         dims = []
-        for i in range(0, self.ndim):   
+        for i in range(0, self.ndim):  
+            dimlen = self.dimlen(i)
             k = indices[i]
             if isinstance(k, int):
                 sidx = k
@@ -87,6 +88,9 @@ class DimVariable():
                         sidx = iidx
             else:
                 print k
+                return None
+            if eidx >= dimlen:
+                print 'Index out of range!'
                 return None
             origin.append(sidx)
             n = eidx - sidx + 1

@@ -660,7 +660,7 @@ def sqrt(x):
     
     :param x: (*array_like*) The values whose square-roots are required.
     
-    :returns y: (*array_like**) An array of the same shape as *x*, containing the positive
+    :returns y: (*array_like*) An array of the same shape as *x*, containing the positive
         square-root of each element in *x*.
         
     Examples::
@@ -674,6 +674,30 @@ def sqrt(x):
         return x.sqrt()
     else:
         return math.sqrt(x)
+        
+def pow(x1, x2):
+    """
+    First array elements raised to powers from second array, element-wise.
+    
+    :param x1: (*array_like*) The bases.
+    :param x2: (*array_like*) The exponents.
+    
+    :returns: (*array_like*) The bases in *x1* raised to the exponents in *x2*.
+    """
+    if isinstance(x1, list):
+        x1 = array(x1)
+    if isinstance(x2, list):
+        x2 = array(x2)
+    if isinstance(x1, (DimArray, MIArray)):
+        if isinstance(x2, (DimArray, MIArray)):
+            return MIArray(ArrayMath.pow(x1.asarray(), x2.asarray()))
+        else:
+            return MIArray(ArrayMath.pow(x1.asarray(), x2))
+    else:
+        if isinstance(x2, (DimArray, MIArray)):
+            return MIArray(ArrayMath.pow(x1, x2.asarray()))
+        else:
+            return math.pow(x1, x2)
 
 def sin(x):
     """
@@ -997,6 +1021,20 @@ def meshgrid(x, y):
     ya = y.asarray()
     ra = ArrayUtil.meshgrid(xa, ya)
     return MIArray(ra[0]), MIArray(ra[1])
+    
+def broadcast_to(a, shape):
+    """
+    Broadcast an array to a new shape.
+    
+    :param a: (*array_like*) The array to broadcast.
+    :param shape: (*tuple*) The shape of the desired array.
+    
+    :returns: (*MIArray*) A readonly view on the original array with the given shape.
+    """
+    if isinstance(a, list):
+        a = array(a)
+    r = ArrayUtil.broadcast(a.asarray(), shape)
+    return MIArray(r)
         
 def linregress(x, y):
     if isinstance(x, list):
