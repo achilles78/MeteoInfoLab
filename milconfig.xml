@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\hdf">
     <RecentFolder Folder="D:\Working\MIScript\mywork\sds"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\emission"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\emission\MEIC"/>
@@ -15,5 +15,5 @@
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="139,43" MainFormSize="1403,763"/>
+  <Startup MainFormLocation="139,27" MainFormSize="1403,807"/>
 </MeteoInfo>

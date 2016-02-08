@@ -127,14 +127,17 @@ class DimVariable():
         self.variable.addDimension(dimtype, dimvalue)
         self.ndim = self.variable.getDimNumber()
         
-    def setdim(self, dimtype, dimvalue, index=None):
+    def setdim(self, dimtype, dimvalue, reverse=False, index=None):
         if isinstance(dimvalue, MIArray):
             dimvalue = dimvalue.aslist()
         if index is None:
-            self.variable.setDimension(dimtype, dimvalue)
+            self.variable.setDimension(dimtype, dimvalue, reverse)
         else:
-            self.variable.setDimension(dimtype, dimvalue, index)
+            self.variable.setDimension(dimtype, dimvalue, reverse, index)
         self.ndim = self.variable.getDimNumber()
+        
+    def setdimrev(self, idx, reverse):
+        self.dims[idx].setReverse(reverse)
         
     def addattr(self, attrname, attrvalue):
         self.ncvariable.addAttribute(Attribute(attrname, attrvalue))
