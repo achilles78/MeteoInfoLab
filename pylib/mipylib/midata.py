@@ -271,6 +271,15 @@ def __getfilename(fname):
             return None, isweb
           
 def addfile(fname, access='r', dtype='netcdf'):
+    """
+    Opens a data file that is written in a supported file format.
+    
+    :param fname: (*string*) The full or relative path of the data file to load.
+    :param access: (*string*) The access right setting to the data file. Default is ``r``.
+    :param dtype: (*string*) The data type of the data file. Default is ``netcdf``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    """
     if access == 'r':
         fname = fname.strip()
         fname, isweb = __getfilename(fname)

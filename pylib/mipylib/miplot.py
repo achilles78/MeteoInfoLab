@@ -14,7 +14,7 @@ from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, GridData, Array
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import Plot, XY1DPlot, BarPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation
-from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition
+from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
 from org.meteoinfo.script import ChartForm, MapForm
 from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage, LegendScheme, LegendType
@@ -1968,7 +1968,6 @@ def quiver(*args, **kwargs):
     fill_value = kwargs.pop('fill_value', -9999.0)
     order = kwargs.pop('order', None)
     isuv = kwargs.pop('isuv', True)
-    size = kwargs.pop('size', 10)
     n = len(args) 
     iscolor = False
     cdata = None
@@ -2009,8 +2008,79 @@ def quiver(*args, **kwargs):
             c = cmap.getColor(0)
         else:
             c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, size)
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+    ls = __setlegendscheme_point(ls, **kwargs)
     layer = __plot_uvgriddata(udata, vdata, cdata, ls, 'quiver', isuv)
+    udata = None
+    vdata = None
+    cdata = None
+    return MILayer(layer)
+    
+def barbs(*args, **kwargs):
+    """
+    Plot a 2-D field of barbs.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+    :param z: (*array_like*) Optional, 2-D z value array.
+    :param cmap: (*string*) Color map string.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+    :param size: (*float*) Base size of the arrows.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Created barbs VectoryLayer.
+    """
+    plot = gca
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    order = kwargs.pop('order', None)
+    isuv = kwargs.pop('isuv', True)
+    n = len(args) 
+    iscolor = False
+    cdata = None
+    if n <= 4:
+        udata = midata.asgriddata(args[0])
+        vdata = midata.asgriddata(args[1])
+        args = args[2:]
+        if len(args) > 0:
+            cdata = midata.asgriddata(args[0])
+            iscolor = True
+            args = args[1:]
+    elif n <= 6:
+        x = args[0]
+        y = args[1]
+        u = args[2]
+        v = args[3]
+        udata = midata.asgriddata(u, x, y, fill_value)
+        vdata = midata.asgriddata(v, x, y, fill_value)
+        args = args[4:]
+        if len(args) > 0:
+            cdata = midata.asgriddata(args[0], x, y, fill_value)
+            iscolor = True
+            args = args[1:]
+    if iscolor:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+    else:    
+        if cmap.getColorCount() == 1:
+            c = cmap.getColor(0)
+        else:
+            c = Color.black
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+    ls = __setlegendscheme_point(ls, **kwargs)
+    layer = __plot_uvgriddata(udata, vdata, cdata, ls, 'barbs', isuv)
     udata = None
     vdata = None
     cdata = None
@@ -2066,6 +2136,11 @@ def __plot_uvgriddata(udata, vdata, cdata, ls, type, isuv):
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
         else:
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
+    elif type == 'barbs':
+        if cdata == None:
+            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, ls, 'layer', isuv)
+        else:
+            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
     
     shapetype = layer.getShapeType()
     mapview = MapView()
@@ -2563,7 +2638,6 @@ def quiverm(*args, **kwargs):
     proj = kwargs.pop('proj', None)
     order = kwargs.pop('order', None)
     isuv = kwargs.pop('isuv', True)
-    size = kwargs.pop('size', 10)
     n = len(args) 
     iscolor = False
     cdata = None
@@ -2608,8 +2682,149 @@ def quiverm(*args, **kwargs):
             c = cmap.getColor(0)
         else:
             c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, size)
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+    ls = __setlegendscheme_point(ls, **kwargs)
     layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'quiver', isuv, proj=proj)
+    udata = None
+    vdata = None
+    cdata = None
+    return MILayer(layer)
+    
+def quiverkey(*args, **kwargs):
+    """
+    Add a key to a quiver plot.
+    
+    :param Q: (*MILayer*) The quiver layer instance returned by a call to quiver/quiverm.
+    :param X: (*float*) The location x of the key.
+    :param Y: (*float*) The location y of the key.
+    :param label: (*string*) A string with the length and units of the key.
+    :param coordinates=['axes'|'figure'|'data'|'inches']: (*string*) Coordinate system and units for 
+        *X, Y*. 'axes' and 'figure' are normalized coordinate system with 0,0 in the lower left and 
+        1,1 in the upper right, 'data' are the axes data coordinates (used for the locations of the 
+        vectors in the quiver plot itself); 'inches' is position in the figure in inches, with 0,0 
+        at the lower left corner.
+    :param color: (*Color*) Overrides face and edge colors from Q.
+    :param labelpos=['N'|'S'|'E'|'W']: (*string*) Position the label above, below, to the right, to
+        the left of the arrow, respectively.
+    :param labelsep: (*float*) Distance in inches between the arrow and the label. Default is 0.1.
+    :param labelcolor: (*Color*) Label color. Default to default is black.
+    :param fontproperties: (*dict*) A dictionary with keyword arguments accepted by the FontProperties
+        initializer: *family, style, variant, size, weight*.
+    """
+    wa = ChartWindArrow()
+    Q = args[0]
+    wa.setLayer(Q.layer)
+    X = args[1]
+    Y = args[2]
+    wa.setX(X)
+    wa.setY(Y)
+    U = args[3]
+    wa.setLength(U)
+    if len(args) == 5:
+        label = args[4]
+        wa.setLabel(label)
+    cobj = kwargs.pop('color', 'b')
+    color = __getcolor(cobj)
+    wa.setColor(color)
+    lcobj = kwargs.pop('labelcolor', 'b')
+    lcolor = __getcolor(lcobj)
+    wa.setLabelColor(lcolor)
+    bbox = kwargs.pop('bbox', None)
+    if not bbox is None:
+        fill = bbox.pop('fill', None)
+        if not fill is None:
+            wa.setFill(fill)
+        facecolor = bbox.pop('facecolor', None)
+        if not facecolor is None:
+            facecolor = __getcolor(facecolor)
+            wa.setFill(True)
+            wa.setBackground(facecolor)
+        edge = bbox.pop('edge', None)
+        if not edge is None:
+            wa.setDrawNeatline(edge)
+        edgecolor = bbox.pop('edgecolor', None)
+        if not edgecolor is None:
+            edgecolor = __getcolor(edgecolor)
+            wa.setNeatlineColor(edgecolor)
+            wa.setDrawNeatline(True)
+        linewidth = bbox.pop('linewidth', None)
+        if not linewidth is None:
+            wa.setNeatlineSize(linewidth)
+            wa.setDrawNeatline(True)
+    gca.setWindArrow(wa)
+    draw_if_interactive()
+    
+def barbsm(*args, **kwargs):
+    """
+    Plot a 2-D field of barbs in a map.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+    :param z: (*array_like*) Optional, 2-D z value array.
+    :param cmap: (*string*) Color map string.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+    :param size: (*float*) Base size of the arrows.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Created barbs VectoryLayer.
+    """
+    plot = gca
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    proj = kwargs.pop('proj', None)
+    order = kwargs.pop('order', None)
+    isuv = kwargs.pop('isuv', True)
+    n = len(args) 
+    iscolor = False
+    cdata = None
+    onlyuv = True
+    if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
+        onlyuv = False
+    if onlyuv:
+        u = midata.asmiarray(args[0])
+        v = midata.asmiarray(args[1])
+        xx = args[0].dimvalue(1)
+        yy = args[0].dimvalue(0)
+        x, y = midata.meshgrid(xx, yy)
+        args = args[2:]
+        if len(args) > 0:
+            cdata = midata.asmiarray(args[0])
+            iscolor = True
+            args = args[1:]
+    else:
+        x = midata.asmiarray(args[0])
+        y = midata.asmiarray(args[1])
+        u = midata.asmiarray(args[2])
+        v = midata.asmiarray(args[3])
+        args = args[4:]
+        if len(args) > 0:
+            cdata = midata.asmiarray(args[0])
+            iscolor = True
+            args = args[1:]
+    if iscolor:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+    else:    
+        if cmap.getColorCount() == 1:
+            c = cmap.getColor(0)
+        else:
+            c = Color.black
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+    ls = __setlegendscheme_point(ls, **kwargs)
+    layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'barbs', isuv, proj=proj)
     udata = None
     vdata = None
     cdata = None
@@ -2735,6 +2950,8 @@ def __plot_uvdata_m(plot, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
         zv = z.array
     if type == 'quiver':
         layer = DrawMeteoData.createVectorLayer(x.array, y.array, u.array, v.array, zv, ls, 'layer', isuv)
+    elif type == 'barbs':
+        layer = DrawMeteoData.createBarbLayer(x.array, y.array, u.array, v.array, zv, ls, 'layer', isuv)
     
     if (proj != None):
         layer.setProjInfo(proj)
@@ -2756,6 +2973,11 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None, de
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
         else:
             layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
+    elif type == 'barbs':
+        if cdata == None:
+            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, ls, 'layer', isuv)
+        else:
+            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
     elif type == 'streamplot':
         layer = DrawMeteoData.createStreamlineLayer(udata.data, vdata.data, density, ls, 'layer', isuv)
     
