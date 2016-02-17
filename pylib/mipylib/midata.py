@@ -85,6 +85,10 @@ class PyTableData():
                 return r
             else:
                 return coldata.getData()
+        else:
+            row = key[0]
+            col = key[1]
+            return self.data.getValue(row, col)
         return None
         
     def __setitem__(self, key, value):
@@ -172,6 +176,11 @@ class PyTableData():
             self.data.saveAsCSVFile(filename)
         else:
             self.data.saveAsASCIIFile(filename)
+            
+    def ave(self, colnames):
+        cols = self.data.findColumns(colnames)
+        dtable = self.data.average(cols)
+        return PyTableData(TableData(dtable))
         
     def ave_year(self, colnames, year=None):
         if not self.timedata:
@@ -241,6 +250,9 @@ class PyTableData():
             
     def assinglerow(self):
         return PyTableData(TableData(self.data.toSingleRowTable(self.data.getDataTable())))
+        
+    def sql(self, expression):
+        return PyTableData(self.data.sqlSelect(expression))
     
     def clone(self):
         return PyTableData(self.data.clone())

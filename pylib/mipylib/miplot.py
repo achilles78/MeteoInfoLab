@@ -418,6 +418,9 @@ def bar(*args, **kwargs):
         if not isinstance(yerr, (int, float)):
             yerr = __getplotdata(yerr)
         esdata.setYerror(yerr)
+    bottom = kwargs.pop('bottom', None)
+    if not bottom is None:
+        esdata.setBottom(bottom)
     dataset.addSeries(esdata)   
 
     #Create bar plot
@@ -437,16 +440,25 @@ def bar(*args, **kwargs):
     fcobj = kwargs.pop('color', None)
     if fcobj is None:
         fcobj = kwargs.pop('facecolor', 'b')
-    color = __getcolor(fcobj)
-    lb = PolygonBreak()
-    lb.setCaption(label)
-    lb.setColor(color)
+    if isinstance(fcobj, (tuple, list)):
+        colors = __getcolors(fcobj)
+    else:
+        color = __getcolor(fcobj)
+        colors = [color]
     ecobj = kwargs.pop('edgecolor', 'k')
     edgecolor = __getcolor(ecobj)
-    lb.setOutlineColor(edgecolor)
-    linewidth = kwargs.pop('linewidth', 1.0)
-    lb.setOutlineSize(linewidth)
-    slb = SeriesLegend(lb)
+    linewidth = kwargs.pop('linewidth', 1.0)    
+    slb = SeriesLegend()
+    for color in colors:
+        lb = PolygonBreak()
+        lb.setCaption(label)
+        lb.setColor(color)    
+        if edgecolor is None:
+            lb.setDrawOutline(False)
+        else:
+            lb.setOutlineColor(edgecolor)  
+        lb.setOutlineSize(linewidth)        
+        slb.addLegendBreak(lb)
     slb.setPlotMethod(ChartPlotMethod.BAR)
     ecolor = kwargs.pop('ecolor', 'k')
     ecolor = __getcolor(ecolor)
@@ -630,6 +642,7 @@ def axes(**kwargs):
     :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
         height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
     :param bgcolor: (*Color*) Optional, axes background color.
+    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
     :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
     :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
     :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
@@ -644,10 +657,17 @@ def axes(**kwargs):
         figure()
         
     position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
-    bottomaxis = kwargs.pop('bottomaxis', True)
-    leftaxis = kwargs.pop('leftaxis', True)
-    topaxis = kwargs.pop('topaxis', True)
-    rightaxis = kwargs.pop('rightaxis', True)
+    axis = kwargs.pop('axis', True)
+    if axis:
+        bottomaxis = kwargs.pop('bottomaxis', True)
+        leftaxis = kwargs.pop('leftaxis', True)
+        topaxis = kwargs.pop('topaxis', True)
+        rightaxis = kwargs.pop('rightaxis', True)
+    else:
+        bottomaxis = False
+        leftaxis = False
+        topaxis = False
+        rightaxis = False
     xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
     yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
     xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
@@ -708,6 +728,7 @@ def axesm(**kwargs):
     :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
         height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
     :param bgcolor: (*Color*) Optional, axes background color.
+    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
     :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
     :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
     :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
@@ -718,7 +739,7 @@ def axesm(**kwargs):
     :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
     :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
     :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
-    :param frameon: (*boolean*) Optional, set frome visible or not. Default is ``True`` .
+    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``True`` .
     :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
     :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
     :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
@@ -729,10 +750,17 @@ def axesm(**kwargs):
         figure()
         
     position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
-    bottomaxis = kwargs.pop('bottomaxis', True)
-    leftaxis = kwargs.pop('leftaxis', True)
-    topaxis = kwargs.pop('topaxis', True)
-    rightaxis = kwargs.pop('rightaxis', True)
+    axis = kwargs.pop('axis', True)
+    if axis:
+        bottomaxis = kwargs.pop('bottomaxis', True)
+        leftaxis = kwargs.pop('leftaxis', True)
+        topaxis = kwargs.pop('topaxis', True)
+        rightaxis = kwargs.pop('rightaxis', True)
+    else:
+        bottomaxis = False
+        leftaxis = False
+        topaxis = False
+        rightaxis = False
     xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
     yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
     xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
@@ -960,6 +988,7 @@ def clf():
     
     chartpanel.getChart().setTitle(None)
     chartpanel.getChart().clearPlots()
+    chartpanel.getChart().clearTexts()
     global gca
     gca = None
     draw_if_interactive()
@@ -1125,6 +1154,9 @@ def __getpointstyle(style):
     return pointStyle
     
 def __getcolor(style):
+    if style is None:
+        return None
+        
     if isinstance(style, Color):
         return style
         
@@ -1170,6 +1202,12 @@ def __getcolor(style):
             c = Color(style[0], style[1], style[2], style[3])
                
     return c
+
+def __getcolors(cs):
+    colors = []
+    for c in cs:
+        colors.append(__getcolor(c))
+    return colors
     
 def __getsymbolinterval(n):
     i = 1
@@ -1377,6 +1415,10 @@ def text(x, y, s, **kwargs):
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
     :param color: (*color*) Tick label string color. Default is ``black`` .
+    :param coordinates=['axes'|'figure'|'data'|'inches']: (*string*) Coordinate system and units for 
+        *X, Y*. 'axes' and 'figure' are normalized coordinate system with 0,0 in the lower left and 
+        1,1 in the upper right, 'data' are the axes data coordinates (Default value); 'inches' is 
+        position in the figure in inches, with 0,0 at the lower left corner.
     """
     fontname = kwargs.pop('fontname', 'Arial')
     fontsize = kwargs.pop('fontsize', 14)
@@ -1391,7 +1433,12 @@ def text(x, y, s, **kwargs):
     text.setColor(c)
     text.setX(x)
     text.setY(y)
-    gca.addText(text)
+    coordinates = kwargs.pop('coordinates', 'data')
+    text.setCoordinates(coordinates)
+    if coordinates == 'figure':
+        chartpanel.getChart().addText(text)
+    else:
+        gca.addText(text)
     draw_if_interactive()
     
 def axis(limits):

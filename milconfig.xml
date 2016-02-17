@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
-    <RecentFolder Folder="D:\Working\MIScript\mywork\emission"/>
-    <RecentFolder Folder="D:\Working\MIScript\mywork\emission\MEIC"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
     <RecentFolder Folder="D:\Working\MIScript\mywork\current"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+    <RecentFolder Folder="D:\Working\MIScript\mywork"/>
+    <RecentFolder Folder="D:\Working\MIScript\mywork\cawdata"/>
+    <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="139,27" MainFormSize="1403,807"/>
+  <Startup MainFormLocation="138,24" MainFormSize="1403,807"/>
 </MeteoInfo>
