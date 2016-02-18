@@ -1655,6 +1655,7 @@ def colorbar(layer, **kwargs):
     :param fontname: (*string*) Font name. Default is ``Arial`` .
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+    :param label: (*string*) Label. Default is ``None`` .
     :param extendrect: (*boolean*) If ``True`` the minimum and maximum colorbar extensions will be
         rectangular (the default). If ``False`` the extensions will be triangular.
     :param extendfrac: [None | 'auto' | length] If set to *None*, both the minimum and maximum triangular
@@ -1687,6 +1688,9 @@ def colorbar(layer, **kwargs):
     legend.setShrink(shrink)
     legend.setAspect(aspect)
     legend.setLabelFont(font)
+    label = kwargs.pop('label', None)
+    if not label is None:
+        legend.setLabel(label)
     if orientation == 'horizontal':
         legend.setPlotOrientation(PlotOrientation.HORIZONTAL)
         legend.setPosition(LegendPosition.LOWER_CENTER_OUTSIDE)
