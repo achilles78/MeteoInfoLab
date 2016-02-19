@@ -48,6 +48,12 @@ class DimVariable():
                 return data
             else:
                 return rr
+                
+        if isinstance(indices, str):    #metadata
+            rr = self.dataset.read(self.name)
+            m = rr.findMember(indices)
+            data = rr.getArray(0, m)
+            return MIArray(data)
         
         if not isinstance(indices, tuple):
             inds = []
