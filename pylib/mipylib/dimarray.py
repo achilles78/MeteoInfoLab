@@ -326,7 +326,7 @@ class DimArray():
         return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
         
     def setdimvalue(self, idx, dimvalue):
-        if isinstance(dimvalue, MIArray):
+        if isinstance(dimvalue, (MIArray, DimArray)):
             dimvalue = dimvalue.aslist()
         self.dims[idx].setDimValues(dimvalue)
         

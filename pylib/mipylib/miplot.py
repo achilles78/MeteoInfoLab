@@ -1335,17 +1335,20 @@ def xticks(*args, **kwargs):
     axis_t = gca.getAxis(Location.TOP)
     if len(args) > 0:
         locs = args[0]
-        if isinstance(locs, MIArray):
+        if isinstance(locs, (MIArray, DimArray)):
             locs = locs.aslist()
         axis.setTickLocations(locs)
         axis_t.setTickLocations(locs)
         args = args[1:]
     if len(args) > 0:
         labels = args[0]
-        if isinstance(labels, MIArray):
+        if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
-        axis.setTickLabels(labels)
-        axis_t.setTickLabels(labels)
+            axis.setTickLabels_Number(labels)
+            axis_t.setTickLabels_Number(labels)
+        else:
+            axis.setTickLabels(labels)
+            axis_t.setTickLabels(labels)
     fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
     fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
     bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
@@ -1384,10 +1387,13 @@ def yticks(*args, **kwargs):
         args = args[1:]
     if len(args) > 0:
         labels = args[0]
-        if isinstance(labels, MIArray):
+        if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
-        axis.setTickLabels(labels)
-        axis_r.setTickLabels(labels)
+            axis.setTickLabels_Number(labels)
+            axis_r.setTickLabels_Number(labels)
+        else:
+            axis.setTickLabels(labels)
+            axis_r.setTickLabels(labels)
     fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
     fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
     bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())

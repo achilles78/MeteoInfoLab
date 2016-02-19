@@ -41,10 +41,13 @@ class DimVariable():
     def __getitem__(self, indices):
         if indices is None:
             rr = self.dataset.read(self.name)
-            ArrayMath.missingToNaN(rr, self.fill_value)
-            array = MIArray(rr)
-            data = DimArray(array, self.dims, self.fill_value, self.dataset.proj)
-            return data
+            if rr.getDataType().isNumeric():
+                ArrayMath.missingToNaN(rr, self.fill_value)
+                array = MIArray(rr)
+                data = DimArray(array, self.dims, self.fill_value, self.dataset.proj)
+                return data
+            else:
+                return rr
         
         if not isinstance(indices, tuple):
             inds = []
