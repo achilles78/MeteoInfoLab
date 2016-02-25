@@ -120,7 +120,10 @@ public class MeteoInfoLab {
     }
     
     private static void runScript(String args[], String fn, int idx) {
-        String ext = GlobalUtil.getFileExtension(fn);
+        //String ext = GlobalUtil.getFileExtension(fn);
+        //registerFonts();
+        org.meteoinfo.global.util.FontUtil.registerWeatherFont();
+        
         System.out.println("Running Jython script...");
         PySystemState state = new PySystemState();
         if (args.length > idx + 1) {

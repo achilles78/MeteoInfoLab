@@ -321,6 +321,10 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         jPanel_Status = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu_File = new javax.swing.JMenu();
+        jMenuItem_NewFile = new javax.swing.JMenuItem();
+        jMenuItem_OpenFile = new javax.swing.JMenuItem();
+        jMenuItem_SaveFile = new javax.swing.JMenuItem();
+        jMenuItem_SaveAs = new javax.swing.JMenuItem();
         jMenuItem_CloseAllFiles = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         jMenuItem_Exist = new javax.swing.JMenuItem();
@@ -486,6 +490,41 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         getContentPane().add(jPanel_Status, java.awt.BorderLayout.PAGE_END);
 
         jMenu_File.setText("File");
+
+        jMenuItem_NewFile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem_NewFile.setText("New");
+        jMenuItem_NewFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_NewFileActionPerformed(evt);
+            }
+        });
+        jMenu_File.add(jMenuItem_NewFile);
+
+        jMenuItem_OpenFile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem_OpenFile.setText("Open ...");
+        jMenuItem_OpenFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_OpenFileActionPerformed(evt);
+            }
+        });
+        jMenu_File.add(jMenuItem_OpenFile);
+
+        jMenuItem_SaveFile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem_SaveFile.setText("Save");
+        jMenuItem_SaveFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_SaveFileActionPerformed(evt);
+            }
+        });
+        jMenu_File.add(jMenuItem_SaveFile);
+
+        jMenuItem_SaveAs.setText("Save As ...");
+        jMenuItem_SaveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_SaveAsActionPerformed(evt);
+            }
+        });
+        jMenu_File.add(jMenuItem_SaveAs);
 
         jMenuItem_CloseAllFiles.setText("Close All Files");
         jMenuItem_CloseAllFiles.addActionListener(new java.awt.event.ActionListener() {
@@ -864,6 +903,26 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         colorMapDialog.setVisible(true);
     }//GEN-LAST:event_jMenuItem_ColorDialogActionPerformed
 
+    private void jMenuItem_NewFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_NewFileActionPerformed
+        // TODO add your handling code here:
+        this.jButton_NewFile.doClick();
+    }//GEN-LAST:event_jMenuItem_NewFileActionPerformed
+
+    private void jMenuItem_OpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_OpenFileActionPerformed
+        // TODO add your handling code here:
+        this.jButton_OpenFile.doClick();
+    }//GEN-LAST:event_jMenuItem_OpenFileActionPerformed
+
+    private void jMenuItem_SaveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_SaveFileActionPerformed
+        // TODO add your handling code here:
+        this.jButton_SaveFile.doClick();
+    }//GEN-LAST:event_jMenuItem_SaveFileActionPerformed
+
+    private void jMenuItem_SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_SaveAsActionPerformed
+        // TODO add your handling code here:
+        this.jButton_SaveAs.doClick();
+    }//GEN-LAST:event_jMenuItem_SaveAsActionPerformed
+
     /**
      * Get figure dockable
      *
@@ -1065,7 +1124,11 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     private javax.swing.JMenuItem jMenuItem_Copy;
     private javax.swing.JMenuItem jMenuItem_Cut;
     private javax.swing.JMenuItem jMenuItem_Exist;
+    private javax.swing.JMenuItem jMenuItem_NewFile;
+    private javax.swing.JMenuItem jMenuItem_OpenFile;
     private javax.swing.JMenuItem jMenuItem_Paste;
+    private javax.swing.JMenuItem jMenuItem_SaveAs;
+    private javax.swing.JMenuItem jMenuItem_SaveFile;
     private javax.swing.JMenuItem jMenuItem_SetFont;
     private javax.swing.JMenu jMenu_Apps;
     private javax.swing.JMenu jMenu_Editor;

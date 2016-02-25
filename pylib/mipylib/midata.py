@@ -1059,15 +1059,11 @@ def broadcast_to(a, shape):
         
 def linregress(x, y):
     if isinstance(x, list):
-        xl = x
-    else:
-        xl = x.asarray()
+        x = array(x)
     if isinstance(y, list):
-        yl = y
-    else:
-        yl = y.asarray()
-    r = ArrayMath.lineRegress(xl, yl)
-    return r[0], r[1], r[2]
+        y = array(y)
+    r = ArrayMath.lineRegress(x.asarray(), y.asarray())
+    return r[0], r[1], r[2], r[3], r[4]
     
 def polyval(p, x):
     return MIArray(ArrayMath.polyVal(p, x.asarray()))

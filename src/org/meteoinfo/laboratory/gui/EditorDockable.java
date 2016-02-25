@@ -17,7 +17,6 @@ import java.io.PrintStream;
 import java.text.MessageFormat;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
