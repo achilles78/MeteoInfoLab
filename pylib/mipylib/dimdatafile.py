@@ -56,6 +56,9 @@ class DimDataFile():
         v = MIArray(attr.getValues())
         return v
         
+    def varnames(self):
+        return self.dataset.getDataInfo().getVariableNames()
+        
     def read(self, varname, origin=None, size=None, stride=None):
         if origin is None:
             return self.dataset.read(varname)
