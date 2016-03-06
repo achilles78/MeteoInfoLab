@@ -1503,16 +1503,18 @@ def addtimedim(infn, outfn, t, tunit='hours'):
 def joinncfile(infns, outfn, tdimname):
     NetCDFDataInfo.joinDataFiles(infns, outfn, tdimname)
     
-def binread(fn, dim, datatype=None):
+def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     """
     Read data array from a binary file.
     
     :param dim: (*list*) Dimensions.
     :param datatype: (*string*) Data type string.
+    :param skip: (*int*) Skip bytes number.
+    :param byteorder: (*string*) Byte order. ``little_endian`` or ``big_endian``.
     
     :returns: (*MIArray*) Data array
     """
-    r = ArrayUtil.readBinFile(fn, dim, datatype);
+    r = ArrayUtil.readBinFile(fn, dim, datatype, skip, byteorder);
     return MIArray(r)
         
 def binwrite(fn, data):
