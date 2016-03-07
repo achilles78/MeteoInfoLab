@@ -8,7 +8,7 @@
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
-from ucar.ma2 import Array, Range
+from ucar.ma2 import Array, Range, MAMath
 import jarray
 
 import milayer
@@ -73,7 +73,9 @@ class MIArray():
         else:
             for i in flips:
                 r = r.flip(i)
-            return MIArray(r)
+            rr = Array.factory(r.getDataType(), r.getShape());
+            MAMath.copy(rr, r);
+            return MIArray(rr)
         
     def __setitem__(self, indices, value):
         #print type(indices) 
