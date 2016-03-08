@@ -36,7 +36,7 @@ import dimarray
 from dimarray import DimArray, PyGridData, PyStationData
 import miarray
 from miarray import MIArray
-import midata
+import minum
 import milayer
 from milayer import MILayer, MIXYListData
 import miutil
@@ -1908,13 +1908,13 @@ def imshow(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     if n <= 2:
-        gdata = midata.asgridarray(args[0])
+        gdata = minum.asgridarray(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgridarray(a, x, y, fill_value)
+        gdata = minum.asgridarray(a, x, y, fill_value)
         args = args[3:]    
     if len(args) > 0:
         level_arg = args[0]
@@ -1952,7 +1952,7 @@ def contour(*args, **kwargs):
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
     if n <= 2:
-        gdata = midata.asgriddata(args[0])
+        gdata = minum.asgriddata(args[0])
         if isinstance(args[0], DimArray):
             if args[0].islondim(1):
                 xaxistype = 'lon'
@@ -1965,7 +1965,7 @@ def contour(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
+        gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
@@ -2004,7 +2004,7 @@ def contourf(*args, **kwargs):
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
     if n <= 2:
-        gdata = midata.asgriddata(args[0])
+        gdata = minum.asgriddata(args[0])
         if isinstance(args[0], DimArray):
             if args[0].islondim(1):
                 xaxistype = 'lon'
@@ -2017,7 +2017,7 @@ def contourf(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
+        gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
@@ -2059,11 +2059,11 @@ def quiver(*args, **kwargs):
     iscolor = False
     cdata = None
     if n <= 4:
-        udata = midata.asgriddata(args[0])
-        vdata = midata.asgriddata(args[1])
+        udata = minum.asgriddata(args[0])
+        vdata = minum.asgriddata(args[1])
         args = args[2:]
         if len(args) > 0:
-            cdata = midata.asgriddata(args[0])
+            cdata = minum.asgriddata(args[0])
             iscolor = True
             args = args[1:]
     elif n <= 6:
@@ -2071,11 +2071,11 @@ def quiver(*args, **kwargs):
         y = args[1]
         u = args[2]
         v = args[3]
-        udata = midata.asgriddata(u, x, y, fill_value)
-        vdata = midata.asgriddata(v, x, y, fill_value)
+        udata = minum.asgriddata(u, x, y, fill_value)
+        vdata = minum.asgriddata(v, x, y, fill_value)
         args = args[4:]
         if len(args) > 0:
-            cdata = midata.asgriddata(args[0], x, y, fill_value)
+            cdata = minum.asgriddata(args[0], x, y, fill_value)
             iscolor = True
             args = args[1:]
     if iscolor:
@@ -2129,11 +2129,11 @@ def barbs(*args, **kwargs):
     iscolor = False
     cdata = None
     if n <= 4:
-        udata = midata.asgriddata(args[0])
-        vdata = midata.asgriddata(args[1])
+        udata = minum.asgriddata(args[0])
+        vdata = minum.asgriddata(args[1])
         args = args[2:]
         if len(args) > 0:
-            cdata = midata.asgriddata(args[0])
+            cdata = minum.asgriddata(args[0])
             iscolor = True
             args = args[1:]
     elif n <= 6:
@@ -2141,11 +2141,11 @@ def barbs(*args, **kwargs):
         y = args[1]
         u = args[2]
         v = args[3]
-        udata = midata.asgriddata(u, x, y, fill_value)
-        vdata = midata.asgriddata(v, x, y, fill_value)
+        udata = minum.asgriddata(u, x, y, fill_value)
+        vdata = minum.asgriddata(v, x, y, fill_value)
         args = args[4:]
         if len(args) > 0:
-            cdata = midata.asgriddata(args[0], x, y, fill_value)
+            cdata = minum.asgriddata(args[0], x, y, fill_value)
             iscolor = True
             args = args[1:]
     if iscolor:
@@ -2281,30 +2281,30 @@ def scatterm(*args, **kwargs):
         if isinstance(args[0], PyStationData):
             gdata = args[0]
         else:
-            gdata = midata.asgriddata(args[0])
+            gdata = minum.asgriddata(args[0])
         args = []
     elif n <=4:
         x = args[0]
         y = args[1]
         if not isinstance(x, (DimArray, MIArray)):
-            x = midata.array(x)
+            x = minum.array(x)
         if not isinstance(y, (DimArray, MIArray)):
-            y = midata.array(y)
+            y = minum.array(y)
         if n == 2:
             a = x
             args = []
         else:
             a = args[2]
             if not isinstance(a, (DimArray, MIArray)):
-                a = midata.array(a)
+                a = minum.array(a)
             args = args[3:]                
         if a.rank == 1:
-            gdata = midata.asstationdata(a, x, y, fill_value)
+            gdata = minum.asstationdata(a, x, y, fill_value)
         else:
             if a.asarray().getSize() == x.asarray().getSize():
-                gdata = midata.asstationdata(a, x, y, fill_value)                
+                gdata = minum.asstationdata(a, x, y, fill_value)                
             else:
-                gdata = midata.asgriddata(a, x, y, fill_value)
+                gdata = minum.asgriddata(a, x, y, fill_value)
         
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if 'symbolspec' in kwargs:
@@ -2352,8 +2352,8 @@ def plotm(*args, **kwargs):
                 xdata = []
                 for i in range(0, len(args[0])):
                     xdata.append(i)
-            xdatalist.append(midata.asarray(xdata))
-            ydatalist.append(midata.asarray(ydata))
+            xdatalist.append(minum.asarray(xdata))
+            ydatalist.append(minum.asarray(ydata))
     elif n == 2:
         if isinstance(args[1], basestring):
             ydata = __getplotdata(args[0])
@@ -2367,16 +2367,16 @@ def plotm(*args, **kwargs):
         else:
             xdata = __getplotdata(args[0])
             ydata = __getplotdata(args[1])
-        xdatalist.append(midata.asarray(xdata))
-        ydatalist.append(midata.asarray(ydata))
+        xdatalist.append(minum.asarray(xdata))
+        ydatalist.append(minum.asarray(ydata))
     else:
         c = 'x'
         for arg in args: 
             if c == 'x':    
-                xdatalist.append(midata.asarray(arg))
+                xdatalist.append(minum.asarray(arg))
                 c = 'y'
             elif c == 'y':
-                ydatalist.append(midata.asarray(arg))
+                ydatalist.append(minum.asarray(arg))
                 c = 's'
             elif c == 's':
                 if isinstance(arg, basestring):
@@ -2384,7 +2384,7 @@ def plotm(*args, **kwargs):
                     c = 'x'
                 else:
                     styles.append('-')
-                    xdatalist.append(midata.asarray(arg))
+                    xdatalist.append(minum.asarray(arg))
                     c = 'y'
     
     if not isxylistdata:
@@ -2484,13 +2484,13 @@ def imshowm(*args, **kwargs):
     order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
-        gdata = midata.asgridarray(args[0])
+        gdata = minum.asgridarray(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgridarray(a, x, y, fill_value)
+        gdata = minum.asgridarray(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
         level_arg = args[0]
@@ -2534,13 +2534,13 @@ def contourm(*args, **kwargs):
     order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
-        gdata = midata.asgriddata(args[0])
+        gdata = minum.asgriddata(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
+        gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     isplot = kwargs.pop('isplot', True)
@@ -2579,13 +2579,13 @@ def contourfm(*args, **kwargs):
     order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
-        gdata = midata.asgriddata(args[0])
+        gdata = minum.asgriddata(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
+        gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if interpolate:
@@ -2607,13 +2607,13 @@ def gridfm(*args, **kwargs):
     order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
-        gdata = midata.asgriddata(args[0])
+        gdata = minum.asgriddata(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = midata.asgriddata(a, x, y, fill_value)
+        gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if interpolate:
@@ -2632,19 +2632,19 @@ def surfacem_1(*args, **kwargs):
         if isinstance(args[0], PyStationData):
             gdata = args[0]
         else:
-            gdata = midata.asgriddata(args[0])
+            gdata = minum.asgriddata(args[0])
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
         if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
-            gdata = midata.asgriddata(a, x, y, fill_value)
+            gdata = minum.asgriddata(a, x, y, fill_value)
         else:
             if not plot.getProjInfo().isLonLat():
-                x, y = midata.project(x, y, plot.getProjInfo())
-            a, x_g, y_g = midata.griddata([x, y], a, method='surface')
-            gdata = midata.asgriddata(a, x_g, y_g, fill_value)
+                x, y = minum.project(x, y, plot.getProjInfo())
+            a, x_g, y_g = minum.griddata([x, y], a, method='surface')
+            gdata = minum.asgriddata(a, x_g, y_g, fill_value)
         
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
@@ -2665,15 +2665,15 @@ def surfacem(*args, **kwargs):
     n = len(args) 
     if n <= 2:
         a = args[0]
-        y = midata.linspace(1, a.shape[1], 1)
-        x = midata.linspace(1, a.shape[0], 1)
+        y = minum.linspace(1, a.shape[1], 1)
+        x = minum.linspace(1, a.shape[0], 1)
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
         if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
-            x, y = midata.meshgrid(x, y)        
+            x, y = minum.meshgrid(x, y)        
         args = args[3:]
     ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)   
     
@@ -2681,7 +2681,7 @@ def surfacem(*args, **kwargs):
         lonlim = 90
     else:
         lonlim = 0
-        x, y = midata.project(x, y, toproj=plot.getProjInfo())
+        x, y = minum.project(x, y, toproj=plot.getProjInfo())
     layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
     layer.setProjInfo(plot.getProjInfo())
     shapetype = layer.getShapeType()
@@ -2732,24 +2732,24 @@ def quiverm(*args, **kwargs):
     if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
         onlyuv = False
     if onlyuv:
-        u = midata.asmiarray(args[0])
-        v = midata.asmiarray(args[1])
+        u = minum.asmiarray(args[0])
+        v = minum.asmiarray(args[1])
         xx = args[0].dimvalue(1)
         yy = args[0].dimvalue(0)
-        x, y = midata.meshgrid(xx, yy)
+        x, y = minum.meshgrid(xx, yy)
         args = args[2:]
         if len(args) > 0:
-            cdata = midata.asmiarray(args[0])
+            cdata = minum.asmiarray(args[0])
             iscolor = True
             args = args[1:]
     else:
-        x = midata.asmiarray(args[0])
-        y = midata.asmiarray(args[1])
-        u = midata.asmiarray(args[2])
-        v = midata.asmiarray(args[3])
+        x = minum.asmiarray(args[0])
+        y = minum.asmiarray(args[1])
+        u = minum.asmiarray(args[2])
+        v = minum.asmiarray(args[3])
         args = args[4:]
         if len(args) > 0:
-            cdata = midata.asmiarray(args[0])
+            cdata = minum.asmiarray(args[0])
             iscolor = True
             args = args[1:]
     if iscolor:
@@ -2872,24 +2872,24 @@ def barbsm(*args, **kwargs):
     if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
         onlyuv = False
     if onlyuv:
-        u = midata.asmiarray(args[0])
-        v = midata.asmiarray(args[1])
+        u = minum.asmiarray(args[0])
+        v = minum.asmiarray(args[1])
         xx = args[0].dimvalue(1)
         yy = args[0].dimvalue(0)
-        x, y = midata.meshgrid(xx, yy)
+        x, y = minum.meshgrid(xx, yy)
         args = args[2:]
         if len(args) > 0:
-            cdata = midata.asmiarray(args[0])
+            cdata = minum.asmiarray(args[0])
             iscolor = True
             args = args[1:]
     else:
-        x = midata.asmiarray(args[0])
-        y = midata.asmiarray(args[1])
-        u = midata.asmiarray(args[2])
-        v = midata.asmiarray(args[3])
+        x = minum.asmiarray(args[0])
+        y = minum.asmiarray(args[1])
+        u = minum.asmiarray(args[2])
+        v = minum.asmiarray(args[3])
         args = args[4:]
         if len(args) > 0:
-            cdata = midata.asmiarray(args[0])
+            cdata = minum.asmiarray(args[0])
             iscolor = True
             args = args[1:]
     if iscolor:
@@ -2945,16 +2945,16 @@ def streamplotm(*args, **kwargs):
     density = kwargs.pop('density', 4)
     n = len(args)
     if n <= 4:
-        udata = midata.asgriddata(args[0])
-        vdata = midata.asgriddata(args[1])
+        udata = minum.asgriddata(args[0])
+        vdata = minum.asgriddata(args[1])
         args = args[2:]
     elif n <= 6:
         x = args[0]
         y = args[1]
         u = args[2]
         v = args[3]
-        udata = midata.asgriddata(u, x, y, fill_value)
-        vdata = midata.asgriddata(v, x, y, fill_value)
+        udata = minum.asgriddata(u, x, y, fill_value)
+        vdata = minum.asgriddata(v, x, y, fill_value)
         args = args[4:]  
     ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Polyline, color, 1)
     layer = __plot_uvgriddata_m(plot, udata, vdata, None, ls, 'streamplot', isuv, proj=proj, density=density)

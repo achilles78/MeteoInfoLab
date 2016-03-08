@@ -1,2 +1,2 @@
 import mipylib.miplot as plt
-import mipylib.midata as ds
+import mipylib.minum as np
