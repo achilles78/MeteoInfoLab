@@ -17,7 +17,7 @@ from org.meteoinfo.chart.plot import Plot, XY1DPlot, BarPlot, XY2DPlot, MapPlot,
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
 from org.meteoinfo.script import ChartForm, MapForm
-from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage, LegendScheme, LegendType
+from org.meteoinfo.legend import MapFrame, LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.drawing import PointStyle
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
@@ -369,6 +369,7 @@ def bar(*args, **kwargs):
     :param edgecolor: (*Color*) Optional, the color of the bar edge.
     :param linewidth: (*int*) Optional, width of bar edge.
     :param label: (*string*) Label of the bar series.
+    :param hatch: (*string*) Hatch string.
     
     :returns: Bar legend break.
     """
@@ -447,7 +448,12 @@ def bar(*args, **kwargs):
         colors = [color]
     ecobj = kwargs.pop('edgecolor', 'k')
     edgecolor = __getcolor(ecobj)
-    linewidth = kwargs.pop('linewidth', 1.0)    
+    linewidth = kwargs.pop('linewidth', 1.0) 
+    hatch = kwargs.pop('hatch', None)
+    hatch = __gethatch(hatch) 
+    hatchsize = kwargs.pop('hatchsize', None)
+    bgcolor = kwargs.pop('bgcolor', None)
+    bgcolor = __getcolor(bgcolor)
     slb = SeriesLegend()
     for color in colors:
         lb = PolygonBreak()
@@ -457,7 +463,13 @@ def bar(*args, **kwargs):
             lb.setDrawOutline(False)
         else:
             lb.setOutlineColor(edgecolor)  
-        lb.setOutlineSize(linewidth)        
+        lb.setOutlineSize(linewidth)   
+        if not hatch is None:
+            lb.setStyle(hatch)
+            if not bgcolor is None:
+                lb.setBackColor(bgcolor)
+            if not hatchsize is None:
+                lb.setStyleSize(hatchsize)
         slb.addLegendBreak(lb)
     slb.setPlotMethod(ChartPlotMethod.BAR)
     ecolor = kwargs.pop('ecolor', 'k')
@@ -1228,6 +1240,24 @@ def __getfont(**kwargs):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     return font
+    
+def __gethatch(h):
+    hatch = HatchStyle.NONE
+    if h == '-' or h == 'horizontal':
+        hatch = HatchStyle.HORIZONTAL
+    elif h == '|' or h == 'vertical':
+        hatch = HatchStyle.VERTICAL
+    elif h == '\\' or h == 'forward_diagonal':
+        hatch = HatchStyle.FORWARD_DIAGONAL
+    elif h == '/' or h == 'backward_diagonal':
+        hatch = HatchStyle.BACKWARD_DIAGONAL
+    elif h == '+' or h == 'cross':
+        hatch = HatchStyle.CROSS
+    elif h == 'x' or h == 'diagonal_cross':
+        hatch = HatchStyle.DIAGONAL_CROSS
+    elif h == '.' or h == 'dot':
+        hatch = HatchStyle.DOT    
+    return hatch
 
 def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     """
