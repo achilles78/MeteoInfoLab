@@ -59,6 +59,7 @@ import org.meteoinfo.map.MapView;
 import org.meteoinfo.plugin.IApplication;
 import org.meteoinfo.plugin.IPlugin;
 import org.meteoinfo.ui.ColorListCellRender;
+import org.python.core.PyInstance;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
@@ -150,17 +151,21 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
                 PyStringMap locals = (PyStringMap) interp.getLocals();
                 PyList items = locals.items();
-                String name;
+                String name, className;
                 PyObject var;
                 List<Object[]> vars = new ArrayList<>();
                 for (Object a : items) {
                     PyTuple at = (PyTuple) a;
                     name = at.__getitem__(0).toString();
                     var = at.__getitem__(1);
-                    if (var.toString().contains("<mipylib.dimarray.DimArray instance at")) {
-                        vars.add(new Object[]{name, "DimArray", var.__len__(), ""});
-                    } else if (var.toString().contains("<mipylib.dimvariable.DimVariable instance at")) {
-                        vars.add(new Object[]{name, "DimVariable", var.__len__(), ""});
+                    if (var instanceof PyInstance) {
+                        className = ((PyInstance) var).instclass.__name__;
+                        switch (className) {
+                            case "DimArray":
+                            case "MIArray":
+                                vars.add(new Object[]{name, className, var.__str__(), ""});
+                                break;
+                        }
                     }
                 }
                 if (FrmMain.this.variableDock != null) {

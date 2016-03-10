@@ -37,9 +37,13 @@ class DimArray():
         for l in shape:
             len = len * l
         return len
-        
+
     def __str__(self):
-        return self.array.__str__()
+        sizestr = str(self.shape[0])
+        if self.rank > 1:
+            for i in range(1, self.rank):
+                sizestr = sizestr + '*%s' % self.shape[i]
+        return sizestr
         
     def __repr__(self):
         return self.array.__repr__()

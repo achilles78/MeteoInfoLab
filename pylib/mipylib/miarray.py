@@ -26,8 +26,20 @@ class MIArray():
     def __len__(self):
         return int(self.array.getSize())
         
+    def __findattr__(self, name):
+        if name == 'size':
+            sizestr = str(self.shape[0])
+            if self.rank > 1:
+                for i in range(1, self.rank):
+                    sizestr = sizestr + '*%s' % self.shape[i]
+            return sizestr
+        
     def __str__(self):
-        return ArrayUtil.convertToString(self.array)
+        sizestr = str(self.shape[0])
+        if self.rank > 1:
+            for i in range(1, self.rank):
+                sizestr = sizestr + 'x%s' % self.shape[i]
+        return sizestr
         
     def __repr__(self):
         return ArrayUtil.convertToString(self.array)

@@ -136,7 +136,7 @@ class DimVariable():
         self.variable.addDimension(dimtype, dimvalue)
         self.ndim = self.variable.getDimNumber()
         
-    def setdim(self, dimtype, dimvalue, reverse=False, index=None):
+    def setdim(self, dimtype, dimvalue, index=None, reverse=False):
         if isinstance(dimvalue, MIArray):
             dimvalue = dimvalue.aslist()
         if index is None:
