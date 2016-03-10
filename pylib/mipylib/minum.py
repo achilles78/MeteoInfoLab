@@ -675,6 +675,25 @@ def ones(shape, dtype='float'):
         shapelist = shape
     return MIArray(ArrayUtil.ones(shapelist, dtype))
     
+def rand(*args):
+    """
+    Random values in a given shape.
+    
+    Create an array of the given shape and propagate it with random samples from a uniform 
+        distribution over [0, 1).
+    
+    :param d0, d1, ..., dn: (*int*) optional. The dimensions of the returned array, should all
+        be positive. If no argument is given a single Python float is returned.
+        
+    :returns: Random values array.
+    """
+    if len(args) == 0:
+        return ArrayUtil.rand()
+    elif len(args) == 1:
+        return MIArray(ArrayUtil.rand(args[0]))
+    else:
+        return MIArray(ArrayUtil.rand(args))
+    
 def sqrt(x):
     """
     Return the positive square-root of an array, element-wise.

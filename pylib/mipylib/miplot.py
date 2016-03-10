@@ -109,9 +109,10 @@ def plot(*args, **kwargs):
     :returns: Legend breaks of the lines.
     
     The following format string characters are accepted to control the line style or marker:
-      ==========  ===================================
-      Character   Description
-      ==========  ===================================
+    
+      =========  ===========
+      Character  Description
+      =========  ===========
       '-'         solid line style
       '--'        dashed line style
       '-.'        dash-dot line style
@@ -128,18 +129,21 @@ def plot(*args, **kwargs):
       '*'         star marker
       'x'         x marker
       'D'         diamond marker
-      =========   ===================================
+      =========  ===========
       
     The following color abbreviations are supported:
-      =========   ===================================
-      'b'         blue
-      'g'         green
-      'r'         red
-      'c'         cyan
-      'm'         magenta
-      'y'         yellow
-      'k'         black
-      ==========  ====================================
+      
+      =========  =====
+      Character  Color  
+      =========  =====
+      'b'        blue
+      'g'        green
+      'r'        red
+      'c'        cyan
+      'm'        magenta
+      'y'        yellow
+      'k'        black
+      =========  =====
     """
     global gca
     if isholdon:
@@ -370,8 +374,25 @@ def bar(*args, **kwargs):
     :param linewidth: (*int*) Optional, width of bar edge.
     :param label: (*string*) Label of the bar series.
     :param hatch: (*string*) Hatch string.
+    :param hatchsize: (*int*) Hatch size. Default is None (8).
+    :param bgcolor: (*Color*) Background color, only valid with hatch.
     
     :returns: Bar legend break.
+    
+    
+    The following format string characters are accepted to control the hatch style:
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         horizontal hatch style
+      '|'         vertical hatch style
+      '\\'        forward_diagonal hatch style
+      '/'         backward_diagonal hatch style
+      '+'         cross hatch style
+      'x'         diagonal_cross hatch style
+      '.'         dot hatch style
+      =========  ===========
+      
     """
     #Get dataset
     global gca
