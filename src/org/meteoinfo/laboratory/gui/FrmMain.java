@@ -1012,7 +1012,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
         PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
         try {
-            interp.exec("mipylib.midata.currentfolder = '" + path + "'");
+            interp.exec("mipylib.minum.currentfolder = '" + path + "'");
         } catch (Exception e) {
             e.printStackTrace();
         }
