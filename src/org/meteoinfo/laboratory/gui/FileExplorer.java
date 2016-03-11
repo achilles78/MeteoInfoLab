@@ -99,6 +99,7 @@ public class FileExplorer extends JPanel implements MouseListener{
     public void setPath(File path){
         this.path = path;
         this.listFiles(path);
+        this.fireCurrentPathChangedEvent();
     }
     
     /**
