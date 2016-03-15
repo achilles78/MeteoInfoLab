@@ -21,25 +21,17 @@ class MIArray():
     def __init__(self, array):
         self.array = array
         self.rank = array.getRank()
-        self.shape = array.getShape()
-        
-    def __len__(self):
-        return int(self.array.getSize())
-        
-    def __findattr__(self, name):
-        if name == 'size':
-            sizestr = str(self.shape[0])
-            if self.rank > 1:
-                for i in range(1, self.rank):
-                    sizestr = sizestr + '*%s' % self.shape[i]
-            return sizestr
-        
-    def __str__(self):
-        sizestr = str(self.shape[0])
+        self.shape = array.getShape()  
+        self.sizestr = str(self.shape[0])
         if self.rank > 1:
             for i in range(1, self.rank):
-                sizestr = sizestr + 'x%s' % self.shape[i]
-        return sizestr
+                self.sizestr = self.sizestr + '*%s' % self.shape[i]
+        
+    def __len__(self):
+        return int(self.array.getSize())         
+        
+    def __str__(self):
+        return ArrayUtil.convertToString(self.array)
         
     def __repr__(self):
         return ArrayUtil.convertToString(self.array)
@@ -240,7 +232,15 @@ class MIArray():
     def __and__(self, other):
         r = MIArray(ArrayMath.bitAnd(self.array, other))
         return r
-        
+    
+    def getsize():
+        if name == 'size':
+            sizestr = str(self.shape[0])
+            if self.rank > 1:
+                for i in range(1, self.rank):
+                    sizestr = sizestr + '*%s' % self.shape[i]
+            return sizestr
+    
     def astype(self, dtype):
         if dtype == 'int' or dtype is int:
             r = MIArray(ArrayUtil.toInteger(self.array))

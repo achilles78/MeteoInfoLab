@@ -25,6 +25,10 @@ class DimArray():
         if not array is None:
             self.rank = array.rank
             self.shape = array.shape
+            self.sizestr = str(self.shape[0])
+            if self.rank > 1:
+                for i in range(1, self.rank):
+                    self.sizestr = self.sizestr + '*%s' % self.shape[i]
         self.dims = dims
         if not dims is None:
             self.ndim = len(dims)
@@ -39,11 +43,7 @@ class DimArray():
         return len
 
     def __str__(self):
-        sizestr = str(self.shape[0])
-        if self.rank > 1:
-            for i in range(1, self.rank):
-                sizestr = sizestr + '*%s' % self.shape[i]
-        return sizestr
+        return self.array.__repr__()
         
     def __repr__(self):
         return self.array.__repr__()
@@ -321,6 +321,14 @@ class DimArray():
         array = MIArray(rr)
         data = DimArray(array, dims, self.fill_value, self.proj)
         return data
+    
+    def getsize():
+        if name == 'size':
+            sizestr = str(self.shape[0])
+            if self.rank > 1:
+                for i in range(1, self.rank):
+                    sizestr = sizestr + '*%s' % self.shape[i]
+            return sizestr
     
     # get dimension length
     def dimlen(self, idx=0):

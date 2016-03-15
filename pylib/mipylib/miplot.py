@@ -27,7 +27,7 @@ from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
 from org.meteoinfo.laboratory.gui import FrmMain
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.shape import ShapeTypes
+from org.meteoinfo.shape import ShapeTypes, Graphic
 
 from javax.swing import WindowConstants
 from java.awt import Color, Font
@@ -3135,7 +3135,7 @@ def worldmap():
         
 def geoshow(*args, **kwargs):
     plot = gca
-    if len(args) == 1:
+    if isinstance(args[0], MILayer):
         layer = args[0]
         layer = layer.layer   
         visible = kwargs.pop('visible', True)
@@ -3204,30 +3204,45 @@ def geoshow(*args, **kwargs):
                 labelset.setYOffset(yoffset)
                 avoidcoll = kwargs.pop('avoidcoll', True)
                 labelset.setAvoidCollision(avoidcoll)
-                layer.addLabels()   
-    elif len(args) == 2:
-        lat = args[0]
-        lon = args[1]
-        displaytype = kwargs.pop('displaytype', 'line')
-        if isinstance(lat, (int, float)):
+                layer.addLabels()  
+        draw_if_interactive()
+    else:
+        if isinstance(args[0], Graphic):
+            graphic = args[0]
             displaytype = 'point'
-        else:
-            if len(lat) == 1:
+            stype = graphic.getShape().getShapeType()
+            if stype == ShapeTypes.Polyline:
+                displaytype = 'line'
+            elif stype == ShapeTypes.Polygon:
+                displaytype = 'polygon'
+            lbreak, isunique = __getlegendbreak(displaytype, kwargs)
+            graphic.setLegend(lbreak)
+            plot.addGraphic(graphic)            
+            draw_if_interactive()
+        elif len(args) == 2:
+            lat = args[0]
+            lon = args[1]
+            displaytype = kwargs.pop('displaytype', 'line')
+            if isinstance(lat, (int, float)):
                 displaytype = 'point'
             else:
-                if isinstance(lon, (MIArray, DimArray)):
-                    lon = lon.aslist()
-                if isinstance(lat, (MIArray, DimArray)):
-                    lat = lat.aslist()
+                if len(lat) == 1:
+                    displaytype = 'point'
+                else:
+                    if isinstance(lon, (MIArray, DimArray)):
+                        lon = lon.aslist()
+                    if isinstance(lat, (MIArray, DimArray)):
+                        lat = lat.aslist()
 
-        lbreak, isunique = __getlegendbreak(displaytype, kwargs)
-        if displaytype == 'point':
-            plot.addPoint(lat, lon, lbreak)
-        elif displaytype == 'polyline' or displaytype == 'line':
-            plot.addPolyline(lat, lon, lbreak)
-        elif displaytype == 'polygon':
-            plot.addPolygon(lat, lon, lbreak)
-    draw_if_interactive()
+            lbreak, isunique = __getlegendbreak(displaytype, kwargs)
+            if displaytype == 'point':
+                graphic = plot.addPoint(lat, lon, lbreak)
+            elif displaytype == 'polyline' or displaytype == 'line':
+                graphic = plot.addPolyline(lat, lon, lbreak)
+            elif displaytype == 'polygon':
+                graphic = plot.addPolygon(lat, lon, lbreak)
+            draw_if_interactive()
+            return graphic
 
 def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     ocmap = ColorUtil.getColorMap(cmap)

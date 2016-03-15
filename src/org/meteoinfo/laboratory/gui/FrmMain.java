@@ -163,7 +163,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
                         switch (className) {
                             case "DimArray":
                             case "MIArray":
-                                vars.add(new Object[]{name, className, var.__str__(), ""});
+                                vars.add(new Object[]{name, className, var.__getattr__("sizestr"), ""});
                                 break;
                         }
                     }
