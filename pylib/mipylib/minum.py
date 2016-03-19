@@ -1536,14 +1536,15 @@ def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     r = ArrayUtil.readBinFile(fn, dim, datatype, skip, byteorder);
     return MIArray(r)
         
-def binwrite(fn, data):
+def binwrite(fn, data, byteorder='little_endian'):
     """
     Create a binary data file from an array variable.
     
     :param fn: (*string*) Path needed to locate binary file.
     :param data: (*DimArray or MIArray*) A numeric array variable of any dimensionality.
+    :param byteorder: (*string*) Byte order. ``little_endian`` or ``big_endian``.
     """
-    ArrayUtil.saveBinFile(fn, data.asarray())
+    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder)
     
 # Get month abstract English name
 def monthname(m):  

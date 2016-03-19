@@ -14,7 +14,7 @@ def asshape(a):
     else:
         return a
         
-def intersection(a, b):
+def intersect(a, b):
     ap = asshape(a)
     bp = asshape(b)
     cp = ap.intersection(bp)

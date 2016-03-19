@@ -495,7 +495,7 @@ class DimArray():
         else:
             return gdata.data.toStation(x, y)
             
-    def project(self, x, y, toproj=None, method='bilinear'):
+    def project(self, x=None, y=None, toproj=None, method='bilinear'):
         """
         Project array
         
@@ -510,6 +510,22 @@ class DimArray():
         xx = self.dims[self.ndim - 1].getDimValue()
         if toproj is None:
             toproj = self.proj
+        
+        if x is None or y is None:
+            pr = ArrayUtil.reproject(self.array.array, xx, yy, self.proj, toproj)
+            r = pr[0]
+            x = pr[1]
+            y = pr[2]
+            dims = []
+            ydim = Dimension()
+            ydim.setDimValues(MIArray(y).aslist())
+            dims.append(ydim)
+            xdim = Dimension()
+            xdim.setDimValues(MIArray(x).aslist())    
+            dims.append(xdim)
+            rr = DimArray(MIArray(r), dims, self.fill_value, toproj)
+            return rr
+        
         if method == 'bilinear':
             method = ResampleMethods.Bilinear
         else:
