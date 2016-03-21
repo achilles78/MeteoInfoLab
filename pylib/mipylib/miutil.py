@@ -8,6 +8,7 @@
 from org.meteoinfo.global.util import DateUtil
 from java.util import Calendar
 import datetime
+import minum
 
 def pydate(t):    
     """
@@ -58,3 +59,39 @@ def date2num(t):
     tt = jdate(t)
     v = DateUtil.toOADate(tt)
     return v
+    
+def grib2nc(infn, outfn):
+    """
+    Convert GRIB data file to netCDF data file.
+    
+    :param infn: (*string*) Input GRIB data file name.
+    :param outfn: (*string*) Output netCDF data file name.
+    """
+    #Open GRIB file
+    f = minum.addfile(infn)
+    #New netCDF file
+    ncfile = minum.addfile(outfn, 'c')
+    #Add dimensions
+    for dim in f.dimensions():
+        ncfile.adddim(dim.getDimName(), dim.getDimLength())
+    #Add global attributes
+    for attr in f.attributes():
+        ncfile.addgroupattr(attr.getName(), attr.getValues())
+    #Add variables
+    variables = []
+    for var in f.variables():    
+        #print 'Variable: ' + var.getShortName()
+        nvar = ncfile.addvar(var.getShortName(), var.getDataType(), var.getDimensions())
+        for attr in var.getAttributes():
+            nvar.addattr(attr.getName(), attr.getValues())
+        variables.append(nvar)
+    #Create netCDF file
+    ncfile.create()
+    #Write data
+    for var in variables:
+        print 'Variable: ' + var.name
+        data = f[str(var.name)].read()
+        ncfile.write(var, data)
+    #Close netCDF file
+    ncfile.close()
+    print 'Convert finished!'

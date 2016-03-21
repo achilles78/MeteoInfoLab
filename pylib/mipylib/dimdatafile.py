@@ -48,13 +48,22 @@ class DimDataFile():
         if self.dataset is None:
             return 'None'
         return self.dataset.getInfoText()
+    
+    def dimensions(self):
+        return self.dataset.getDataInfo().getDimensions()
         
+    def attributes(self):
+        return self.dataset.getDataInfo().getGlobalAttributes()
+    
     def attrvalue(self, key):
         attr = self.dataset.getDataInfo().findGlobalAttribute(key)
         if attr is None:
             return None
         v = MIArray(attr.getValues())
         return v
+        
+    def variables(self):
+        return self.dataset.getDataInfo().getNCVariables()
         
     def varnames(self):
         return self.dataset.getDataInfo().getVariableNames()
@@ -164,19 +173,22 @@ class DimDataFile():
         return self.ncfile.addGroupAttribute(group, Attribute(attrname, attrvalue))
  
     def __getdatatype(self, datatype):
-        if datatype == 'string':
-            dt = DataType.STRING
-        elif datatype == 'int':
-            dt = DataType.INT
-        elif datatype == 'float':
-            dt = DataType.FLOAT
-        elif datatype == 'double':
-            dt = DataType.DOUBLE
-        elif datatype == 'char':
-            dt = DataType.CHAR
+        if isinstance(datatype, str):
+            if datatype == 'string':
+                dt = DataType.STRING
+            elif datatype == 'int':
+                dt = DataType.INT
+            elif datatype == 'float':
+                dt = DataType.FLOAT
+            elif datatype == 'double':
+                dt = DataType.DOUBLE
+            elif datatype == 'char':
+                dt = DataType.CHAR
+            else:
+                dt = DataType.STRING
+            return dt
         else:
-            dt = DataType.STRING
-        return dt
+            return datatype
  
     def addvar(self, varname, datatype, dims, group=None):
         dt = self.__getdatatype(datatype)

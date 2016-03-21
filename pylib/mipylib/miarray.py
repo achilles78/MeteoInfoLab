@@ -21,11 +21,12 @@ class MIArray():
     def __init__(self, array):
         self.array = array
         self.rank = array.getRank()
-        self.shape = array.getShape()  
-        self.sizestr = str(self.shape[0])
-        if self.rank > 1:
-            for i in range(1, self.rank):
-                self.sizestr = self.sizestr + '*%s' % self.shape[i]
+        self.shape = array.getShape()
+        if self.rank > 0:
+            self.sizestr = str(self.shape[0])
+            if self.rank > 1:
+                for i in range(1, self.rank):
+                    self.sizestr = self.sizestr + '*%s' % self.shape[i]
         
     def __len__(self):
         return int(self.array.getSize())         

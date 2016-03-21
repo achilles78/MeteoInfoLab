@@ -28,6 +28,10 @@ class DimVariable():
             self.fill_value = variable.getFillValue()
             self.scale_factor = variable.getScaleFactor()
             self.add_offset = variable.getAddOffset()
+        elif not ncvariable is None:
+            self.name = ncvariable.getShortName()
+            self.dims = ncvariable.getDimensions()
+            self.ndim = len(self.dims)
         if not dataset is None:
             self.proj = dataset.proj
             
@@ -115,7 +119,10 @@ class DimVariable():
         array = MIArray(rr)
         data = DimArray(array, dims, self.fill_value, self.dataset.proj)
         return data
-        
+    
+    def read(self):
+        return MIArray(self.dataset.read(self.name))
+    
     # get dimension length
     def dimlen(self, idx):
         return self.dims[idx].getDimLength()
