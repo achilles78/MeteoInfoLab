@@ -13,7 +13,7 @@ from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, GridData, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import Plot, XY1DPlot, BarPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation
+from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
 from org.meteoinfo.script import ChartForm, MapForm
