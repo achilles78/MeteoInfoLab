@@ -3146,42 +3146,15 @@ def geoshow(*args, **kwargs):
             #LegendScheme
             ls = kwargs.pop('symbolspec', None)
             if ls is None:
-                if 'facecolor' in kwargs or 'edgecolor' in kwargs or 'size' in kwargs:
-                    fcobj = kwargs.pop('facecolor', None)
-                    ecobj = kwargs.pop('edgecolor', None)
-                    if fcobj is None:
-                        facecolor = Color.lightGray
-                        drawfill = False
-                    else:
-                        facecolor = __getcolor(fcobj)
-                        drawfill = True
-                    if ecobj is None:
-                        drawline = False  
-                        edgecolor = Color.black
-                    else:
-                        drawline = True
-                        edgecolor = __getcolor(ecobj)            
-                    size = kwargs.pop('size', None)
-                    lb = layer.getLegendScheme().getLegendBreaks().get(0)
-                    lb.setColor(facecolor)
-                    btype = lb.getBreakType()
-                    if btype == BreakTypes.PointBreak:
-                        if size is None:
-                            size = 6
-                        lb.setSize(size)
-                        lb.setDrawOutline(drawline)
-                        lb.setOutlineColor(edgecolor)        
-                    elif btype == BreakTypes.PolylineBreak:
-                        if size is None:
-                            size = 1
-                        lb.setSize(size)
-                    elif btype == BreakTypes.PolygonBreak:
-                        lb.setDrawFill(drawfill)
-                        lb.setDrawOutline(drawline)
-                        lb.setOutlineColor(edgecolor)
-                        if size is None:
-                            size = 1
-                        lb.setOutlineSize(size)
+                lb = layer.getLegendScheme().getLegendBreaks().get(0)
+                btype = lb.getBreakType()
+                geometry = 'point'
+                if btype == BreakTypes.PolylineBreak:
+                    geometry = 'line'
+                elif btype == BreakTypes.PolygonBreak:
+                    geometry = 'polygon'
+                lb, isunique = __getlegendbreak(geometry, kwargs)
+                layer.getLegendScheme().getLegendBreaks().set(0, lb)
             else:
                 layer.setLegendScheme(ls)
             plot.addLayer(layer)
@@ -3312,8 +3285,12 @@ def weatherspec(weather='all', size=20, color='b'):
     return DrawMeteoData.createWeatherLegendScheme(wlist, size, c)
 
 def __getlegendbreak(geometry, rule): 
-    cobj = rule.pop('color', 'k')
-    color = __getcolor(cobj)
+    cobj = rule.pop('color', None)
+    if cobj is None:
+        cobj = rule.pop('facecolor', None)
+    color = None
+    if not cobj is None:
+        color = __getcolor(cobj)
     if geometry == 'point':
         lb = PointBreak()        
         marker = rule.pop('marker', 'o')
@@ -3361,8 +3338,14 @@ def __getlegendbreak(geometry, rule):
         ecobj = rule.pop('edgecolor', 'k')
         edgecolor = __getcolor(ecobj)
         lb.setOutlineColor(edgecolor)
-        fill = rule.pop('fill', True)
-        lb.setDrawFill(fill)
+        fill = rule.pop('fill', None)
+        if fill is None:
+            if color is None:
+                lb.setDrawFill(False)
+            else:
+                lb.setDrawFill(True)
+        else:
+            lb.setDrawFill(fill)
         edge = rule.pop('edge', True)
         lb.setDrawOutline(edge)
         size = rule.pop('size', 1)
@@ -3371,8 +3354,9 @@ def __getlegendbreak(geometry, rule):
         lb = ColorBreak()
     caption = rule.pop('caption', None)
     if not caption is None:
-        lb.setCaption(caption)    
-    lb.setColor(color)
+        lb.setCaption(caption) 
+    if not color is None:
+        lb.setColor(color)
     value = rule.pop('value', None)
     isunique = True
     if not value is None:
