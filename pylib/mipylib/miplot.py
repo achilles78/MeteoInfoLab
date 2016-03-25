@@ -1852,6 +1852,8 @@ def __setlegendscheme_point(ls, **kwargs):
     if not marker is None:
         pstyle = __getpointstyle(marker)
     fcobj = kwargs.pop('facecolor', None)
+    if fcobj is None:
+        fcobj = kwargs.pop('color', None)
     if not fcobj is None:
         facecolor = __getcolor(fcobj)
     ecobj = kwargs.pop('edgecolor', None)
