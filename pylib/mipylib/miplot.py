@@ -932,6 +932,19 @@ def xaxis(ax=None, **kwargs):
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
     minortick = kwargs.pop('minortick', False)
+    axistype = kwargs.pop('axistype', None)
+    if not axistype is None:
+        if axistype == 'lon':
+            ax.setXAxis(LonLatAxis('Longitude', True, True))
+        elif axistype == 'lat':
+            ax.setXAxis(LonLatAxis('Latitude', True, False))
+        elif axistype == 'time':
+            ax.setXAxis(TimeAxis('Time', True))
+            timetickformat = kwargs.pop('timetickformat', None)
+            if not timetickformat is None:
+                ax.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
+                ax.getAxis(Location.TOP).setTimeFormat(timetickformat)
+        ax.updateDrawExtent()
     locs = [Location.BOTTOM, Location.TOP]
     for loc in locs:
         axis = ax.getAxis(loc)
@@ -954,6 +967,21 @@ def yaxis(ax=None, **kwargs):
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
     minortick = kwargs.pop('minortick', False)
+    axistype = kwargs.pop('axistype', None)
+    if not axistype is None:
+        drawticklabel = ax.getAxis(Location.RIGHT).isDrawTickLabel()
+        if axistype == 'lon':
+            ax.setYAxis(LonLatAxis('Longitude', False, True))
+        elif axistype == 'lat':
+            ax.setYAxis(LonLatAxis('Latitude', False, False))
+        elif axistype == 'time':
+            ax.setYAxis(TimeAxis('Time', False))
+            timetickformat = kwargs.pop('timetickformat', None)
+            if not timetickformat is None:
+                ax.getAxis(Location.LEFT).setTimeFormat(timetickformat)
+                ax.getAxis(Location.RIGHT).setTimeFormat(timetickformat)
+        ax.getAxis(Location.RIGHT).setDrawTickLabel(drawticklabel)
+        ax.updateDrawExtent()
     locs = [Location.LEFT, Location.RIGHT]
     for loc in locs:
         axis = ax.getAxis(loc)
