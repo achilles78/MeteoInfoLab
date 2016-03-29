@@ -25,10 +25,13 @@ class DimArray():
         if not array is None:
             self.rank = array.rank
             self.shape = array.shape
-            self.sizestr = str(self.shape[0])
-            if self.rank > 1:
-                for i in range(1, self.rank):
-                    self.sizestr = self.sizestr + '*%s' % self.shape[i]
+            if self.rank > 0:
+                self.sizestr = str(self.shape[0])
+                if self.rank > 1:
+                    for i in range(1, self.rank):
+                        self.sizestr = self.sizestr + '*%s' % self.shape[i]
+            else:
+                self.sizestr = '1'
         self.dims = dims
         if not dims is None:
             self.ndim = len(dims)

@@ -115,6 +115,8 @@ class DimVariable():
                 dims.append(dim.extract(sidx, eidx, step))
             stride.append(step) 
         rr = self.dataset.read(self.name, origin, size, stride).reduce()
+        if rr.getSize() == 1:
+            return rr.getObject(0)
         ArrayMath.missingToNaN(rr, self.fill_value)
         array = MIArray(rr)
         data = DimArray(array, dims, self.fill_value, self.dataset.proj)
