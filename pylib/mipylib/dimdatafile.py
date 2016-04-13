@@ -63,7 +63,7 @@ class DimDataFile():
         return v
         
     def variables(self):
-        return self.dataset.getDataInfo().getNCVariables()
+        return self.dataset.getDataInfo().getVariables()
         
     def varnames(self):
         return self.dataset.getDataInfo().getVariableNames()
@@ -165,7 +165,8 @@ class DimDataFile():
             return self.dataset.toStation(varname, x, y, t)
         else:
             return self.dataset.toStation(varname, x, y, z, t)
-            
+    
+    #Write netCDF data    
     def adddim(self, dimname, dimsize, group=None):
         return self.ncfile.addDimension(group, dimname, dimsize)
         
@@ -191,7 +192,7 @@ class DimDataFile():
             return datatype
  
     def addvar(self, varname, datatype, dims, group=None):
-        dt = self.__getdatatype(datatype)
+        dt = self.__getdatatype(datatype)        
         return DimVariable(ncvariable=self.ncfile.addVariable(group, varname, dt, dims))
         
     def create(self):

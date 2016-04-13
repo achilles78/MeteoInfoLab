@@ -73,7 +73,7 @@ def grib2nc(infn, outfn):
     ncfile = minum.addfile(outfn, 'c')
     #Add dimensions
     for dim in f.dimensions():
-        ncfile.adddim(dim.getDimName(), dim.getDimLength())
+        ncfile.adddim(dim.getShortName(), dim.getLength())
     #Add global attributes
     for attr in f.attributes():
         ncfile.addgroupattr(attr.getName(), attr.getValues())

@@ -127,7 +127,7 @@ class DimVariable():
     
     # get dimension length
     def dimlen(self, idx):
-        return self.dims[idx].getDimLength()
+        return self.dims[idx].getLength()
         
     def dimvalue(self, idx):
         return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
