@@ -52,6 +52,12 @@ class DimDataFile():
     def dimensions(self):
         return self.dataset.getDataInfo().getDimensions()
         
+    def finddim(self, name):
+        for dim in self.dataset.getDataInfo().getDimensions():
+            if name == dim.getShortName():
+                return dim
+        return None
+        
     def attributes(self):
         return self.dataset.getDataInfo().getGlobalAttributes()
     
