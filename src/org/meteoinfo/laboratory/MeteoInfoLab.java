@@ -201,6 +201,7 @@ public class MeteoInfoLab {
     
     private static void runApplication() {
         runApplication(false);
+        //runApplication(true);
     }
 
     private static void runApplication(final boolean isEng) {
