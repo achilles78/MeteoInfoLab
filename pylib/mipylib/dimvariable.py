@@ -136,7 +136,7 @@ class DimVariable():
         attr = self.variable.findAttribute(key)
         if attr is None:
             return None
-        v = MIArray(attr.attValue)
+        v = MIArray(attr.getValues())
         return v
         
     def adddim(self, dimtype, dimvalue):

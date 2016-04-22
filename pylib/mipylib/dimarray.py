@@ -25,6 +25,7 @@ class DimArray():
         if not array is None:
             self.rank = array.rank
             self.shape = array.shape
+            self.datatype = array.datatype
             if self.rank > 0:
                 self.sizestr = str(self.shape[0])
                 if self.rank > 1:
@@ -335,7 +336,7 @@ class DimArray():
     
     # get dimension length
     def dimlen(self, idx=0):
-        return self.dims[idx].getDimLength()
+        return self.dims[idx].getLength()
         
     def dimvalue(self, idx=0):
         return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))

@@ -22,6 +22,7 @@ class MIArray():
         self.array = array
         self.rank = array.getRank()
         self.shape = array.getShape()
+        self.datatype = array.getDataType()
         if self.rank > 0:
             self.sizestr = str(self.shape[0])
             if self.rank > 1:

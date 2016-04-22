@@ -1450,6 +1450,22 @@ def griddata(points, values, xi=None, **kwargs):
         return None
 
 def projinfo(proj='longlat', **kwargs):
+    """
+    Create a projection object with Proj.4 parameters (http://proj4.org/)
+    
+    :param proj: (*string*) Projection name.
+    :param lat_0: (*float*) Latitude of origin.
+    :param lon_0: (*float*) Central meridian.
+    :param lat_1: (*float*) Latitude of first standard paralle.
+    :param lat_2: (*float*) Latitude of second standard paralle.
+    :param lat_ts: (*float*) Latitude of true scale.
+    :param k: (*float*) Scaling factor.
+    :param x_0: (*float*) False easting.
+    :param y_0: (*float*) False northing.
+    :param h: (*float*) Height from earth surface.
+    
+    :returns: (*ProjectionInfo*) ProjectionInfo object.
+    """
     if proj == 'longlat' and len(kwargs) == 0:
         return KnownCoordinateSystems.geographic.world.WGS1984
         
@@ -1489,6 +1505,16 @@ def projinfo(proj='longlat', **kwargs):
     return ProjectionInfo(projstr)     
     
 def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, toproj=KnownCoordinateSystems.geographic.world.WGS1984):
+    """
+    Project geographic coordinates from one projection to another.
+    
+    :param x: (*array_like*) X coordinate values for projection.
+    :param y: (*array_like*) Y coordinate values for projection.
+    :param fromproj: (*ProjectionInfo*) From projection. Default is longlat projection.
+    :param toproj: (*ProjectionInfo*) To projection. Default is longlat projection.
+    
+    :returns: (*array_like*, *array_like*) Projected geographic coordinates.
+    """
     if isinstance(fromproj, str):
         fromproj = ProjectionInfo(fromproj)
     if isinstance(toproj, str):
@@ -1502,6 +1528,23 @@ def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, topr
         return outpt.X, outpt.Y
     
 def projectxy(lon, lat, xnum, ynum, dx, dy, toproj, fromproj=None, pos='lowerleft'):
+    """
+    Get projected x, y coordinates by projection and a given lon, lat coordinate.
+    
+    :param lon: (*float*) Longitude value.
+    :param lat: (*float*) Latitude value.
+    :param xnum: (*int*) X number.
+    :param ynum: (*int*) Y number.
+    :param dx: (*float*) X delta.
+    :param dy: (*float*) Y delta.
+    :param toproj: (*ProjectionInfo*) To projection.
+    :param fromproj: (*ProjectionInfo*) From projection. Default is longlat projection.
+    :param pos: (*string*) ['lowerleft' | 'center'] Lon, lat coordinate position.
+
+    :returns: (*array_like*, *array_like*) Projected x, y coordinates.
+    """
+    if fromproj is None:
+        fromproj = KnownCoordinateSystems.geographic.world.WGS1984
     x, y = project(lon, lat, toproj, fromproj)
     if pos == 'lowerleft':
         xx = arange1(x, xnum, dx)
