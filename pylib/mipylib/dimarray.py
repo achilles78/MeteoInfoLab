@@ -78,7 +78,7 @@ class DimArray():
                 step = 1                
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
-                eidx = self.dims[i].getDimLength()-1 if k.stop is None else k.stop-1
+                eidx = self.dims[i].getLength()-1 if k.stop is None else k.stop-1
                 step = 1 if k.step is None else k.step
             elif isinstance(k, tuple) or isinstance(k, list):
                 dim = self.dims[i]
@@ -95,8 +95,8 @@ class DimArray():
             else:
                 print k
                 return None
-            
-            if sidx >= self.dims[i].getDimLength():
+
+            if sidx >= self.shape[i]:
                 raise IndexError()
                 
             if sidx != eidx:
@@ -285,7 +285,7 @@ class DimArray():
                 step = 1                
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
-                eidx = self.dims[i].getDimLength()-1 if k.stop is None else k.stop
+                eidx = self.dims[i].getLength()-1 if k.stop is None else k.stop
                 step = 1 if k.step is None else k.step
             elif isinstance(k, tuple) or isinstance(k, list):
                 dim = self.dims[i]

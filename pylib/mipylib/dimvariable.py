@@ -39,7 +39,7 @@ class DimVariable():
         len = 1;
         if not self.variable is None:
             for dim in self.variable.getDimensions():
-                len = len * dim.getDimLength()            
+                len = len * dim.getLength()            
         return len
         
     def __getitem__(self, indices):
