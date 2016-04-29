@@ -5,7 +5,6 @@
 package org.meteoinfo.laboratory.gui;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -15,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import javax.xml.parsers.ParserConfigurationException;
 import org.meteoinfo.laboratory.application.Application;
 import org.meteoinfo.laboratory.application.AppCollection;
 import org.meteoinfo.global.util.GlobalUtil;
@@ -75,6 +75,11 @@ public class FrmAppsManager extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Application Manager");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Applications"));
 
@@ -150,8 +155,6 @@ public class FrmAppsManager extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        jPanel1.getAccessibleContext().setAccessibleName("Applications");
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -182,7 +185,7 @@ public class FrmAppsManager extends javax.swing.JDialog {
         // TODO add your handling code here:
         List<Application> plugins = new ArrayList<>();
 
-        String pluginPath = parent.getStartupPath() + File.separator + "plugins";
+        String pluginPath = parent.getApplications().getPluginPath();
         if (new File(pluginPath).isDirectory()) {
             List<String> fileNames = GlobalUtil.getFiles(pluginPath, ".jar");
             for (String fn : fileNames) {
@@ -218,6 +221,15 @@ public class FrmAppsManager extends javax.swing.JDialog {
             this.updatePluginCheckList();
         }
     }//GEN-LAST:event_jButton_UpdateListActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        try {
+            // TODO add your handling code here:
+            this.parent.getApplications().saveConfigFile();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(FrmAppsManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_formWindowClosed
 
     public Application readApplication(String jarFileName) {
         try {

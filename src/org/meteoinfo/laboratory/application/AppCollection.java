@@ -174,7 +174,7 @@ public class AppCollection extends ArrayList<Application> {
                 plugin.setVersion(attrs.getNamedItem("Version").getNodeValue());
                 plugin.setDescription(attrs.getNamedItem("Description").getNodeValue());
                 String jarPath = attrs.getNamedItem("JarPath").getNodeValue();
-                jarPath = this._pluginPath + File.separator + jarPath;
+                //jarPath = this._pluginPath + File.separator + jarPath;
                 plugin.setJarFileName(jarPath);
                 plugin.setClassName(attrs.getNamedItem("ClassName").getNodeValue());
                 plugin.setLoad(Boolean.parseBoolean(attrs.getNamedItem("IsLoad").getNodeValue()));

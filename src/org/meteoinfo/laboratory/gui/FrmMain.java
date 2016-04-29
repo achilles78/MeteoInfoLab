@@ -221,7 +221,8 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
             this.apps.loadConfigFile(appConfFn);
             if (this.apps.size() > 0) {
                 for (Application app : apps) {
-                    this.loadApplication(app);
+                    if (app.isLoad())
+                        this.loadApplication(app);
                 }
             }
         } catch (MalformedURLException ex) {
