@@ -46,7 +46,7 @@ public class Application extends PluginBase {
      */
     public String getJarPath(){
         String path = this._jarFileName;
-        int idx = path.indexOf("plugins");
+        int idx = path.indexOf("toolbox");
         if (idx >= 0){
             path = path.substring(idx + 8);
         }
