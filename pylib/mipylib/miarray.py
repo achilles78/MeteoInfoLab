@@ -322,6 +322,8 @@ class MIArray():
         return self.array
         
     def reshape(self, shape):
+        if isinstance(shape, int):
+            shape = [shape]
         shape = jarray.array(shape, 'i')
         return MIArray(self.array.reshape(shape))
     

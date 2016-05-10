@@ -1045,6 +1045,17 @@ def dot(a, b):
     return MIArray(r)
         
 def reshape(a, shape):
+    """
+    Gives a new shape to an array without changing its data.
+    
+    :param a: (*array_like*) Array to be reshaped.
+    :param shape: (*int or tuple of ints*) The new shape should be compatible with the original 
+        shape. If an integer, then the result will be a 1-D array of that length. One shape 
+        dimension can be -1. In this case, the value is inferred from the length of the array and 
+        remaining dimensions.
+        
+    :returns: Reshaped array.
+    """
     return a.reshape(shape)
         
 def meshgrid(x, y):
