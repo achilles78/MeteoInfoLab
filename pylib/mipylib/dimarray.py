@@ -129,7 +129,7 @@ class DimArray():
         
     def __setitem__(self, indices, value):
         #print type(indices) 
-        if isinstance(indices, MIArray) or isinstance(indices, DimArray):
+        if isinstance(indices, (MIArray, DimArray)):
             ArrayMath.setValue(self.asarray(), indices.asarray(), value)
             return None
         
@@ -163,7 +163,10 @@ class DimArray():
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
     
-        ArrayMath.setSection(self.array.array, ranges, value)
+        if isinstance(value, (MIArray, DimArray)):
+            value = value.asarray()
+        r = ArrayMath.setSection(self.array.array, ranges, value)
+        self.array.array = r
         
     def __add__(self, other):
         r = None

@@ -121,7 +121,8 @@ class MIArray():
 
         if isinstance(value, MIArray):
             value = value.asarray()
-        ArrayMath.setSection(self.array, ranges, value)
+        r = ArrayMath.setSection(self.array, ranges, value)
+        self.array = r
     
     def __abs__(self):
         return MIArray(ArrayMath.abs(self.array))
