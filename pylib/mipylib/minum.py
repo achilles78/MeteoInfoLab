@@ -1044,7 +1044,7 @@ def dot(a, b):
     r = ArrayMath.dot(a.asarray(), b.asarray())
     return MIArray(r)
         
-def reshape(a, shape):
+def reshape(a, *args):
     """
     Gives a new shape to an array without changing its data.
     
@@ -1056,7 +1056,7 @@ def reshape(a, shape):
         
     :returns: Reshaped array.
     """
-    return a.reshape(shape)
+    return a.reshape(*args)
         
 def meshgrid(x, y):
     if isinstance(x, list):
@@ -1137,6 +1137,50 @@ def rot90(a, k=1):
             for i in range(0, len(a.dims)):
                 dims.append(a.dims[i])
         return DimArray(MIArray(r), dims, a.fill_value, a.proj) 
+        
+def trapz(y, x=None, dx=1.0, axis=-1):
+    """
+    Integrate along the given axis using the composite trapezoidal rule.
+    
+    :param y: (*array_like*) Input array to integrate.
+    :param x: (*array_like*) Optional, If x is None, then spacing between all y elements is dx.
+    :param dx: (*scalar*) Optional, If x is None, spacing given by dx is assumed. Default is 1.
+    :param axis: (*int*) Optional, Specify the axis.
+    
+    :returns: Definite integral as approximated by trapezoidal rule.
+    """
+    if isinstance(y, list):
+        y = array(y)
+    
+    if y.rank == 1:
+        if x is None:
+            r = ArrayMath.trapz(y.asarray(), dx)
+        else:
+            if isinstance(x, list):
+                x = array(x)
+            r = ArrayMath.trapz(y.asarray(), x.asarray())
+        return r
+    else:
+        if axis == -1:
+            shape = y.shape
+            for i in range(y.rank):
+                if shape[i] > 1:
+                    axis = i
+                    break
+        if x is None:
+            r = ArrayMath.trapz(y.asarray(), dx, axis)
+        else:
+            if isinstance(x, list):
+                x = array(x)
+            r = ArrayMath.trapz(y.asarray(), x.asarray(), axis)
+        if isinstance(y, MIArray):
+            return MIArray(r)
+        else:
+            dims = []
+            for i in range(0, y.ndim):
+                if i != axis:
+                    dims.append(y.dims[i])
+            return DimArray(MIArray(r), dims, y.fill_value, y.proj)
 
 def tf2tc(tf):
     """

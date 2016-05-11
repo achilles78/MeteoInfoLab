@@ -488,8 +488,8 @@ class DimArray():
     def asarray(self):
         return self.array.array
         
-    def reshape(self, shape):
-        return self.array.reshape(shape)
+    def reshape(self, *args):
+        return self.array.reshape(*args)
      
     def tostation(self, x, y):
         gdata = self.asgriddata()
