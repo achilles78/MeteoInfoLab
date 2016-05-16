@@ -450,16 +450,16 @@ class DimArray():
         return r
         
     def min(self):
-        return self.array.min(self.fill_value)
+        return self.array.min()
         
     def max(self):
-        return self.array.max(self.fill_value)
+        return self.array.max()
         
     def sum(self):
-        return self.array.sum(self.fill_value)
+        return self.array.sum()
         
     def ave(self):
-        return self.array.ave(self.fill_value)
+        return self.array.ave()
         
     def inpolygon(self, polygon):
         #x = self.dims[1].getDimValue()
@@ -482,7 +482,7 @@ class DimArray():
     def maskout(self, polygon):
         x = self.dims[1].getDimValue()
         y = self.dims[0].getDimValue()
-        r = DimArray(self.array.maskout(x, y, polygon, self.fill_value), self.dims, self.fill_value, self.proj)
+        r = DimArray(self.array.maskout(x, y, polygon), self.dims, self.fill_value, self.proj)
         return r
      
     def aslist(self):

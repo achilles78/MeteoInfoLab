@@ -13,6 +13,8 @@ import jarray
 
 import milayer
 from milayer import MILayer
+
+from java.lang import Double
         
 # The encapsulate class of Array
 class MIArray():
@@ -362,7 +364,7 @@ class MIArray():
                 polygon = polygon.layer
             return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
         
-    def maskout(self, x, y, polygon, fill_value=-9999.0):
+    def maskout(self, x, y, polygon, fill_value=Double.NaN):
         if isinstance(x, MIArray):
             xl = x.aslist()
         else:
