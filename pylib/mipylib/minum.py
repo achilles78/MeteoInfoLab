@@ -1438,7 +1438,7 @@ def maskout(data, x=None, y=None, mask=None):
         if isinstance(data, DimArray):
             return data.maskout(mask)
         else:
-            return null
+            return None
     else:
         if not isinstance(mask, (list, ArrayList)):
             mask = [mask]
@@ -1481,28 +1481,31 @@ def griddata(points, values, xi=None, **kwargs):
         radius = kwargs.pop('radius', None)
         if radius is None:
             r = ArrayUtil.interpolation_IDW_Neighbor(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), pnum)
-            return MIArray(r), x_g, y_g
         else:
             r = ArrayUtil.interpolation_IDW_Radius(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), pnum, radius)
-            return MIArray(r), x_g, y_g
     elif method == 'cressman':
         radius = kwargs.pop('radius', [10, 7, 4, 2, 1])
         if isinstance(radius, MIArray):
             radius = radius.aslist()
         r = ArrayUtil.cressman(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
-        return MIArray(r), x_g, y_g
     elif method == 'neareast':
         radius = kwargs.pop('radius', inf)
         r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
-        return MIArray(r), x_g, y_g
     elif method == 'inside':
-        r = ArrayUtil.interpolation_Inside(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist())
-        return MIArray(r), x_g, y_g    
+        r = ArrayUtil.interpolation_Inside(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist())   
     elif method == 'surface':        
         r = ArrayUtil.interpolation_Surface(x_s.asarray(), y_s.asarray(), values, x_g.asarray(), y_g.asarray())
-        return MIArray(r), x_g, y_g
     else:
         return None
+    
+    convexhull = kwargs.pop('convexhull', False)
+    if convexhull:
+        polyshape = ArrayUtil.convexHull(x_s.asarray(), y_s.asarray())
+        x_gg, y_gg = meshgrid(x_g, y_g)
+        r = maskout(MIArray(r), x=x_gg, y=y_gg, mask=polyshape)
+        return r, x_g, y_g
+    else:
+        return MIArray(r), x_g, y_g
 
 def projinfo(proj='longlat', **kwargs):
     """

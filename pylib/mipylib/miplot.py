@@ -27,7 +27,7 @@ from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
 from org.meteoinfo.laboratory.gui import FrmMain
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.shape import ShapeTypes, Graphic
+from org.meteoinfo.shape import Shape, ShapeTypes, Graphic
 
 from javax.swing import WindowConstants
 from java.awt import Color, Font
@@ -851,7 +851,7 @@ def axesm(**kwargs):
     xyscale = kwargs.pop('xyscale', 1)
     
     global gca
-    mapview = MapView()
+    mapview = MapView(projinfo)
     mapview.setXYScaleFactor(xyscale)
     gca = MapPlot(mapview)    
     gca.setPosition(position[0], position[1], position[2], position[3])
@@ -885,7 +885,7 @@ def axesm(**kwargs):
         bgcolor = __getcolor(bgcobj)
         gca.setDrawBackground(True)
         gca.setBackground(bgcolor)
-    gca.getMapView().projectLayers(projinfo)
+    #gca.getMapView().projectLayers(projinfo)
     chart = chartpanel.getChart()
     if chart.getPlot() is None:
         chart.addPlot(gca)
@@ -3170,8 +3170,12 @@ def geoshow(*args, **kwargs):
         layer = layer.layer   
         visible = kwargs.pop('visible', True)
         layer.setVisible(visible)
-        if layer.getLayerType() == LayerTypes.ImageLayer:     
-            plot.addLayer(layer)
+        order = kwargs.pop('order', None)
+        if layer.getLayerType() == LayerTypes.ImageLayer:
+            if order is None:
+                plot.addLayer(layer)
+            else:
+                plot.addLayer(order, layer)
         else:
             #LegendScheme
             ls = kwargs.pop('symbolspec', None)
@@ -3187,7 +3191,10 @@ def geoshow(*args, **kwargs):
                 layer.getLegendScheme().getLegendBreaks().set(0, lb)
             else:
                 layer.setLegendScheme(ls)
-            plot.addLayer(layer)
+            if order is None:
+                plot.addLayer(layer)
+            else:
+                plot.addLayer(order, layer)
             #Labels        
             labelfield = kwargs.pop('labelfield', None)
             if not labelfield is None:
@@ -3220,6 +3227,18 @@ def geoshow(*args, **kwargs):
                 displaytype = 'polygon'
             lbreak, isunique = __getlegendbreak(displaytype, kwargs)
             graphic.setLegend(lbreak)
+            plot.addGraphic(graphic)            
+            draw_if_interactive()
+        elif isinstance(args[0], Shape):
+            shape = args[0]
+            displaytype = 'point'
+            stype = shape.getShapeType()
+            if stype == ShapeTypes.Polyline:
+                displaytype = 'line'
+            elif stype == ShapeTypes.Polygon:
+                displaytype = 'polygon'
+            lbreak, isunique = __getlegendbreak(displaytype, kwargs)
+            graphic = Graphic(shape, lbreak)
             plot.addGraphic(graphic)            
             draw_if_interactive()
         elif len(args) == 2:

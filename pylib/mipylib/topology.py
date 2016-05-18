@@ -6,6 +6,7 @@
 # Note: Jython
 #-----------------------------------------------------
 
+from org.meteoinfo.data import ArrayUtil
 from org.meteoinfo.shape import Graphic
             
 def asshape(a):
@@ -48,11 +49,18 @@ def buffer(a, dis):
     c = Graphic(cp, a.getLegend())
     return c
     
-def convexhull(a):
-    ap = asshape(a)
-    cp = ap.convexHull()
-    c = Graphic(cp, a.getLegend())
-    return c
+def convexhull(*args):
+    if len(args) == 1:
+        a = args[0]
+        ap = asshape(a)
+        cp = ap.convexHull()
+        c = Graphic(cp, a.getLegend())
+        return c
+    else:
+        x = args[0]
+        y = args[1]
+        r = ArrayUtil.convexHull(x.asarray(), y.asarray())
+        return r
     
 def split(a, b):
     ap = asshape(a)

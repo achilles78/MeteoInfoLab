@@ -7,6 +7,7 @@
 from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes
 from org.meteoinfo.projection import ProjectionManage
+from org.meteoinfo.shape import PolygonShape
 from java.util import Date, Calendar
 from java.awt import Font
 
@@ -89,6 +90,12 @@ class MILayer():
         
     def project(self, toproj):
         r = ProjectionManage.projectLayer(self.layer, toproj)
+        return MILayer(r)
+        
+    def clip(self, clipobj):
+        if isinstance(clipobj, PolygonShape):
+            clipobj = [clipobj]
+        r = self.layer.clip(clipobj)
         return MILayer(r)
         
     def clone(self):
