@@ -110,7 +110,11 @@ class PyTableData():
         return self.data.getDataTable().getColumnNames()
         
     def setcolname(self, col, colname):
-        return self.data.getDataTable().renameColumn(col, colname)
+        self.data.getDataTable().renameColumn(col, colname)
+        
+    def setcolnames(self, colnames):
+        for i in range(len(colnames)):
+            self.data.getDataTable().renameColumn(i, colnames[i])
     
     def coldata(self, key):
         if isinstance(key, str):
@@ -491,7 +495,11 @@ def readtable(filename, **kwargs):
     readvarnames = kwargs.pop('readvarnames', True)
     readrownames = kwargs.pop('readrownames', False)
     tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
-    return PyTableData(tdata)
+    r = PyTableData(tdata)
+    colnames = kwargs.pop('colnames', None)
+    if not colnames is None:
+        r.setcolnames(colnames)
+    return r
     
 def geotiffread(filename):
     geotiff = GeoTiff(filename)

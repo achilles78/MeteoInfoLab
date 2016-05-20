@@ -1643,6 +1643,7 @@ def legend(*args, **kwargs):
     
     :param breaks: (*ColorBreak*) Legend breaks (optional).
     :param labels: (*list of string*) Legend labels (optional).
+    :param orientation: (*string*) Colorbar orientation: ``vertical`` or ``horizontal``.
     :param loc: (*string*) The location of the legend, including: 'upper right', upper left',
         'lower left', 'lower right', 'right', 'ceter left', 'center right', lower center',
         'upper center', 'center' and 'custom'. Default is 'upper right'.
@@ -1681,7 +1682,7 @@ def legend(*args, **kwargs):
             plot.setLegend(clegend)
         else:
             clegend.setLegendScheme(ls)
-            
+        
     loc = kwargs.pop('loc', 'upper right')    
     lp = LegendPosition.fromString(loc)
     clegend.setPosition(lp)
@@ -1689,7 +1690,15 @@ def legend(*args, **kwargs):
         x = kwargs.pop('x', 0)
         y = kwargs.pop('y', 0)
         clegend.setX(x)
-        clegend.setY(y)    
+        clegend.setY(y) 
+    orien = 'vertical'
+    if lp == LegendPosition.UPPER_CENTER_OUTSIDE or lp == LegendPosition.LOWER_CENTER_OUTSIDE:
+        orien = 'horizontal'
+    orientation = kwargs.pop('orientation', orien)
+    if orientation == 'horizontal':
+        clegend.setPlotOrientation(PlotOrientation.HORIZONTAL)
+    else:
+        clegend.setPlotOrientation(PlotOrientation.VERTICAL)
     frameon = kwargs.pop('frameon', True)
     clegend.setDrawNeatLine(frameon)
     bcobj = kwargs.pop('background', None)
