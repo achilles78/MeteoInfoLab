@@ -15,6 +15,8 @@ import milayer
 from miarray import MIArray
 from milayer import MILayer
 import math
+import datetime
+import miutil
 
 # Dimension array
 class DimArray():
@@ -573,6 +575,27 @@ class DimArray():
             else:
                 rdims.append(self.dims[i])
         return DimArray(MIArray(r), rdims, self.fill_value, self.proj)
+        
+    def savegrid(self, fname, format='surfer', **kwargs):
+        gdata = self.asgridarray()
+        if format == 'surfer':
+            gdata.saveAsSurferASCIIFile(fname)
+        else:
+            desc = kwargs.pop('description', 'var')
+            date = kwargs.pop('date', datetime.datetime.now())
+            date = miutil.jdate(date)
+            hours = kwargs.pop('hours', 0)
+            level = kwargs.pop('level', 0)
+            smooth = kwargs.pop('smooth', 1)
+            boldvalue =kwargs.pop('boldvalue', 0)
+            proj = kwargs.pop('proj', self.proj)
+            if proj is None:
+                gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue)
+            else:
+                if proj.isLonLat():
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue)
+                else:
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, proj)
     
        
 # The encapsulate class of GridData

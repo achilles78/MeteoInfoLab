@@ -6,15 +6,17 @@
 #-----------------------------------------------------
 #import math
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.data import GridData, ArrayMath, ArrayUtil
+from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
 from ucar.ma2 import Array, Range, MAMath
 import jarray
 
 import milayer
 from milayer import MILayer
+import miutil
 
 from java.lang import Double
+import datetime
         
 # The encapsulate class of Array
 class MIArray():
@@ -377,6 +379,23 @@ class MIArray():
             polygon = polygon.layer
         return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, fill_value))
         
-    def savegrid(self, x, y, fname):
-        gdata = GridData(self.array, x.array, y.array, -9999.0)
-        gdata.saveAsSurferASCIIFile(fname)
+    def savegrid(self, x, y, fname, format='surfer', **kwargs):
+        gdata = GridArray(self.array, x.array, y.array, -9999.0)
+        if format == 'surfer':
+            gdata.saveAsSurferASCIIFile(fname)
+        else:
+            desc = kwargs.pop('description', 'var')
+            date = kwargs.pop('date', datetime.datetime.now())
+            date = miutil.jdate(date)
+            hours = kwargs.pop('hours', 0)
+            level = kwargs.pop('level', 0)
+            smooth = kwargs.pop('smooth', 1)
+            boldvalue =kwargs.pop('boldvalue', 0)
+            proj = kwargs.pop('proj', None)
+            if proj is None:
+                gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue)
+            else:
+                if proj.isLonLat():
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue)
+                else:
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, proj)
