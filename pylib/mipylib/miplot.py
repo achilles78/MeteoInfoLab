@@ -772,7 +772,8 @@ def axesm(**kwargs):
     :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
     :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
     :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
-    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``True`` .
+    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``False`` for lon/lat
+        projection, ortherwise is ``True``.
     :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
     :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
     :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
@@ -845,7 +846,10 @@ def axesm(**kwargs):
     gridline = kwargs.pop('gridline', False)
     griddx = kwargs.pop('griddx', 10)
     griddy = kwargs.pop('griddy', 10)
-    frameon = kwargs.pop('frameon', True)
+    if projinfo.isLonLat():
+        frameon = kwargs.pop('frameon', False)
+    else:
+        framon = kwargs.pop('frameon', True)
     axison = kwargs.pop('axison', None)
     bgcobj = kwargs.pop('bgcolor', None)
     xyscale = kwargs.pop('xyscale', 1)
