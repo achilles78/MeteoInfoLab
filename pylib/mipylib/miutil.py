@@ -5,7 +5,9 @@
 # Note: Jython
 #-----------------------------------------------------
 
+from org.meteoinfo.global import PointD
 from org.meteoinfo.global.util import DateUtil
+from org.meteoinfo.shape import PointShape, PolylineShape, PolygonShape, ShapeUtil
 from java.util import Calendar
 import datetime
 import minum
@@ -59,6 +61,34 @@ def date2num(t):
     tt = jdate(t)
     v = DateUtil.toOADate(tt)
     return v
+
+def makeshapes(x, y, type=None):
+    """
+    Make shapes by x and y coordinates.
+    
+    :param x: (*array_like*) X coordinates.
+    :param y: (*array_like*) Y coordinates.
+    :param type: (*string*) Shape type [point | line | polygon].
+    
+    :returns: Shapes
+    """
+    shapes = []   
+    if isinstance(x, (int, float)):
+        shape = PointShape()
+        shape.setPoint(PointD(x, y))
+        shapes.append(shape)    
+    else:
+        if not isinstance(x, list):
+            x = x.asarray()
+        if not isinstance(y, list):
+            y = y.asarray()
+        if type == 'point':
+            shapes = ShapeUtil.createPointShapes(x, y)
+        elif type == 'line':
+            shapes = ShapeUtil.createPolylineShapes(x, y)
+        elif type == 'polygon':
+            shapes = ShapeUtil.createPolygonShapes(x, y)
+    return shapes    
     
 def grib2nc(infn, outfn):
     """

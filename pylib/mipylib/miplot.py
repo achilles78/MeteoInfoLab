@@ -251,9 +251,9 @@ def plot(*args, **kwargs):
             plot = XY1DPlot()
     
     if xaxistype == 'lon':
-        plot.setXAxis(LonLatAxis('Longitude', True, True))
+        plot.setXAxis(LonLatAxis('Longitude', True))
     elif xaxistype == 'lat':
-        plot.setXAxis(LonLatAxis('Latitude', True, False))
+        plot.setXAxis(LonLatAxis('Latitude', False))
     elif xaxistype == 'time':
         plot.setXAxis(TimeAxis('Time', True))
     timetickformat = kwargs.pop('timetickformat', None)
@@ -526,6 +526,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     :param y: (*array_like*) Input y data.
     :param s: (*int*) Size of points.
     :param c: (*Color*) Color of the points.
+    :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
     :param marker: (*string*) Marker of the points.
     :param label: (*string*) Label of the points series.
     
@@ -556,7 +557,39 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     #Set plot data styles
     pb, isunique = __getlegendbreak('point', kwargs)
     pb.setCaption(label)
-    plot.setLegendBreak(dataset.getSeriesCount() - 1, pb)
+    pstyle = __getpointstyle(marker)    
+    pb.setStyle(pstyle)
+    colors = __getcolors(c, alpha)
+    seriesIdx = dataset.getSeriesCount() - 1
+    if isinstance(s, int):   
+        pb.setSize(s)
+        if len(colors) == 1:
+            pb.setColor(colors[0])
+            plot.setLegendBreak(seriesIdx, pb)
+        else:
+            n = len(colors)
+            slegend = SeriesLegend(n)
+            for i in range(0, n):
+                npb = pb.clone()
+                npb.setColor(colors[i])
+                slegend.setLegendBreak(i, npb)
+            plot.setLegendBreak(seriesIdx, slegend)
+    else:
+        n = len(s)
+        slegend = SeriesLegend(n)
+        if len(colors) == 1:
+            pb.setColor(colors[0])
+            for i in range(0, n):
+                npb = pb.clone()
+                npb.setSize(s[i])
+                slegend.setLegendBreak(i, npb)  
+        else:
+            for i in range(0, n):
+                npb = pb.clone()
+                npb.setSize(s[i])
+                npb.setColor(colors[i])
+                slegend.setLegendBreak(i, npb) 
+        plot.setLegendBreak(seriesIdx, slegend)
     
     #Paint dataset
     if chartpanel is None:
@@ -730,9 +763,9 @@ def axes(**kwargs):
     if yreverse:
         plot.getYAxis().setInverse(True)
     if xaxistype == 'lon':
-        plot.setXAxis(LonLatAxis('Longitude', True, True))
+        plot.setXAxis(LonLatAxis('Longitude', True))
     elif xaxistype == 'lat':
-        plot.setXAxis(LonLatAxis('Latitude', True, False))
+        plot.setXAxis(LonLatAxis('Latitude', False))
     elif xaxistype == 'time':
         plot.setXAxis(TimeAxis('Time', True))
     if not bgcobj is None:
@@ -939,9 +972,9 @@ def xaxis(ax=None, **kwargs):
     axistype = kwargs.pop('axistype', None)
     if not axistype is None:
         if axistype == 'lon':
-            ax.setXAxis(LonLatAxis('Longitude', True, True))
+            ax.setXAxis(LonLatAxis('Longitude', True))
         elif axistype == 'lat':
-            ax.setXAxis(LonLatAxis('Latitude', True, False))
+            ax.setXAxis(LonLatAxis('Latitude', False))
         elif axistype == 'time':
             ax.setXAxis(TimeAxis('Time', True))
             timetickformat = kwargs.pop('timetickformat', None)
@@ -975,9 +1008,9 @@ def yaxis(ax=None, **kwargs):
     if not axistype is None:
         drawticklabel = ax.getAxis(Location.RIGHT).isDrawTickLabel()
         if axistype == 'lon':
-            ax.setYAxis(LonLatAxis('Longitude', False, True))
+            ax.setYAxis(LonLatAxis('Longitude', True))
         elif axistype == 'lat':
-            ax.setYAxis(LonLatAxis('Latitude', False, False))
+            ax.setYAxis(LonLatAxis('Latitude', False))
         elif axistype == 'time':
             ax.setYAxis(TimeAxis('Time', False))
             timetickformat = kwargs.pop('timetickformat', None)
@@ -1218,12 +1251,16 @@ def __getpointstyle(style):
     
     return pointStyle
     
-def __getcolor(style):
+def __getcolor(style, alpha=None):
     if style is None:
         return None
         
     if isinstance(style, Color):
-        return style
+        c = style
+        if not alpha is None:
+            alpha = (int)(alpha * 255)
+            c = Color(c.getRed(), c.getGreen(), c.getBlue(), alpha)
+        return c
         
     c = Color.black
     if isinstance(style, str):
@@ -1260,18 +1297,28 @@ def __getcolor(style):
                 c = Color.magenta
             elif 'y' in style:
                 c = Color.yellow 
-    elif isinstance(style, tuple) or isinstance(style, list):
+    elif isinstance(style, (tuple, list)):
         if len(style) == 3:
             c = Color(style[0], style[1], style[2])
         else:
             c = Color(style[0], style[1], style[2], style[3])
-               
+    
+    if not alpha is None:
+        alpha = (int)(alpha * 255)
+        c = Color(c.getRed(), c.getGreen(), c.getBlue(), alpha)
+    
     return c
 
-def __getcolors(cs):
+def __getcolors(cs, alpha=None):
     colors = []
-    for c in cs:
-        colors.append(__getcolor(c))
+    if isinstance(cs, (tuple, list, MIArray)):
+        if isinstance(cs[0], int):
+            colors.append(__getcolor(cs, alpha))
+        else:            
+            for c in cs:
+                colors.append(__getcolor(c, alpha))
+    else:
+        colors.append(__getcolor(cs, alpha))
     return colors
     
 def __getsymbolinterval(n):
@@ -1922,10 +1969,14 @@ def __setlegendscheme_line(ls, **kwargs):
     size = kwargs.pop('size', 1)
     lsobj = kwargs.pop('linestyle', '-')
     linestyle = __getlinestyle(lsobj)
-    cobj = kwargs.pop('color', 'k')
-    color = __getcolor(cobj)    
+    cobj = kwargs.pop('color', None)
+    if cobj is None:
+        color = None
+    else:
+        color = __getcolor(cobj)    
     for lb in ls.getLegendBreaks():
-        lb.setColor(facecolor)
+        if not color is None:
+            lb.setColor(color)
         lb.setStyle(linestyle)
         lb.setSize(size)
     return ls
@@ -2259,9 +2310,9 @@ def __plot_griddata(gdata, ls, type, xaxistype=None):
             plot = XY2DPlot(mapview)
     
     if xaxistype == 'lon':
-        plot.setXAxis(LonLatAxis('Longitude', True, True))
+        plot.setXAxis(LonLatAxis('Longitude', True))
     elif xaxistype == 'lat':
-        plot.setXAxis(LonLatAxis('Latitude', True, False))
+        plot.setXAxis(LonLatAxis('Latitude', False))
     elif xaxistype == 'time':
         plot.setXAxis(TimeAxis('Time', True))
     
@@ -3286,6 +3337,7 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     if alpha is None:
         cols = ocmap.getColorList(n)    
     else:
+        alpha = (int)(alpha * 255)
         cols = ocmap.getColorList(n, alpha)
     colors = []
     for c in cols:
@@ -3317,6 +3369,8 @@ def makesymbolspec(geometry, *args, **kwargs):
             colors.append(__getcolor(cobj))
         ls = LegendManage.createLegendScheme(shapetype, levels, colors)
         __setlegendscheme(ls, **kwargs)
+        field = kwargs.pop('field', '')    
+        ls.setFieldName(field)
         return ls
     
     ls = LegendScheme(shapetype)

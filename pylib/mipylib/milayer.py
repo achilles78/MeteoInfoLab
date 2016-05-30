@@ -5,17 +5,32 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.data import TableUtil, XYListDataset
-from org.meteoinfo.layer import LayerTypes
-from org.meteoinfo.projection import ProjectionManage
-from org.meteoinfo.shape import PolygonShape
+from org.meteoinfo.layer import LayerTypes, VectorLayer
+from org.meteoinfo.projection import ProjectionManage, KnownCoordinateSystems
+from org.meteoinfo.shape import PolygonShape, ShapeTypes
 from java.util import Date, Calendar
 from java.awt import Font
-
 from datetime import datetime
+import miutil
 
 class MILayer():
-    def __init__(self, layer):
-        self.layer = layer
+    def __init__(self, layer=None, shapetype=None):
+        if layer is None:
+            if shapetype is None:
+                print 'shapetype must be specified!'
+            else:                
+                type = ShapeTypes.Point
+                if shapetype == 'line':
+                    type = ShapeTypes.Polyline
+                elif shapetype == 'polygon':
+                    type = ShapeTypes.Polygon
+                self.layer = VectorLayer(type)
+                self.shapetype = type
+                self.proj = KnownCoordinateSystems.geographic.world.WGS1984
+        else:
+            self.layer = layer
+            self.shapetype = layer.getShapeType()
+            self.proj = layer.getProjInfo()
     
     def __repr__(self):
         return self.layer.getLayerInfo()
@@ -62,6 +77,25 @@ class MILayer():
             for i in range(n):
                 if i < len(values):
                     self.layer.editCellValue(fieldname, i, values[i])
+                    
+    def delfield(self, fieldname):
+        self.layer.editRemoveField(fieldname)
+        
+    def renamefield(self, fieldname, newfieldname):
+        self.layer.editRenameField(fieldname, newfieldname)
+        
+    def addshape(self, x, y, fields=None):
+        type = 'point'
+        if self.shapetype == ShapeTypes.Polyline:
+            type = 'line'
+        elif self.shapetype == ShapeTypes.Polygon:
+            type = 'polygon'
+        shapes = miutil.makeshapes(x, y, type)
+        if len(shapes) == 1:
+            self.layer.editAddShape(shapes[0], fields)
+        else:
+            for shape, field in zip(shapes, fields):
+                self.layer.editAddShape(shape, field)
                     
     def addlabels(self, fieldname, **kwargs):
         labelset = self.layer.getLabelSet()
@@ -144,3 +178,4 @@ class MIXYListData():
             self.data.addSeries(key, xdata, ydata)
         else:
             self.data.addSeries(key, xdata.asarray(), ydata.asarray())   
+            
