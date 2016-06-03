@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
+  <Path OpenPath="W:\SDS_Asian\verification\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
@@ -11,9 +10,10 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+    <RecentFolder Folder="W:\SDS_Asian\verification\script"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="144,0" MainFormSize="1360,848"/>
+  <Startup MainFormLocation="140,5" MainFormSize="1360,848"/>
 </MeteoInfo>

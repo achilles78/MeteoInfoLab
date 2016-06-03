@@ -580,7 +580,11 @@ class DimArray():
         gdata = self.asgridarray()
         if format == 'surfer':
             gdata.saveAsSurferASCIIFile(fname)
-        else:
+        elif format == 'bil':
+            gdata.saveAsBILFile(fname)
+        elif format == 'esri_ascii':
+            gdata.saveAsESRIASCIIFile(fname)
+        elif format == 'micaps4':
             desc = kwargs.pop('description', 'var')
             date = kwargs.pop('date', datetime.datetime.now())
             date = miutil.jdate(date)

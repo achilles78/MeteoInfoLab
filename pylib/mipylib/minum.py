@@ -1412,6 +1412,23 @@ def polygon(*args):
 def inpolygon(x, y, polygon):
     return GeoComputation.pointInPolygon(polygon, x, y)
     
+def distance(x, y, islonlat=False):
+    """
+    Get distance of a line.
+    
+    :param x: (*array_like*) X coordinates.
+    :param y: (*array_like*) Y coordinates.
+    :param islonlat: (*boolean*) x/y is longitude/latitude or not.
+    
+    :returns: Distance, meters for lon/lat.
+    """
+    if isinstance(x, (MIArray, DimArray)):
+        x = x.aslist()
+    if isinstance(y, (MIArray, DimArray)):
+        y = y.aslist()
+    r = GeoComputation.getDistance(x, y, islonlat)
+    return r
+    
 def polyarea(*args, **kwargs):
     islonlat = kwargs.pop('islonlat', False)
     if len(args) == 1:

@@ -2587,6 +2587,7 @@ def imshowm(*args, **kwargs):
         color args (string, float, rgb, etc), different levels will be plotted in different colors in 
         the order specified.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param fill_color: (*color*) Fill_color. Default is None (white color).
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
     :param order: (*int*) Z-order of created layer for display.
     
@@ -2619,6 +2620,16 @@ def imshowm(*args, **kwargs):
     else:    
         #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
         ls = LegendManage.createImageLegend(gdata, cmap)
+    fill_color = kwargs.pop('fill_color', None)
+    if not fill_color is None:
+        cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
+        if cb.isNoData():
+            cb.setColor(__getcolor(fill_color))
+        else:
+            cb = ColorBreak()
+            cb.setColor(__getcolor(fill_color))
+            cb.setNoData(True)
+            ls.addLegendBreak(cb)
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
     gdata = None
     return MILayer(layer)
