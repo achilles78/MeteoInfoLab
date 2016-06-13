@@ -1045,6 +1045,9 @@ def dot(a, b):
     
     :returns: Result Matrix.
     """
+    if isinstance(a, (int, long, float, complex)) and isinstance(b, (int, long, float, complex)):
+        return a * b
+        
     if isinstance(a, list):
         a = array(a)
     if isinstance(b, list):

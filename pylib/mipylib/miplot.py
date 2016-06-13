@@ -514,7 +514,13 @@ def bar(*args, **kwargs):
 def hist(x, bins=10, range=None, normed=False, cumulative=False,
         bottom=None, histtype='bar', align='mid',
         orientation='vertical', rwidth=None, log=False, **kwargs):
+    """
+    Plot a histogram.
     
+    :param x: (*array_like*) Input values, this takes either a single array or a sequency of arrays 
+        which are not required to be of the same length.
+    :param bins: (*int*) If an integer is given, bins + 1 bin edges are returned.
+    """
     return None
     
 def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
@@ -882,7 +888,7 @@ def axesm(**kwargs):
     if projinfo.isLonLat():
         frameon = kwargs.pop('frameon', False)
     else:
-        framon = kwargs.pop('frameon', True)
+        frameon = kwargs.pop('frameon', True)
     axison = kwargs.pop('axison', None)
     bgcobj = kwargs.pop('bgcolor', None)
     xyscale = kwargs.pop('xyscale', 1)
