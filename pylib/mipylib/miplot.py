@@ -10,7 +10,7 @@ import inspect
 import datetime
 
 from org.meteoinfo.chart import ChartPanel, Location
-from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, GridData, ArrayUtil
+from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, GridData, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation
@@ -596,6 +596,85 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
                 npb.setColor(colors[i])
                 slegend.setLegendBreak(i, npb) 
         plot.setLegendBreak(seriesIdx, slegend)
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None:
+        chart.clearPlots()
+        chart.setPlot(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return pb 
+    
+def fill_between(x, y1, y2=0, where=None, **kwargs):
+    """
+    Make filled polygons between two curves (y1 and y2) where ``where==True``.
+    
+    :param x: (*array_like*) An N-length array of the x data.
+    :param y1: (*array_like*) An N-length array (or scalar) of the y data.
+    :param y2: (*array_like*) An N-length array (or scalar) of the y data.
+    :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
+        N-length boolean array and the fill will only happen over the regions where ``where==True``.
+    """
+    #Get dataset
+    global gca
+    if gca is None:
+        dataset = XYListDataset()
+    else:
+        dataset = gca.getDataset()
+        if dataset is None:
+            dataset = XYListDataset()    
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    dn = len(x)
+    xdata = __getplotdata(x)
+    if isinstance(y1, (int, long, float)):
+        yy = []
+        for i in range(dn):
+            yy.append(y1)
+        y1 = minum.array(yy).array
+    else:
+        y1 = __getplotdata(y1)
+    if isinstance(y2, (int, long, float)):
+        yy = []
+        for i in range(dn):
+            yy.append(y2)
+        y2 = minum.array(yy).array
+    else:
+        y2 = __getplotdata(y2)
+    ss = XYYSeriesData()
+    ss.setKey(label)
+    ss.setXdata(xdata)
+    ss.setYdata(y1)
+    ss.setY2data(y2)
+    if not where is None:
+        if isinstance(where, (tuple, list)):
+            where = minum.array(where)
+        ss.setWhere(where.asarray())
+    dataset.addSeries(ss)
+    
+    #Create XY1DPlot
+    if gca is None:
+        plot = XY1DPlot(dataset)
+    else:
+        plot = gca
+        plot.setDataset(dataset)
+    
+    #Set plot data styles
+    pb, isunique = __getlegendbreak('polygon', kwargs)
+    pb.setCaption(label)
+    pb.setDrawOutline(False)
+    seriesIdx = dataset.getSeriesCount() - 1
+    slb = SeriesLegend()
+    slb.addLegendBreak(pb)
+    slb.setPlotMethod(ChartPlotMethod.FILL)
+    plot.setLegendBreak(seriesIdx, slb)
     
     #Paint dataset
     if chartpanel is None:
@@ -3490,6 +3569,9 @@ def __getlegendbreak(geometry, rule):
         lb.setCaption(caption) 
     if not color is None:
         lb.setColor(color)
+    alpha = rule.pop('alpha', None)
+    if not alpha is None:
+        lb.setColor(__getcolor(lb.getColor(), alpha))
     value = rule.pop('value', None)
     isunique = True
     if not value is None:

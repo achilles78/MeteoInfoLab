@@ -746,6 +746,9 @@ def pow(x1, x2):
             return MIArray(ArrayMath.pow(x1, x2.asarray()))
         else:
             return math.pow(x1, x2)
+            
+def power(x1, x2):
+    return pow(x1, x2)
 
 def sin(x):
     """
