@@ -216,6 +216,8 @@ public class MeteoInfoLab {
             Logger.getLogger(MeteoInfoLab.class.getName()).log(Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        //System.setProperty("-Dsun.java2d.dpiaware", "false");
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
