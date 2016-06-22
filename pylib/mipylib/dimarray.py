@@ -351,6 +351,30 @@ class DimArray():
             dimvalue = dimvalue.aslist()
         self.dims[idx].setDimValues(dimvalue)
         
+    def adddim(self, dimvalue, dimtype=None, index=None):
+        if isinstance(dimvalue, (MIArray, DimArray)):
+            dimvalue = dimvalue.aslist()
+        dtype = DimensionType.Other
+        if not dimtype is None:
+            if dimtype.upper() == 'X':
+                dtype = DimensionType.X
+            elif dimtype.upper() == 'Y':
+                dtype = DimensionType.Y
+            elif dimtype.upper() == 'Z':
+                dtype = DimensionType.Z
+            elif dimtype.upper() == 'T':
+                dtype = DimensionType.T
+        dim = Dimension(dtype)
+        dim.setDimValues(dimvalue)
+        if self.dims is None:
+            self.dims = [dim]
+        else:
+            if index is None:
+                self.dims.append(dim)
+            else:
+                self.dims.insert(index, dim)
+        self.ndim = len(self.dims)
+        
     def xdim(self):
         for dim in self.dims:
             if dim.getDimType() == DimensionType.X:
