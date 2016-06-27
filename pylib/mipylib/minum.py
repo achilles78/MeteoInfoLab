@@ -1003,6 +1003,100 @@ def mean(x, axis=None):
                     if i != axis:
                         dims.append(x.dims[i])
                 return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+                
+def maximum(x1, x2):
+    """
+    Element-wise maximum of array elements.
+    
+    Compare two arrays and returns a new array containing the element-wise maxima. If one of the elements 
+    being compared is a NaN, then that element is returned. If both elements are NaNs then the first is 
+    returned. The latter distinction is important for complex NaNs, which are defined as at least one of 
+    the real or imaginary parts being a NaN. The net effect is that NaNs are propagated.
+    
+    :param x1,x2: (*array_like*) The arrays holding the elements to be compared. They must have the same 
+        shape.
+    
+    :returns: The maximum of x1 and x2, element-wise. Returns scalar if both x1 and x2 are scalars.
+    """
+    if isinstance(x1, list):
+        x1 = array(x1)
+    if isinstance(x2, list):
+        x2 = array(x2)
+    if isinstance(x1, (MIArray, DimArray)):
+        return MIArray(ArrayMath.maximum(x1.asarray(), x2.asarray()))
+    else:
+        return max(x1, x2)
+        
+def fmax(x1, x2):
+    """
+    Element-wise maximum of array elements.
+    
+    Compare two arrays and returns a new array containing the element-wise maxima. If one of the 
+    elements being compared is a NaN, then the non-nan element is returned. If both elements are 
+    NaNs then the first is returned. The latter distinction is important for complex NaNs, which 
+    are defined as at least one of the real or imaginary parts being a NaN. The net effect is that 
+    NaNs are ignored when possible.
+    
+    :param x1,x2: (*array_like*) The arrays holding the elements to be compared. They must have the same 
+        shape.
+    
+    :returns: The maximum of x1 and x2, element-wise. Returns scalar if both x1 and x2 are scalars.
+    """
+    if isinstance(x1, list):
+        x1 = array(x1)
+    if isinstance(x2, list):
+        x2 = array(x2)
+    if isinstance(x1, (MIArray, DimArray)):
+        return MIArray(ArrayMath.fmax(x1.asarray(), x2.asarray()))
+    else:
+        return max(x1, x2)
+        
+def minimum(x1, x2):
+    """
+    Element-wise minimum of array elements.
+    
+    Compare two arrays and returns a new array containing the element-wise minima. If one of the elements 
+    being compared is a NaN, then that element is returned. If both elements are NaNs then the first is 
+    returned. The latter distinction is important for complex NaNs, which are defined as at least one of 
+    the real or imaginary parts being a NaN. The net effect is that NaNs are propagated.
+    
+    :param x1,x2: (*array_like*) The arrays holding the elements to be compared. They must have the same 
+        shape.
+    
+    :returns: The minimum of x1 and x2, element-wise. Returns scalar if both x1 and x2 are scalars.
+    """
+    if isinstance(x1, list):
+        x1 = array(x1)
+    if isinstance(x2, list):
+        x2 = array(x2)
+    if isinstance(x1, (MIArray, DimArray)):
+        return MIArray(ArrayMath.minimum(x1.asarray(), x2.asarray()))
+    else:
+        return min(x1, x2)
+        
+def fmin(x1, x2):
+    """
+    Element-wise minimum of array elements.
+    
+    Compare two arrays and returns a new array containing the element-wise minima. If one of the 
+    elements being compared is a NaN, then the non-nan element is returned. If both elements are 
+    NaNs then the first is returned. The latter distinction is important for complex NaNs, which 
+    are defined as at least one of the real or imaginary parts being a NaN. The net effect is that 
+    NaNs are ignored when possible.
+    
+    :param x1,x2: (*array_like*) The arrays holding the elements to be compared. They must have the same 
+        shape.
+    
+    :returns: The minimum of x1 and x2, element-wise. Returns scalar if both x1 and x2 are scalars.
+    """
+    if isinstance(x1, list):
+        x1 = array(x1)
+    if isinstance(x2, list):
+        x2 = array(x2)
+    if isinstance(x1, (MIArray, DimArray)):
+        return MIArray(ArrayMath.fmin(x1.asarray(), x2.asarray()))
+    else:
+        return min(x1, x2)
 
 def ave_month(data, colnames, t):
     """
