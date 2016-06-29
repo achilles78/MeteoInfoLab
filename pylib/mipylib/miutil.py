@@ -8,7 +8,8 @@
 from org.meteoinfo.global import PointD
 from org.meteoinfo.global.util import DateUtil
 from org.meteoinfo.shape import PointShape, PolylineShape, PolygonShape, ShapeUtil
-from java.util import Calendar
+from java.util import Calendar, Locale
+from java.text import SimpleDateFormat
 import datetime
 import minum
 
@@ -61,6 +62,22 @@ def date2num(t):
     tt = jdate(t)
     v = DateUtil.toOADate(tt)
     return v
+    
+def dateformat(t, format, language=None):
+    """
+    Format python date to string using Java SimpleDateFormat.
+    
+    :param t: Python date.
+    
+    :returns: Format string of the date
+    """
+    jt = jdate(t)
+    if language is None:
+        df = SimpleDateFormat(format)
+    else:
+        locale = Locale(language)
+        df = SimpleDateFormat(format, locale)
+    return df.format(jt)
 
 def makeshapes(x, y, type=None):
     """

@@ -129,6 +129,8 @@ class MILayer():
     def clip(self, clipobj):
         if isinstance(clipobj, PolygonShape):
             clipobj = [clipobj]
+        elif isinstance(clipobj, MILayer):
+            clipobj = clipobj.layer
         r = self.layer.clip(clipobj)
         return MILayer(r)
         
@@ -136,6 +138,11 @@ class MILayer():
         return MILayer(self.layer.clone())
     
     def save(self, fn=None):
+        """
+        Save layer as shape file.
+        
+        :param fn: (*string*) Shape file name (.shp).
+        """
         if fn is None:
             if self.layer.getFileName().strip() == '':
                 print 'File name is needed to save the layer!'
@@ -143,6 +150,14 @@ class MILayer():
                 self.layer.saveFile()    
         else:
             self.layer.saveFile(fn)
+    
+    def savekml(self, fn):
+        """
+        Save layer as KML file.
+        
+        :param fn: (*string*) KML file name.
+        """
+        self.layer.saveAsKMLFile(fn)
         
 class MIXYListData():
     def __init__(self, data=None):

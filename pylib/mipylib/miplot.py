@@ -1969,7 +1969,12 @@ def __getcolormap(**kwargs):
             cmap = ColorMap(cs)
     else:
         cmapstr = kwargs.pop('cmap', 'matlab_jet')
-        cmap = ColorUtil.getColorMap(cmapstr)
+        alpha = kwargs.pop('alpha', None)
+        if alpha is None:
+            cmap = ColorUtil.getColorMap(cmapstr)
+        else:
+            alpha = (int)(alpha * 255)
+            cmap = ColorUtil.getColorMap(cmapstr, alpha)
     reverse = kwargs.pop('cmapreverse', False)
     if reverse:
         cmap.reverse()
@@ -3340,15 +3345,16 @@ def geoshow(*args, **kwargs):
             #LegendScheme
             ls = kwargs.pop('symbolspec', None)
             if ls is None:
-                lb = layer.getLegendScheme().getLegendBreaks().get(0)
-                btype = lb.getBreakType()
-                geometry = 'point'
-                if btype == BreakTypes.PolylineBreak:
-                    geometry = 'line'
-                elif btype == BreakTypes.PolygonBreak:
-                    geometry = 'polygon'
-                lb, isunique = __getlegendbreak(geometry, kwargs)
-                layer.getLegendScheme().getLegendBreaks().set(0, lb)
+                if len(kwargs) > 0:
+                    lb = layer.getLegendScheme().getLegendBreaks().get(0)
+                    btype = lb.getBreakType()
+                    geometry = 'point'
+                    if btype == BreakTypes.PolylineBreak:
+                        geometry = 'line'
+                    elif btype == BreakTypes.PolygonBreak:
+                        geometry = 'polygon'
+                    lb, isunique = __getlegendbreak(geometry, kwargs)
+                    layer.getLegendScheme().getLegendBreaks().set(0, lb)
             else:
                 layer.setLegendScheme(ls)
             if order is None:
