@@ -1194,6 +1194,27 @@ def broadcast_to(a, shape):
         a = array(a)
     r = ArrayUtil.broadcast(a.asarray(), shape)
     return MIArray(r)
+    
+def corrcoef(x, y):
+    """
+    Return Pearson product-moment correlation coefficients.
+    
+    :param x: (*array_like*) A 1-D or 2-D array containing multiple variables and observations. 
+        Each row of x represents a variable, and each column a single observation of all those 
+        variables.
+    :param y: (*array_like*) An additional set of variables and observations. y has the same 
+        shape as x.
+        
+    :returns: The correlation coefficient matrix of the variables.
+    """
+    if isinstance(x, list):
+        x = array(x)
+    if isinstance(y, list):
+        y = array(y)
+    a = ArrayMath.getR(x.asarray(), y.asarray())
+    b = ArrayMath.getR(y.asarray(), x.asarray())
+    r = array([[1, a], [b, 1]])
+    return r
         
 def linregress(x, y):
     if isinstance(x, list):
