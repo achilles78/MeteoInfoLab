@@ -253,7 +253,7 @@ def plot(*args, **kwargs):
     if xaxistype == 'lon':
         plot.setXAxis(LonLatAxis('Longitude', True))
     elif xaxistype == 'lat':
-        plot.setXAxis(LonLatAxis('Latitude', False))
+        plot.setXAxis(LonLatAxis('Latitude', True, False))
     elif xaxistype == 'time':
         plot.setXAxis(TimeAxis('Time', True))
     timetickformat = kwargs.pop('timetickformat', None)
