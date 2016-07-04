@@ -8,7 +8,7 @@ import os
 import math
 import datetime
 from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
-from org.meteoinfo.data.meteodata import MeteoDataInfo
+from org.meteoinfo.data.meteodata import MeteoDataInfo, Dimension, DimensionType
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
 from org.meteoinfo.data.meteodata.arl import ARLDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
@@ -1788,10 +1788,10 @@ def binwrite(fn, data, byteorder='little_endian'):
     Create a binary data file from an array variable.
     
     :param fn: (*string*) Path needed to locate binary file.
-    :param data: (*DimArray or MIArray*) A numeric array variable of any dimensionality.
+    :param data: (*array_like*) A numeric array variable of any dimensionality.
     :param byteorder: (*string*) Byte order. ``little_endian`` or ``big_endian``.
     """
-    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder)
+    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder)    
     
 # Get month abstract English name
 def monthname(m):  

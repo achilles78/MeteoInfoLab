@@ -14,59 +14,106 @@ def asshape(a):
         return a.getShape()
     else:
         return a
-        
-def intersect(a, b):
-    ap = asshape(a)
-    bp = asshape(b)
-    cp = ap.intersection(bp)
-    c = Graphic(cp, a.getLegend())
-    return c
-    
-def union(a, b):
-    ap = asshape(a)
-    bp = asshape(b)
-    cp = ap.union(bp)
-    c = Graphic(cp, a.getLegend())
-    return c 
-    
-def difference(a, b):
-    ap = asshape(a)
-    bp = asshape(b)
-    cp = ap.difference(bp)
-    c = Graphic(cp, a.getLegend())
-    return c
-    
-def symdifference(a, b):
-    ap = asshape(a)
-    bp = asshape(b)
-    cp = ap.symDifference(bp)
-    c = Graphic(cp, a.getLegend())
-    return c
-    
+
 def buffer(a, dis):
     ap = asshape(a)
-    cp = ap.buffer(dis)
-    c = Graphic(cp, a.getLegend())
-    return c
+    r = ap.buffer(dis)
+    return r
+    
+def contains(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.contains(bp)
     
 def convexhull(*args):
     if len(args) == 1:
         a = args[0]
         ap = asshape(a)
-        cp = ap.convexHull()
-        c = Graphic(cp, a.getLegend())
-        return c
+        r = ap.convexHull()
+        return r
     else:
         x = args[0]
         y = args[1]
         r = ArrayUtil.convexHull(x.asarray(), y.asarray())
-        return r
+        return r    
+
+def coveredby(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.coveredBy(bp)
+    
+def covers(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.covers(bp)
+    
+def crosses(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.crosses(bp)
+
+def difference(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    r = ap.difference(bp)
+    return r  
+
+def disjoint(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.disjoint(bp)
+    
+def equals(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.equals(bp)
+    
+def intersection(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    r = ap.intersection(bp)
+    return r
+    
+def intersects(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.intersects(bp)
+    
+def overlaps(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.overlaps(bp)
+    
+def reform(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    r = ap.reform(bp)
+    return r
+    
+def union(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    r = ap.union(bp)
+    return r
+    
+def symdifference(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    r = ap.symDifference(bp)
+    return r
     
 def split(a, b):
     ap = asshape(a)
     bp = asshape(b)
-    cps = ap.split(bp)
-    r = []
-    for cp in cps:
-        r.append(Graphic(cp, a.getLegend()))
+    r = ap.split(bp)
     return r
+    
+def touches(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.touches(bp)
+    
+def within(a, b):
+    ap = asshape(a)
+    bp = asshape(b)
+    return ap.within(bp)
