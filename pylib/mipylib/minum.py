@@ -980,7 +980,10 @@ def mean(x, axis=None):
             for xx in x:
                 a.append(xx.asarray())
             r = ArrayMath.mean(a)
-            return MIArray(r)
+            if isinstance(x[0], MIArray):            
+                return MIArray(r)
+            else:
+                return DimArray(MIArray(r), x[0].dims, x[0].fill_value, x[0].proj)
         elif isinstance(x[0], PyStationData):
             a = []
             for xx in x:

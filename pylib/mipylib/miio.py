@@ -194,7 +194,7 @@ def ncwrite(fn, data, varname, dims=None, attrs=None):
         if isinstance(data, MIArray):
             dims = []
             for s in data.shape:
-                dimvalue = arange(s)
+                dimvalue = minum.arange(s)
                 dimname = 'dim' + str(len(dims))
                 dims.append(dimension(dimvalue, dimname))
         else:
@@ -203,7 +203,7 @@ def ncwrite(fn, data, varname, dims=None, attrs=None):
     ncfile = minum.addfile(fn, 'c')
     #Add dimensions
     ncdims = []
-    for dim in dims:
+    for dim in dims:    
         ncdims.append(ncfile.adddim(dim.getShortName(), dim.getLength()))
     #Add global attributes
     ncfile.addgroupattr('Conventions', 'CF-1.6')
