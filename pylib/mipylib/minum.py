@@ -250,7 +250,20 @@ class PyTableData():
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_Day(cols)
-            return PyTableData(TableData(dtable))
+            ttd = TimeTableData(dtable)
+            ttd.setTimeColName('Date')
+            return PyTableData(ttd)
+            
+    def ave_hour(self, colnames):
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_Hour(cols)
+            ttd = TimeTableData(dtable)
+            ttd.setTimeColName('Date')
+            return PyTableData(ttd)
             
     def assinglerow(self):
         return PyTableData(TableData(self.data.toSingleRowTable(self.data.getDataTable())))

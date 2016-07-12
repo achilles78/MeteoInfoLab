@@ -1061,7 +1061,10 @@ def xaxis(ax=None, **kwargs):
         elif axistype == 'lat':
             ax.setXAxis(LonLatAxis('Latitude', False))
         elif axistype == 'time':
-            ax.setXAxis(TimeAxis('Time', True))
+            b_axis = TimeAxis(ax.getAxis(Location.BOTTOM))
+            ax.setAxis(b_axis, Location.BOTTOM)
+            t_axis = TimeAxis(ax.getAxis(Location.TOP))
+            ax.setAxis(t_axis, Location.TOP)
             timetickformat = kwargs.pop('timetickformat', None)
             if not timetickformat is None:
                 ax.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)

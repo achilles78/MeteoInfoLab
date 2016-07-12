@@ -62,6 +62,20 @@ def date2num(t):
     v = DateUtil.toOADate(tt)
     return v
     
+def dates2nums(dates):
+    """
+    Convert python dates to numerical values.
+    
+    :param dates: (*list*) Python dates.
+    
+    :returns: (*list*) Numerical values
+    """
+    values = []
+    for t in dates:
+        tt = jdate(t)
+        values.append(DateUtil.toOADate(tt))
+    return values
+    
 def num2date(v):
     """
     Convert numerical value to python date.
