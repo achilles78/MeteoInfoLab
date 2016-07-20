@@ -1241,6 +1241,23 @@ def linregress(x, y):
     return r[0], r[1], r[2], r[3], r[4]
     
 def polyval(p, x):
+    """
+    Evaluate a polynomial at specific values.
+    
+    If p is of length N, this function returns the value:
+    
+    p[0]*x**(N-1) + p[1]*x**(N-2) + ... + p[N-2]*x + p[N-1]
+    
+    If x is a sequence, then p(x) is returned for each element of x. If x is another polynomial then the 
+    composite polynomial p(x(t)) is returned.
+    
+    :param p: (*array_like*) 1D array of polynomial coefficients (including coefficients equal to zero) 
+        from highest degree to the constant term.
+    :param x: (*array_like*) A number, an array of numbers, or an instance of poly1d, at which to evaluate 
+        p.
+        
+    :returns: Polynomial value
+    """
     return MIArray(ArrayMath.polyVal(p, x.asarray()))
     
 def transpose(a, dim1=0, dim2=1):
@@ -1583,19 +1600,22 @@ def polyarea(*args, **kwargs):
         r = GeoComputation.getArea(x, y, islonlat)
     return r
     
-def maskout(data, x=None, y=None, mask=None):
+def maskout(data, mask, x=None, y=None):
     """
     Maskout data by polygons - NaN values of elements outside polygons.
     
+    :param mask: (*list*) Polygon list as maskout borders.
     :param data: (*array_like*) Array data for maskout.
     :param x: (*array_like*) X coordinate array.
     :param y: (*array_like*) Y coordinate array.
-    :param mask: (*list*) Polygon list as maskout borders.
 
     :returns: (*array_like*) Maskouted data array.
     """
     if mask is None:
         return data
+    elif isinstance(mask, (MIArray, DimArray)):
+        r = ArrayMath.maskout(data.asarray(), mask.asarray())
+        return MIArray(r)
     if x is None or y is None:
         if isinstance(data, DimArray):
             return data.maskout(mask)
@@ -1799,15 +1819,16 @@ def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     r = ArrayUtil.readBinFile(fn, dim, datatype, skip, byteorder);
     return MIArray(r)
         
-def binwrite(fn, data, byteorder='little_endian'):
+def binwrite(fn, data, byteorder='little_endian', append=False):
     """
     Create a binary data file from an array variable.
     
     :param fn: (*string*) Path needed to locate binary file.
     :param data: (*array_like*) A numeric array variable of any dimensionality.
     :param byteorder: (*string*) Byte order. ``little_endian`` or ``big_endian``.
+    :param append: (*boolean*) Append to an existing file or not.
     """
-    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder)    
+    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder, append)    
     
 # Get month abstract English name
 def monthname(m):  

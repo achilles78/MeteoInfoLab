@@ -505,11 +505,15 @@ class DimArray():
         r = DimArray(r, self.dims, self.fill_value, self.proj)
         return r
         
-    def maskout(self, polygon):
-        x = self.dims[1].getDimValue()
-        y = self.dims[0].getDimValue()
-        r = DimArray(self.array.maskout(x, y, polygon), self.dims, self.fill_value, self.proj)
-        return r
+    def maskout(self, mask):
+        if isinstance(mask, (MIArray, DimArray)):
+            r = ArrayMath.maskout(self.asarray(), mask.asarray())
+            return DimArray(MIArray(r), self.dims, self.fill_value, self.proj)
+        else:
+            x = self.dims[1].getDimValue()
+            y = self.dims[0].getDimValue()
+            r = DimArray(self.array.maskout(x, y, mask), self.dims, self.fill_value, self.proj)
+            return r
      
     def aslist(self):
         return ArrayMath.asList(self.array.array)

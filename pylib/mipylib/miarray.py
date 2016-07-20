@@ -366,18 +366,22 @@ class MIArray():
                 polygon = polygon.layer
             return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
         
-    def maskout(self, x, y, polygon, fill_value=Double.NaN):
-        if isinstance(x, MIArray):
-            xl = x.aslist()
+    def maskout(self, mask, x=None, y=None, fill_value=Double.NaN):
+        if isinstance(mask, MIArray):
+            r = ArrayMath.maskout(self.array, mask.asarray(), fill_value)
+            return MIArray(r)
         else:
-            xl = x
-        if isinstance(y, MIArray):
-            yl = y.aslist()
-        else:
-            yl = y
-        if isinstance(polygon, MILayer):
-            polygon = polygon.layer
-        return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, fill_value))
+            if isinstance(x, MIArray):
+                xl = x.aslist()
+            else:
+                xl = x
+            if isinstance(y, MIArray):
+                yl = y.aslist()
+            else:
+                yl = y
+            if isinstance(polygon, MILayer):
+                polygon = polygon.layer
+            return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, fill_value))
         
     def savegrid(self, x, y, fname, format='surfer', **kwargs):
         gdata = GridArray(self.array, x.array, y.array, -9999.0)

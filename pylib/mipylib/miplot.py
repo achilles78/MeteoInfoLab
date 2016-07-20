@@ -13,11 +13,11 @@ from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, GridData, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation
+from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
 from org.meteoinfo.script import ChartForm, MapForm
-from org.meteoinfo.legend import MapFrame, LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage, LegendScheme, LegendType
+from org.meteoinfo.legend import MapFrame, LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.drawing import PointStyle
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
@@ -77,27 +77,218 @@ def hold(ishold):
     isholdon = ishold
  
 def __getplotdata(data):
-    if isinstance(data, MIArray):
-        return data.array
-    elif isinstance(data, DimArray):
-        return data.array.array
+    if isinstance(data, (MIArray, DimArray)):
+        return data.asarray()
     elif isinstance(data, (list, tuple)):
         if isinstance(data[0], datetime.datetime):
             dd = []
             for d in data:
                 v = miutil.date2num(d)
                 dd.append(v)
-            return dd
+            return minum.array(dd).array
         else:
-            return data
+            return minum.array(data).array
     else:
-        return [data]
+        return minum.array([data]).array
 
 def draw_if_interactive():
     if isinteractive:
 		chartpanel.paintGraphics()
         
 def plot(*args, **kwargs):
+    """
+    Plot lines and/or markers to the axes. *args* is a variable length argument, allowing
+    for multiple *x, y* pairs with an optional format string.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param style: (*string*) Line style for plot.
+    
+    :returns: Legend breaks of the lines.
+    
+    The following format string characters are accepted to control the line style or marker:
+    
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         solid line style
+      '--'        dashed line style
+      '-.'        dash-dot line style
+      ':'         dotted line style
+      '.'         point marker
+      ','         pixel marker
+      'o'         circle marker
+      'v'         triangle_down marker
+      '^'         triangle_up marker
+      '<'         triangle_left marker
+      '>'         triangle_right marker
+      's'         square marker
+      'p'         pentagon marker
+      '*'         star marker
+      'x'         x marker
+      'D'         diamond marker
+      =========  ===========
+      
+    The following color abbreviations are supported:
+      
+      =========  =====
+      Character  Color  
+      =========  =====
+      'b'        blue
+      'g'        green
+      'r'        red
+      'c'        cyan
+      'm'        magenta
+      'y'        yellow
+      'k'        black
+      =========  =====
+    """
+    global gca
+    
+    xdatalist = []
+    ydatalist = []    
+    styles = []
+    xaxistype = None
+    isxylistdata = False
+    if len(args) == 1:
+        if isinstance(args[0], MIXYListData):
+            dataset = args[0].data
+            snum = args[0].size()
+            isxylistdata = True
+        else:
+            ydata = args[0]
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+                if args[0].islondim(0):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(0):
+                    xaxistype = 'lat'
+                elif args[0].istimedim(0):
+                    xaxistype = 'time'
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            xdatalist.append(xdata)
+            ydatalist.append(ydata)
+    elif len(args) == 2:
+        if isinstance(args[1], basestring):
+            ydata = args[0]
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+                if args[0].islondim(0):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(0):
+                    xaxistype = 'lat'
+                elif args[0].istimedim(0):
+                    xaxistype = 'time'
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            styles.append(args[1])
+        else:
+            xdata = args[0]
+            ydata = args[1]
+        xdatalist.append(xdata)
+        ydatalist.append(ydata)
+    else:
+        c = 'x'
+        for arg in args: 
+            if c == 'x':
+                #xdatalist.append(__getplotdata(arg))    
+                xdatalist.append(arg)
+                c = 'y'
+            elif c == 'y':
+                #ydatalist.append(__getplotdata(arg))
+                ydatalist.append(arg)
+                c = 's'
+            elif c == 's':
+                if isinstance(arg, basestring):
+                    styles.append(arg)
+                    c = 'x'
+                else:
+                    styles.append('-')
+                    #xdatalist.append(__getplotdata(arg))
+                    xdatalist.append(arg)
+                    c = 'y'
+    if len(styles) == 0:
+        styles = None
+    else:
+        while len(styles) < len(xdatalist):
+            styles.append('-')
+    
+    #Set plot data styles
+    lines = []
+    legend = kwargs.pop('legend', None)
+    if not legend is None:
+        lbs = legend.getLegendBreaks()
+        for i in range(0, snum):
+            line = lbs[i]
+            lines.append(line)
+    else:
+        if styles != None:
+            for i in range(0, len(styles)):
+                label = kwargs.pop('label', 'S_' + str(i + 1))
+                line = __getplotstyle(styles[i], label, **kwargs)
+                lines.append(line)
+        else:
+            snum = len(xdatalist)
+            for i in range(0, snum):
+                label = kwargs.pop('label', 'S_' + str(i + 1))
+                line = __getlegendbreak('line', **kwargs)[0]
+                lines.append(line)
+    
+    #Create XY1DPlot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    
+    if not xaxistype is None:
+        __setXAxisType(plot, xaxistype)    
+    timetickformat = kwargs.pop('timetickformat', None)
+    if not timetickformat is None:
+        if not xaxistype == 'time':
+            plot.setXAxis(TimeAxis('Time', True))
+        plot.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
+        plot.getAxis(Location.TOP).setTimeFormat(timetickformat)
+    #plot.setDataset(dataset)     
+
+    #Add graphics
+    if not isxylistdata:
+        #Add data series
+        snum = len(xdatalist)
+        for i in range(0, snum):
+            label = kwargs.pop('label', 'S_' + str(i + 1))
+            xdata = __getplotdata(xdatalist[i])
+            ydata = __getplotdata(ydatalist[i])
+            graphic = GraphicFactory.createLineString(xdata, ydata, lines[i])
+            plot.addGraphic(graphic)
+            #dataset.addSeries(label, xdata, ydata)
+    plot.setAutoExtent()
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.clearPlots()
+        chart.setPlot(plot)
+    gca = plot
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    draw_if_interactive()
+    if len(lines) > 1:
+        return lines
+    else:
+        return lines[0]
+        
+def plot_bak(*args, **kwargs):
     """
     Plot lines and/or markers to the axes. *args* is a variable length argument, allowing
     for multiple *x, y* pairs with an optional format string.
@@ -396,6 +587,146 @@ def bar(*args, **kwargs):
     """
     #Get dataset
     global gca
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    xdata = None
+    autowidth = True
+    width = 0.8
+    if len(args) == 1:
+        ydata = args[0]
+    elif len(args) == 2:
+        if isinstance(args[1], (int, float)):
+            ydata = args[0]
+            width = args[1]
+            autowidth = False
+        else:
+            xdata = args[0]
+            ydata = args[1]
+    else:
+        xdata = args[0]
+        ydata = args[1]
+        width = args[2]
+        autowidth = False
+        
+    if xdata is None:
+        xdata = []
+        for i in range(1, len(args[0]) + 1):
+            xdata.append(i)
+    xdata = __getplotdata(xdata)
+    ydata = __getplotdata(ydata)
+    yerr = kwargs.pop('yerr', None)
+    if not yerr is None:
+        if not isinstance(yerr, (int, float)):
+            yerr = __getplotdata(yerr)
+    bottom = kwargs.pop('bottom', None)   
+    if not bottom is None:
+        bottom = __getplotdata(bottom)
+    
+    #Set plot data styles
+    fcobj = kwargs.pop('color', None)
+    if fcobj is None:
+        fcobj = kwargs.pop('facecolor', 'b')
+    if isinstance(fcobj, (tuple, list)):
+        colors = __getcolors(fcobj)
+    else:
+        color = __getcolor(fcobj)
+        colors = [color]
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = __getcolor(ecobj)
+    linewidth = kwargs.pop('linewidth', 1.0) 
+    hatch = kwargs.pop('hatch', None)
+    hatch = __gethatch(hatch) 
+    hatchsize = kwargs.pop('hatchsize', None)
+    bgcolor = kwargs.pop('bgcolor', None)
+    bgcolor = __getcolor(bgcolor)
+    ecolor = kwargs.pop('ecolor', 'k')
+    ecolor = __getcolor(ecolor)
+    barbreaks = []
+    for color in colors:
+        lb = BarBreak()
+        lb.setCaption(label)
+        lb.setColor(color)    
+        if edgecolor is None:
+            lb.setDrawOutline(False)
+        else:
+            lb.setOutlineColor(edgecolor)  
+        lb.setOutlineSize(linewidth)   
+        if not hatch is None:
+            lb.setStyle(hatch)
+            if not bgcolor is None:
+                lb.setBackColor(bgcolor)
+            if not hatchsize is None:
+                lb.setStyleSize(hatchsize)
+        lb.setErrorColor(ecolor)
+        barbreaks.append(lb)
+        
+    #Create bar graphics
+    graphics = GraphicFactory.createBars(xdata, ydata, autowidth, width, not yerr is None, yerr, \
+        not bottom is None, bottom, barbreaks)        
+    
+    #Create bar plot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY1DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return lb
+    
+def bar_bak(*args, **kwargs):
+    """
+    Make a bar plot.
+    
+    Make a bar plot with rectangles bounded by:
+        left, left + width, bottom, bottom + height
+    
+    :param left: (*array_like*) The x coordinates of the left sides of the bars.
+    :param height: (*array_like*) The height of the bars.
+    :param width: (*array_like*) Optional, the widths of the bars default: 0.8.
+    :param bottom: (*array_like*) Optional, the y coordinates of the bars default: None
+    :param color: (*Color*) Optional, the color of the bar faces.
+    :param edgecolor: (*Color*) Optional, the color of the bar edge.
+    :param linewidth: (*int*) Optional, width of bar edge.
+    :param label: (*string*) Label of the bar series.
+    :param hatch: (*string*) Hatch string.
+    :param hatchsize: (*int*) Hatch size. Default is None (8).
+    :param bgcolor: (*Color*) Background color, only valid with hatch.
+    
+    :returns: Bar legend break.
+    
+    
+    The following format string characters are accepted to control the hatch style:
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         horizontal hatch style
+      '|'         vertical hatch style
+      '\\'        forward_diagonal hatch style
+      '/'         backward_diagonal hatch style
+      '+'         cross hatch style
+      'x'         diagonal_cross hatch style
+      '.'         dot hatch style
+      =========  ===========
+      
+    """
+    #Get dataset
+    global gca
     if gca is None:
         dataset = XYListDataset()
     else:
@@ -538,6 +869,86 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     
     :returns: Points legend break.
     """
+    global gca    
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    xdata = __getplotdata(x)
+    ydata = __getplotdata(y)
+    
+    #Create XY2DPlot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        plot = gca
+    
+    #Set plot data styles
+    pb, isunique = __getlegendbreak('point', **kwargs)
+    pb.setCaption(label)
+    pstyle = __getpointstyle(marker)    
+    pb.setStyle(pstyle)
+    colors = __getcolors(c, alpha)
+    pbs = []
+    if isinstance(s, int):   
+        pb.setSize(s)
+        if len(colors) == 1:
+            pb.setColor(colors[0])
+            pbs.append(pb)
+        else:
+            n = len(colors)
+            for i in range(0, n):
+                npb = pb.clone()
+                npb.setColor(colors[i])
+                pbs.append(npb)
+    else:
+        n = len(s)
+        if len(colors) == 1:
+            pb.setColor(colors[0])
+            for i in range(0, n):
+                npb = pb.clone()
+                npb.setSize(s[i])
+                pbs.append(npb)
+        else:
+            for i in range(0, n):
+                npb = pb.clone()
+                npb.setSize(s[i])
+                npb.setColor(colors[i])
+                pbs.append(npb)
+                
+    #Create graphics
+    graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None:
+        chart.clearPlots()
+        chart.setPlot(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return pb 
+    
+def scatter_bak(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
+            alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
+    """
+    Make a scatter plot of x vs y, where x and y are sequence like objects of the same lengths.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param s: (*int*) Size of points.
+    :param c: (*Color*) Color of the points.
+    :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
+    :param marker: (*string*) Marker of the points.
+    :param label: (*string*) Label of the points series.
+    
+    :returns: Points legend break.
+    """
     #Get dataset
     global gca
     if gca is None:
@@ -561,7 +972,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
         plot.setDataset(dataset)
     
     #Set plot data styles
-    pb, isunique = __getlegendbreak('point', kwargs)
+    pb, isunique = __getlegendbreak('point', **kwargs)
     pb.setCaption(label)
     pstyle = __getpointstyle(marker)    
     pb.setStyle(pstyle)
@@ -667,7 +1078,7 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
         plot.setDataset(dataset)
     
     #Set plot data styles
-    pb, isunique = __getlegendbreak('polygon', kwargs)
+    pb, isunique = __getlegendbreak('polygon', **kwargs)
     pb.setCaption(label)
     pb.setDrawOutline(False)
     seriesIdx = dataset.getSeriesCount() - 1
@@ -762,7 +1173,7 @@ def subplot(nrows, ncols, plot_number):
     gca = chart.getPlot(plot_number)
     chart.setCurrentPlot(plot_number - 1)
     if gca is None:
-        gca = XY1DPlot()
+        gca = XY2DPlot()
         gca.isSubPlot = True
         plot_number -= 1
         rowidx = plot_number / ncols
@@ -833,7 +1244,7 @@ def axes(**kwargs):
     yreverse = kwargs.pop('yreverse', False)
     xaxistype = kwargs.pop('xaxistype', 'normal')
     bgcobj = kwargs.pop('bgcolor', None)    
-    plot = XY1DPlot()
+    plot = XY2DPlot()
     plot.setPosition(position[0], position[1], position[2], position[3])    
     if bottomaxis == False:
         plot.getAxis(Location.BOTTOM).setVisible(False)
@@ -1026,7 +1437,7 @@ def twinx(ax):
     """
     ax.getAxis(Location.RIGHT).setVisible(False)
     ax.setSameShrink(True)
-    plot = XY1DPlot()
+    plot = XY2DPlot()
     plot.setSameShrink(True)
     plot.setPosition(ax.getPosition())
     plot.getAxis(Location.BOTTOM).setVisible(False)
@@ -1056,19 +1467,7 @@ def xaxis(ax=None, **kwargs):
     minortick = kwargs.pop('minortick', False)
     axistype = kwargs.pop('axistype', None)
     if not axistype is None:
-        if axistype == 'lon':
-            ax.setXAxis(LonLatAxis('Longitude', True))
-        elif axistype == 'lat':
-            ax.setXAxis(LonLatAxis('Latitude', False))
-        elif axistype == 'time':
-            b_axis = TimeAxis(ax.getAxis(Location.BOTTOM))
-            ax.setAxis(b_axis, Location.BOTTOM)
-            t_axis = TimeAxis(ax.getAxis(Location.TOP))
-            ax.setAxis(t_axis, Location.TOP)
-            timetickformat = kwargs.pop('timetickformat', None)
-            if not timetickformat is None:
-                ax.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
-                ax.getAxis(Location.TOP).setTimeFormat(timetickformat)
+        __setXAxisType(ax, axistype)
         ax.updateDrawExtent()
     locs = [Location.BOTTOM, Location.TOP]
     for loc in locs:
@@ -1094,18 +1493,7 @@ def yaxis(ax=None, **kwargs):
     minortick = kwargs.pop('minortick', False)
     axistype = kwargs.pop('axistype', None)
     if not axistype is None:
-        drawticklabel = ax.getAxis(Location.RIGHT).isDrawTickLabel()
-        if axistype == 'lon':
-            ax.setYAxis(LonLatAxis('Longitude', True))
-        elif axistype == 'lat':
-            ax.setYAxis(LonLatAxis('Latitude', False))
-        elif axistype == 'time':
-            ax.setYAxis(TimeAxis('Time', False))
-            timetickformat = kwargs.pop('timetickformat', None)
-            if not timetickformat is None:
-                ax.getAxis(Location.LEFT).setTimeFormat(timetickformat)
-                ax.getAxis(Location.RIGHT).setTimeFormat(timetickformat)
-        ax.getAxis(Location.RIGHT).setDrawTickLabel(drawticklabel)
+        __setYAxisType(ax, axistype)
         ax.updateDrawExtent()
     locs = [Location.LEFT, Location.RIGHT]
     for loc in locs:
@@ -1217,7 +1605,8 @@ def __getplotstyle(style, caption, **kwargs):
             plb.setStyle(lineStyle)
             plb.setDrawSymbol(True)
             plb.setSymbolStyle(pointStyle)
-            plb.setSymbolInterval(__getsymbolinterval(n))
+            interval = kwargs.pop('markerinterval', 1)
+            plb.setSymbolInterval(interval)
             if not c is None:
                 plb.setColor(c)
                 plb.setSymbolColor(c)
@@ -1446,6 +1835,62 @@ def __gethatch(h):
     elif h == '.' or h == 'dot':
         hatch = HatchStyle.DOT    
     return hatch
+    
+def __setXAxisType(ax, axistype, timetickformat=None):
+    if axistype == 'lon':
+        b_axis = LonLatAxis(ax.getAxis(Location.BOTTOM))
+        b_axis.setLabel('Longitude')
+        b_axis.setLongitude(True)
+        ax.setAxis(b_axis, Location.BOTTOM)
+        t_axis = LonLatAxis(ax.getAxis(Location.TOP))
+        t_axis.setLabel('Longitude')
+        t_axis.setLongitude(True)
+        ax.setAxis(t_axis, Location.TOP)
+    elif axistype == 'lat':
+        b_axis = LonLatAxis(ax.getAxis(Location.BOTTOM))
+        b_axis.setLabel('Latitude')
+        b_axis.setLongitude(False)
+        ax.setAxis(b_axis, Location.BOTTOM)
+        t_axis = LonLatAxis(ax.getAxis(Location.TOP))
+        t_axis.setLabel('Latitude')
+        t_axis.setLongitude(False)
+        ax.setAxis(t_axis, Location.TOP)
+    elif axistype == 'time':
+        b_axis = TimeAxis(ax.getAxis(Location.BOTTOM))
+        ax.setAxis(b_axis, Location.BOTTOM)
+        t_axis = TimeAxis(ax.getAxis(Location.TOP))
+        ax.setAxis(t_axis, Location.TOP)
+        if not timetickformat is None:
+            ax.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
+            ax.getAxis(Location.TOP).setTimeFormat(timetickformat)
+            
+def __setYAxisType(ax, axistype, timetickformat=None):
+    if axistype == 'lon':
+        b_axis = LonLatAxis(ax.getAxis(Location.LEFT))
+        b_axis.setLabel('Longitude')
+        b_axis.setLongitude(True)
+        ax.setAxis(b_axis, Location.LEFT)
+        t_axis = LonLatAxis(ax.getAxis(Location.RIGHT))
+        t_axis.setLabel('Longitude')
+        t_axis.setLongitude(True)
+        ax.setAxis(t_axis, Location.RIGHT)
+    elif axistype == 'lat':
+        b_axis = LonLatAxis(ax.getAxis(Location.LEFT))
+        b_axis.setLabel('Latitude')
+        b_axis.setLongitude(False)
+        ax.setAxis(b_axis, Location.LEFT)
+        t_axis = LonLatAxis(ax.getAxis(Location.RIGHT))
+        t_axis.setLabel('Latitude')
+        t_axis.setLongitude(False)
+        ax.setAxis(t_axis, Location.RIGHT)
+    elif axistype == 'time':
+        b_axis = TimeAxis(ax.getAxis(Location.LEFT))
+        ax.setAxis(b_axis, Location.LEFT)
+        t_axis = TimeAxis(ax.getAxis(Location.RIGHT))
+        ax.setAxis(t_axis, Location.RIGHT)
+        if not timetickformat is None:
+            ax.getAxis(Location.LEFT).setTimeFormat(timetickformat)
+            ax.getAxis(Location.RIGHT).setTimeFormat(timetickformat)
 
 def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     """
@@ -1676,7 +2121,9 @@ def axis(limits):
         xmax = limits[1]
         ymin = limits[2]
         ymax = limits[3]
-        gca.setDrawExtent(Extent(xmin, xmax, ymin, ymax))
+        extent = Extent(xmin, xmax, ymin, ymax)
+        gca.setDrawExtent(extent)
+        gca.setExtent(extent.clone())
         draw_if_interactive()
     else:
         print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
@@ -1696,7 +2143,9 @@ def axism(limits=None):
             xmax = limits[1]
             ymin = limits[2]
             ymax = limits[3]
-            gca.setLonLatExtent(Extent(xmin, xmax, ymin, ymax))
+            extent = Extent(xmin, xmax, ymin, ymax)
+            gca.setLonLatExtent(extent)
+            gca.setExtent(extent.clone())
             draw_if_interactive()
         else:
             print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
@@ -1752,6 +2201,7 @@ def xlim(xmin, xmax):
     extent.minX = xmin
     extent.maxX = xmax
     plot.setDrawExtent(extent)
+    plot.setExtent(extent.clone())
     draw_if_interactive()
             
 def ylim(ymin, ymax):
@@ -1766,6 +2216,7 @@ def ylim(ymin, ymax):
     extent.minY = ymin
     extent.maxY = ymax
     plot.setDrawExtent(extent)
+    plot.setExtent(extent.clone())
     draw_if_interactive()   
 
 def xreverse():
@@ -1798,7 +2249,8 @@ def legend(*args, **kwargs):
     :param labcolor: (*color*) Tick label string color. Default is ``black`` .
     """
     plot = gca
-    plot.setDrawLegend(True)    
+    plot.setDrawLegend(True)   
+    plot.updateLegendScheme()
     clegend = plot.getLegend()   
     ls = kwargs.pop('legend', None)
     if ls is None:
@@ -1910,9 +2362,14 @@ def colorbar(layer, **kwargs):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     plot = gca
-    ls = layer.legend()
-    legend = plot.getLegend()
-    if legend == None:
+    if isinstance(layer, MILayer):
+        ls = layer.legend()
+    elif isinstance(layer, LegendScheme):
+        ls = layer
+    else:
+        ls = makelegend(layer)
+    legend = plot.getLegend()   
+    if legend is None:
         legend = ChartLegend(ls)
         plot.setLegend(legend)
     else:
@@ -2094,8 +2551,90 @@ def __setlegendscheme_polygon(ls, **kwargs):
         lb.setDrawFill(fill)        
         lb.setDrawOutline(edge)
     return ls
-      
+
 def imshow(*args, **kwargs):
+    """
+    Display an image on the axes.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D or 3-D (RGB) z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    
+    :returns: (*RasterLayer*) RasterLayer created from array data.
+    """
+    #Get dataset
+    global gca
+    
+    n = len(args)
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    xaxistype = None
+    if n <= 2:
+        gdata = minum.asgridarray(args[0])
+        if isinstance(args[0], DimArray):
+            if args[0].islondim(1):
+                xaxistype = 'lon'
+            elif args[0].islatdim(1):
+                xaxistype = 'lat'
+            elif args[0].istimedim(1):
+                xaxistype = 'time'
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        gdata = minum.asgridarray(a, x, y, fill_value)
+        args = args[3:]    
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createImageLegend(gdata, cn, cmap)
+        else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
+            ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
+    else:
+        ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    ls = ls.convertTo(ShapeTypes.Image)
+        
+    igraphic = GraphicFactory.createImage(gdata, ls)
+    
+    #Create bar plot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    if not xaxistype is None:
+        __setXAxisType(plot, xaxistype)
+        plot.updateDrawExtent()
+    plot.addGraphic(igraphic)
+    plot.setAutoExtent()
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY1DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return ls
+    
+def imshow_bak(*args, **kwargs):
     """
     Display an image on the axes.
     
@@ -2139,6 +2678,89 @@ def imshow(*args, **kwargs):
     return MILayer(layer)
       
 def contour(*args, **kwargs):
+    """
+    Plot contours.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param smooth: (*boolean*) Smooth countour lines or not.
+    
+    :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
+    """
+    #Get dataset
+    global gca
+    
+    n = len(args)
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    xaxistype = None
+    if n <= 2:
+        gdata = minum.asgriddata(args[0])
+        if isinstance(args[0], DimArray):
+            if args[0].islondim(1):
+                xaxistype = 'lon'
+            elif args[0].islatdim(1):
+                xaxistype = 'lat'
+            elif args[0].istimedim(1):
+                xaxistype = 'time'
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        gdata = minum.asgriddata(a, x, y, fill_value)
+        args = args[3:]
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+        else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+    
+    smooth = kwargs.pop('smooth', True)
+    igraphic = GraphicFactory.createContourLines(gdata.data, ls, smooth)
+    
+    #Create bar plot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    if not xaxistype is None:
+        __setXAxisType(plot, xaxistype)
+        plot.updateDrawExtent()
+    plot.addGraphic(igraphic)
+    plot.setAutoExtent()
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY1DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return ls
+    
+def contour_bak(*args, **kwargs):
     """
     Plot contours.
     
@@ -3210,6 +3832,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
         else:
             plot.addLayer(order, layer)
         plot.setDrawExtent(layer.getExtent().clone())
+        plot.setExtent(layer.getExtent().clone())
         
         if chartpanel is None:
             figure()
@@ -3237,6 +3860,7 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
  
     plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent().clone())
+    plot.setExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -3265,6 +3889,7 @@ def __plot_uvdata_m(plot, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
     shapetype = layer.getShapeType()
     plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent().clone())
+    plot.setExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -3293,6 +3918,7 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None, de
     shapetype = layer.getShapeType()
     plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent().clone())
+    plot.setExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -3356,7 +3982,7 @@ def geoshow(*args, **kwargs):
                         geometry = 'line'
                     elif btype == BreakTypes.PolygonBreak:
                         geometry = 'polygon'
-                    lb, isunique = __getlegendbreak(geometry, kwargs)
+                    lb, isunique = __getlegendbreak(geometry, **kwargs)
                     layer.getLegendScheme().getLegendBreaks().set(0, lb)
             else:
                 layer.setLegendScheme(ls)
@@ -3394,7 +4020,7 @@ def geoshow(*args, **kwargs):
                 displaytype = 'line'
             elif stype == ShapeTypes.Polygon:
                 displaytype = 'polygon'
-            lbreak, isunique = __getlegendbreak(displaytype, kwargs)
+            lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
             graphic.setLegend(lbreak)
             plot.addGraphic(graphic)            
             draw_if_interactive()
@@ -3406,7 +4032,7 @@ def geoshow(*args, **kwargs):
                 displaytype = 'line'
             elif stype == ShapeTypes.Polygon:
                 displaytype = 'polygon'
-            lbreak, isunique = __getlegendbreak(displaytype, kwargs)
+            lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
             graphic = Graphic(shape, lbreak)
             plot.addGraphic(graphic)            
             draw_if_interactive()
@@ -3425,7 +4051,7 @@ def geoshow(*args, **kwargs):
                     if isinstance(lat, (MIArray, DimArray)):
                         lat = lat.aslist()
 
-            lbreak, isunique = __getlegendbreak(displaytype, kwargs)
+            lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
             if displaytype == 'point':
                 graphic = plot.addPoint(lat, lon, lbreak)
             elif displaytype == 'polyline' or displaytype == 'line':
@@ -3505,7 +4131,7 @@ def weatherspec(weather='all', size=20, color='b'):
     c = __getcolor(color)
     return DrawMeteoData.createWeatherLegendScheme(wlist, size, c)
 
-def __getlegendbreak(geometry, rule): 
+def __getlegendbreak(geometry, **rule): 
     cobj = rule.pop('color', None)
     if cobj is None:
         cobj = rule.pop('facecolor', None)
@@ -3528,7 +4154,8 @@ def __getlegendbreak(geometry, rule):
         lb.setDrawOutline(edge)
     elif geometry == 'line':
         lb = PolylineBreak()
-        size = rule.pop('size', 1)
+        size = rule.pop('size', 1.0)
+        size = rule.pop('linewidth', size)
         lb.setSize(size)
         lsobj = rule.pop('linestyle', '-')
         linestyle = __getlinestyle(lsobj)
