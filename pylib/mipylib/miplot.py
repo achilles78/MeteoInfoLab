@@ -3291,7 +3291,7 @@ def barbs(*args, **kwargs):
     iscolor = False
     cdata = None
     xaxistype = None
-    if n <= 4:
+    if n <= 3:
         x = args[0].dimvalue(1)
         y = args[0].dimvalue(0)
         x, y = minum.meshgrid(x, y)
@@ -3308,7 +3308,7 @@ def barbs(*args, **kwargs):
             cdata = args[0]
             iscolor = True
             args = args[1:]
-    elif n <= 6:
+    elif n <= 5:
         x = args[0]
         y = args[1]
         u = args[2]
