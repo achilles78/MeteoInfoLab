@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="V:\EMI\script">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\qaqc"/>
@@ -10,7 +9,7 @@
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\MeteoInfoLab"/>
     <RecentFolder Folder="C:\TEMP"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="V:\EMI\script"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>

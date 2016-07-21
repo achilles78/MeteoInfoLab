@@ -27,7 +27,7 @@ from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
 from org.meteoinfo.laboratory.gui import FrmMain
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.shape import Shape, ShapeTypes, Graphic
+from org.meteoinfo.shape import Shape, ShapeTypes, Graphic, GraphicCollection
 
 from javax.swing import WindowConstants
 from java.awt import Color, Font
@@ -495,6 +495,61 @@ def plot_bak(*args, **kwargs):
         return lines[0]
 
 def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
+    global gca  
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    xdata = __getplotdata(x)
+    ydata = __getplotdata(y)
+    if not yerr is None:
+        if isinstance(yerr, (int, float)):
+            ye = []
+            for i in range(xdata.getSize()):
+                ye.append(yerr)
+            yerr = minum.array(ye).array
+        else:
+            yerr = __getplotdata(yerr)
+    if not xerr is None:
+        if isinstance(xerr, (int, float)):
+            ye = []
+            for i in range(xdata.getSize()):
+                ye.append(xerr)
+            xerr = minum.array(ye).array
+        else:
+            xerr = __getplotdata(xerr)
+    
+    #Get plot data style
+    if fmt == '':
+        line = __getlegendbreak('line' **kwargs)[0]
+    else:
+        line = __getplotstyle(fmt, label, **kwargs)
+    
+    #Create graphics
+    graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerr, yerr, line)
+    
+    #Create XY2DPlot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        plot = gca
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    
+    #Chart panel
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None:
+        chart.clearPlots()
+        chart.setPlot(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return graphics 
+    
+def errorbar_bak(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     global gca
     if gca is None:
         dataset = XYListDataset()
@@ -682,7 +737,7 @@ def bar(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY1DPlot)):
+    if gca is None or (not isinstance(gca, XY2DPlot)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -1023,6 +1078,72 @@ def scatter_bak(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, v
     return pb 
     
 def fill_between(x, y1, y2=0, where=None, **kwargs):
+    """
+    Make filled polygons between two curves (y1 and y2) where ``where==True``.
+    
+    :param x: (*array_like*) An N-length array of the x data.
+    :param y1: (*array_like*) An N-length array (or scalar) of the y data.
+    :param y2: (*array_like*) An N-length array (or scalar) of the y data.
+    :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
+        N-length boolean array and the fill will only happen over the regions where ``where==True``.
+    """
+    #Get dataset
+    global gca   
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    dn = len(x)
+    xdata = __getplotdata(x)
+    if isinstance(y1, (int, long, float)):
+        yy = []
+        for i in range(dn):
+            yy.append(y1)
+        y1 = minum.array(yy).array
+    else:
+        y1 = __getplotdata(y1)
+    if isinstance(y2, (int, long, float)):
+        yy = []
+        for i in range(dn):
+            yy.append(y2)
+        y2 = minum.array(yy).array
+    else:
+        y2 = __getplotdata(y2)
+    if not where is None:
+        if isinstance(where, (tuple, list)):
+            where = minum.array(where)
+        where = where.asarray()
+    
+    #Set plot data styles
+    pb, isunique = __getlegendbreak('polygon', **kwargs)
+    pb.setCaption(label)
+    pb.setDrawOutline(False)
+    
+    #Create graphics
+    graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb)    
+    
+    #Create XY1DPlot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        plot = gca    
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None:
+        chart.clearPlots()
+        chart.setPlot(plot)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return pb 
+    
+def fill_between_bak(x, y1, y2=0, where=None, **kwargs):
     """
     Make filled polygons between two curves (y1 and y2) where ``where==True``.
     
@@ -1586,6 +1707,7 @@ def __getplotstyle(style, caption, **kwargs):
     pointStyle = __getpointstyle(style)
     lineStyle = __getlinestyle(style)
     if not pointStyle is None:
+        fill = kwargs.pop('fill', True)        
         if lineStyle is None:           
             pb = PointBreak()
             pb.setCaption(caption)
@@ -1595,8 +1717,12 @@ def __getplotstyle(style, caption, **kwargs):
             else:
                 pb.setSize(8)
             pb.setStyle(pointStyle)
+            pb.setDrawFill(fill)
             if not c is None:
-                pb.setColor(c)
+                pb.setColor(c)      
+            edgecolor = kwargs.pop('edgecolor', pb.getColor())
+            edgecolor = __getcolor(edgecolor)
+            pb.setOutlineColor(edgecolor)
             return pb
         else:
             plb = PolylineBreak()
@@ -1605,11 +1731,17 @@ def __getplotstyle(style, caption, **kwargs):
             plb.setStyle(lineStyle)
             plb.setDrawSymbol(True)
             plb.setSymbolStyle(pointStyle)
+            plb.setFillSymbol(fill)
             interval = kwargs.pop('markerinterval', 1)
             plb.setSymbolInterval(interval)
             if not c is None:
                 plb.setColor(c)
-                plb.setSymbolColor(c)
+            makercolor = kwargs.pop('makercolor', plb.getColor())
+            makercolor = __getcolor(makercolor)
+            plb.setSymbolColor(c)
+            makerfillcolor = kwargs.pop('makerfillcolor', makercolor)
+            makerfillcolor = __getcolor(makerfillcolor)
+            plb.setSymbolFillColor(makerfillcolor)
             return plb
     else:
         plb = PolylineBreak()
@@ -2366,6 +2498,8 @@ def colorbar(layer, **kwargs):
         ls = layer.legend()
     elif isinstance(layer, LegendScheme):
         ls = layer
+    elif isinstance(layer, GraphicCollection):
+        ls = layer.getLegendScheme()
     else:
         ls = makelegend(layer)
     legend = plot.getLegend()   
@@ -2733,7 +2867,7 @@ def contour(*args, **kwargs):
     smooth = kwargs.pop('smooth', True)
     igraphic = GraphicFactory.createContourLines(gdata.data, ls, smooth)
     
-    #Create bar plot
+    #Create plot
     if gca is None:
         plot = XY2DPlot()
     else:
@@ -2745,7 +2879,9 @@ def contour(*args, **kwargs):
         __setXAxisType(plot, xaxistype)
         plot.updateDrawExtent()
     plot.addGraphic(igraphic)
-    plot.setAutoExtent()
+    #plot.setAutoExtent()
+    plot.setExtent(igraphic.getExtent())
+    plot.setDrawExtent(igraphic.getExtent())
     
     #Create figure
     if chartpanel is None:
@@ -2753,12 +2889,12 @@ def contour(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY1DPlot)):
+    if gca is None or (not isinstance(gca, XY2DPlot)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
-    return ls
+    return igraphic
     
 def contour_bak(*args, **kwargs):
     """
@@ -2829,6 +2965,89 @@ def contourf(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
     """
+    #Get dataset
+    global gca
+    
+    n = len(args)    
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    xaxistype = None
+    if n <= 2:
+        gdata = minum.asgriddata(args[0])
+        if isinstance(args[0], DimArray):
+            if args[0].islondim(1):
+                xaxistype = 'lon'
+            elif args[0].islatdim(1):
+                xaxistype = 'lat'
+            elif args[0].istimedim(1):
+                xaxistype = 'time'
+        args = args[1:]
+    elif n <=4:
+        x = args[0]
+        y = args[1]
+        a = args[2]
+        gdata = minum.asgriddata(a, x, y, fill_value)
+        args = args[3:]
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+        else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+    smooth = kwargs.pop('smooth', True)
+    igraphic = GraphicFactory.createContourPolygons(gdata.data, ls, smooth)
+    
+    #Create plot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    if not xaxistype is None:
+        __setXAxisType(plot, xaxistype)
+        plot.updateDrawExtent()
+    plot.addGraphic(igraphic)
+    #plot.setAutoExtent()
+    plot.setExtent(igraphic.getExtent())
+    plot.setDrawExtent(igraphic.getExtent())
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return igraphic
+    
+def contourf_bak(*args, **kwargs):
+    """
+    Plot filled contours.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    
+    :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
+    """
     n = len(args)    
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
@@ -2864,6 +3083,118 @@ def contourf(*args, **kwargs):
     return MILayer(layer)
 
 def quiver(*args, **kwargs):
+    """
+    Plot a 2-D field of arrows.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+    :param z: (*array_like*) Optional, 2-D z value array.
+    :param cmap: (*string*) Color map string.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+    :param size: (*float*) Base size of the arrows.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Created quiver VectoryLayer.
+    """
+    global gca
+    
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    order = kwargs.pop('order', None)
+    isuv = kwargs.pop('isuv', True)
+    n = len(args) 
+    iscolor = False
+    cdata = None
+    xaxistype = None
+    if n <= 4:
+        x = args[0].dimvalue(1)
+        y = args[0].dimvalue(0)
+        x, y = minum.meshgrid(x, y)
+        u = args[0]
+        v = args[1]
+        if args[0].islondim(1):
+            xaxistype = 'lon'
+        elif args[0].islatdim(1):
+            xaxistype = 'lat'
+        elif args[0].istimedim(1):
+            xaxistype = 'time'
+        args = args[2:]
+        if len(args) > 0:
+            cdata = args[0]
+            iscolor = True
+            args = args[1:]
+    elif n <= 6:
+        x = args[0]
+        y = args[1]
+        u = args[2]
+        v = args[3]
+        args = args[4:]
+        if len(args) > 0:
+            cdata = args[0]
+            iscolor = True
+            args = args[1:]
+    x = __getplotdata(x)
+    y = __getplotdata(y)
+    u = __getplotdata(u)
+    v = __getplotdata(v)    
+    
+    if iscolor:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+    else:    
+        if cmap.getColorCount() == 1:
+            c = cmap.getColor(0)
+        else:
+            c = Color.black
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+    ls = __setlegendscheme_point(ls, **kwargs)
+    
+    if not cdata is None:
+        cdata = __getplotdata(cdata)
+    igraphic = GraphicFactory.createArrows(x, y, u, v, cdata, ls, isuv)
+    
+    #Create plot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    if not xaxistype is None:
+        __setXAxisType(plot, xaxistype)
+        plot.updateDrawExtent()
+    plot.addGraphic(igraphic)
+    plot.setAutoExtent()
+    #plot.setExtent(igraphic.getExtent())
+    #plot.setDrawExtent(igraphic.getExtent())
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return igraphic
+    
+def quiver_bak(*args, **kwargs):
     """
     Plot a 2-D field of arrows.
     
@@ -2932,8 +3263,120 @@ def quiver(*args, **kwargs):
     vdata = None
     cdata = None
     return MILayer(layer)
-    
+
 def barbs(*args, **kwargs):
+    """
+    Plot a 2-D field of barbs.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+    :param z: (*array_like*) Optional, 2-D z value array.
+    :param cmap: (*string*) Color map string.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+    :param size: (*float*) Base size of the arrows.
+    :param order: (*int*) Z-order of created layer for display.
+    
+    :returns: (*VectoryLayer*) Created barbs VectoryLayer.
+    """
+    global gca
+    
+    cmap = __getcolormap(**kwargs)
+    fill_value = kwargs.pop('fill_value', -9999.0)
+    order = kwargs.pop('order', None)
+    isuv = kwargs.pop('isuv', True)
+    n = len(args) 
+    iscolor = False
+    cdata = None
+    xaxistype = None
+    if n <= 4:
+        x = args[0].dimvalue(1)
+        y = args[0].dimvalue(0)
+        x, y = minum.meshgrid(x, y)
+        u = args[0]
+        v = args[1]
+        if args[0].islondim(1):
+            xaxistype = 'lon'
+        elif args[0].islatdim(1):
+            xaxistype = 'lat'
+        elif args[0].istimedim(1):
+            xaxistype = 'time'
+        args = args[2:]
+        if len(args) > 0:
+            cdata = args[0]
+            iscolor = True
+            args = args[1:]
+    elif n <= 6:
+        x = args[0]
+        y = args[1]
+        u = args[2]
+        v = args[3]
+        args = args[4:]
+        if len(args) > 0:
+            cdata = args[0]
+            iscolor = True
+            args = args[1:]
+    x = __getplotdata(x)
+    y = __getplotdata(y)
+    u = __getplotdata(u)
+    v = __getplotdata(v)    
+    
+    if iscolor:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+        else:
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+    else:    
+        if cmap.getColorCount() == 1:
+            c = cmap.getColor(0)
+        else:
+            c = Color.black
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+    ls = __setlegendscheme_point(ls, **kwargs)
+    
+    if not cdata is None:
+        cdata = __getplotdata(cdata)
+    igraphic = GraphicFactory.createBarbs(x, y, u, v, cdata, ls, isuv)
+    
+    #Create plot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    if not xaxistype is None:
+        __setXAxisType(plot, xaxistype)
+        plot.updateDrawExtent()
+    plot.addGraphic(igraphic)
+    plot.setAutoExtent()
+    #plot.setExtent(igraphic.getExtent())
+    #plot.setDrawExtent(igraphic.getExtent())
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return igraphic
+    
+def barbs_bak(*args, **kwargs):
     """
     Plot a 2-D field of barbs.
     
@@ -3641,7 +4084,10 @@ def quiverkey(*args, **kwargs):
     """
     wa = ChartWindArrow()
     Q = args[0]
-    wa.setLayer(Q.layer)
+    if isinstance(wa, MILayer):
+        wa.setLayer(Q.layer)
+    else:
+        wa.setLayer(Q)
     X = args[1]
     Y = args[2]
     wa.setX(X)
@@ -3935,14 +4381,19 @@ def clabel(layer, **kwargs):
     font = __getfont(**kwargs)
     cstr = kwargs.pop('color', 'black')
     color = __getcolor(cstr)
-    labelset = layer.layer.getLabelSet()
+    gc = layer
+    if isinstance(layer, MILayer):
+        gc = layer.layer
+    drawshadow = kwargs.pop('drawshadow', True)
+    labelset = gc.getLabelSet()
     labelset.setLabelFont(font)
     labelset.setLabelColor(color)
+    labelset.setDrawShadow(drawshadow)
     dynamic = kwargs.pop('dynamic', True)
     if dynamic:
-        layer.layer.addLabelsContourDynamic(layer.layer.getExtent())
+        gc.addLabelsContourDynamic(gc.getExtent())
     else:
-        layer.layer.addLabels()
+        gc.addLabels()
     draw_if_interactive()
         
 def worldmap():
