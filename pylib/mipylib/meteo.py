@@ -16,9 +16,11 @@ Lv = 2.501e6        #Latent heat of vaporization for liquid water at 0C (J kg^-1
 Cp_d = 1005         #Specific heat at constant pressure for dry air (J kg^-1)
 epsilon = Mw / Md
 kappa = 0.286
+degCtoK=273.15        # Temperature offset between K and C (deg C)
 
 def potential_temperature(pressure, temperature):
-    r'''Calculate the potential temperature.
+    """
+    Calculate the potential temperature.
     Uses the Poisson equation to calculation the potential temperature
     given `pressure` and `temperature`.
     Parameters
@@ -44,12 +46,13 @@ def potential_temperature(pressure, temperature):
     >>> from metpy.units import units
     >>> metpy.calc.potential_temperature(800. * units.mbar, 273. * units.kelvin)
     290.9814150577374
-    '''
+    """
 
     return temperature * (P0 / pressure)**kappa
 
 def dry_lapse(pressure, temperature):
-    r'''Calculate the temperature at a level assuming only dry processes
+    """
+    Calculate the temperature at a level assuming only dry processes
     operating from the starting point.
     This function lifts a parcel starting at `temperature`, conserving
     potential temperature. The starting pressure should be the first item in
@@ -70,12 +73,12 @@ def dry_lapse(pressure, temperature):
                   processes
     parcel_profile : Calculate complete parcel profile
     potential_temperature
-    '''
+    """
 
     return temperature * (pressure / pressure[0])**kappa
     
 def moist_lapse(pressure, temperature):
-    r'''
+    """
     Calculate the temperature at a level assuming liquid saturation processes
     operating from the starting point.
     This function lifts a parcel starting at `temperature`. The starting
@@ -107,7 +110,7 @@ def moist_lapse(pressure, temperature):
     ----------
     .. [1] Bakhshaii, A. and R. Stull, 2013: Saturated Pseudoadiabats--A
            Noniterative Approximation. J. Appl. Meteor. Clim., 52, 5-15.
-    '''
+    """
 
     def dt(t, p):
         rs = saturation_mixing_ratio(p, t)
@@ -117,7 +120,8 @@ def moist_lapse(pressure, temperature):
     return dt
                                     
 def mixing_ratio(part_press, tot_press):
-    r'''Calculates the mixing ratio of gas given its partial pressure
+    """
+    Calculates the mixing ratio of gas given its partial pressure
     and the total pressure of the air.
     There are no required units for the input arrays, other than that
     they have the same units.
@@ -134,12 +138,13 @@ def mixing_ratio(part_press, tot_press):
     See Also
     --------
     vapor_pressure
-    '''
+    """
 
     return epsilon * part_press / (tot_press - part_press)
 
 def saturation_mixing_ratio(tot_press, temperature):
-    r'''Calculates the saturation mixing ratio given total pressure
+    """
+    Calculates the saturation mixing ratio given total pressure
     and the temperature.
     The implementation uses the formula outlined in [4]
     Parameters
@@ -156,12 +161,13 @@ def saturation_mixing_ratio(tot_press, temperature):
     ----------
     .. [4] Hobbs, Peter V. and Wallace, John M., 1977: Atmospheric Science, an Introductory
             Survey. 73.
-    '''
+    """
 
     return mixing_ratio(saturation_vapor_pressure(temperature), tot_press)
 
 def equivalent_potential_temperature(pressure, temperature):
-    r'''Calculates equivalent potential temperature given an air parcel's
+    """
+    Calculates equivalent potential temperature given an air parcel's
     pressure and temperature.
     The implementation uses the formula outlined in [5]
     Parameters
@@ -181,7 +187,7 @@ def equivalent_potential_temperature(pressure, temperature):
     ----------
     .. [5] Hobbs, Peter V. and Wallace, John M., 1977: Atmospheric Science, an Introductory
             Survey. 78-79.
-    '''
+    """
 
     pottemp = potential_temperature(pressure, temperature)
     smixr = saturation_mixing_ratio(pressure, temperature)

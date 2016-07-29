@@ -4,3 +4,4 @@ from mipylib.miplot import *
 import mipylib.minum as np
 import mipylib.miplot as plt
 import mipylib.random as random
+import mipylib.meteo as meteo
