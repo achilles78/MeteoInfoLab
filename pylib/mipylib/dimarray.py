@@ -512,7 +512,7 @@ class DimArray():
         else:
             x = self.dims[1].getDimValue()
             y = self.dims[0].getDimValue()
-            r = DimArray(self.array.maskout(x, y, mask), self.dims, self.fill_value, self.proj)
+            r = DimArray(self.array.maskout(mask, x, y), self.dims, self.fill_value, self.proj)
             return r
      
     def aslist(self):

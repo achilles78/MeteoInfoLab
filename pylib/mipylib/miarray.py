@@ -379,9 +379,9 @@ class MIArray():
                 yl = y.aslist()
             else:
                 yl = y
-            if isinstance(polygon, MILayer):
-                polygon = polygon.layer
-            return MIArray(ArrayMath.maskout(self.array, xl, yl, polygon, fill_value))
+            if isinstance(mask, MILayer):
+                mask = mask.layer
+            return MIArray(ArrayMath.maskout(self.array, xl, yl, mask, fill_value))
         
     def savegrid(self, x, y, fname, format='surfer', **kwargs):
         gdata = GridArray(self.array, x.array, y.array, -9999.0)

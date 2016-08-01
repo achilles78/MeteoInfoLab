@@ -259,7 +259,10 @@ def plot(*args, **kwargs):
     #plot.setDataset(dataset)     
 
     #Add graphics
-    if not isxylistdata:
+    if isxylistdata:
+        graphic = GraphicFactory.createLineString(dataset, lines)
+        plot.addGraphic(graphic)
+    else:
         #Add data series
         snum = len(xdatalist)
         for i in range(0, snum):
@@ -1363,7 +1366,7 @@ def axes(**kwargs):
     ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'
     xreverse = kwargs.pop('xreverse', False)
     yreverse = kwargs.pop('yreverse', False)
-    xaxistype = kwargs.pop('xaxistype', 'normal')
+    xaxistype = kwargs.pop('xaxistype', None)
     bgcobj = kwargs.pop('bgcolor', None)    
     plot = XY2DPlot()
     plot.setPosition(position[0], position[1], position[2], position[3])    
@@ -1379,12 +1382,8 @@ def axes(**kwargs):
         plot.getXAxis().setInverse(True)
     if yreverse:
         plot.getYAxis().setInverse(True)
-    if xaxistype == 'lon':
-        plot.setXAxis(LonLatAxis('Longitude', True))
-    elif xaxistype == 'lat':
-        plot.setXAxis(LonLatAxis('Latitude', False))
-    elif xaxistype == 'time':
-        plot.setXAxis(TimeAxis('Time', True))
+    if not xaxistype is None:
+        __setXAxisType(plot, xaxistype)
     if not bgcobj is None:
         bgcolor = __getcolor(bgcobj)
         plot.setDrawBackground(True)
@@ -4561,7 +4560,7 @@ def makesymbolspec(geometry, *args, **kwargs):
     n = len(args)
     isunique = True
     for arg in args:
-        lb, isu = __getlegendbreak(geometry, arg)
+        lb, isu = __getlegendbreak(geometry, **arg)
         if isunique  and not isu:
             isunique = False
         ls.addLegendBreak(lb)
