@@ -2152,10 +2152,15 @@ def xticks(*args, **kwargs):
         font = Font(fontname, Font.PLAIN, fontsize)
     color = kwargs.pop('color', 'k')
     c = __getcolor(color)
+    angle = kwargs.pop('rotation', 0)
+    if angle == 'vertical':
+        angle = 90
     axis.setTickLabelFont(font)
     axis.setTickLabelColor(c)
+    axis.setTickLabelAngle(angle)
     axis_t.setTickLabelFont(font)
     axis_t.setTickLabelColor(c)
+    axis_t.setTickLabelAngle(angle)
     draw_if_interactive()
     
 def yticks(*args, **kwargs):
