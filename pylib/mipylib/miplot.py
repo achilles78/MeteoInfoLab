@@ -2464,11 +2464,12 @@ def readlegend(fn):
         print 'File not exists: ' + fn
         return None
         
-def colorbar(layer, **kwargs):
+def colorbar(mappable, **kwargs):
     """
     Add a colorbar to a plot.
     
-    :param layer: (*MapLayer*) The layer in plot.
+    :param mappable: (*MapLayer | LegendScheme | List of ColorBreak*) The mappable in plot.
+    :param cax: (*Plot*) None | axes object into which the colorbar will be drawn.
     :param cmap: (*string*) Color map name. Default is None.
     :param shrink: (*float*) Fraction by which to shrink the colorbar. Default is 1.0.
     :param orientation: (*string*) Colorbar orientation: ``vertical`` or ``horizontal``.
@@ -2486,6 +2487,9 @@ def colorbar(layer, **kwargs):
         as a fraction of the interior colorbar length.
     :param ticks: [None | list of ticks] If None, ticks are determined automatically from the input.
     """
+    cax = kwargs.pop('cax', None)
+    if cax is None:
+        cax = gca
     cmap = kwargs.pop('cmap', None)
     shrink = kwargs.pop('shrink', 1)
     orientation = kwargs.pop('orientation', 'vertical')
@@ -2497,25 +2501,32 @@ def colorbar(layer, **kwargs):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    plot = gca
-    if isinstance(layer, MILayer):
-        ls = layer.legend()
-    elif isinstance(layer, LegendScheme):
-        ls = layer
-    elif isinstance(layer, GraphicCollection):
-        ls = layer.getLegendScheme()
+    fontname = kwargs.pop('labelfontname', fontname)
+    fontsize = kwargs.pop('labelfontsize', fontsize)
+    bold = kwargs.pop('labelbold', bold)
+    if bold:
+        labelfont = Font(fontname, Font.BOLD, fontsize)
     else:
-        ls = makelegend(layer)
-    legend = plot.getLegend()   
+        labelfont = Font(fontname, Font.PLAIN, fontsize)    
+    if isinstance(mappable, MILayer):
+        ls = mappable.legend()
+    elif isinstance(mappable, LegendScheme):
+        ls = mappable
+    elif isinstance(mappable, GraphicCollection):
+        ls = mappable.getLegendScheme()
+    else:
+        ls = makelegend(mappable)
+    legend = cax.getLegend()   
     if legend is None:
         legend = ChartLegend(ls)
-        plot.setLegend(legend)
+        cax.setLegend(legend)
     else:
         legend.setLegendScheme(ls)
     legend.setColorbar(True)   
     legend.setShrink(shrink)
     legend.setAspect(aspect)
-    legend.setLabelFont(font)
+    legend.setTickFont(font)
+    legend.setLabelFont(labelfont)
     label = kwargs.pop('label', None)
     if not label is None:
         legend.setLabel(label)
@@ -2534,7 +2545,7 @@ def colorbar(layer, **kwargs):
     ticks = kwargs.pop('ticks', None)
     if not ticks is None:
         legend.setTickLabels(ticks)
-    plot.setDrawLegend(True)
+    cax.setDrawLegend(True)
     draw_if_interactive()
 
 def set(obj, **kwargs):
