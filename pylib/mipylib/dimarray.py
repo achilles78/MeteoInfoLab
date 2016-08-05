@@ -523,6 +523,27 @@ class DimArray():
         
     def reshape(self, *args):
         return self.array.reshape(*args)
+        
+    def interpn(self, xi):
+        """
+        Multidimensional interpolation on regular grids.
+
+        :param xi: (*list*) The coordinates to sample the gridded data at.
+        
+        :returns: (*float*) Interpolated value at input coordinates.
+        """
+        points = []
+        for i in range(self.ndim):
+            points.append(self.dims[i].getDimValue())
+        if isinstance(xi, (MIArray, DimArray)):
+            xi = xi.aslist()
+        nxi = []
+        for x in xi:
+            if isinstance(x, datetime.datetime):
+                x = miutil.date2num(x)
+            nxi.append(x)
+        r = ArrayUtil.interpn(points, self.asarray(), nxi)
+        return r
      
     def tostation(self, x, y):
         gdata = self.asgriddata()

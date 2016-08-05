@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="V:\emission\script">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
     <RecentFolder Folder="D:\Working\MIScript\mywork"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\emission"/>
@@ -10,7 +10,7 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\qaqc"/>
-    <RecentFolder Folder="V:\emission\script"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>

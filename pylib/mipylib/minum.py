@@ -1642,6 +1642,33 @@ def rmaskout(data, x, y, mask):
         mask = [mask]
     r = ArrayMath.maskout_Remove(data.asarray(), x.asarray(), y.asarray(), mask)
     return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])    
+
+def interpn(points, values, xi):
+    """
+    Multidimensional interpolation on regular grids.
+    
+    :param points: (*list*) The points defining the regular grid in n dimensions.
+    :param values: (*array_like*) The data on the regular grid in n dimensions.
+    :param xi: (*list*) The coordinates to sample the gridded data at.
+    
+    :returns: (*float*) Interpolated value at input coordinates.
+    """
+    npoints = []
+    for p in points:
+        if isinstance(p, (MIArray, DimArray)):
+            p = p.aslist()
+        npoints.append(p)
+        
+    if isinstance(xi, (MIArray, DimArray)):
+        xi = xi.aslist()
+    nxi = []
+    for x in xi:
+        if isinstance(x, datetime.datetime):
+            x = miutil.date2num(x)
+        nxi.append(x)
+        
+    r = ArrayUtil.interpn(npoints, values.asarray(), nxi)
+    return r
     
 def griddata(points, values, xi=None, **kwargs):
     method = kwargs.pop('method', 'idw')
