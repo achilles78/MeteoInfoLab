@@ -1690,9 +1690,10 @@ def clf():
 # Clear last layer    
 def cll():
     if not gca is None:
-        if isinstance(gca, XY1DPlot):
-            gca.removeLastSeries()
-        elif isinstance(gca, XY2DPlot):
+        if isinstance(gca, XY2DPlot):
+            gca.removeLastGraphic()
+            gca.setAutoExtent()
+        elif isinstance(gca, MapPlot):
             gca.removeLastLayer()
         draw_if_interactive()
 
