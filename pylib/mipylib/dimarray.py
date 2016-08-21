@@ -4,11 +4,12 @@
 # Purpose: MeteoInfo dimarray module
 # Note: Jython
 #-----------------------------------------------------
-from org.meteoinfo.projection import ProjectionInfo
+from org.meteoinfo.projection import ProjectionInfo, KnownCoordinateSystems, Reproject
 from org.meteoinfo.data import GridData, GridArray, StationData, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 from org.meteoinfo.geoprocess.analysis import ResampleMethods
 from org.meteoinfo.layer import VectorLayer
+from org.meteoinfo.global import PointD
 from ucar.ma2 import Array, Range, MAMath
 import miarray
 import milayer
@@ -64,6 +65,41 @@ class DimArray():
         if len(indices) != self.ndim:
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
             return None
+            
+        if not self.proj is None and not self.proj.isLonLat():
+            xlim = None
+            ylim = None
+            xidx = -1
+            yidx = -1
+            for i in range(0, self.ndim):
+                dim = self.dims[i]
+                if dim.getDimType() == DimensionType.X:                    
+                    k = indices[i]
+                    if isinstance(k, (tuple, list)):
+                        xlim = k
+                        xidx = i
+                elif dim.getDimType() == DimensionType.Y:
+                    k = indices[i]
+                    if isinstance(k, (tuple, list)):
+                        ylim = k
+                        yidx = i
+            if not xlim is None and not ylim is None:                
+                fromproj=KnownCoordinateSystems.geographic.world.WGS1984
+                inpt = PointD(xlim[0], ylim[0])
+                outpt1 = Reproject.reprojectPoint(inpt, fromproj, self.proj)
+                inpt = PointD(xlim[1], ylim[1])
+                outpt2 = Reproject.reprojectPoint(inpt, fromproj, self.proj)
+                xlim = [outpt1.X, outpt2.X]
+                ylim = [outpt1.Y, outpt2.Y]
+                indices1 = []
+                for i in range(0, self.ndim):
+                    if i == xidx:
+                        indices1.append(xlim)
+                    elif i == yidx:
+                        indices1.append(ylim)
+                    else:
+                        indices1.append(indices[i])
+                indices = indices1
             
         #origin = []
         #size = []

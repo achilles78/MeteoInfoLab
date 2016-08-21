@@ -1786,6 +1786,10 @@ def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, topr
         fromproj = ProjectionInfo(fromproj)
     if isinstance(toproj, str):
         toproj = ProjectionInfo(toproj)
+    if isinstance(x, (tuple, list)):
+        x = array(x)
+    if isinstance(y, (tuple, list)):
+        y = array(y)
     if isinstance(x, (MIArray, DimArray)):
         outxy = ArrayUtil.reproject(x.asarray(), y.asarray(), fromproj, toproj)
         return MIArray(outxy[0]), MIArray(outxy[1])
