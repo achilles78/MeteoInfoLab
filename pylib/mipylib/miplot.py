@@ -2978,6 +2978,7 @@ def contourf(*args, **kwargs):
         string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
         color args (string, float, rgb, etc), different levels will be plotted in different colors in 
         the order specified.
+    :param smooth: (*boolean*) Smooth countour lines or not.
     
     :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
     """
@@ -3826,6 +3827,8 @@ def contourm(*args, **kwargs):
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
     :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
     :param order: (*int*) Z-order of created layer for display.
+    :param smooth: (*boolean*) Smooth countour lines or not.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
     
     :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
     """
@@ -3848,7 +3851,11 @@ def contourm(*args, **kwargs):
         plot = gca
     else:
         plot = None
-    layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj, order=order)
+    smooth = kwargs.pop('smooth', True)
+    layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj, order=order, smooth=smooth)
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
         
@@ -3870,6 +3877,8 @@ def contourfm(*args, **kwargs):
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
     :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
     :param order: (*int*) Z-order of created layer for display.
+    :param smooth: (*boolean*) Smooth countour lines or not.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
     
     :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
     """    
@@ -3895,7 +3904,11 @@ def contourfm(*args, **kwargs):
         plot = gca
     else:
         plot = None
-    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order)
+    smooth = kwargs.pop('smooth', True)
+    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order, smooth=smooth)
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
     
@@ -3919,6 +3932,9 @@ def gridfm(*args, **kwargs):
     if interpolate:
         gdata = gdata.interpolate()
     layer = __plot_griddata_m(plot, gdata, ls, 'gridf', proj=proj, order=order)
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
     
@@ -3953,7 +3969,9 @@ def surfacem_1(*args, **kwargs):
         ls = __setlegendscheme_point(ls, **kwargs)    
           
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo(), order=order)
-
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
     
@@ -3993,11 +4011,14 @@ def surfacem(*args, **kwargs):
     else:
         plot.addLayer(order, layer)
     plot.setDrawExtent(layer.getExtent())
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     
     if chartpanel is None:
         figure()
     
-    chart = Chart(plot)
+    #chart = Chart(plot)
     draw_if_interactive()
     return MILayer(layer)
     
@@ -4016,6 +4037,7 @@ def quiverm(*args, **kwargs):
     :param size: (*float*) Base size of the arrows.
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
     :param order: (*int*) Z-order of created layer for display.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
     
     :returns: (*VectoryLayer*) Created quiver VectoryLayer.
     """
@@ -4072,6 +4094,9 @@ def quiverm(*args, **kwargs):
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
     ls = __setlegendscheme_point(ls, **kwargs)
     layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'quiver', isuv, proj=proj)
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     udata = None
     vdata = None
     cdata = None
@@ -4159,6 +4184,7 @@ def barbsm(*args, **kwargs):
     :param size: (*float*) Base size of the arrows.
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
     :param order: (*int*) Z-order of created layer for display.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
     
     :returns: (*VectoryLayer*) Created barbs VectoryLayer.
     """
@@ -4215,6 +4241,9 @@ def barbsm(*args, **kwargs):
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
     ls = __setlegendscheme_point(ls, **kwargs)
     layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'barbs', isuv, proj=proj)
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     udata = None
     vdata = None
     cdata = None
@@ -4235,6 +4264,7 @@ def streamplotm(*args, **kwargs):
     :param density: (*int*) Streamline density. Default is 4.
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
     :param order: (*int*) Z-order of created layer for display.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
     
     :returns: (*VectoryLayer*) Created streamline VectoryLayer.
     """
@@ -4261,16 +4291,19 @@ def streamplotm(*args, **kwargs):
         args = args[4:]  
     ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Polyline, color, 1)
     layer = __plot_uvgriddata_m(plot, udata, vdata, None, ls, 'streamplot', isuv, proj=proj, density=density)
+    select = kwargs.pop('select', True)
+    if select:
+        plot.setSelectedLayer(layer)
     udata = None
     vdata = None
     return MILayer(layer)
         
-def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None):
+def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True):
     #print 'GridData...'
     if type == 'contourf':
-        layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
+        layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', smooth)
     elif type == 'contour':
-        layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
+        layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', smooth)
     elif type == 'imshow':
         layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls)      
     elif type == 'scatter':

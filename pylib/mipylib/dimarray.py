@@ -18,6 +18,9 @@ from milayer import MILayer
 import math
 import datetime
 import miutil
+from java.lang import Double
+
+nan = Double.NaN
 
 # Dimension array
 class DimArray():
@@ -39,7 +42,9 @@ class DimArray():
         self.dims = dims
         if not dims is None:
             self.ndim = len(dims)
-        self.fill_value = fill_value
+        self.fill_value = fill_value        
+        if math.isnan(self.fill_value):
+            self.fill_value = -9999.0
         self.proj = proj
         
     def __len__(self):

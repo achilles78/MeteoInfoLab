@@ -7,6 +7,7 @@ package org.meteoinfo.laboratory.gui;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.meteoinfo.chart.ChartPanel;
+import org.meteoinfo.chart.MouseMode;
 import org.meteoinfo.ui.ButtonTabComponent;
 
 /**
@@ -53,6 +55,95 @@ public class FigureDockable extends DefaultSingleCDockable {
         });
         this.getContentPane().add(tabbedPanel);
         //this.setCloseable(false);
+        
+        //Add actions     
+        //Select action
+        CButton button = new CButton();
+        button.setText("Select");
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/Arrow.png")));
+        button.setTooltip("Select");
+        button.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed( ActionEvent e ){
+                ChartPanel cp = FigureDockable.this.getCurrentFigure();
+                if (cp != null)
+                    cp.setMouseMode(MouseMode.SELECT);
+            }
+        });
+        this.addAction(button);
+        this.addSeparator();
+        //Zoom in action
+        button = new CButton();
+        button.setText("Zoom In");
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_ZoomIn.Image.png")));
+        button.setTooltip("Zoom In");
+        button.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed( ActionEvent e ){
+                ChartPanel cp = FigureDockable.this.getCurrentFigure();
+                if (cp != null)
+                    cp.setMouseMode(MouseMode.ZOOM_IN);
+            }
+        });
+        this.addAction(button);
+        //Zoom out action
+        button = new CButton();
+        button.setText("Zoom Out");
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_ZoomOut.Image.png")));
+        button.setTooltip("Zoom Out");
+        button.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed( ActionEvent e ){
+                ChartPanel cp = FigureDockable.this.getCurrentFigure();
+                if (cp != null)
+                    cp.setMouseMode(MouseMode.ZOOM_OUT);
+            }
+        });
+        this.addAction(button);
+        //Pan action
+        button = new CButton();
+        button.setText("Pan");
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_Pan.Image.png")));
+        button.setTooltip("Pan");
+        button.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed( ActionEvent e ){
+                ChartPanel cp = FigureDockable.this.getCurrentFigure();
+                if (cp != null)
+                    cp.setMouseMode(MouseMode.PAN);
+            }
+        });
+        this.addAction(button);
+        //Full extent action
+        button = new CButton();
+        button.setText("Full Extent");
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_FullExtent.Image.png")));
+        button.setTooltip("Full Extent");
+        button.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed( ActionEvent e ){
+                ChartPanel cp = FigureDockable.this.getCurrentFigure();
+                if (cp != null)
+                    cp.onUndoZoomClick();
+            }
+        });
+        this.addAction(button);
+        this.addSeparator();
+        //Identifer action
+        button = new CButton();
+        button.setText("Identifer");
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/information.png")));
+        button.setTooltip("Identifer");
+        button.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed( ActionEvent e ){
+                ChartPanel cp = FigureDockable.this.getCurrentFigure();
+                if (cp != null)
+                    cp.setMouseMode(MouseMode.IDENTIFER);
+            }
+        });
+        this.addAction(button);
+        this.addSeparator();
     }
 
     /**
