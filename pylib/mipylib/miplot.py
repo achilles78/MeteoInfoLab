@@ -3773,6 +3773,7 @@ def imshowm(*args, **kwargs):
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
     order = kwargs.pop('order', None)
+    ls = kwargs.pop('symbolspec', None)
     n = len(args) 
     if n <= 2:
         gdata = minum.asgridarray(args[0])
@@ -3784,17 +3785,19 @@ def imshowm(*args, **kwargs):
         gdata = minum.asgridarray(a, x, y, fill_value)
         args = args[3:]
     if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createImageLegend(gdata, cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
+        if ls is None:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createImageLegend(gdata, cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
     else:    
-        #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-        ls = LegendManage.createImageLegend(gdata, cmap)
+        if ls is None:
+            #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+            ls = LegendManage.createImageLegend(gdata, cmap)
     fill_color = kwargs.pop('fill_color', None)
     if not fill_color is None:
         cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)

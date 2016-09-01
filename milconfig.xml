@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="E:\Temp\jingjing">
+  <Path OpenPath="C:\TEMP">
     <RecentFolder Folder="D:\Working\MIScript\mywork"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\cuace"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
@@ -8,9 +8,9 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\qaqc"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
-    <RecentFolder Folder="W:\SDS_Asian\verification\script"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
-    <RecentFolder Folder="E:\Temp\jingjing"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\MeteoInfoLab"/>
+    <RecentFolder Folder="C:\TEMP"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
