@@ -18,7 +18,7 @@ from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, C
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
 from org.meteoinfo.script import ChartForm, MapForm
 from org.meteoinfo.legend import MapFrame, LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
-from org.meteoinfo.drawing import PointStyle
+from org.meteoinfo.drawing import PointStyle, MarkerType
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.global.image import AnimatedGifEncoder
@@ -4432,13 +4432,25 @@ def clabel(layer, **kwargs):
     color = __getcolor(cstr)
     gc = layer
     if isinstance(layer, MILayer):
-        gc = layer.layer
-    drawshadow = kwargs.pop('drawshadow', True)
+        gc = layer.layer   
+    dynamic = kwargs.pop('dynamic', True)
+    if gc.getShapeType() != ShapeTypes.Polyline:
+        dynamic = False
+    drawshadow = kwargs.pop('drawshadow', dynamic)
     labelset = gc.getLabelSet()
+    fieldname = kwargs.pop('fieldname', labelset.getFieldName())
+    if fieldname is None:
+        fieldname = gc.getFieldName(0)
+    labelset.setFieldName(fieldname)
     labelset.setLabelFont(font)
     labelset.setLabelColor(color)
     labelset.setDrawShadow(drawshadow)
-    dynamic = kwargs.pop('dynamic', True)
+    xoffset = kwargs.pop('xoffset', 0)
+    labelset.setXOffset(xoffset)
+    yoffset = kwargs.pop('yoffset', 0)
+    labelset.setYOffset(yoffset)
+    avoidcoll = kwargs.pop('avoidcoll', True)
+    labelset.setAvoidCollision(avoidcoll)    
     if dynamic:
         gc.addLabelsContourDynamic(gc.getExtent())
     else:
@@ -4641,8 +4653,20 @@ def __getlegendbreak(geometry, **rule):
     if geometry == 'point':
         lb = PointBreak()        
         marker = rule.pop('marker', 'o')
-        pstyle = __getpointstyle(marker)
-        lb.setStyle(pstyle)
+        if marker == 'image':
+            imagepath = rule.pop('imagepath', None)
+            if not imagepath is None:
+                lb.setMarkerType(MarkerType.Image)
+                lb.setImagePath(imagepath)
+        elif maker == 'font':
+            fontname = rule.pop('fontname', 'Weather')
+            lb.setMarkerType(MarkerType.Character)
+            lb.setFontName(fontname)
+            charindex = rule.pop('charindex', 0)
+            lb.setCharIndex(charindex)
+        else:
+            pstyle = __getpointstyle(marker)
+            lb.setStyle(pstyle)
         size = rule.pop('size', 6)
         lb.setSize(size)
         ecobj = rule.pop('edgecolor', 'k')

@@ -10,6 +10,8 @@ import minum
 import miutil
 import miarray
 from miarray import MIArray
+import dimarray
+from dimarray import DimArray
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 
 def grib2nc(infn, outfn):
