@@ -4064,8 +4064,9 @@ def quiverm(*args, **kwargs):
         x, y = minum.meshgrid(xx, yy)
         args = args[2:]
         if len(args) > 0:
-            cdata = minum.asmiarray(args[0])
-            iscolor = True
+            if isinstance(args[0], (DimArray, MIArray)):
+                cdata = minum.asmiarray(args[0])
+                iscolor = True
             args = args[1:]
     else:
         x = minum.asmiarray(args[0])
@@ -4661,7 +4662,7 @@ def __getlegendbreak(geometry, **rule):
             if not imagepath is None:
                 lb.setMarkerType(MarkerType.Image)
                 lb.setImagePath(imagepath)
-        elif maker == 'font':
+        elif marker == 'font':
             fontname = rule.pop('fontname', 'Weather')
             lb.setMarkerType(MarkerType.Character)
             lb.setFontName(fontname)

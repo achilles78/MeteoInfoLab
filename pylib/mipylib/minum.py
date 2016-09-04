@@ -36,7 +36,7 @@ from milayer import MILayer
 
 from java.awt import Color
 from java.lang import Math, Double
-from java.util import Calendar, ArrayList
+from java.util import Calendar, ArrayList, Date
 
 # Global variables
 pi = Math.PI
@@ -124,7 +124,10 @@ class PyTableData():
         return None
         
     def getvalue(self, row, col):
-        return self.data.getValue(row, col)
+        r = self.data.getValue(row, col)
+        if isinstance(r, Date):
+            r = miutil.pydate(r)
+        return r
 
     def setvalue(self, row, col, value):
         self.data.setValue(row, col, value)
