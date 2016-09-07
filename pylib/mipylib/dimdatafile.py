@@ -19,6 +19,7 @@ from miarray import MIArray
 from datetime import datetime
 
 from java.util import Calendar
+from java.lang import Float
 import jarray
 
 # Dimension dataset
@@ -176,7 +177,9 @@ class DimDataFile():
     def adddim(self, dimname, dimsize, group=None):
         return self.ncfile.addDimension(group, dimname, dimsize)
         
-    def addgroupattr(self, attrname, attrvalue, group=None):
+    def addgroupattr(self, attrname, attrvalue, group=None, float=False):
+        if float:
+            attrvalue = Float(attrvalue)
         return self.ncfile.addGroupAttribute(group, Attribute(attrname, attrvalue))
  
     def __getdatatype(self, datatype):

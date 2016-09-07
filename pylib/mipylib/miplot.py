@@ -15,7 +15,7 @@ from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
-from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis
+from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
 from org.meteoinfo.legend import MapFrame, LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.drawing import PointStyle, MarkerType
@@ -497,6 +497,58 @@ def plot_bak(*args, **kwargs):
     else:
         return lines[0]
 
+def semilogy(*args, **kwargs):
+    """
+    Make a plot with log scaling on the y axis.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param style: (*string*) Line style for plot.
+    
+    :returns: Legend breaks of the lines.
+    
+    The following format string characters are accepted to control the line style or marker:
+    
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         solid line style
+      '--'        dashed line style
+      '-.'        dash-dot line style
+      ':'         dotted line style
+      '.'         point marker
+      ','         pixel marker
+      'o'         circle marker
+      'v'         triangle_down marker
+      '^'         triangle_up marker
+      '<'         triangle_left marker
+      '>'         triangle_right marker
+      's'         square marker
+      'p'         pentagon marker
+      '*'         star marker
+      'x'         x marker
+      'D'         diamond marker
+      =========  ===========
+      
+    The following color abbreviations are supported:
+      
+      =========  =====
+      Character  Color  
+      =========  =====
+      'b'        blue
+      'g'        green
+      'r'        red
+      'c'        cyan
+      'm'        magenta
+      'y'        yellow
+      'k'        black
+      =========  =====
+    """       
+    lines = plot(*args, **kwargs)
+    global gca
+    __setYAxisType(gca, 'log')
+    return lines
+        
 def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     global gca  
     
@@ -2023,6 +2075,13 @@ def __setYAxisType(ax, axistype, timetickformat=None):
         if not timetickformat is None:
             ax.getAxis(Location.LEFT).setTimeFormat(timetickformat)
             ax.getAxis(Location.RIGHT).setTimeFormat(timetickformat)
+    elif axistype == 'log':
+        b_axis = LogAxis(ax.getAxis(Location.LEFT))
+        b_axis.setLabel('Log')
+        ax.setAxis(b_axis, Location.LEFT)
+        t_axis = LogAxis(ax.getAxis(Location.RIGHT))
+        t_axis.setLabel('Log')
+        ax.setAxis(t_axis, Location.RIGHT)
 
 def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     """
