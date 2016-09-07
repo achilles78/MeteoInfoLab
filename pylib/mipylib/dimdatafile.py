@@ -179,7 +179,11 @@ class DimDataFile():
         
     def addgroupattr(self, attrname, attrvalue, group=None, float=False):
         if float:
-            attrvalue = Float(attrvalue)
+            if isinstance(attrvalue, (list, tuple)):
+                for i in range(len(attrvalue)):
+                    attrvalue[i] = Float(attrvalue[i])
+            else:
+                attrvalue = Float(attrvalue)
         return self.ncfile.addGroupAttribute(group, Attribute(attrname, attrvalue))
  
     def __getdatatype(self, datatype):
