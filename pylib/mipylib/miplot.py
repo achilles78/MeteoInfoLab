@@ -1638,8 +1638,12 @@ def xaxis(ax=None, **kwargs):
     c = __getcolor(color)
     minortick = kwargs.pop('minortick', False)
     axistype = kwargs.pop('axistype', None)
+    timetickformat = kwargs.pop('timetickformat', None)
     if not axistype is None:
-        __setXAxisType(ax, axistype)
+        if timetickformat is None:
+            __setXAxisType(ax, axistype)
+        else:
+            __setXAxisType(ax, axistype, timetickformat)
         ax.updateDrawExtent()
     locs = [Location.BOTTOM, Location.TOP]
     for loc in locs:
@@ -1664,8 +1668,12 @@ def yaxis(ax=None, **kwargs):
     c = __getcolor(color)
     minortick = kwargs.pop('minortick', False)
     axistype = kwargs.pop('axistype', None)
+    timetickformat = kwargs.pop('timetickformat', None)
     if not axistype is None:
-        __setYAxisType(ax, axistype)
+        if timetickformat is None:
+            __setYAxisType(ax, axistype)
+        else:
+            __setYAxisType(ax, axistype, timetickformat)
         ax.updateDrawExtent()
     locs = [Location.LEFT, Location.RIGHT]
     for loc in locs:
@@ -2191,6 +2199,9 @@ def xticks(*args, **kwargs):
         locs = args[0]
         if isinstance(locs, (MIArray, DimArray)):
             locs = locs.aslist()
+        if isinstance(locs[0], datetime.datetime):
+            for i in range(len(locs)):
+                locs[i] = miutil.date2num(locs[i])
         axis.setTickLocations(locs)
         axis_t.setTickLocations(locs)
         args = args[1:]
@@ -2241,6 +2252,9 @@ def yticks(*args, **kwargs):
         locs = args[0]
         if isinstance(locs, MIArray):
             locs = locs.aslist()
+        if isinstance(locs[0], datetime.datetime):
+            for i in range(len(locs)):
+                locs[i] = miutil.date2num(locs[i])
         axis.setTickLocations(locs)
         axis_r.setTickLocations(locs)
         args = args[1:]
@@ -2393,6 +2407,10 @@ def xlim(xmin, xmax):
     :param xmax: (*float*) Maximum limit of the x axis.
     """
     plot = gca
+    if isinstance(xmin, datetime.datetime):
+        xmin = miutil.date2num(xmin)
+    if isinstance(xmax, datetime.datetime):
+        xmax = miutil.date2num(xmax)    
     extent = plot.getDrawExtent()
     extent.minX = xmin
     extent.maxX = xmax
@@ -2408,6 +2426,10 @@ def ylim(ymin, ymax):
     :param xmax: (*float*) Maximum limit of the yaxis.
     """
     plot = gca
+    if isinstance(ymin, datetime.datetime):
+        ymin = miutil.date2num(ymin)
+    if isinstance(ymax, datetime.datetime):
+        ymax = miutil.date2num(ymax) 
     extent = plot.getDrawExtent()
     extent.minY = ymin
     extent.maxY = ymax
