@@ -1041,8 +1041,11 @@ def maximum(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, (MIArray, DimArray)):
+    if isinstance(x1, MIArray):
         return MIArray(ArrayMath.maximum(x1.asarray(), x2.asarray()))
+    elif isinstance(x1, DimArray):
+        r = MIArray(ArrayMath.maximum(x1.asarray(), x2.asarray()))
+        return DimArray(r, x1.dims, x1.fill_value, x1.proj)
     else:
         return max(x1, x2)
         
