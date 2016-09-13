@@ -237,6 +237,7 @@ def plot(*args, **kwargs):
             for i in range(0, snum):
                 label = kwargs.pop('label', 'S_' + str(i + 1))
                 line = __getlegendbreak('line', **kwargs)[0]
+                line.setCaption(label)
                 lines.append(line)
     
     #Create XY1DPlot

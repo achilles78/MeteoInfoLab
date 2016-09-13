@@ -528,6 +528,20 @@ class DimArray():
     def ave(self):
         return self.array.ave()
         
+    def setdata(self, v, x=None, y=None, method='mean'):
+        '''
+        Set data values according the locations.
+        
+        :param v: (*array_like*) The data array.
+        :param x: (*array_like*) X coordinate array.
+        :param y: (*array_like*) Y coordinate array.
+        :param method: (*string*) Method, ['mean' | 'max' | 'min' | 'count'].               
+        '''
+        if x is None:
+            x = self.dimvalue(1)
+            y = self.dimvalue(0)
+        
+        
     def inpolygon(self, polygon):
         #x = self.dims[1].getDimValue()
         #y = self.dims[0].getDimValue()

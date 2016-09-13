@@ -25,6 +25,7 @@ class DimVariable():
         self.ncvariable = ncvariable
         if not variable is None:
             self.name = variable.getName()
+            self.datatype = variable.getDataType()
             self.dims = variable.getDimensions()
             self.ndim = variable.getDimNumber()
             self.fill_value = variable.getFillValue()

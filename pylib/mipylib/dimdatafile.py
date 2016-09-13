@@ -192,6 +192,8 @@ class DimDataFile():
                 dt = DataType.STRING
             elif datatype == 'int':
                 dt = DataType.INT
+            elif datatype == 'long':
+                dt = DataType.LONG
             elif datatype == 'float':
                 dt = DataType.FLOAT
             elif datatype == 'double':
