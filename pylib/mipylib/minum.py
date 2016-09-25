@@ -302,7 +302,7 @@ def __getfilename(fname):
             print 'File not exist: ' + fname
             return None, isweb
           
-def addfile(fname, access='r', dtype='netcdf'):
+def addfile(fname, access='r', dtype='netcdf', keepopen=False):
     """
     Opens a data file that is written in a supported file format.
     
@@ -334,7 +334,7 @@ def addfile(fname, access='r', dtype='netcdf'):
             return addfile_awx(fname, False)
         
         meteodata = MeteoDataInfo()
-        meteodata.openData(fname)
+        meteodata.openData(fname, keepopen)
         __addmeteodata(meteodata)
         datafile = DimDataFile(meteodata)
         return datafile
@@ -1068,8 +1068,11 @@ def fmax(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, (MIArray, DimArray)):
+    if isinstance(x1, MIArray):
         return MIArray(ArrayMath.fmax(x1.asarray(), x2.asarray()))
+    elif isinstance(x1, DimArray):
+        r = MIArray(ArrayMath.fmax(x1.asarray(), x2.asarray()))
+        return DimArray(r, x1.dims, x1.fill_value, x1.proj)
     else:
         return max(x1, x2)
         
@@ -1091,8 +1094,11 @@ def minimum(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, (MIArray, DimArray)):
+    if isinstance(x1, MIArray):
         return MIArray(ArrayMath.minimum(x1.asarray(), x2.asarray()))
+    elif isinstance(x1, DimArray):
+        r = MIArray(ArrayMath.minimum(x1.asarray(), x2.asarray()))
+        return DimArray(r, x1.dims, x1.fill_value, x1.proj)
     else:
         return min(x1, x2)
         
@@ -1115,8 +1121,11 @@ def fmin(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, (MIArray, DimArray)):
+    if isinstance(x1, MIArray):
         return MIArray(ArrayMath.fmin(x1.asarray(), x2.asarray()))
+    elif isinstance(x1, DimArray):
+        r = MIArray(ArrayMath.fmin(x1.asarray(), x2.asarray()))
+        return DimArray(r, x1.dims, x1.fill_value, x1.proj)
     else:
         return min(x1, x2)
 
@@ -1647,7 +1656,35 @@ def rmaskout(data, x, y, mask):
     if not isinstance(mask, (list, ArrayList)):
         mask = [mask]
     r = ArrayMath.maskout_Remove(data.asarray(), x.asarray(), y.asarray(), mask)
-    return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])    
+    return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])  
+
+def interp2d(*args, **kwargs):
+    """
+    Interpolate over a 2-D grid.
+    
+    :param x: (*array_like*) X coordinate array of the sample points.
+    :param y: (*array_like*) Y coordinate array of the sample points.
+    :param z: (*array_like*) 2-D value array of the sample points.
+    :param xq: (*array_like*) X coordinate array of the query points.
+    :param yq: (*array_like*) Y coordinate array of the query points.
+    :param kind: (*string*) The kind of the interpolation method. ['linear' | 'nearest'].
+    
+    :returns: (*array_like*) Interpolated array.
+    """
+    if len(args) == 3:
+        z = args[0]
+        x = z.dimvalue(1)
+        y = z.dimvalue(0)
+        xq = args[1]
+        yq = args[2]
+    else:
+        x = args[0]
+        y = args[1]
+        z = args[2]
+        xq = args[3]
+        yq = args[4]
+    r = ArrayUtil.resample_Bilinear(z.asarray(), x.asarray(), y.asarray(), xq.asarray(), yq.asarray())
+    return MIArray(r)
 
 def interpn(points, values, xi):
     """

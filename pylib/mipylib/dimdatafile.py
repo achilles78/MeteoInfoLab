@@ -49,6 +49,10 @@ class DimDataFile():
         if self.dataset is None:
             return 'None'
         return self.dataset.getInfoText()
+        
+    def close(self):
+        if not self.dataset is None:
+            self.dataset.close()
     
     def dimensions(self):
         return self.dataset.getDataInfo().getDimensions()
