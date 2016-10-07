@@ -2675,8 +2675,7 @@ def __getcolormap(**kwargs):
 def __getlegendscheme(args, min, max, **kwargs):
     ls = kwargs.pop('symbolspec', None)
     if ls is None:
-        cmap = __getcolormap(**kwargs)
-        ecobj = kwargs.pop('edgecolor', None)
+        cmap = __getcolormap(**kwargs)        
         if len(args) > 0:
             level_arg = args[0]
             if isinstance(level_arg, int):
@@ -2688,6 +2687,7 @@ def __getlegendscheme(args, min, max, **kwargs):
                 ls = LegendManage.createLegendScheme(min, max, level_arg, cmap)
         else:    
             ls = LegendManage.createLegendScheme(min, max, cmap)
+        ecobj = kwargs.pop('edgecolor', None)
         if not ecobj is None:
             edgecolor = __getcolor(ecobj)
             ls = ls.convertTo(ShapeTypes.Polygon)
@@ -2716,34 +2716,9 @@ def __setlegendscheme_image(ls, **kwargs):
     return ls
         
 def __setlegendscheme_point(ls, **kwargs):
-    ls = ls.convertTo(ShapeTypes.Point)
-    size = kwargs.pop('size', None)
-    marker = kwargs.pop('marker', None)
-    if not marker is None:
-        pstyle = __getpointstyle(marker)
-    fcobj = kwargs.pop('facecolor', None)
-    if fcobj is None:
-        fcobj = kwargs.pop('color', None)
-    if not fcobj is None:
-        facecolor = __getcolor(fcobj)
-    ecobj = kwargs.pop('edgecolor', None)
-    if not ecobj is None:
-        edgecolor = __getcolor(ecobj)
-    fill = kwargs.pop('fill', None)
-    edge = kwargs.pop('edge', None)
+    ls = ls.convertTo(ShapeTypes.Point)    
     for lb in ls.getLegendBreaks():
-        if not fcobj is None:
-            lb.setColor(facecolor)
-        if not marker is None:
-            lb.setStyle(pstyle)
-        if not size is None:
-            lb.setSize(size)      
-        if not ecobj is None:
-            lb.setOutlineColor(edgecolor)  
-        if not fill is None:
-            lb.setDrawFill(fill)  
-        if not edge is None:
-            lb.setDrawOutline(edge)
+        __setpointlegendbreak(lb, **kwargs)
     return ls
     
 def __setlegendscheme_line(ls, **kwargs):
@@ -4728,75 +4703,129 @@ def weatherspec(weather='all', size=20, color='b'):
         wlist = weather
     c = __getcolor(color)
     return DrawMeteoData.createWeatherLegendScheme(wlist, size, c)
+    
+def __getpointlegendbreak(**kwargs):
+    lb = PointBreak()        
+    marker = kwargs.pop('marker', 'o')
+    if marker == 'image':
+        imagepath = kwargs.pop('imagepath', None)
+        if not imagepath is None:
+            lb.setMarkerType(MarkerType.Image)
+            lb.setImagePath(imagepath)
+    elif marker == 'font':
+        fontname = kwargs.pop('fontname', 'Weather')
+        lb.setMarkerType(MarkerType.Character)
+        lb.setFontName(fontname)
+        charindex = kwargs.pop('charindex', 0)
+        lb.setCharIndex(charindex)
+    else:
+        pstyle = __getpointstyle(marker)
+        lb.setStyle(pstyle)
+    size = kwargs.pop('size', 6)
+    lb.setSize(size)
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = __getcolor(ecobj)
+    lb.setOutlineColor(edgecolor)
+    fill = kwargs.pop('fill', True)
+    lb.setDrawFill(fill)
+    edge = kwargs.pop('edge', True)
+    lb.setDrawOutline(edge)
+    return lb
+    
+def __setpointlegendbreak(lb, **kwargs):       
+    marker = kwargs.pop('marker', 'o')
+    if marker == 'image':
+        imagepath = kwargs.pop('imagepath', None)
+        if not imagepath is None:
+            lb.setMarkerType(MarkerType.Image)
+            lb.setImagePath(imagepath)
+    elif marker == 'font':
+        fontname = kwargs.pop('fontname', 'Weather')
+        lb.setMarkerType(MarkerType.Character)
+        lb.setFontName(fontname)
+        charindex = kwargs.pop('charindex', 0)
+        lb.setCharIndex(charindex)
+    else:
+        pstyle = __getpointstyle(marker)
+        lb.setStyle(pstyle)
+    size = kwargs.pop('size', 6)
+    lb.setSize(size)
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = __getcolor(ecobj)
+    lb.setOutlineColor(edgecolor)
+    fill = kwargs.pop('fill', True)
+    lb.setDrawFill(fill)
+    edge = kwargs.pop('edge', True)
+    lb.setDrawOutline(edge)
 
-def __getlegendbreak(geometry, **rule): 
-    cobj = rule.pop('color', None)
+def __getlegendbreak(geometry, **kwargs): 
+    cobj = kwargs.pop('color', None)
     if cobj is None:
-        cobj = rule.pop('facecolor', None)
+        cobj = kwargs.pop('facecolor', None)
     color = None
     if not cobj is None:
         color = __getcolor(cobj)
     if geometry == 'point':
         lb = PointBreak()        
-        marker = rule.pop('marker', 'o')
+        marker = kwargs.pop('marker', 'o')
         if marker == 'image':
-            imagepath = rule.pop('imagepath', None)
+            imagepath = kwargs.pop('imagepath', None)
             if not imagepath is None:
                 lb.setMarkerType(MarkerType.Image)
                 lb.setImagePath(imagepath)
         elif marker == 'font':
-            fontname = rule.pop('fontname', 'Weather')
+            fontname = kwargs.pop('fontname', 'Weather')
             lb.setMarkerType(MarkerType.Character)
             lb.setFontName(fontname)
-            charindex = rule.pop('charindex', 0)
+            charindex = kwargs.pop('charindex', 0)
             lb.setCharIndex(charindex)
         else:
             pstyle = __getpointstyle(marker)
             lb.setStyle(pstyle)
-        size = rule.pop('size', 6)
+        size = kwargs.pop('size', 6)
         lb.setSize(size)
-        ecobj = rule.pop('edgecolor', 'k')
+        ecobj = kwargs.pop('edgecolor', 'k')
         edgecolor = __getcolor(ecobj)
         lb.setOutlineColor(edgecolor)
-        fill = rule.pop('fill', True)
+        fill = kwargs.pop('fill', True)
         lb.setDrawFill(fill)
-        edge = rule.pop('edge', True)
+        edge = kwargs.pop('edge', True)
         lb.setDrawOutline(edge)
     elif geometry == 'line':
         lb = PolylineBreak()
-        size = rule.pop('size', 1.0)
-        size = rule.pop('linewidth', size)
+        size = kwargs.pop('size', 1.0)
+        size = kwargs.pop('linewidth', size)
         lb.setSize(size)
-        lsobj = rule.pop('linestyle', '-')
+        lsobj = kwargs.pop('linestyle', '-')
         linestyle = __getlinestyle(lsobj)
         lb.setStyle(linestyle)
-        marker = rule.pop('marker', None)
+        marker = kwargs.pop('marker', None)
         if not marker is None:
             pstyle = __getpointstyle(marker)
             lb.setDrawSymbol(True)
             lb.setSymbolStyle(pstyle)
-            markersize = rule.pop('markersize', 8)
+            markersize = kwargs.pop('markersize', 8)
             lb.setSymbolSize(markersize)
-            markercolor = rule.pop('markercolor', None)
+            markercolor = kwargs.pop('markercolor', None)
             if markercolor is None:
                 makercolor = color
             else:
                 makercolor = __getcolor(makercolor)
             lb.setSymbolColor(makercolor)
-            fillcolor = rule.pop('makerfillcolor', None)
+            fillcolor = kwargs.pop('makerfillcolor', None)
             if not fillcolor is None:
                 lb.setFillSymbol(True)
                 lb.setSymbolFillColor(__getcolor(fillcolor))
             else:
                 lb.setSymbolFillColor(markercolor)
-            interval = rule.pop('markerinterval', 1)
+            interval = kwargs.pop('markerinterval', 1)
             lb.setSymbolInterval(interval)
     elif geometry == 'polygon':
         lb = PolygonBreak()
-        ecobj = rule.pop('edgecolor', 'k')
+        ecobj = kwargs.pop('edgecolor', 'k')
         edgecolor = __getcolor(ecobj)
         lb.setOutlineColor(edgecolor)
-        fill = rule.pop('fill', None)
+        fill = kwargs.pop('fill', None)
         if fill is None:
             if color is None:
                 lb.setDrawFill(False)
@@ -4804,21 +4833,21 @@ def __getlegendbreak(geometry, **rule):
                 lb.setDrawFill(True)
         else:
             lb.setDrawFill(fill)
-        edge = rule.pop('edge', True)
+        edge = kwargs.pop('edge', True)
         lb.setDrawOutline(edge)
-        size = rule.pop('size', 1)
+        size = kwargs.pop('size', 1)
         lb.setOutlineSize(size)
     else:
         lb = ColorBreak()
-    caption = rule.pop('caption', None)
+    caption = kwargs.pop('caption', None)
     if not caption is None:
         lb.setCaption(caption) 
     if not color is None:
         lb.setColor(color)
-    alpha = rule.pop('alpha', None)
+    alpha = kwargs.pop('alpha', None)
     if not alpha is None:
         lb.setColor(__getcolor(lb.getColor(), alpha))
-    value = rule.pop('value', None)
+    value = kwargs.pop('value', None)
     isunique = True
     if not value is None:
         if isinstance(value, tuple):

@@ -11,6 +11,7 @@ from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, Table
 from org.meteoinfo.data.meteodata import MeteoDataInfo, Dimension, DimensionType
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
 from org.meteoinfo.data.meteodata.arl import ARLDataInfo
+from org.meteoinfo.data.meteodata.bufr import BufrDataInfo
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.mapdata.geotiff import GeoTiff
 from org.meteoinfo.data.analysis import MeteoMath
@@ -343,6 +344,10 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False):
             arldata = ARLDataInfo()
             arldata.createDataFile(fname)
             datafile = DimDataFile(arldata=arldata)
+        elif dtype == 'bufr':
+            bufrdata = BufrDataInfo()
+            bufrdata.createDataFile(fname)
+            datafile = DimDataFile(bufrdata=bufrdata)
         else:
             ncfile = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, fname)
             datafile = DimDataFile(ncfile=ncfile)

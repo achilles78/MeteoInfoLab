@@ -26,7 +26,7 @@ import jarray
 class DimDataFile():
     
     # dataset must be org.meteoinfo.data.meteodata.MeteoDataInfo
-    def __init__(self, dataset=None, ncfile=None, arldata=None):
+    def __init__(self, dataset=None, ncfile=None, arldata=None, bufrdata = None):
         self.dataset = dataset
         if not dataset is None:
             self.filename = dataset.getFileName()
@@ -35,6 +35,7 @@ class DimDataFile():
             self.proj = dataset.getProjectionInfo()
         self.ncfile = ncfile
         self.arldata = arldata
+        self.bufrdata = bufrdata
         
     def __getitem__(self, key):
         if isinstance(key, str):
@@ -233,6 +234,8 @@ class DimDataFile():
             self.ncfile.close()
         elif not self.arldata is None:
             self.arldata.closeDataFile()
+        elif not self.bufrdata is None:
+            self.bufrdata.closeDataFile()
         
     def largefile(self, islarge=True):
         self.ncfile.setLargeFile(islarge)
@@ -272,3 +275,30 @@ class DimDataFile():
         t = cal.getTime()
         ksum = self.arldata.writeGridData(t, lidx, vname, fhour, grid, data.asarray())
         return ksum
+        
+    # Write Bufr data
+    def write_indicator(self, bufrlen, edition=3):
+        self.bufrdata.writeIndicatorSection(bufrlen, edition)
+        
+    def write_identification(self, **kwargs):
+        length = kwargs.pop('length', 17)
+        master_table = kwargs.pop('master_table', 0)
+        subcenter_id = kwargs.pop('subcenter_id', 0)
+        center_id = kwargs.pop('center_id', 74)
+        update = kwargs.pop('update', 0)
+        optional = kwargs.pop('optional', 0)
+        category = kwargs.pop('category', 7)
+        sub_category = kwargs.pop('sub_category', 0)
+        master_table_version = kwargs.pop('master_table_version', 11)
+        local_table_version = kwargs.pop('local_table_version', 1)
+        year = kwargs.pop('year', 2016)
+        month = kwargs.pop('month', 1)
+        day = kwargs.pop('day', 1)
+        hour = kwargs.pop('hour', 0)
+        minute = kwargs.pop('minute', 0)
+        self.bufrdata.writeIdentificationSection(length, master_table, subcenter_id, center_id,\
+            update, optional, category, sub_category, master_table_version,\
+            local_table_version, year, month, day, hour, minute)
+            
+    def write_datadescription(self, length, n, datetype, descriptors):
+        self.bufrdata.writeDataDescriptionSection(length, n, datatype, descriptors)
