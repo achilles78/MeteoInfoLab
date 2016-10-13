@@ -3652,11 +3652,10 @@ def scatterm(*args, **kwargs):
                 gdata = minum.asstationdata(a, x, y, fill_value)                
             else:
                 gdata = minum.asgriddata(a, x, y, fill_value)
-        
-    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    if 'symbolspec' in kwargs:
-        __setlegendscheme(ls, **kwargs)
-    else:
+    
+    ls = kwargs.pop('symbolspec', None)
+    if ls is None:
+        ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
         ls = __setlegendscheme_point(ls, **kwargs)    
     if isinstance(gdata, PyGridData):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
@@ -3860,11 +3859,11 @@ def imshowm(*args, **kwargs):
         cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
         if cb.isNoData():
             cb.setColor(__getcolor(fill_color))
-        else:
-            cb = ColorBreak()
-            cb.setColor(__getcolor(fill_color))
-            cb.setNoData(True)
-            ls.addLegendBreak(cb)
+        # else:  
+            # cb = ColorBreak()
+            # cb.setColor(__getcolor(fill_color))
+            # cb.setNoData(True)
+            # ls.addLegendBreak(cb)
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
     gdata = None
     return MILayer(layer)
