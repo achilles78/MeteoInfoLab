@@ -42,7 +42,7 @@ from milayer import MILayer, MIXYListData
 import miutil
 
 ## Global ##
-milapp = None
+milapp1 = None
 batchmode = False
 isinteractive = False
 maplayout = MapLayout()
@@ -1300,7 +1300,7 @@ def figure(bgcolor=None, figsize=None, newfig=True):
         show(newfig)
         
 def show(newfig=True):
-    if milapp == None:
+    if milapp1 == None:
         if not batchmode:            
             form = ChartForm(chartpanel)
             chartpanel.paintGraphics()
@@ -1309,7 +1309,7 @@ def show(newfig=True):
             form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
             form.setVisible(True)     
     else:
-        figureDock = milapp.getFigureDock()
+        figureDock = milapp1.getFigureDock()
         if newfig:
             figureDock.addFigure(chartpanel)
         else:

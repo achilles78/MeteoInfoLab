@@ -357,7 +357,7 @@ public class EditorDockable extends DefaultSingleCDockable {
 //                }
                 try {
                     interp.exec("import sys");
-                    //interp.set("mis", mis);
+                    interp.set("milapp", EditorDockable.this.parent);
                     //interp.exec("sys.path.append('" + path + "')");
                     //interp.exec("import mipylib");
                     //interp.exec("from mipylib.miscript import *");                    

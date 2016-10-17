@@ -78,7 +78,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
         //this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
-            interp.set("mlapp", parent);
+            interp.set("milapp", parent);
             interp.exec("import sys");
             interp.exec("import os");
             interp.exec("import datetime");
@@ -105,7 +105,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         new Thread(interp).start();
         try {
             interp.exec("mipylib.miplot.isinteractive = True");
-            interp.exec("mipylib.miplot.milapp = mlapp");
+            interp.exec("mipylib.miplot.milapp1 = milapp");
             interp.exec("mipylib.minum.currentfolder = '" + currentPath + "'");
         } catch (Exception e) {
             e.printStackTrace();

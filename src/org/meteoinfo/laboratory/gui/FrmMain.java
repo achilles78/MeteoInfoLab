@@ -1068,6 +1068,10 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public void openProjectFile(String fileName) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    public void runScript(String fileName){
+        
+    }
 
     /**
      * @param args the command line arguments
