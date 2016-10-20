@@ -1361,7 +1361,7 @@ def subplot(nrows, ncols, plot_number):
         chart.setCurrentPlot(chart.getPlots().size() - 1)
     #gca = plot
     
-    return plot
+    return gca
     
 def currentplot(plot_number):
     if chartpanel is None:
@@ -1373,6 +1373,14 @@ def currentplot(plot_number):
     chart.setCurrentPlot(plot_number - 1)
     
     return plot
+    
+def gca():
+    """
+    Get current axes.
+    
+    :returns: Current axes.
+    """
+    return gca
     
 def axes(**kwargs):
     """
@@ -1638,6 +1646,7 @@ def xaxis(ax=None, **kwargs):
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
     minortick = kwargs.pop('minortick', False)
+    tickin = kwargs.pop('tickin', True)
     axistype = kwargs.pop('axistype', None)
     timetickformat = kwargs.pop('timetickformat', None)
     if not axistype is None:
@@ -1652,7 +1661,8 @@ def xaxis(ax=None, **kwargs):
         axis.setShift(shift)
         axis.setColor_All(c)
         axis.setMinorTickVisible(minortick)
-    draw_if_interactive
+        axis.setInsideTick(tickin)
+    draw_if_interactive()
     
 def yaxis(ax=None, **kwargs):
     """
@@ -1668,6 +1678,7 @@ def yaxis(ax=None, **kwargs):
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
     minortick = kwargs.pop('minortick', False)
+    tickin = kwargs.pop('tickin', True)
     axistype = kwargs.pop('axistype', None)
     timetickformat = kwargs.pop('timetickformat', None)
     if not axistype is None:
@@ -1682,7 +1693,30 @@ def yaxis(ax=None, **kwargs):
         axis.setShift(shift)
         axis.setColor_All(c)
         axis.setMinorTickVisible(minortick)
-    draw_if_interactive
+        axis.setInsideTick(tickin)
+    draw_if_interactive()
+    
+def box(ax=None, on=None):
+    """
+    Display exes outline or not.
+    
+    :param ax: The axes. Current axes is used if ax is None.
+    :param on: (*boolean*) Box on or off. If on is None, toggle state.
+    """
+    if ax is None:
+        ax = gca
+    locs_all = [Location.LEFT, Location.BOTTOM, Location.TOP, Location.RIGHT]
+    locs = []
+    for loc in locs_all:
+        if not ax.getAxis(loc).isDrawTickLabel():
+            locs.append(loc)
+    for loc in locs:
+        axis = ax.getAxis(loc)
+        if on is None:
+            axis.setVisible(not axis.isVisible())
+        else:
+            axis.setVisible(on)
+    draw_if_interactive()
     
 def antialias(b=True):
     """
@@ -2645,6 +2679,9 @@ def set(obj, **kwargs):
             for loc in locs:
                 axis = obj.getAxis(loc)
                 axis.setMinorTickVisible(yminortick)
+        tickin = kwargs.pop('tickin', None)
+        if not tickin is None:
+            obj.setInsideTick(tickin)
     draw_if_interactive()
     
 def __getcolormap(**kwargs):
