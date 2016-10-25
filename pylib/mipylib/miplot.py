@@ -22,7 +22,7 @@ from org.meteoinfo.drawing import PointStyle, MarkerType
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.global.image import AnimatedGifEncoder
-from org.meteoinfo.layer import LayerTypes
+from org.meteoinfo.layer import LayerTypes, MapLayer
 from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
 from org.meteoinfo.laboratory.gui import FrmMain
@@ -2973,6 +2973,8 @@ def contour(*args, **kwargs):
             ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
     else:    
         ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+    ls = ls.convertTo(ShapeTypes.Polyline)
+    __setlegendscheme(ls, **kwargs)
     
     smooth = kwargs.pop('smooth', True)
     igraphic = GraphicFactory.createContourLines(gdata.data, ls, smooth)
@@ -3942,6 +3944,8 @@ def contourm(*args, **kwargs):
         gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    ls = ls.convertTo(ShapeTypes.Polyline)
+    __setlegendscheme(ls, **kwargs)
     isplot = kwargs.pop('isplot', True)
     if isplot:
         plot = gca
@@ -4535,10 +4539,11 @@ def clabel(layer, **kwargs):
         dynamic = False
     drawshadow = kwargs.pop('drawshadow', dynamic)
     labelset = gc.getLabelSet()
-    fieldname = kwargs.pop('fieldname', labelset.getFieldName())
-    if fieldname is None:
-        fieldname = gc.getFieldName(0)
-    labelset.setFieldName(fieldname)
+    if isinstance(gc, MapLayer):
+        fieldname = kwargs.pop('fieldname', labelset.getFieldName())
+        if fieldname is None:
+            fieldname = gc.getFieldName(0)
+        labelset.setFieldName(fieldname)
     labelset.setLabelFont(font)
     labelset.setLabelColor(color)
     labelset.setDrawShadow(drawshadow)
