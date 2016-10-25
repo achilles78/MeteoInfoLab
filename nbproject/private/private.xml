@@ -4,12 +4,8 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/src/org/meteoinfo/laboratory/gui/ConsoleDockable.java</file>
-            <file>file:/D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/src/org/meteoinfo/laboratory/application/AppCollection.java</file>
             <file>file:/D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/src/org/meteoinfo/laboratory/gui/FrmMain.java</file>
             <file>file:/D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/src/org/meteoinfo/laboratory/gui/EditorDockable.java</file>
-            <file>file:/D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/src/org/meteoinfo/laboratory/MeteoInfoLab.java</file>
-            <file>file:/D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/src/org/meteoinfo/laboratory/gui/FrmAppsManager.java</file>
-            <file>file:/D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/src/org/meteoinfo/laboratory/application/Application.java</file>
         </group>
     </open-files>
 </project-private>
