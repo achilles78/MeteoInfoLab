@@ -320,9 +320,11 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
      */
     public void unloadApplication(Application plugin) {
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        plugin.getPluginObject().unload();
-        plugin.setPluginObject(null);
-        plugin.setLoad(false);
+        if (plugin.getPluginObject() != null){
+            plugin.getPluginObject().unload();
+            plugin.setPluginObject(null);
+            plugin.setLoad(false);
+        }
         this.setCursor(Cursor.getDefaultCursor());
     }
 
