@@ -103,7 +103,7 @@ public class AppCollection extends ArrayList<Application> {
             Attr pluginAuthorAttr = doc.createAttribute("Author");
             Attr pluginVersionAttr = doc.createAttribute("Version");
             Attr pluginDescriptionAttr = doc.createAttribute("Description");
-            Attr pluginJarPathAttr = doc.createAttribute("JarPath");
+            Attr pluginPathAttr = doc.createAttribute("Path");
             Attr pluginClassNameAttr = doc.createAttribute("ClassName");
             Attr pluginIsLoadAttr = doc.createAttribute("IsLoad");
             
@@ -111,7 +111,7 @@ public class AppCollection extends ArrayList<Application> {
             pluginAuthorAttr.setValue(app.getAuthor());
             pluginVersionAttr.setValue(app.getVersion());
             pluginDescriptionAttr.setValue(app.getDescription());
-            pluginJarPathAttr.setValue(app.getJarPath());
+            pluginPathAttr.setValue(app.getPath());
             pluginClassNameAttr.setValue(app.getClassName());
             pluginIsLoadAttr.setValue(String.valueOf(app.isLoad()));
             
@@ -119,7 +119,7 @@ public class AppCollection extends ArrayList<Application> {
             pluginElem.setAttributeNode(pluginAuthorAttr);
             pluginElem.setAttributeNode(pluginVersionAttr);
             pluginElem.setAttributeNode(pluginDescriptionAttr);
-            pluginElem.setAttributeNode(pluginJarPathAttr);
+            pluginElem.setAttributeNode(pluginPathAttr);
             pluginElem.setAttributeNode(pluginClassNameAttr);
             pluginElem.setAttributeNode(pluginIsLoadAttr);
             
@@ -173,9 +173,8 @@ public class AppCollection extends ArrayList<Application> {
                 plugin.setAuthor(attrs.getNamedItem("Author").getNodeValue());
                 plugin.setVersion(attrs.getNamedItem("Version").getNodeValue());
                 plugin.setDescription(attrs.getNamedItem("Description").getNodeValue());
-                String jarPath = attrs.getNamedItem("JarPath").getNodeValue();
-                jarPath = this._pluginPath + File.separator + jarPath;
-                plugin.setJarFileName(jarPath);
+                String path = attrs.getNamedItem("Path").getNodeValue();
+                plugin.setPath(path);
                 plugin.setClassName(attrs.getNamedItem("ClassName").getNodeValue());
                 plugin.setLoad(Boolean.parseBoolean(attrs.getNamedItem("IsLoad").getNodeValue()));
                 this.add(plugin);

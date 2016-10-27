@@ -14,14 +14,14 @@ import dimarray
 from dimarray import DimArray
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 
-def grib2nc(infn, outfn):
+def convert2nc(infn, outfn):
     """
-    Convert GRIB data file to netCDF data file.
+    Convert data file (Grib, HDF...) to netCDF data file.
     
-    :param infn: (*string*) Input GRIB data file name.
+    :param infn: (*string*) Input data file name.
     :param outfn: (*string*) Output netCDF data file name.
     """
-    #Open GRIB file
+    #Open input data file
     f = minum.addfile(infn)
     #New netCDF file
     ncfile = minum.addfile(outfn, 'c')

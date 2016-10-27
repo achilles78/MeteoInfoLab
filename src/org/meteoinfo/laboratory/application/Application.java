@@ -15,7 +15,7 @@ import org.meteoinfo.plugin.PluginBase;
 public class Application extends PluginBase {
     // <editor-fold desc="Variables">
     //private String _name;
-    private String _jarFileName;
+    private String path;
     private String _className;
     private IPlugin _pluginObject = null;
     private boolean _isLoad = false;
@@ -25,19 +25,19 @@ public class Application extends PluginBase {
     // <editor-fold desc="Get Set Methods">
     
     /**
-     * Get jar file name
-     * @return Jar file name
+     * Get path
+     * @return Path
      */
-    public String getJarFileName(){
-        return this._jarFileName;
+    public String getPath(){
+        return this.path;
     }
     
      /**
-     * Set jar file name
-     * @param value Jar file name
+     * Set path
+     * @param value Path
      */
-    public void setJarFileName(String value){
-        this._jarFileName = value;
+    public void setPath(String value){
+        this.path = value;
     }
     
     /**
@@ -45,7 +45,7 @@ public class Application extends PluginBase {
      * @return Jar path
      */
     public String getJarPath(){
-        String path = this._jarFileName;
+        String path = this.path;
         int idx = path.indexOf("toolbox");
         if (idx >= 0){
             path = path.substring(idx + 8);

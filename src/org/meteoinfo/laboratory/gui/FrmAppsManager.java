@@ -20,6 +20,8 @@ import org.meteoinfo.laboratory.application.AppCollection;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.plugin.IPlugin;
 import org.meteoinfo.ui.CheckBoxListEntry;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
 
 /**
  *
@@ -32,6 +34,7 @@ public class FrmAppsManager extends javax.swing.JDialog {
 
     /**
      * Creates new form FrmPluginManager
+     *
      * @param parent
      * @param modal
      */
@@ -187,38 +190,53 @@ public class FrmAppsManager extends javax.swing.JDialog {
 
         String pluginPath = parent.getApplications().getPluginPath();
         if (new File(pluginPath).isDirectory()) {
-            List<String> fileNames = GlobalUtil.getFiles(pluginPath, ".jar");
-            for (String fn : fileNames) {
-                Application plugin = this.readApplication(fn);
-                if (plugin != null) {
-                    plugins.add(plugin);
+//            List<String> fileNames = GlobalUtil.getFiles(pluginPath, ".jar");
+//            for (String fn : fileNames) {
+//                Application plugin = this.readApplication(fn);
+//                if (plugin != null) {
+//                    plugins.add(plugin);
+//                }
+//            }
+
+            File f = new File(pluginPath);
+            if (f.isDirectory()) {
+                File fs[] = f.listFiles();
+                for (File ff : fs) {
+                    if (ff.isDirectory()) {
+                        Application plugin = this.readPyApp(ff.getName(), "loadApp.py");
+                        if (plugin != null) {
+                            plugins.add(plugin);
+                        }
+                    }
                 }
             }
 
-            List<String> pluginNames = new ArrayList<>();
-            for (Application plugin : apps) {
-                pluginNames.add(plugin.getName());
-            }
-
-            List<String> newPluginNames = new ArrayList<>();
-            for (Application plugin : plugins) {
-                newPluginNames.add(plugin.getName());
-            }
-
-            for (int i = 0; i < apps.size(); i++) {
-                if (!newPluginNames.contains(apps.get(i).getName())) {
-                    apps.remove(i);
-                    i -= 1;
+            if (plugins.size() > 0) {
+                List<String> pluginNames = new ArrayList<>();
+                for (Application plugin : apps) {
+                    pluginNames.add(plugin.getName());
                 }
-            }
 
-            for (Application plugin : plugins) {
-                if (!pluginNames.contains(plugin.getName())) {
-                    apps.add(plugin);
+                List<String> newPluginNames = new ArrayList<>();
+                for (Application plugin : plugins) {
+                    newPluginNames.add(plugin.getName());
                 }
-            }
 
-            this.updatePluginCheckList();
+                for (int i = 0; i < apps.size(); i++) {
+                    if (!newPluginNames.contains(apps.get(i).getName())) {
+                        apps.remove(i);
+                        i -= 1;
+                    }
+                }
+
+                for (Application plugin : plugins) {
+                    if (!pluginNames.contains(plugin.getName())) {
+                        apps.add(plugin);
+                    }
+                }
+
+                this.updatePluginCheckList();
+            }
         }
     }//GEN-LAST:event_jButton_UpdateListActionPerformed
 
@@ -231,16 +249,36 @@ public class FrmAppsManager extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_formWindowClosed
 
+    public Application readPyApp(String path, String fileName) {
+        try {
+            Application plugin = new Application();
+            plugin.setPath(path);
+            plugin.setClassName("LoadApp");
+            PythonInterpreter interp = this.parent.getConsoleDockable().getInterpreter();
+            interp.exec("import " + path);
+            interp.exec("from " + path + ".loadApp import LoadApp");
+            PyObject loadClass = interp.get("LoadApp");
+            PyObject loadObj = loadClass.__call__();
+            IPlugin instance = (IPlugin) loadObj.__tojava__(IPlugin.class);
+            plugin.setPluginObject(instance);
+            return plugin;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public Application readApplication(String jarFileName) {
         try {
             Application plugin = new Application();
-            plugin.setJarFileName(jarFileName);
+            plugin.setPath(jarFileName);
             String className = GlobalUtil.getPluginClassName(jarFileName);
-            if (className == null){
+            if (className == null) {
                 return null;
             } else {
                 plugin.setClassName(className);
-                URL url = new URL("file:" + plugin.getJarFileName());
+                URL url = new URL("file:" + plugin.getPath());
                 URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{url});
                 Class<?> clazz = urlClassLoader.loadClass(plugin.getClassName());
                 IPlugin instance = (IPlugin) clazz.newInstance();
@@ -258,7 +296,7 @@ public class FrmAppsManager extends javax.swing.JDialog {
         }
         return null;
     }
-    
+
     /**
      * @param args the command line arguments
      */

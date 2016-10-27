@@ -64,6 +64,7 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
+import org.python.util.PythonInterpreter;
 import org.xml.sax.SAXException;
 
 /**
@@ -253,7 +254,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public String getStartupPath() {
         return this.startupPath;
     }
-
+    
     /**
      * Load an application
      *
@@ -261,30 +262,56 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
      */
     public void loadApplication(Application plugin) {
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        URL url = null;
         try {
-            url = new URL("file:" + plugin.getJarFileName());
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{url});
-        try {
-            Class<?> clazz = urlClassLoader.loadClass(plugin.getClassName());
-            IPlugin instance = (IPlugin) clazz.newInstance();
+            PythonInterpreter interp = this.getConsoleDockable().getInterpreter();
+            String path = plugin.getPath();
+            interp.exec("import " + path);
+            interp.exec("from " + path + ".loadApp import LoadApp");
+            PyObject loadClass = interp.get("LoadApp");
+            PyObject loadObj = loadClass.__call__();
+            IPlugin instance = (IPlugin) loadObj.__tojava__(IPlugin.class);
             instance.setApplication(FrmMain.this);
             instance.setName(plugin.getName());
             plugin.setPluginObject(instance);
             plugin.setLoad(true);
             instance.load();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         this.setCursor(Cursor.getDefaultCursor());
     }
+
+//    /**
+//     * Load an application
+//     *
+//     * @param plugin Application
+//     */
+//    public void loadApplication_bak(Application plugin) {
+//        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//        URL url = null;
+//        try {
+//            url = new URL("file:" + plugin.getJarFileName());
+//        } catch (MalformedURLException ex) {
+//            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{url});
+//        try {
+//            Class<?> clazz = urlClassLoader.loadClass(plugin.getClassName());
+//            IPlugin instance = (IPlugin) clazz.newInstance();
+//            instance.setApplication(FrmMain.this);
+//            instance.setName(plugin.getName());
+//            plugin.setPluginObject(instance);
+//            plugin.setLoad(true);
+//            instance.load();
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        this.setCursor(Cursor.getDefaultCursor());
+//    }
 
     /**
      * Unload an application
