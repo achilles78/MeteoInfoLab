@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import org.meteoinfo.global.DataConvert;
 import org.meteoinfo.global.util.FontUtil;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.gui.FrmMain;
@@ -36,8 +37,20 @@ public class MeteoInfoLab {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        if (args.length >= 1) {
+        // TODO code application logic here        
+        if (args.length >= 1){
+            if (args[0].equalsIgnoreCase("-r")) {
+                String fontPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "fonts";
+                //fontPath = "D:\\MyProgram\\java\\MeteoInfoDev\\MeteoInfo\\fonts";
+                List<String> fontFns = GlobalUtil.getFiles(fontPath, ".ttc");
+                for (String fontFn : fontFns){
+                    System.out.println("Register: " + fontFn);
+                    FontUtil.registerFont(fontFn);
+                }
+                args = (String[])DataConvert.resizeArray(args, args.length - 1);
+            }
+        }
+        if (args.length >= 1) {            
             if (args[0].equalsIgnoreCase("-i")) {
                 runInteractive();
             } else if (args[0].equalsIgnoreCase("-b")) {
@@ -58,15 +71,6 @@ public class MeteoInfoLab {
                 }
             } else if (args[0].equalsIgnoreCase("-eng")) {
                 runApplication(true);
-            } else if (args[0].equalsIgnoreCase("-r")) {
-                String fontPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "fonts";
-                //fontPath = "D:\\MyProgram\\java\\MeteoInfoDev\\MeteoInfo\\fonts";
-                List<String> fontFns = GlobalUtil.getFiles(fontPath, ".ttc");
-                for (String fontFn : fontFns){
-                    System.out.println("Register: " + fontFn);
-                    FontUtil.registerFont(fontFn);
-                }
-                runApplication();
             } else {
                 String fn = args[0];
                 if (new File(fn).isFile()) {
