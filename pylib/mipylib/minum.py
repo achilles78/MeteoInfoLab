@@ -1555,12 +1555,19 @@ def asstationdata(data, x, y, fill_value=-9999.0):
     stdata = StationData(data.asarray(), x.asarray(), y.asarray(), fill_value)
     return PyStationData(stdata)
         
-def shaperead(fn):
-    layer = MILayer(MapDataManage.loadLayer(fn))
-    lb = layer.legend().getLegendBreaks()[0]
-    if lb.getBreakType() == BreakTypes.PolygonBreak:
-        lb.setDrawFill(False)
-    return layer
+def shaperead(fn):   
+    if os.path.exists(fn):        
+        try:
+            layer = MILayer(MapDataManage.loadLayer(fn))
+            lb = layer.legend().getLegendBreaks()[0]
+            if lb.getBreakType() == BreakTypes.PolygonBreak:
+                lb.setDrawFill(False)
+            return layer
+        except:
+            raise
+    else:
+        print 'File not exists: ' + fn
+        raise
     
 def georead(fn):
     layer = MILayer(MapDataManage.loadLayer(fn))
