@@ -11,12 +11,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import org.meteoinfo.global.util.FontUtil;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.gui.FrmMain;
 import org.meteoinfo.laboratory.gui.MyPythonInterpreter;
@@ -56,6 +58,15 @@ public class MeteoInfoLab {
                 }
             } else if (args[0].equalsIgnoreCase("-eng")) {
                 runApplication(true);
+            } else if (args[0].equalsIgnoreCase("-r")) {
+                String fontPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "fonts";
+                //fontPath = "D:\\MyProgram\\java\\MeteoInfoDev\\MeteoInfo\\fonts";
+                List<String> fontFns = GlobalUtil.getFiles(fontPath, ".ttc");
+                for (String fontFn : fontFns){
+                    System.out.println("Register: " + fontFn);
+                    FontUtil.registerFont(fontFn);
+                }
+                runApplication();
             } else {
                 String fn = args[0];
                 if (new File(fn).isFile()) {
