@@ -303,7 +303,7 @@ def __getfilename(fname):
             print 'File not exist: ' + fname
             return None, isweb
           
-def addfile(fname, access='r', dtype='netcdf', keepopen=False):
+def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
     """
     Opens a data file that is written in a supported file format.
     
@@ -346,10 +346,17 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False):
             datafile = DimDataFile(arldata=arldata)
         elif dtype == 'bufr':
             bufrdata = BufrDataInfo()
+            if os.path.exists(fname):
+                os.remove(fname)
             bufrdata.createDataFile(fname)
             datafile = DimDataFile(bufrdata=bufrdata)
         else:
-            ncfile = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, fname)
+            version = kwargs.pop('version', 'netcdf3')
+            if version == 'netcdf3':
+                version = NetcdfFileWriter.Version.netcdf3
+            else:
+                version = NetcdfFileWriter.Version.netcdf4
+            ncfile = NetcdfFileWriter.createNew(version, fname)
             datafile = DimDataFile(ncfile=ncfile)
         return datafile
     else:

@@ -26,7 +26,7 @@ import jarray
 class DimDataFile():
     
     # dataset must be org.meteoinfo.data.meteodata.MeteoDataInfo
-    def __init__(self, dataset=None, ncfile=None, arldata=None, bufrdata = None):
+    def __init__(self, dataset=None, ncfile=None, arldata=None, bufrdata=None):
         self.dataset = dataset
         if not dataset is None:
             self.filename = dataset.getFileName()
@@ -54,6 +54,10 @@ class DimDataFile():
     def close(self):
         if not self.dataset is None:
             self.dataset.close()
+        elif not self.arldata is None:
+            self.arldata.closeDataFile()
+        elif not self.bufrdata is None:
+            self.bufrdata.closeDataFile()
     
     def dimensions(self):
         return self.dataset.getDataInfo().getDimensions()
@@ -278,10 +282,13 @@ class DimDataFile():
         
     # Write Bufr data
     def write_indicator(self, bufrlen, edition=3):
-        self.bufrdata.writeIndicatorSection(bufrlen, edition)
+        return self.bufrdata.writeIndicatorSection(bufrlen, edition)
+        
+    def rewrite_indicator(self, bufrlen, edition=3):
+        self.bufrdata.reWriteIndicatorSection(bufrlen, edition)
         
     def write_identification(self, **kwargs):
-        length = kwargs.pop('length', 17)
+        length = kwargs.pop('length', 18)
         master_table = kwargs.pop('master_table', 0)
         subcenter_id = kwargs.pop('subcenter_id', 0)
         center_id = kwargs.pop('center_id', 74)
@@ -296,9 +303,21 @@ class DimDataFile():
         day = kwargs.pop('day', 1)
         hour = kwargs.pop('hour', 0)
         minute = kwargs.pop('minute', 0)
-        self.bufrdata.writeIdentificationSection(length, master_table, subcenter_id, center_id,\
+        return self.bufrdata.writeIdentificationSection(length, master_table, subcenter_id, center_id,\
             update, optional, category, sub_category, master_table_version,\
             local_table_version, year, month, day, hour, minute)
             
-    def write_datadescription(self, length, n, datetype, descriptors):
-        self.bufrdata.writeDataDescriptionSection(length, n, datatype, descriptors)
+    def write_datadescription(self, n, datatype, descriptors):
+        return self.bufrdata.writeDataDescriptionSection(n, datatype, descriptors)
+        
+    def write_datahead(self, len):
+        return self.bufrdata.writeDataSectionHead(len)
+        
+    def rewrite_datahead(self, len):
+        return self.bufrdata.reWriteDataSectionHead(len)
+        
+    def write_data(self, value, nbits=None):
+        return self.bufrdata.write(value, nbits)
+        
+    def write_end(self):
+        return self.bufrdata.writeEndSection()

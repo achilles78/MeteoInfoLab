@@ -2790,7 +2790,7 @@ def __setlegendscheme_polygon(ls, **kwargs):
     for lb in ls.getLegendBreaks():
         if not facecolor is None:
             lb.setColor(facecolor)
-        lb.setOutlineSize(size)        
+        lb.setOutlineSize(edgesize)        
         lb.setOutlineColor(edgecolor)        
         lb.setDrawFill(fill)        
         lb.setDrawOutline(edge)

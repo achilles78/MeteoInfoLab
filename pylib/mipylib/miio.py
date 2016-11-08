@@ -14,7 +14,7 @@ import dimarray
 from dimarray import DimArray
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 
-def convert2nc(infn, outfn):
+def convert2nc(infn, outfn, version='netcdf3'):
     """
     Convert data file (Grib, HDF...) to netCDF data file.
     
@@ -24,7 +24,7 @@ def convert2nc(infn, outfn):
     #Open input data file
     f = minum.addfile(infn)
     #New netCDF file
-    ncfile = minum.addfile(outfn, 'c')
+    ncfile = minum.addfile(outfn, 'c', version=version)
     #Add dimensions
     for dim in f.dimensions():
         ncfile.adddim(dim.getShortName(), dim.getLength())
