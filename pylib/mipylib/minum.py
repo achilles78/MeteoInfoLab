@@ -5,6 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 import os
+import sys
 import math
 import datetime
 from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
@@ -347,7 +348,11 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
         elif dtype == 'bufr':
             bufrdata = BufrDataInfo()
             if os.path.exists(fname):
-                os.remove(fname)
+                try:
+                    os.remove(fname)
+                except:   
+                    info=sys.exc_info()   
+                    print info[0],":",info[1]
             bufrdata.createDataFile(fname)
             datafile = DimDataFile(bufrdata=bufrdata)
         else:
