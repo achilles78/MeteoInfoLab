@@ -987,12 +987,6 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     xdata = __getplotdata(x)
     ydata = __getplotdata(y)
     
-    #Create XY2DPlot
-    if gca is None:
-        plot = XY2DPlot()
-    else:
-        plot = gca
-    
     #Set plot data styles
     pb, isunique = __getlegendbreak('point', **kwargs)
     pb.setCaption(label)
@@ -1028,6 +1022,13 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
                 
     #Create graphics
     graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -1036,10 +1037,8 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None:
-        chart.clearPlots()
-        chart.setPlot(plot)
-    #chart.setAntiAlias(True)
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -2381,6 +2380,7 @@ def axism(limits=None):
     """
     if limits is None:
         gca.setDrawExtent(gca.getMapView().getExtent())
+        gca.setExtent(gca.getDrawExtent().clone())
         draw_if_interactive()
     else:
         if len(limits) == 4:
@@ -4110,7 +4110,8 @@ def surfacem(*args, **kwargs):
             plot.addLayer(layer)
     else:
         plot.addLayer(order, layer)
-    plot.setDrawExtent(layer.getExtent())
+    plot.setDrawExtent(layer.getExtent().clone())
+    plot.setExtent(layer.getExtent().clone())
     select = kwargs.pop('select', True)
     if select:
         plot.setSelectedLayer(layer)

@@ -86,7 +86,7 @@ class PyTableData():
                     r.append(dt)
                 return r
             else:
-                return coldata.getData()
+                return MIArray(ArrayUtil.array(coldata.getData()))
         else:
             row = key[0]
             col = key[1]
