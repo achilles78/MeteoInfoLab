@@ -548,6 +548,114 @@ def semilogy(*args, **kwargs):
     lines = plot(*args, **kwargs)
     global gca
     __setYAxisType(gca, 'log')
+    gca.setAutoExtent()
+    return lines
+    
+def semilogx(*args, **kwargs):
+    """
+    Make a plot with log scaling on the x axis.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param style: (*string*) Line style for plot.
+    
+    :returns: Legend breaks of the lines.
+    
+    The following format string characters are accepted to control the line style or marker:
+    
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         solid line style
+      '--'        dashed line style
+      '-.'        dash-dot line style
+      ':'         dotted line style
+      '.'         point marker
+      ','         pixel marker
+      'o'         circle marker
+      'v'         triangle_down marker
+      '^'         triangle_up marker
+      '<'         triangle_left marker
+      '>'         triangle_right marker
+      's'         square marker
+      'p'         pentagon marker
+      '*'         star marker
+      'x'         x marker
+      'D'         diamond marker
+      =========  ===========
+      
+    The following color abbreviations are supported:
+      
+      =========  =====
+      Character  Color  
+      =========  =====
+      'b'        blue
+      'g'        green
+      'r'        red
+      'c'        cyan
+      'm'        magenta
+      'y'        yellow
+      'k'        black
+      =========  =====
+    """       
+    lines = plot(*args, **kwargs)
+    global gca
+    __setXAxisType(gca, 'log')
+    gca.setAutoExtent()
+    return lines
+    
+def loglog(*args, **kwargs):
+    """
+    Make a plot with log scaling on both x and y axis.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param style: (*string*) Line style for plot.
+    
+    :returns: Legend breaks of the lines.
+    
+    The following format string characters are accepted to control the line style or marker:
+    
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         solid line style
+      '--'        dashed line style
+      '-.'        dash-dot line style
+      ':'         dotted line style
+      '.'         point marker
+      ','         pixel marker
+      'o'         circle marker
+      'v'         triangle_down marker
+      '^'         triangle_up marker
+      '<'         triangle_left marker
+      '>'         triangle_right marker
+      's'         square marker
+      'p'         pentagon marker
+      '*'         star marker
+      'x'         x marker
+      'D'         diamond marker
+      =========  ===========
+      
+    The following color abbreviations are supported:
+      
+      =========  =====
+      Character  Color  
+      =========  =====
+      'b'        blue
+      'g'        green
+      'r'        red
+      'c'        cyan
+      'm'        magenta
+      'y'        yellow
+      'k'        black
+      =========  =====
+    """       
+    lines = plot(*args, **kwargs)
+    global gca
+    __setXAxisType(gca, 'log')
+    __setYAxisType(gca, 'log')
+    gca.setAutoExtent()
     return lines
         
 def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
@@ -604,6 +712,8 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     gca = plot
     draw_if_interactive()
     return graphics 
+    
+
     
 def errorbar_bak(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     global gca
@@ -2089,7 +2199,16 @@ def __setXAxisType(ax, axistype, timetickformat=None):
         if not timetickformat is None:
             ax.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
             ax.getAxis(Location.TOP).setTimeFormat(timetickformat)
-            
+    elif axistype == 'log':
+        b_axis = LogAxis(ax.getAxis(Location.BOTTOM))
+        b_axis.setLabel('Log')
+        b_axis.setMinorTickNum(10)
+        ax.setAxis(b_axis, Location.BOTTOM)
+        t_axis = LogAxis(ax.getAxis(Location.TOP))
+        t_axis.setLabel('Log')
+        t_axis.setMinorTickNum(10)
+        ax.setAxis(t_axis, Location.TOP)        
+                
 def __setYAxisType(ax, axistype, timetickformat=None):
     if axistype == 'lon':
         b_axis = LonLatAxis(ax.getAxis(Location.LEFT))
@@ -2118,12 +2237,14 @@ def __setYAxisType(ax, axistype, timetickformat=None):
             ax.getAxis(Location.LEFT).setTimeFormat(timetickformat)
             ax.getAxis(Location.RIGHT).setTimeFormat(timetickformat)
     elif axistype == 'log':
-        b_axis = LogAxis(ax.getAxis(Location.LEFT))
-        b_axis.setLabel('Log')
-        ax.setAxis(b_axis, Location.LEFT)
-        t_axis = LogAxis(ax.getAxis(Location.RIGHT))
-        t_axis.setLabel('Log')
-        ax.setAxis(t_axis, Location.RIGHT)
+        l_axis = LogAxis(ax.getAxis(Location.LEFT))
+        l_axis.setLabel('Log')
+        l_axis.setMinorTickNum(10)
+        ax.setAxis(l_axis, Location.LEFT)
+        r_axis = LogAxis(ax.getAxis(Location.RIGHT))
+        r_axis.setLabel('Log')
+        r_axis.setMinorTickNum(10)
+        ax.setAxis(r_axis, Location.RIGHT)
 
 def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     """
