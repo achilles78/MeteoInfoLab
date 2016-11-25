@@ -5099,3 +5099,6 @@ def giffinish(animation):
     Finish a gif animation object and write gif animation image file
     """
     animation.finish()
+        
+def clear():
+    milapp1.delVariables()

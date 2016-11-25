@@ -80,6 +80,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     private String startupPath;
     private Options options = new Options();
     private AppCollection apps = new AppCollection();
+    private List<String> loadObjects = new ArrayList<>();
 
     /**
      * Creates new form FrmMain
@@ -128,7 +129,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         if (!this.options.getRecentFolders().contains(cf)) {
             this.jComboBox_CurrentFolder.addItem(cf);
         }
-        this.jComboBox_CurrentFolder.setSelectedItem(cf);
+        this.jComboBox_CurrentFolder.setSelectedItem(cf);                
 
         //Add dockable panels
         CControl control = new CControl(this);
@@ -143,29 +144,91 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         this.editorDock.setTextFont(this.options.getTextFont());
         this.editorDock.addNewTextEditor("New file");
         consoleDock = new ConsoleDockable(this, this.startupPath, "Console", "Console");
+        
+        //Load applications        
+        String toolboxPath = this.startupPath + File.separator + "toolbox";
+        if (isDebug) {
+            toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
+        }
+        String appConfFn = toolboxPath + File.separator + "apps.xml";
+        try {
+            this.apps.setPluginPath(toolboxPath);
+            this.apps.loadConfigFile(appConfFn);
+            if (this.apps.size() > 0) {
+                for (Application app : apps) {
+                    if (app.isLoad()) {
+                        this.loadApplication(app);
+                    }
+                }
+            }
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException | SAXException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                
         final PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
+        PyStringMap locals = (PyStringMap) interp.getLocals();
+        PyList items = locals.items();
+        String name;
+        for (Object a : items) {
+            PyTuple at = (PyTuple) a;
+            name = at.__getitem__(0).toString();
+            this.loadObjects.add(name);
+        }
         interp.addConsoleExecListener(new IConsoleExecListener() {
             @Override
             public void consoleExecEvent(ConsoleExecEvent event) {
 
                 PyStringMap locals = (PyStringMap) interp.getLocals();
                 PyList items = locals.items();
-                String name, className;
+                String name, className, size, value;
                 PyObject var;
                 List<Object[]> vars = new ArrayList<>();
                 for (Object a : items) {
                     PyTuple at = (PyTuple) a;
                     name = at.__getitem__(0).toString();
-                    var = at.__getitem__(1);
-                    if (var instanceof PyInstance) {
-                        className = ((PyInstance) var).instclass.__name__;
-                        switch (className) {
-                            case "DimArray":
-                            case "MIArray":
-                                vars.add(new Object[]{name, className, var.__getattr__("sizestr"), ""});
-                                break;
+                    if (!FrmMain.this.loadObjects.contains(name)) {
+                        var = at.__getitem__(1);
+                        if (var instanceof PyInstance) {
+                            className = ((PyInstance) var).instclass.__name__;
+                            switch (className) {
+                                case "DimArray":
+                                case "MIArray":
+                                    if (var.__len__() <= 10){
+                                        value = var.__str__().toString();
+                                    } else {
+                                        value = "";
+                                    }
+                                    vars.add(new Object[]{name, className, var.__getattr__("sizestr"), value});
+                                    break;
+                                default:
+                                    vars.add(new Object[]{name, className, "", ""});
+                                    break;
+                            }
+                        } else {
+                            className = var.getClass().getSimpleName();
+                            value = "";
+                            size = "";
+                            switch (className){
+                                case "PyInteger":
+                                case "PyFloat":                                
+                                case "PyString":
+                                    value = var.toString();
+                                    size = "1";
+                                    break;
+                                case "PyList":
+                                case "PyTuple":
+                                    if (var.__len__() <= 10)
+                                        value = var.toString();
+                                    size = String.valueOf(var.__len__());
+                                    break;
+                            }
+                            vars.add(new Object[]{name, className, size, value});
                         }
-                    }
+                    }                    
                 }
                 if (FrmMain.this.variableDock != null) {
                     FrmMain.this.variableDock.getVariableExplorer().updateVariables(vars);
@@ -207,32 +270,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         grid.add(5, 0, 5, 5, this.variableDock);
         grid.add(5, 0, 5, 5, this.fileDock);
         grid.add(5, 5, 5, 5, figuresDock);
-        control.getContentArea().deploy(grid);
-
-        //Load applications        
-        String toolboxPath = this.startupPath + File.separator + "toolbox";
-        if (isDebug) {
-            toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
-        }
-        String appConfFn = toolboxPath + File.separator + "apps.xml";
-        try {
-            this.apps.setPluginPath(toolboxPath);
-            this.apps.loadConfigFile(appConfFn);
-            if (this.apps.size() > 0) {
-                for (Application app : apps) {
-                    if (app.isLoad())
-                        this.loadApplication(app);
-                }
-            }
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        control.getContentArea().deploy(grid);        
     }
 
     /**
@@ -252,7 +290,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public String getStartupPath() {
         return this.startupPath;
     }
-    
+
     /**
      * Load an application
      *
@@ -310,7 +348,6 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 //        }
 //        this.setCursor(Cursor.getDefaultCursor());
 //    }
-
     /**
      * Unload an application
      *
@@ -318,7 +355,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
      */
     public void unloadApplication(Application plugin) {
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        if (plugin.getPluginObject() != null){
+        if (plugin.getPluginObject() != null) {
             plugin.getPluginObject().unload();
             plugin.setPluginObject(null);
             plugin.setLoad(false);
@@ -1095,9 +1132,22 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public void openProjectFile(String fileName) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    public void runScript(String fileName){
-        
+
+    /**
+     * Delete variables
+     */
+    public void delVariables() {
+        PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
+        PyStringMap locals = (PyStringMap) interp.getLocals();
+        PyList items = locals.items();
+        String name;
+        for (Object a : items) {
+            PyTuple at = (PyTuple) a;
+            name = at.__getitem__(0).toString();
+            if (!this.loadObjects.contains(name)) {
+                locals.__delitem__(name);
+            }
+        }
     }
 
     /**

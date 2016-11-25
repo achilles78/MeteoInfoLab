@@ -648,6 +648,8 @@ def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None):
         when endpoint is False.
     :param num: (*int, optional*) Number of samples to generate. Default is 50. Must 
         be non-negative.
+    :param endpoint: (*boolean, optional*) If true, stop is the last sample. Otherwise, it is not included. 
+        Default is True.
     :param dtype: (*dtype*) The type of output array. If dtype is not given, infer the data
         type from the other input arguments.
         
@@ -675,6 +677,8 @@ def logspace(start, stop, num=50, endpoint=True, base=10.0, dtype=None):
         (a sequence of length num) are returned.
     :param num: (*int, optional*) Number of samples to generate. Default is 50. Must 
         be non-negative.
+    :param endpoint: (*boolean, optional*) If true, stop is the last sample. Otherwise, it is not included. 
+        Default is True.
     :param base: (*float, optional*) The base of the log space. The step size between the elements in
         ln(samples) / ln(base) (or log_base(samples)) is uniform. Default is 10.0. 
     :param dtype: (*dtype*) The type of output array. If dtype is not given, infer the data
