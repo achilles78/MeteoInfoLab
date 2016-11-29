@@ -13,7 +13,7 @@ from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, GridData, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
+from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, PiePlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
@@ -1073,7 +1073,77 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
         which are not required to be of the same length.
     :param bins: (*int*) If an integer is given, bins + 1 bin edges are returned.
     """
-    return None
+    #Get dataset
+    global gca
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    
+    #Set plot data styles
+    fcobj = kwargs.pop('color', None)
+    if fcobj is None:
+        fcobj = kwargs.pop('facecolor', 'b')
+    if isinstance(fcobj, (tuple, list)):
+        colors = __getcolors(fcobj)
+    else:
+        color = __getcolor(fcobj)
+        colors = [color]
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = __getcolor(ecobj)
+    linewidth = kwargs.pop('linewidth', 1.0) 
+    hatch = kwargs.pop('hatch', None)
+    hatch = __gethatch(hatch) 
+    hatchsize = kwargs.pop('hatchsize', None)
+    bgcolor = kwargs.pop('bgcolor', None)
+    bgcolor = __getcolor(bgcolor)
+    ecolor = kwargs.pop('ecolor', 'k')
+    ecolor = __getcolor(ecolor)
+    barbreaks = []
+    for color in colors:
+        lb = BarBreak()
+        lb.setCaption(label)
+        lb.setColor(color)    
+        if edgecolor is None:
+            lb.setDrawOutline(False)
+        else:
+            lb.setOutlineColor(edgecolor)  
+        lb.setOutlineSize(linewidth)   
+        if not hatch is None:
+            lb.setStyle(hatch)
+            if not bgcolor is None:
+                lb.setBackColor(bgcolor)
+            if not hatchsize is None:
+                lb.setStyleSize(hatchsize)
+        lb.setErrorColor(ecolor)
+        barbreaks.append(lb)
+        
+    #Create bar graphics
+    x = __getplotdata(x)
+    graphics = GraphicFactory.createHistBars(x, bins, barbreaks)        
+    
+    #Create bar plot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return lb
     
 def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
             alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
@@ -1290,7 +1360,10 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     if gca is None:
         plot = XY2DPlot()
     else:
-        plot = gca    
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot() 
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -1386,6 +1459,151 @@ def fill_between_bak(x, y1, y2=0, where=None, **kwargs):
     gca = plot
     draw_if_interactive()
     return pb 
+    
+def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6, shadow=False, 
+    labeldistance=1.1, startangle=0, radius=None, hold=None, **kwargs):
+    """
+    Plot a pie chart.
+    
+    Make a pie chart of array *x*. The fraction area of each wedge is given by x/sum(x). If
+    sum(x) <= 1, then the values of x give the fractional area directly and the array will not
+    be normalized. The wedges are plotted counterclockwise, by default starting from the x-axis.
+    
+    :param explode: (*None | len(x)sequence) If not *None*, is a ``len(x)`` array which specifies
+        the fraction of the radius with which to offset each wedge.
+    :param labels: (*None | len(x) sequence of colors*] A sequence of strings providing the labels
+        for each wedge.
+    :param colors: (*None | color sequence*) A sequence of color args through which the pie chart
+        will cycle.
+    :param autopct: (*None | format string | format function) If not *None*, is a string or function
+        used to label the wedges with their numeric value. The label will be placed inside the wedge.
+        If it is a format string, the label will be ``fmt%pct``. If it is a function, it will be called.
+    :param pctdistance: (*float*) The ratio between the center of each pie slice and the start of the
+        text generated by *autopct*. Ignored if autopct is *None*; default is 0.6.
+    :param labeldistance: (*float*) The ratial distance at which the pie labels are drawn.
+    :param shadow: (*boolean*) Draw a shadow beneath the pie.
+    :param startangle: (*float*) If not *0*, rotates the start of the pie chart by *angle* degrees
+        counterclockwise from the x-axis.
+    :radius: (*float*) The radius of the pie, if *radius* is *None* it will be set to 1.
+    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    
+    :returns: (*tuple*) Patches and texts.
+    """    
+    #Get current axes
+    global gca   
+    
+    n = len(x)
+    x = __getplotdata(x)
+    if colors is None:
+        colors = makecolors(n)
+    else:
+        colors = __getcolors(colors)
+        
+    fontname = kwargs.pop('fontname', 'Arial')
+    fontsize = kwargs.pop('fontsize', 14)
+    bold = kwargs.pop('bold', False)
+    fontcolor = kwargs.pop('fontcolor', 'black')
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    fontcolor = __getcolor(fontcolor)
+    
+    #Create graphics
+    graphics = GraphicFactory.createPieArcs(x, colors, labels, startangle, explode, font, fontcolor, \
+        autopct)
+    
+    #Create PiePlot
+    if gca is None:
+        plot = PiePlot()
+    else:
+        if isinstance(gca, PiePlot):
+            plot = gca
+        else:
+            plot = PiePlot()
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    plot.setAutoAspect(False)
+    plot.getAxis(Location.BOTTOM).setVisible(False)
+    plot.getAxis(Location.LEFT).setVisible(False)
+    plot.getAxis(Location.TOP).setVisible(False)
+    plot.getAxis(Location.RIGHT).setVisible(False)
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None:
+        chart.setCurrentPlot(plot)
+    elif not isinstance(gca, PiePlot):
+        if isinstance(gca, Plot):
+            chart.removePlot(gca)
+        chart.setCurrentPlot(plot)
+    
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return graphics
+    
+def boxplot(x, showmeans=False, meanline=False):
+    """
+    Make a box and whisker plot.
+    
+    Make a box and whisker plot for each column of x or each vector in sequence x. The box extends from lower
+    to upper quartile values of the data, with a line at the median. The whiskers extend from the box to show
+    the range of the data. Flier points are those past the end of the whiskers.
+    
+    :param x: (*Array or a sequence of vectors) The input data.
+    :param showmeans: (*boolean*) Default is ``False``. Show the mean or not.
+    :param meanline: (*boolean*) Default is ``False``. If ``True`` (and showmeans is ``True``), will try to render
+        the mean as a line spanning. Otherwise, means will be shown as points.
+    """
+    #Get current axes
+    global gca   
+    
+    if isinstance(x, list):
+        x1 = []
+        for a in x:
+            x1.append(__getplotdata(a))
+        x = x1
+    else:
+        x = __getplotdata(x)
+        x = [x]
+    
+    #Create graphics
+    graphics = GraphicFactory.createBox(x, showmeans)
+    
+    #Create XYPlot
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None:
+        chart.setCurrentPlot(plot)
+    elif not isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot):
+            chart.removePlot(gca)
+        chart.setCurrentPlot(plot)
+    
+    chartpanel.setChart(chart)
+    gca = plot
+    xlim(0.5, len(x) + 0.5)
+    xticks(minum.arange(1, len(x) + 1, 1))
+    draw_if_interactive()
+    return graphics
  
 def figure(bgcolor=None, figsize=None, newfig=True):
     """
@@ -1491,12 +1709,14 @@ def gca():
     """
     return gca
     
-def axes(**kwargs):
+def axes(*args, **kwargs):
     """
     Add an axes to the figure.
     
     :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
         height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param aspect: (*string*) ['equal' | 'auto'] or a number. If a number the ratio of x-unit/y-unit in screen-space.
+        Default is 'auto'.
     :param bgcolor: (*Color*) Optional, axes background color.
     :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
     :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
@@ -1512,7 +1732,11 @@ def axes(**kwargs):
     if chartpanel is None:
         figure()
         
-    position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
+    if len(args) > 0:
+        position = args[0]
+    else:
+        position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
+    aspect = kwargs.pop('aspect', 'auto')
     axis = kwargs.pop('axis', True)
     if axis:
         bottomaxis = kwargs.pop('bottomaxis', True)
@@ -1572,7 +1796,7 @@ def axes(**kwargs):
     gca = plot
     return plot
 
-def axesm(**kwargs):  
+def axesm(*args, **kwargs):  
     """
     Add an map axes to the figure.
     
@@ -1602,7 +1826,10 @@ def axesm(**kwargs):
     if chartpanel is None:
         figure()
         
-    position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
+    if len(args) > 0:
+        position = args[0]
+    else:
+        position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
     axis = kwargs.pop('axis', True)
     if axis:
         bottomaxis = kwargs.pop('bottomaxis', True)
