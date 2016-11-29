@@ -1555,7 +1555,7 @@ def boxplot(x, showmeans=False, meanline=False):
     to upper quartile values of the data, with a line at the median. The whiskers extend from the box to show
     the range of the data. Flier points are those past the end of the whiskers.
     
-    :param x: (*Array or a sequence of vectors) The input data.
+    :param x: (*Array or a sequence of vectors*) The input data.
     :param showmeans: (*boolean*) Default is ``False``. Show the mean or not.
     :param meanline: (*boolean*) Default is ``False``. If ``True`` (and showmeans is ``True``), will try to render
         the mean as a line spanning. Otherwise, means will be shown as points.
@@ -2054,15 +2054,17 @@ def box(ax=None, on=None):
             axis.setVisible(on)
     draw_if_interactive()
     
-def antialias(b=True):
+def antialias(b=None):
     """
     Set figure antialias or not.
     
-    :param b: (*boolean*) Set figure antialias or not. Default is ``False`` .
+    :param b: (*boolean*) Set figure antialias or not. Default is ``None``, means the opposite with current status.
     """
     if chartpanel is None:
         figure()
-        
+    
+    if b is None:
+        b = not chartpanel.getChart().isAntiAlias()
     chartpanel.getChart().setAntiAlias(b)
     draw_if_interactive()
     
@@ -5328,4 +5330,7 @@ def giffinish(animation):
     animation.finish()
         
 def clear():
+    """
+    Clear all variables.
+    """
     milapp1.delVariables()
