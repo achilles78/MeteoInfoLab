@@ -1791,6 +1791,7 @@ def axes(*args, **kwargs):
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
     plot.setAxisLabelFont(font)
     chart = chartpanel.getChart()
+    isnew = kwargs.pop('newaxes', False)
     if isnew:
         chart.addPlot(plot)
     else:
@@ -1995,6 +1996,13 @@ def xaxis(ax=None, **kwargs):
         else:
             __setXAxisType(ax, axistype, timetickformat)
         ax.updateDrawExtent()
+    tickfontname = kwargs.pop('tickfontname', 'Arial')
+    tickfontsize = kwargs.pop('tickfontsize', 14)
+    tickbold = kwargs.pop('tickbold', False)
+    if tickbold:
+        font = Font(tickfontname, Font.BOLD, tickfontsize)
+    else:
+        font = Font(tickfontname, Font.PLAIN, tickfontsize)
     locs = [Location.BOTTOM, Location.TOP]
     for loc in locs:
         axis = ax.getAxis(loc)
@@ -2002,6 +2010,7 @@ def xaxis(ax=None, **kwargs):
         axis.setColor_All(c)
         axis.setMinorTickVisible(minortick)
         axis.setInsideTick(tickin)
+        axis.setTickLabelFont(font)
     draw_if_interactive()
     
 def yaxis(ax=None, **kwargs):
@@ -2027,6 +2036,13 @@ def yaxis(ax=None, **kwargs):
         else:
             __setYAxisType(ax, axistype, timetickformat)
         ax.updateDrawExtent()
+    tickfontname = kwargs.pop('tickfontname', 'Arial')
+    tickfontsize = kwargs.pop('tickfontsize', 14)
+    tickbold = kwargs.pop('tickbold', False)
+    if tickbold:
+        font = Font(tickfontname, Font.BOLD, tickfontsize)
+    else:
+        font = Font(tickfontname, Font.PLAIN, tickfontsize)
     locs = [Location.LEFT, Location.RIGHT]
     for loc in locs:
         axis = ax.getAxis(loc)
@@ -2034,6 +2050,7 @@ def yaxis(ax=None, **kwargs):
         axis.setColor_All(c)
         axis.setMinorTickVisible(minortick)
         axis.setInsideTick(tickin)
+        axis.setTickLabelFont(font)
     draw_if_interactive()
     
 def box(ax=None, on=None):

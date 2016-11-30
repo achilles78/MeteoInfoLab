@@ -13,6 +13,8 @@ import dimarray
 from dimarray import DimArray, PyGridData
 import miarray
 from miarray import MIArray
+import miutil
+import datetime
 
 # Dimension variable
 class DimVariable():
@@ -123,16 +125,22 @@ class DimVariable():
                 step = 1 if k.step is None else k.step
             elif isinstance(k, (tuple, list)):
                 dim = self.variable.getDimension(i)
-                sidx = dim.getValueIndex(k[0])
+                sv = k[0]
+                if isinstance(sv, datetime.datetime):
+                    sv = miutil.date2num(sv)
+                sidx = dim.getValueIndex(sv)
                 if len(k) == 1:
                     eidx = sidx
                     step = 1
                 else:                    
-                    eidx = dim.getValueIndex(k[1])
+                    ev = k[1]
+                    if isinstance(ev, datetime.datetime):
+                        ev = miutil.date2num(ev)
+                    eidx = dim.getValueIndex(ev)
                     if len(k) == 2:
                         step = 1
                     else:
-                        step = int(k[2] / dim.getDeltaValue)
+                        step = int(ev / dim.getDeltaValue)
                     if sidx > eidx:
                         iidx = eidx
                         eidx = sidx
