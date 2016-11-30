@@ -1791,7 +1791,10 @@ def axes(*args, **kwargs):
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
     plot.setAxisLabelFont(font)
     chart = chartpanel.getChart()
-    chart.setCurrentPlot(plot)
+    if isnew:
+        chart.addPlot(plot)
+    else:
+        chart.setCurrentPlot(plot)
     global gca
     gca = plot
     return plot
@@ -1937,7 +1940,8 @@ def axesm(*args, **kwargs):
         gca.setBackground(bgcolor)
     #gca.getMapView().projectLayers(projinfo)
     chart = chartpanel.getChart()
-    if chart.getPlot() is None:
+    isnew = kwargs.pop('newaxes', False)
+    if isnew:
         chart.addPlot(gca)
     else:
         chart.setCurrentPlot(gca)
