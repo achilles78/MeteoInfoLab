@@ -111,6 +111,13 @@ class DimDataFile():
         else:
             return None
             
+    def stinfodata(self):
+        if self.dataset.isStationData():
+            sidata = self.dataset.getStationInfoData()
+            return sidata
+        else:
+            return None
+            
     def smodeldata(self, timeindex=0, levelindex=0):
         if self.dataset.isStationData():
             self.dataset.setTimeIndex(timeindex)
