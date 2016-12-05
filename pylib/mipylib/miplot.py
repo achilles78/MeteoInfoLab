@@ -3057,7 +3057,9 @@ def set(obj, **kwargs):
     
 def __getcolormap(**kwargs):
     colors = kwargs.pop('colors', None)
-    if colors != None:
+    if colors is None:
+        colors = kwargs.pop('color', None)
+    if not colors is None:
         if isinstance(colors, str):
             c = __getcolor(colors)
             cmap = ColorMap(c)
