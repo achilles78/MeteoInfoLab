@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
-    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\HazeView\pylib"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\dataconvert">
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\MeteoInfoLab"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
@@ -11,9 +10,10 @@
     <RecentFolder Folder="D:\Working\MIScript"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\micaps"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="24,8" MainFormSize="1385,768"/>
+  <Startup MainFormLocation="124,12" MainFormSize="1385,768"/>
 </MeteoInfo>

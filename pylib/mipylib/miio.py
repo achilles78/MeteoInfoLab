@@ -35,6 +35,8 @@ def convert2nc(infn, outfn, version='netcdf3'):
     variables = []
     for var in f.variables():    
         #print 'Variable: ' + var.getShortName()
+        if var.hasNullDimension():
+            continue
         nvar = ncfile.addvar(var.getShortName(), var.getDataType(), var.getDimensions())
         for attr in var.getAttributes():
             nvar.addattr(attr.getName(), attr.getValues())
