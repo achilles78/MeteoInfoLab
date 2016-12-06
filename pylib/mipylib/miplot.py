@@ -5265,7 +5265,7 @@ def __getlegendbreak(geometry, **kwargs):
     value = kwargs.pop('value', None)
     isunique = True
     if not value is None:
-        if isinstance(value, tuple):
+        if isinstance(value, (tuple, list)):
             lb.setStartValue(value[0])
             lb.setEndValue(value[1])
             isunique = False
