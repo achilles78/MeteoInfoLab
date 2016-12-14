@@ -22,6 +22,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 import org.meteoinfo.chart.ChartPanel;
+import org.meteoinfo.laboratory.util.JIntrospect;
 import org.python.core.Py;
 
 /**
@@ -45,6 +46,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         console.setPreferredSize(new Dimension(600, 400));
         console.println(new ImageIcon(this.getClass().getResource("/org/meteoinfo/laboratory/resources/jython_small_c.png")));
         this.initializeConsole(console, parent.getCurrentFolder());
+        JIntrospect nameComplete = new JIntrospect(this.interp);
+        console.setNameCompletion(nameComplete);
 
         this.getContentPane().add(console, BorderLayout.CENTER);
     }

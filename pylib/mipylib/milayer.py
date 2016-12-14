@@ -126,6 +126,10 @@ class MILayer():
         r = ProjectionManage.projectLayer(self.layer, toproj)
         return MILayer(r)
         
+    def buffer(self, dist=0, merge=False):
+        r = self.layer.buffer(dist, False, merge)
+        return MILayer(r)
+        
     def clip(self, clipobj):
         if isinstance(clipobj, PolygonShape):
             clipobj = [clipobj]

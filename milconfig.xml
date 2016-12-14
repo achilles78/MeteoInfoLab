@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython"/>
@@ -11,6 +9,8 @@
     <RecentFolder Folder="D:\Working\MIScript\mywork\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+    <RecentFolder Folder="D:\OpenSourceCode\Python\jythonconsole-0-0-7"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>

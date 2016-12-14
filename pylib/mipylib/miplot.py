@@ -4998,6 +4998,8 @@ def geoshow(*args, **kwargs):
                 avoidcoll = kwargs.pop('avoidcoll', True)
                 labelset.setAvoidCollision(avoidcoll)
                 layer.addLabels()  
+        plot.setDrawExtent(layer.getExtent().clone())
+        plot.setExtent(layer.getExtent().clone())
         draw_if_interactive()
     else:
         if isinstance(args[0], Graphic):
@@ -5063,8 +5065,12 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
         colors.append(c)
     return colors
 
-def makelegend(lbreaks):
-    ls = LegendScheme(lbreaks)
+def makelegend(source):
+    if isinstance(source, basestring):
+        ls = LegendScheme()
+        ls.importFromXMLFile(source, False)
+    else:
+        ls = LegendScheme(source)    
     return ls
     
 def makesymbolspec(geometry, *args, **kwargs):
