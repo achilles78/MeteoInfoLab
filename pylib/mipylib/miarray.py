@@ -24,13 +24,17 @@ class MIArray():
     # array must be a ucar.ma2.Array object
     def __init__(self, array):
         self.array = array
-        self.rank = array.getRank()
-        self.shape = array.getShape()
-        self.datatype = array.getDataType()
-        if self.rank > 0:
+        self.ndim = array.getRank()
+        s = array.getShape()
+        s1 = []
+        for i in range(len(s)):
+            s1.append(s[i])
+        self.shape = tuple(s1)
+        self.dtype = array.getDataType()
+        if self.ndim > 0:
             self.sizestr = str(self.shape[0])
-            if self.rank > 1:
-                for i in range(1, self.rank):
+            if self.ndim > 1:
+                for i in range(1, self.ndim):
                     self.sizestr = self.sizestr + '*%s' % self.shape[i]
         
     def __len__(self):
@@ -49,17 +53,17 @@ class MIArray():
             inds.append(indices)
             indices = inds
             
-        if self.rank == 0:
+        if self.ndim == 0:
             return self
         
-        if len(indices) != self.rank:
-            print 'indices must be ' + str(self.rank) + ' dimensions!'
+        if len(indices) != self.ndim:
+            print 'indices must be ' + str(self.ndim) + ' dimensions!'
             return None
 
         ranges = []
         flips = []
         iszerodim = True
-        for i in range(0, self.rank):   
+        for i in range(0, self.ndim):   
             if isinstance(indices[i], int):
                 sidx = indices[i]
                 eidx = indices[i]
@@ -98,17 +102,17 @@ class MIArray():
             inds.append(indices)
             indices = inds
         
-        if self.rank == 0:
+        if self.ndim == 0:
             self.array.setObject(0, value)
             return None
         
-        if len(indices) != self.rank:
-            print 'indices must be ' + str(self.rank) + ' dimensions!'
+        if len(indices) != self.ndim:
+            print 'indices must be ' + str(self.ndim) + ' dimensions!'
             return None
 
         ranges = []
         flips = []
-        for i in range(0, self.rank):   
+        for i in range(0, self.ndim):   
             if isinstance(indices[i], int):
                 sidx = indices[i]
                 eidx = indices[i]
@@ -243,8 +247,8 @@ class MIArray():
     def getsize():
         if name == 'size':
             sizestr = str(self.shape[0])
-            if self.rank > 1:
-                for i in range(1, self.rank):
+            if self.ndim > 1:
+                for i in range(1, self.ndim):
                     sizestr = sizestr + '*%s' % self.shape[i]
             return sizestr
     

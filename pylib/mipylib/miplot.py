@@ -4057,7 +4057,7 @@ def scatterm(*args, **kwargs):
             if not isinstance(a, (DimArray, MIArray)):
                 a = minum.array(a)
             args = args[3:]                
-        if a.rank == 1:
+        if a.ndim == 1:
             gdata = minum.asstationdata(a, x, y, fill_value)
         else:
             if a.asarray().getSize() == x.asarray().getSize():
@@ -4427,7 +4427,7 @@ def surfacem_1(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
+        if a.ndim == 2 and a.asarray().getSize() != x.asarray().getSize():            
             gdata = minum.asgriddata(a, x, y, fill_value)
         else:
             if not plot.getProjInfo().isLonLat():
@@ -4463,7 +4463,7 @@ def surfacem(*args, **kwargs):
         x = args[0]
         y = args[1]
         a = args[2]
-        if a.rank == 2 and a.asarray().getSize() != x.asarray().getSize():            
+        if a.ndim == 2 and a.asarray().getSize() != x.asarray().getSize():            
             x, y = minum.meshgrid(x, y)        
         args = args[3:]
     ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)   

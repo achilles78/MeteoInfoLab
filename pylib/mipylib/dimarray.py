@@ -29,13 +29,13 @@ class DimArray():
     def __init__(self, array=None, dims=None, fill_value=-9999.0, proj=None):
         self.array = array
         if not array is None:
-            self.rank = array.rank
+            self.ndim = array.ndim
             self.shape = array.shape
-            self.datatype = array.datatype
-            if self.rank > 0:
+            self.dtype = array.dtype
+            if self.ndim > 0:
                 self.sizestr = str(self.shape[0])
-                if self.rank > 1:
-                    for i in range(1, self.rank):
+                if self.ndim > 1:
+                    for i in range(1, self.ndim):
                         self.sizestr = self.sizestr + '*%s' % self.shape[i]
             else:
                 self.sizestr = '1'
@@ -181,17 +181,17 @@ class DimArray():
             inds.append(indices)
             indices = inds
         
-        if self.rank == 0:
+        if self.ndim == 0:
             self.array.array.setObject(0, value)
             return None
         
-        if len(indices) != self.rank:
-            print 'indices must be ' + str(self.rank) + ' dimensions!'
+        if len(indices) != self.ndim:
+            print 'indices must be ' + str(self.ndim) + ' dimensions!'
             return None
 
         ranges = []
         flips = []        
-        for i in range(0, self.rank):   
+        for i in range(0, self.ndim):   
             if isinstance(indices[i], int):
                 sidx = indices[i]
                 eidx = indices[i]
@@ -375,8 +375,8 @@ class DimArray():
     def getsize():
         if name == 'size':
             sizestr = str(self.shape[0])
-            if self.rank > 1:
-                for i in range(1, self.rank):
+            if self.ndim > 1:
+                for i in range(1, self.ndim):
                     sizestr = sizestr + '*%s' % self.shape[i]
             return sizestr
     
@@ -646,7 +646,7 @@ class DimArray():
         if isinstance(x, list):
             r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value, method)
         elif isinstance(x, MIArray):
-            if x.rank == 1:
+            if x.ndim == 1:
                 r = ArrayUtil.reproject(self.array.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value, method)
             else:
                 r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)

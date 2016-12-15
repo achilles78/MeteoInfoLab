@@ -1255,7 +1255,7 @@ def meshgrid(x, y):
     if isinstance(y, list):
         y = array(y)
         
-    if x.rank != 1 or y.rank != 1:
+    if x.ndim != 1 or y.ndim != 1:
         print 'The paramters must be vector arrays!'
         return None
         
@@ -1381,7 +1381,7 @@ def trapz(y, x=None, dx=1.0, axis=-1):
     if isinstance(y, list):
         y = array(y)
     
-    if y.rank == 1:
+    if y.ndim == 1:
         if x is None:
             r = ArrayMath.trapz(y.asarray(), dx)
         else:
@@ -1392,7 +1392,7 @@ def trapz(y, x=None, dx=1.0, axis=-1):
     else:
         if axis == -1:
             shape = y.shape
-            for i in range(y.rank):
+            for i in range(y.ndim):
                 if shape[i] > 1:
                     axis = i
                     break
