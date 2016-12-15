@@ -18,7 +18,9 @@ import java.util.regex.Matcher;
 import org.meteoinfo.console.NameCompletion;
 import org.meteoinfo.laboratory.gui.PythonInteractiveInterpreter;
 import org.python.core.Py;
+import org.python.core.PyFunction;
 import org.python.core.PyList;
+import org.python.core.PyMethod;
 import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.core.PySystemState;
@@ -172,7 +174,11 @@ public class JIntrospect implements NameCompletion {
             command = command.substring(4);
         }
         command = command.trim();
-        command = rtrimTerminus(command, terminator);
+        if (terminator.equals("(")){
+            if (command.endsWith("("))
+                command = command.substring(0, command.length() - 1);
+        } else
+            command = rtrimTerminus(command, terminator);
         PyList tokens = this.getTokens(command);
         if (tokens == null || tokens.isEmpty())
             return "";
@@ -307,5 +313,40 @@ public class JIntrospect implements NameCompletion {
             }
         }
         return command;
+    }
+    
+    /**
+     * For a command, return a tuple of object name, argspec, tip text.
+     * @param command Command string
+     * @return Tip text
+     * @throws java.io.IOException
+     */
+    public String[] getCallTipJava(String command) throws IOException{
+        String[] callTip = new String[]{"","",""};
+        String root = getRoot(command, "(");
+        PyObject object = this.interp.eval(root);
+        if (object instanceof PyFunction){
+            PyFunction func = (PyFunction)object;
+            String name = func.__doc__.toString();
+            callTip[2] = name;
+        } else if (object instanceof PyMethod){
+            PyMethod func = (PyMethod)object;
+            String name = func.toString();
+            callTip[2] = name;
+        } else {
+            callTip[2] = object.toString();
+        }
+        
+        return callTip;
+    }
+    
+    @Override
+    public String[] getTip(String command){
+        try {
+            return this.getCallTipJava(command);
+        } catch (IOException ex) {
+            Logger.getLogger(JIntrospect.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 }
