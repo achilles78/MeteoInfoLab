@@ -120,18 +120,21 @@ public class JIntrospect implements NameCompletion {
         }
         
         String root = this.getRoot(command, ".");
-        PyObject object = this.interp.eval(root);
-        PyList plist = (PyList) object.__dir__();
-        List<String> list = new ArrayList<>();
-        String name;
-        for (int i = 0; i < plist.__len__(); i++) {
-            name = plist.get(i).toString();
-            if (!name.startsWith("__")) {
-                list.add(name);
+        try {
+            PyObject object = this.interp.eval(root);
+            PyList plist = (PyList) object.__dir__();
+            List<String> list = new ArrayList<>();
+            String name;
+            for (int i = 0; i < plist.__len__(); i++) {
+                name = plist.get(i).toString();
+                if (!name.startsWith("__")) {
+                    list.add(name);
+                }
             }
+            return list;
+        } catch (Exception e){
+            return null;
         }
-
-        return list;
     }
     
     private boolean ispython(Object object){
@@ -289,8 +292,7 @@ public class JIntrospect implements NameCompletion {
         String encoding = "utf-8";
         PythonInterpreter pi = new PythonInterpreter();
         pi.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
-        PyList tokens = (PyList)pi.get("tokens");
-        pi = null;
+        PyList tokens = (PyList)pi.get("tokens");    
         
         return tokens;
     }
@@ -324,17 +326,21 @@ public class JIntrospect implements NameCompletion {
     public String[] getCallTipJava(String command) throws IOException{
         String[] callTip = new String[]{"","",""};
         String root = getRoot(command, "(");
-        PyObject object = this.interp.eval(root);
-        if (object instanceof PyFunction){
-            PyFunction func = (PyFunction)object;
-            String name = func.__doc__.toString();
-            callTip[2] = name;
-        } else if (object instanceof PyMethod){
-            PyMethod func = (PyMethod)object;
-            String name = func.toString();
-            callTip[2] = name;
-        } else {
-            callTip[2] = object.toString();
+        try {
+            PyObject object = this.interp.eval(root);
+            if (object instanceof PyFunction){
+                PyFunction func = (PyFunction)object;
+                String name = func.__doc__.toString();
+                callTip[2] = name;
+            } else if (object instanceof PyMethod){
+                PyMethod func = (PyMethod)object;
+                String name = func.toString();
+                callTip[2] = name;
+            } else {
+                callTip[2] = object.toString();
+            }
+        } catch (Exception e){
+            
         }
         
         return callTip;

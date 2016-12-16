@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 import org.meteoinfo.laboratory.event.ConsoleExecEvent;
 import org.meteoinfo.laboratory.event.IConsoleExecListener;
@@ -38,6 +40,14 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
         err = console.getErr();
         setOut(out);
         setErr(err);
+    }
+    
+    /**
+     * Get console
+     * @return Console
+     */
+    public JConsole getConsole(){
+        return this.console;
     }
 
     @Override
@@ -116,6 +126,11 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
 
     public void fireConsoleExecEvent() {
         fireConsoleExecEvent(new ConsoleExecEvent(this));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PythonInteractiveInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.console.print(">>> ", Color.red);
         //this.console.setStyle(Color.black);
         //this.console.setForeground(Color.black);
