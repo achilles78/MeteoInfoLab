@@ -120,6 +120,9 @@ public class JIntrospect implements NameCompletion {
         }
         
         String root = this.getRoot(command, ".");
+        if (root.isEmpty())
+            return null;
+        
         try {
             PyObject object = this.interp.eval(root);
             PyList plist = (PyList) object.__dir__();
@@ -291,10 +294,13 @@ public class JIntrospect implements NameCompletion {
         String code = sb.toString();
         String encoding = "utf-8";
         PythonInterpreter pi = new PythonInterpreter();
-        pi.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
-        PyList tokens = (PyList)pi.get("tokens");    
-        
-        return tokens;
+        try {
+            pi.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
+            PyList tokens = (PyList)pi.get("tokens");            
+            return tokens;
+        } catch (Exception e){
+            return null;
+        }
     }
     
     /**
