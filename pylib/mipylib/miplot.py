@@ -4581,7 +4581,7 @@ def quiverkey(*args, **kwargs):
     """
     Add a key to a quiver plot.
     
-    :param Q: (*MILayer*) The quiver layer instance returned by a call to quiver/quiverm.
+    :param Q: (*MILayer or GraphicCollection*) The quiver layer instance returned by a call to quiver/quiverm.
     :param X: (*float*) The location x of the key.
     :param Y: (*float*) The location y of the key.
     :param label: (*string*) A string with the length and units of the key.
@@ -4600,7 +4600,7 @@ def quiverkey(*args, **kwargs):
     """
     wa = ChartWindArrow()
     Q = args[0]
-    if isinstance(wa, MILayer):
+    if isinstance(Q, MILayer):
         wa.setLayer(Q.layer)
     else:
         wa.setLayer(Q)

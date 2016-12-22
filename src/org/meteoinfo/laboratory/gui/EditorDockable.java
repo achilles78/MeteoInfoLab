@@ -21,9 +21,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
+import org.fife.ui.autocomplete.AutoCompletion;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.TextEditorPane;
 import org.meteoinfo.global.GenericFileFilter;
+import org.meteoinfo.laboratory.util.JythonCompletionProvider;
 import org.meteoinfo.ui.ButtonTabComponent;
 import org.python.util.PythonInterpreter;
 
@@ -97,11 +100,17 @@ public class EditorDockable extends DefaultSingleCDockable {
         final TextEditor tab = new TextEditor(tabbedPanel, title);
         tabbedPanel.add(tab, title);
         tabbedPanel.setSelectedComponent(tab);
+        RSyntaxTextArea textArea = tab.getTextArea();
         tab.setTextFont(this.textFont);
-        tab.getTextArea().setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
-        tab.getTextArea().discardAllEdits();
+        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
+        textArea.discardAllEdits();
         tab.getTextArea().setDirty(false);
         tab.setTitle(title);
+        JythonCompletionProvider cp = new JythonCompletionProvider();
+        AutoCompletion ac = new AutoCompletion(cp);
+        ac.setAutoCompleteEnabled(true);
+        ac.install(textArea);
+        textArea.setToolTipSupplier(cp);
         ButtonTabComponent btc = new ButtonTabComponent(tabbedPanel);
         JButton button = btc.getTabButton();
         button.addActionListener(new ActionListener() {
