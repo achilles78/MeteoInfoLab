@@ -22,7 +22,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 import org.meteoinfo.chart.ChartPanel;
-import org.meteoinfo.laboratory.util.JIntrospect;
+import org.meteoinfo.laboratory.codecomplete.JIntrospect;
 import org.python.core.Py;
 
 /**

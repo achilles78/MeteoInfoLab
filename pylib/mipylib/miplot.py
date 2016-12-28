@@ -3595,7 +3595,7 @@ def quiver(*args, **kwargs):
     iscolor = False
     cdata = None
     xaxistype = None
-    if n <= 4:
+    if n < 4:
         x = args[0].dimvalue(1)
         y = args[0].dimvalue(0)
         x, y = minum.meshgrid(x, y)
