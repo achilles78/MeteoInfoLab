@@ -42,7 +42,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 public class TextEditor extends JPanel {
     // <editor-fold desc="Variables">
 
-    private TextEditorPane _textArea;
+    private MITextEditorPane _textArea;
     private String _title;
     private File _file = null;
     private JTabbedPane _parent;
@@ -60,7 +60,7 @@ public class TextEditor extends JPanel {
         this.setLayout(new BorderLayout());
         _title = title;
         _parent = parent;
-        _textArea = new TextEditorPane();
+        _textArea = new MITextEditorPane();
         _textArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {

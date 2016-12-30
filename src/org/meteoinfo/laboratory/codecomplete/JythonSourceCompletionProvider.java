@@ -10,8 +10,10 @@
  */
 package org.meteoinfo.laboratory.codecomplete;
 
-import java.util.Collections;
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.text.JTextComponent;
 
 import org.fife.ui.autocomplete.BasicCompletion;
@@ -19,7 +21,7 @@ import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Token;
-
+import org.python.util.PythonInterpreter;
 
 /**
  * The completion provider used for Groovy source code.
@@ -29,134 +31,144 @@ import org.fife.ui.rsyntaxtextarea.Token;
  */
 public class JythonSourceCompletionProvider extends DefaultCompletionProvider {
 
-	//private JarManager jarManager;
+    //private JarManager jarManager;
+    private static final char[] KEYWORD_DEF = {'d', 'e', 'f'};
+    private PythonInterpreter interp = new PythonInterpreter();
 
-	private static final char[] KEYWORD_DEF = { 'd', 'e', 'f' };
+    /**
+     * Constructor.
+     */
+    public JythonSourceCompletionProvider() {
+        setParameterizedCompletionParams('(', ", ", ')');
+        setAutoActivationRules(false, "."); // Default - only activate after '.'
+    }
+    
+    /**
+     * Set python interpreter
+     * @param value Python interpreter
+     */
+    public void setInterp(PythonInterpreter value){
+        this.interp = value;
+    }
 
+    private CodeBlock createAst(JTextComponent comp) {
 
-	/**
-	 * Constructor.
-	 */
-	public JythonSourceCompletionProvider() {
-		setParameterizedCompletionParams('(', ", ", ')');
-		setAutoActivationRules(false, "."); // Default - only activate after '.'
-	}
+        CodeBlock ast = new CodeBlock(0);
 
-	private CodeBlock createAst(JTextComponent comp) {
+        RSyntaxTextArea textArea = (RSyntaxTextArea) comp;
+        TokenScanner scanner = new TokenScanner(textArea);
+        parseCodeBlock(scanner, ast);
 
-		CodeBlock ast = new CodeBlock(0);
+        return ast;
 
-		RSyntaxTextArea textArea = (RSyntaxTextArea)comp;
-		TokenScanner scanner = new TokenScanner(textArea);
-		parseCodeBlock(scanner, ast);
+    }
+    
+    private String getSegment(){
+        return this.seg.toString();
+    }
 
-		return ast;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    protected List<Completion> getCompletionsImpl(JTextComponent comp) {
 
-	}
+        completions.clear();
 
+        CodeBlock ast = createAst(comp);
+        int dot = comp.getCaretPosition();
+        recursivelyAddLocalVars(completions, ast, dot);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	protected List<Completion> getCompletionsImpl(JTextComponent comp) {
+//        String code = comp.getText();
+//        String[] codes = code.split("\n");
+//        try {
+//            for (int i = 0; i < codes.length - 1; i++) {
+//                String c = codes[i];
+//                this.interp.exec(c);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
-		completions.clear();
+        // Cut down the list to just those matching what we've typed.
+        String text = this.getSegment();
+        if (!text.startsWith("import ") && !text.startsWith("from "))
+            text = getAlreadyEnteredText(comp);
+        JIntrospect nameComplete = new JIntrospect(this.interp);
+        try {
+            List<String> list = nameComplete.getAutoCompleteList(text);
+            if (list != null) {
+                for (String str : list) {
+                    completions.add(new FieldCompletion(this, str));
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(JythonSourceCompletionProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-		CodeBlock ast = createAst(comp);
+        return completions;
+    }
 
-		int dot = comp.getCaretPosition();
-		recursivelyAddLocalVars(completions, ast, dot);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isValidChar(char ch) {
+        return Character.isJavaIdentifierPart(ch) || ch == '.';
+    }
 
-		Collections.sort(completions);
+    private void parseCodeBlock(TokenScanner scanner, CodeBlock block) {
 
-		// Cut down the list to just those matching what we've typed.
-		String text = getAlreadyEnteredText(comp);
+        Token t = scanner.next();
+        while (t != null) {
+            if (t.isRightCurly()) {
+                block.setEndOffset(t.getOffset());
+                return;
+            } else if (t.isLeftCurly()) {
+                CodeBlock child = block.addChildCodeBlock(t.getOffset());
+                parseCodeBlock(scanner, child);
+            } else if (t.is(Token.RESERVED_WORD, KEYWORD_DEF)) {
+                t = scanner.next();
+                if (t != null) {
+                    VariableDeclaration varDec = new VariableDeclaration(t
+                            .getLexeme(), t.getOffset());
+                    block.addVariable(varDec);
+                }
+            }
+            t = scanner.next();
+        }
 
-		int start = Collections.binarySearch(completions, text, comparator);
-		if (start<0) {
-			start = -(start+1);
-		}
-		else {
-			// There might be multiple entries with the same input text.
-			while (start>0 &&
-					comparator.compare(completions.get(start-1), text)==0) {
-				start--;
-			}
-		}
+    }
 
-		int end = Collections.binarySearch(completions, text+'{', comparator);
-		end = -(end+1);
+    private void recursivelyAddLocalVars(List<Completion> completions,
+            CodeBlock block, int dot) {
 
-		return completions.subList(start, end);
+        if (!block.contains(dot)) {
+            return;
+        }
 
-	}
+        // Add local variables declared in this code block
+        for (int i = 0; i < block.getVariableDeclarationCount(); i++) {
+            VariableDeclaration dec = block.getVariableDeclaration(i);
+            int decOffs = dec.getOffset();
+            if (decOffs < dot) {
+                BasicCompletion c = new BasicCompletion(this, dec.getName());
+                completions.add(c);
+            } else {
+                break;
+            }
+        }
 
+        // Add any local variables declared in a child code block
+        for (int i = 0; i < block.getChildCodeBlockCount(); i++) {
+            CodeBlock child = block.getChildCodeBlock(i);
+            if (child.contains(dot)) {
+                recursivelyAddLocalVars(completions, child, dot);
+                return; // No other child blocks can contain the dot
+            }
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean isValidChar(char ch) {
-		return Character.isJavaIdentifierPart(ch) || ch=='.';
-	}
-
-
-	private void parseCodeBlock(TokenScanner scanner, CodeBlock block) {
-
-		Token t = scanner.next();
-		while (t != null) {
-			if (t.isRightCurly()) {
-				block.setEndOffset(t.getOffset());
-				return;
-			} else if (t.isLeftCurly()) {
-				CodeBlock child = block.addChildCodeBlock(t.getOffset());
-				parseCodeBlock(scanner, child);
-			} else if (t.is(Token.RESERVED_WORD, KEYWORD_DEF)) {
-				t = scanner.next();
-				if (t != null) {
-					VariableDeclaration varDec = new VariableDeclaration(t
-							.getLexeme(), t.getOffset());
-					block.addVariable(varDec);
-				}
-			}
-			t = scanner.next();
-		}
-
-	}
-
-
-	private void recursivelyAddLocalVars(List<Completion> completions,
-			CodeBlock block, int dot) {
-
-		if (!block.contains(dot)) {
-			return;
-		}
-
-		// Add local variables declared in this code block
-		for (int i=0; i<block.getVariableDeclarationCount(); i++) {
-			VariableDeclaration dec = block.getVariableDeclaration(i);
-			int decOffs = dec.getOffset();
-			if (decOffs<dot) {
-				BasicCompletion c = new BasicCompletion(this, dec.getName());
-				completions.add(c);
-			}
-			else {
-				break;
-			}
-		}
-
-		// Add any local variables declared in a child code block
-		for (int i=0; i<block.getChildCodeBlockCount(); i++) {
-			CodeBlock child = block.getChildCodeBlock(i);
-			if (child.contains(dot)) {
-				recursivelyAddLocalVars(completions, child, dot);
-				return; // No other child blocks can contain the dot
-			}
-		}
-
-	}
-
+    }
 
 }

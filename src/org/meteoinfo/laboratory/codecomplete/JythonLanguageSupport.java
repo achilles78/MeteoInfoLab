@@ -11,10 +11,8 @@
 package org.meteoinfo.laboratory.codecomplete;
 
 //import javax.swing.ListCellRenderer;
-
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-
 
 /**
  * Language support for Groovy.
@@ -24,20 +22,18 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
  */
 public class JythonLanguageSupport extends AbstractLanguageSupport {
 
-	/**
-	 * The completion provider, shared amongst all text areas.
-	 */
-	private JythonCompletionProvider provider;
+    /**
+     * The completion provider, shared amongst all text areas.
+     */
+    private JythonCompletionProvider provider;
 
-
-	/**
-	 * Constructor.
-	 */
-	public JythonLanguageSupport() {
-		setParameterAssistanceEnabled(true);
-		setShowDescWindow(true);
-	}
-
+    /**
+     * Constructor.
+     */
+    public JythonLanguageSupport() {
+        setParameterAssistanceEnabled(true);
+        setShowDescWindow(true);
+    }
 
 //	/**
 //	 * {@inheritDoc}
@@ -45,39 +41,41 @@ public class JythonLanguageSupport extends AbstractLanguageSupport {
 //	protected ListCellRenderer createDefaultCompletionCellRenderer() {
 //		return new CCellRenderer();
 //	}
+    
+    /**
+     * Get Jython completion provider
+     * @return Jython completion provider
+     */
+    public JythonCompletionProvider getProvider() {
+        if (provider == null) {
+            provider = new JythonCompletionProvider();
+        }
+        return provider;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void install(RSyntaxTextArea textArea) {
 
-	private JythonCompletionProvider getProvider() {
-		if (provider==null) {
-			provider = new JythonCompletionProvider();
-		}
-		return provider;
-	}
+        JythonCompletionProvider prov = getProvider();
+        AutoCompletion ac = new JythonAutoCompletion(prov);
+        ac.setAutoCompleteEnabled(true);
+        ac.setAutoActivationEnabled(true);
+        ac.setParameterAssistanceEnabled(isParameterAssistanceEnabled());
+        ac.install(textArea);
+        installImpl(textArea, ac);
 
+        textArea.setToolTipSupplier(prov);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void install(RSyntaxTextArea textArea) {
-
-		JythonCompletionProvider provider = getProvider();
-		AutoCompletion ac = createAutoCompletion(provider.createCodeCompletionProvider());
-		ac.install(textArea);
-		installImpl(textArea, ac);
-
-		textArea.setToolTipSupplier(provider);
-
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void uninstall(RSyntaxTextArea textArea) {
-		uninstallImpl(textArea);
-	}
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void uninstall(RSyntaxTextArea textArea) {
+        uninstallImpl(textArea);
+    }
 
 }

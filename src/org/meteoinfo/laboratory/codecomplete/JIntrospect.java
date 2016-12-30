@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.meteoinfo.console.NameCompletion;
-import org.meteoinfo.laboratory.gui.PythonInteractiveInterpreter;
 import org.python.core.Py;
 import org.python.core.PyFunction;
 import org.python.core.PyList;
@@ -35,14 +34,14 @@ public class JIntrospect implements NameCompletion {
 
     private final Pattern IMPORT_PACKAGE = Pattern.compile("import\\s+(.+)\\.");
     private final Pattern FROM_PACKAGE_IMPORT = Pattern.compile("from\\s+(\\w+(?:\\.\\w+)*)\\.?(?:\\s*import\\s*)?");
-    private final PythonInteractiveInterpreter interp;
+    private final PythonInterpreter interp;
 
     /**
      * Constructor
      *
      * @param interp
      */
-    public JIntrospect(PythonInteractiveInterpreter interp) {
+    public JIntrospect(PythonInterpreter interp) {
         this.interp = interp;
     }
 
@@ -95,6 +94,16 @@ public class JIntrospect implements NameCompletion {
                 return null;
             }
         }
+    }
+    
+    /**
+     * Get auto complete list
+     * @param command Command string
+     * @return Complete list string
+     * @throws IOException 
+     */
+    public List<String> getAutoCompleteList(String command) throws IOException{
+        return this.getAutoCompleteList(command, true, true, true);
     }
 
     /**

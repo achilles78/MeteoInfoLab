@@ -11,8 +11,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.PrintStream;
@@ -22,15 +20,15 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
-import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.TextEditorPane;
 import org.meteoinfo.global.GenericFileFilter;
+import org.meteoinfo.laboratory.codecomplete.JIntrospect;
 import org.meteoinfo.laboratory.codecomplete.JythonCompletionProvider;
 import org.meteoinfo.laboratory.codecomplete.JythonLanguageSupport;
+import org.meteoinfo.laboratory.codecomplete.JythonSourceCompletionProvider;
 import org.meteoinfo.ui.ButtonTabComponent;
 import org.python.util.PythonInterpreter;
 
@@ -44,6 +42,7 @@ public class EditorDockable extends DefaultSingleCDockable {
     //private String startupPath;
     private final JTabbedPane tabbedPanel;
     private Font textFont;
+    private PythonInterpreter interp;
 
     public EditorDockable(FrmMain parent, String id, String title, CAction... actions) {
         super(id, title, actions);
@@ -93,6 +92,14 @@ public class EditorDockable extends DefaultSingleCDockable {
             }
         }
     }
+    
+    /**
+     * Set python interpreter
+     * @param value Python interpreter
+     */
+    public void setInterp(PythonInterpreter value){
+        this.interp = value;
+    }
 
     /**
      * Add a new text editor
@@ -104,18 +111,24 @@ public class EditorDockable extends DefaultSingleCDockable {
         final TextEditor tab = new TextEditor(tabbedPanel, title);
         tabbedPanel.add(tab, title);
         tabbedPanel.setSelectedComponent(tab);
-        RSyntaxTextArea textArea = tab.getTextArea();
+        MITextEditorPane textArea = (MITextEditorPane)tab.getTextArea();
         tab.setTextFont(this.textFont);
         textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
         textArea.discardAllEdits();
         tab.getTextArea().setDirty(false);
         tab.setTitle(title);
-        JythonCompletionProvider cp = new JythonCompletionProvider();
-        JythonLanguageSupport ac = new JythonLanguageSupport();
-        //ac.setTriggerKey(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_MASK));
-        ac.setAutoCompleteEnabled(true);
-        ac.install(textArea);
-        textArea.setToolTipSupplier(cp);
+        
+        //Set name completion
+        JIntrospect nameComplete = new JIntrospect(this.interp);
+        textArea.setNameCompletion(nameComplete);
+        
+//        //Set language support - code auto completion
+//        JythonLanguageSupport ac = new JythonLanguageSupport();
+//        ac.install(textArea);        
+//        JythonCompletionProvider cp = ac.getProvider();
+//        if (this.interp != null)
+//            ((JythonSourceCompletionProvider)cp.getDefaultCompletionProvider()).setInterp(interp);
+
         ButtonTabComponent btc = new ButtonTabComponent(tabbedPanel);
         JButton button = btc.getTabButton();
         button.addActionListener(new ActionListener() {

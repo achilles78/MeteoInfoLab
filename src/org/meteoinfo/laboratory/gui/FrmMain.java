@@ -142,8 +142,11 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         editorDock = new EditorDockable(this, "Editor", "Editor");
         //this.editorDock.setStartupPath(startupPath);
         this.editorDock.setTextFont(this.options.getTextFont());
-        this.editorDock.addNewTextEditor("New file");
+        
         consoleDock = new ConsoleDockable(this, this.startupPath, "Console", "Console");
+                
+        this.editorDock.setInterp(this.consoleDock.getInterpreter());
+        this.editorDock.addNewTextEditor("New file");
         
         //Load applications        
         String toolboxPath = this.startupPath + File.separator + "toolbox";
