@@ -2079,7 +2079,8 @@ def antialias(b=None):
     """
     Set figure antialias or not.
     
-    :param b: (*boolean*) Set figure antialias or not. Default is ``None``, means the opposite with current status.
+    :param b: (*boolean*) Set figure antialias or not. Default is ``None``, means the opposite with 
+        current status.
     """
     if chartpanel is None:
         figure()
@@ -2110,6 +2111,17 @@ def savefig(fname, width=None, height=None, dpi=None):
         chartpanel.saveImage(fname)   
         
 def savefig_jpeg(fname, width=None, height=None, dpi=None):
+    """
+    Save the current figure as a jpeg file.
+    
+    :param fname: (*string*) A string containing a path to a filename. The output format
+        is deduced from the extention of the filename. Supported format: 'png', 'bmp',
+        'jpg', 'eps' and 'pdf'.
+    :param width: (*int*) Optional, width of the output figure with pixel units. Default
+        is None, the output figure size is same as *figures* window.
+    :param height: (*int*) Optional, height of the output figure with pixel units. Default
+        is None, the output figure size is same as *figures* window.
+    """
     if (not width is None) and (not height is None):
         chartpanel.setSize(width, height)
     chartpanel.paintGraphics()
@@ -2120,6 +2132,9 @@ def savefig_jpeg(fname, width=None, height=None, dpi=None):
 
 # Clear current axes
 def cla():
+    '''
+    Clear current axes.
+    '''
     global gca
     if not gca is None:
         chartpanel.getChart().removePlot(gca)
@@ -2128,6 +2143,9 @@ def cla():
 
 # Clear current figure    
 def clf():
+    '''
+    Clear current figure.
+    '''
     if chartpanel is None:
         return
     
@@ -2143,6 +2161,9 @@ def clf():
 
 # Clear last layer    
 def cll():
+    '''
+    Clear last added layer or plot object.
+    '''
     if not gca is None:
         if isinstance(gca, XY2DPlot):
             gca.removeLastGraphic()
@@ -2844,10 +2865,16 @@ def ylim(ymin, ymax):
     draw_if_interactive()   
 
 def xreverse():
+    '''
+    Reverse x axis.
+    '''
     gca.getXAxis().setInverse(True)
     draw_if_interactive()
     
 def yreverse():
+    '''
+    Reverse y axis.
+    '''
     gca.getYAxis().setInverse(True)
     draw_if_interactive()
             
@@ -3037,6 +3064,9 @@ def colorbar(mappable, **kwargs):
     draw_if_interactive()
 
 def set(obj, **kwargs):
+    '''
+    Set properties to an object. Used to change the plot parameters.
+    '''
     if isinstance(obj, Plot):
         xminortick = kwargs.pop('xminortick', None)
         if not xminortick is None:
@@ -4386,6 +4416,27 @@ def contourfm(*args, **kwargs):
     return MILayer(layer)
     
 def gridfm(*args, **kwargs):
+    """
+    Plot grid data as grid rectangles polygons.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
+    :param order: (*int*) Z-order of created layer for display.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
+    
+    :returns: (*VectoryLayer*) Grid VectoryLayer created from array data.
+    """    
     plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)
     interpolate = kwargs.pop('interpolate', False)
@@ -4449,6 +4500,27 @@ def surfacem_1(*args, **kwargs):
     return MILayer(layer)
     
 def surfacem(*args, **kwargs):
+    """
+    Plot irregular grid data as polygons.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
+    :param order: (*int*) Z-order of created layer for display.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
+    
+    :returns: (*VectoryLayer*) Polygon VectoryLayer created from array data.
+    """    
     plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
@@ -4902,6 +4974,19 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None, de
     return layer
     
 def clabel(layer, **kwargs):
+    '''
+    Add contour layer labels.
+    
+    :param layer: (*MILayer*) The contour layer.
+    :param fontname, fontsize: The font auguments.
+    :param color: (*color*) The label color. Default is ``black``.
+    :param dynamic: (*boolean*) Draw labels dynamic or not. Default is ``True``.
+    :param drawshadow: (*boolean*) Draw shadow under labels or not.
+    :param fieldname: (*string*) The field name used for label.
+    :param xoffset: (*int*) X offset of the labels.
+    :param yoffset: (int*) Y offset of the labels.
+    :param avoidcoll: (*boolean*) Avoid labels collision or not.
+    '''
     font = __getfont(**kwargs)
     cstr = kwargs.pop('color', 'black')
     color = __getcolor(cstr)
@@ -4934,6 +5019,9 @@ def clabel(layer, **kwargs):
     draw_if_interactive()
         
 def worldmap():
+    '''
+    Return a map plot.
+    '''
     mapview = MapView()
     mapview.setXYScaleFactor(1.0)
     #print 'Is GeoMap: ' + str(mapview.isGeoMap())
@@ -4946,6 +5034,16 @@ def worldmap():
     return plot    
         
 def geoshow(*args, **kwargs):
+    '''
+    Display map layer or longitude latitude data.
+    
+    Syntax:
+    --------    
+        geoshow(layer) - Displays the map data from a map layer which may created by ``shaperead`` function.
+        geoshow(S) - Displays the vector geographic features stored in S as points, multipoints, lines, or 
+          polygons.
+        geoshow(lat, lon) - Displays the latitude and longitude vectors.
+    '''
     plot = gca
     if isinstance(args[0], MILayer):
         layer = args[0]
@@ -5052,6 +5150,16 @@ def geoshow(*args, **kwargs):
             return graphic
 
 def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
+    '''
+    Make colors.
+    
+    :param n: (*int*) Colors number.
+    :param cmap: (*string*) Color map name. Default is ``matlab_jet``.
+    :param reverse: (*boolean*) Reverse the colors or not. Default is ``False``.
+    :param alpha: (*float*) Alpha value (0 - 1) of the colors. Defaul is ``None``.
+
+    :returns: (*list*) Created colors.
+    '''
     ocmap = ColorUtil.getColorMap(cmap)
     if reverse:
         ocmap.reverse()
@@ -5066,6 +5174,13 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     return colors
 
 def makelegend(source):
+    '''
+    Make a legend.
+    
+    :param souce: Legend file name or list of the legen breaks.
+    
+    :returns: Created legend.
+    '''
     if isinstance(source, basestring):
         ls = LegendScheme()
         ls.importFromXMLFile(source, False)
@@ -5074,6 +5189,17 @@ def makelegend(source):
     return ls
     
 def makesymbolspec(geometry, *args, **kwargs):
+    '''
+    Make a legend.
+    
+    :param geometry: (*string*) Geometry type. [point | line | polygon].
+    :param levels: (*array_like*) Value levels. Default is ``None``, not used.
+    :param colors: (*list*) Colors. Defaul is ``None``, not used.
+    :param legend break parameter maps: (*map*) Legend breaks.
+    :param field: (*string*) The field of to be used in the legend.
+    
+    :returns: Created legend.
+    '''
     shapetype = ShapeTypes.Image
     if geometry == 'point':
         shapetype = ShapeTypes.Point
@@ -5118,6 +5244,15 @@ def makesymbolspec(geometry, *args, **kwargs):
     return ls
     
 def weatherspec(weather='all', size=20, color='b'):
+    '''
+    Make a weather symbol legend.
+    
+    :param weather: (*string or list*) The weather index list. Defaul is ``all``, used all weathers.
+    :param size: (*string*) The weather symbol size.
+    :param color: (*color*) The weather symbol color.
+    
+    :returns: Weather symbol legend.
+    '''
     if isinstance(weather, str):
         wlist = DrawMeteoData.getWeatherTypes(weather)
     else:
@@ -5281,6 +5416,12 @@ def __getlegendbreak(geometry, **kwargs):
     return lb, isunique
     
 def masklayer(mobj, layers):
+    '''
+    Mask layers.
+    
+    :param mobj: (*layer or polgyons*) Mask object.
+    :param layers: (*list*) The layers will be masked.       
+    '''
     plot = gca
     mapview = plot.getMapView()
     mapview.getMaskOut().setMask(True)
@@ -5290,6 +5431,9 @@ def masklayer(mobj, layers):
     draw_if_interactive()
     
 def display(data):
+    '''
+    Old one - should not be used.
+    '''
     if not ismap:
         map()
     

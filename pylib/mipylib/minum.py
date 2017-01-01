@@ -103,22 +103,49 @@ class PyTableData():
         return self.data.toString()
         
     def rownum(self):
+        '''
+        Returns the row number.
+        '''
         return self.data.getDataTable().getRowCount()
         
     def colnum(self):
+        '''
+        Returns the column number.
+        '''
         return self.data.getDataTable().getColumnCount()
     
     def colnames(self):
+        '''
+        Returns the column names.
+        '''
         return self.data.getDataTable().getColumnNames()
         
     def setcolname(self, col, colname):
+        '''
+        Set column name to a specified column.
+        
+        :param col: (*int*) Column index.
+        :param colname: (*string*) New column name.
+        '''
         self.data.getDataTable().renameColumn(col, colname)
         
     def setcolnames(self, colnames):
+        '''
+        Set column names to all or first part of columns.
+        
+        :param colnames: (*list*) List of the column names.
+        '''
         for i in range(len(colnames)):
             self.data.getDataTable().renameColumn(i, colnames[i])
     
     def coldata(self, key):
+        '''
+        Return column data as one dimension array.
+        
+        :param key: (*string*) Column name.
+        
+        :returns: (*MIArray*) Colomn data.
+        '''
         if isinstance(key, str):
             print key     
             values = self.data.getColumnData(key).getDataValues()
@@ -126,21 +153,51 @@ class PyTableData():
         return None
         
     def getvalue(self, row, col):
+        '''
+        Return a value in the table.
+        
+        :param row: (*int*) Row index.
+        :param col: (*int*) Column index.
+        
+        :returns: The value at the row and column.
+        '''
         r = self.data.getValue(row, col)
         if isinstance(r, Date):
             r = miutil.pydate(r)
         return r
 
     def setvalue(self, row, col, value):
+        '''
+        Set a value to the table.
+        
+        :param row: (*int*) Row index.
+        :param col: (*int*) Column index.
+        :param value: (*object*) The value.
+        '''
         self.data.setValue(row, col, value)
     
     def addcoldata(self, colname, dtype, coldata):
+        '''
+        Add a column and its data.
+        
+        :param colname: (*string*) The new column name.
+        :param dtype: (*string*) The data type. [string | int | float].
+        :param value: (*array_like*) The data value.
+        '''
         if isinstance(coldata, MIArray):
             self.data.addColumnData(colname, dtype, coldata.aslist())
         else:
             self.data.addColumnData(colname, dtype, coldata)
 
     def addcol(self, colname, dtype, index=None):
+        '''
+        Add an emtpy column.
+        
+        :param colname: (*string*) The new column name.
+        :param dtype: (*string*) The data type. [string | int | float].
+        :param index: (*int*) The order index of the column to be added. Default is ``None``, the
+            column will be added as last column.
+        '''
         dtype = TableUtil.toDataTypes(dtype)
         if index is None:
             self.data.addColumn(colname, dtype)
@@ -148,50 +205,109 @@ class PyTableData():
             self.data.addColumn(index, colname, dtype)
     
     def delcol(self, colname):
+        '''
+        Delete a column.
+        
+        :param colname: (*string*) The column name.
+        '''
         self.data.removeColumn(colname)
         
     def addrow(self, row=None):
+        '''
+        Add a row.
+        
+        :param row: (*DataRow*) The row. Default is ``None`, an emtpy row will be added.
+        '''
         if row is None:
             self.data.addRow()
         else:
             self.data.addRow(row)
             
     def addrows(self, rows):
+        '''
+        Add rows.
+        
+        :param rows: (*list*) The list of the rows.
+        '''
         self.data.addRows(rows)
         
     def getrow(self, index):
+        '''
+        Return a row.
+        
+        :param index: (*int*) Row index.
+        
+        :returns: The row
+        '''
         return self.data.getRow(index)
         
     def getrows(self):
+        '''
+        Return all rows.               
+        '''
         return self.data.getRows()
         
     #Set time column
     def timecol(self, colname):
+        '''
+        Set time column.
+        
+        :param colname: (*string*) The Name of the column which will be set as time column. For time
+            statistic calculation such as daily average.
+        '''
         tdata = TimeTableData(self.data.dataTable)
         tdata.setTimeColName(colname)
         self.data = tdata;
         self.timedata = True
         
     def join(self, other, colname, colname1=None):
+        '''
+        Join with another table. Joining data is typically used to append the fields of one table to 
+        those of another through an attribute or field common to both tables.
+        
+        :param other: (*PyTableData*) The other table.
+        :param colname: (*string*) The common field name.
+        :param colname1: (*string*) The common field name in the other table. Default is ``None`` if
+            the common field names are same in both tables.
+        '''
         if colname1 == None:
             self.data.join(other.data, colname)
         else:
             self.data.join(other.data, colname, colname1)
-    def join(self, other, colname):
-        self.data.join(other.data, colname)
         
     def savefile(self, filename, delimiter=','):
+        '''
+        Save the table data to an ASCII file.
+        
+        :param filename: (*string*) The file name.
+        :param delimiter: (*string*) Field delimiter character. Default is ``,``.
+        '''
         if delimiter == ',':
             self.data.saveAsCSVFile(filename)
         else:
             self.data.saveAsASCIIFile(filename)
             
     def ave(self, colnames):
+        '''
+        Average some columns data.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains one row of average data of the columns.
+        '''
         cols = self.data.findColumns(colnames)
         dtable = self.data.average(cols)
         return PyTableData(TableData(dtable))
         
     def ave_year(self, colnames, year=None):
+        '''
+        Yearly average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        :param year: (*int*) Specific year. Default is ``None``.
+        
+        :returns: (*PyTableData*) Result table contains some rows of yearly average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -204,6 +320,14 @@ class PyTableData():
             return PyTableData(TableData(dtable))
             
     def ave_yearmonth(self, colnames, month):
+        '''
+        Average the table data by year and month. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        :param month: (*int*) Specific month.
+        
+        :returns: (*PyTableData*) Result table contains some rows of year-month average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -213,6 +337,13 @@ class PyTableData():
             return PyTableData(TableData(dtable))
                   
     def ave_monthofyear(self, colnames):
+        '''
+        Month of year average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of month of year average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -222,6 +353,13 @@ class PyTableData():
             return PyTableData(TableData(dtable))
             
     def ave_seasonofyear(self, colnames):
+        '''
+        Season of year average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of season of year average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -231,6 +369,13 @@ class PyTableData():
             return PyTableData(TableData(dtable))
             
     def ave_hourofday(self, colnames):
+        '''
+        Hour of day average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of hour of day average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -240,6 +385,13 @@ class PyTableData():
             return PyTableData(TableData(dtable))
     
     def ave_month(self, colnames):
+        '''
+        Monthly average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of monthly average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -249,6 +401,13 @@ class PyTableData():
             return PyTableData(TableData(dtable))
             
     def ave_day(self, colnames, day=None):
+        '''
+        Daily average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of daily average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -260,6 +419,13 @@ class PyTableData():
             return PyTableData(ttd)
             
     def ave_hour(self, colnames):
+        '''
+        Hourly average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of hourly average data of the columns.
+        '''
         if not self.timedata:
             print 'There is no time column!'
             return None
@@ -271,12 +437,25 @@ class PyTableData():
             return PyTableData(ttd)
             
     def assinglerow(self):
+        '''
+        Returns single row table if this table is single column table.
+        '''
         return PyTableData(TableData(self.data.toSingleRowTable(self.data.getDataTable())))
         
     def sql(self, expression):
+        '''
+        Returns SQL selection result.
+        
+        :param expression: (*string*) SQL expression.
+        
+        :returns: (*PyTableData*) SQL result table.
+        '''
         return PyTableData(self.data.sqlSelect(expression))
     
     def clone(self):
+        '''
+        Return coloned table.
+        '''
         return PyTableData(self.data.clone())
 
 #################################################################  
@@ -311,6 +490,8 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
     :param fname: (*string*) The full or relative path of the data file to load.
     :param access: (*string*) The access right setting to the data file. Default is ``r``.
     :param dtype: (*string*) The data type of the data file. Default is ``netcdf``.
+    :param keepopen: (*boolean*) If the file keep open after this function. Default is ``False``. The
+        file need to be closed later if ``keepopen`` is ``True``.
     
     :returns: (*DimDataFile*) Opened file object.
     """
@@ -368,6 +549,14 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
         return None
     
 def addfile_grads(fname, getfn=True):
+    '''
+    Add a GrADS data file.
+    
+    :param fname: (*string*) GrADS control file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -377,6 +566,14 @@ def addfile_grads(fname, getfn=True):
     return datafile
     
 def addfile_nc(fname, getfn=True):
+    '''
+    Add a netCDF data file.
+    
+    :param fname: (*string*) The netCDF file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -386,6 +583,14 @@ def addfile_nc(fname, getfn=True):
     return datafile
     
 def addfile_arl(fname, getfn=True):
+    '''
+    Add a ARL data file.
+    
+    :param fname: (*string*) The ARL file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -395,6 +600,14 @@ def addfile_arl(fname, getfn=True):
     return datafile
     
 def addfile_surfer(fname, getfn=True):
+    '''
+    Add a Surfer ASCII grid data file.
+    
+    :param fname: (*string*) The Surfer ASCII grid file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -404,6 +617,14 @@ def addfile_surfer(fname, getfn=True):
     return datafile
     
 def addfile_mm5(fname, getfn=True):
+    '''
+    Add a MM5 data file.
+    
+    :param fname: (*string*) The MM5 file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -413,6 +634,14 @@ def addfile_mm5(fname, getfn=True):
     return datafile
     
 def addfile_lonlat(fname, getfn=True, missingv=-9999.0):
+    '''
+    Add a Lon/Lat ASCII data file.
+    
+    :param fname: (*string*) The Lon/Lat ASCII file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -423,6 +652,14 @@ def addfile_lonlat(fname, getfn=True, missingv=-9999.0):
     return datafile
     
 def addfile_micaps(fname, getfn=True):
+    '''
+    Add a MICAPS data file.
+    
+    :param fname: (*string*) The MICAPS file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -432,6 +669,14 @@ def addfile_micaps(fname, getfn=True):
     return datafile
 
 def addfile_hytraj(fname, getfn=True):
+    '''
+    Add a HYSPLIT trajectory endpoint data file.
+    
+    :param fname: (*string*) The HYSPLIT trajectory endpoint file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if isinstance(fname, basestring):
         if getfn:
             fname, isweb = __getfilename(fname)
@@ -442,6 +687,14 @@ def addfile_hytraj(fname, getfn=True):
     return datafile
     
 def addfile_hyconc(fname, getfn=True):
+    '''
+    Add a HYSPLIT concentration data file.
+    
+    :param fname: (*string*) The HYSPLIT concentration file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -451,6 +704,14 @@ def addfile_hyconc(fname, getfn=True):
     return datafile
     
 def addfile_geotiff(fname, getfn=True):
+    '''
+    Add a GeoTiff data file.
+    
+    :param fname: (*string*) The GeoTiff file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -460,6 +721,14 @@ def addfile_geotiff(fname, getfn=True):
     return datafile
     
 def addfile_awx(fname, getfn=True):
+    '''
+    Add a AWX data file (Satellite data file format from CMA).
+    
+    :param fname: (*string*) The AWX file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
@@ -469,6 +738,14 @@ def addfile_awx(fname, getfn=True):
     return datafile
     
 def addfile_ascii_grid(fname, getfn=True):
+    '''
+    Add a ESRI ASCII grid data file.
+    
+    :param fname: (*string*) The ESRI ASCII grid file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
     if getfn:
         fname, isweb = __getfilename(fname)
     if not os.path.exists(fname):
@@ -505,14 +782,43 @@ def getstationdata(varname='var', timeindex=0, levelindex=0):
         return None
 
 def numasciirow(filename):
+    '''
+    Returns the number of rows in an ASCII file.
+    
+    :param filename: (*string*) The ASCII file name.
+    
+    :returns: The number of rows in the file.
+    '''
     nrow = ArrayUtil.numASCIIRow(filename)
     return nrow
     
 def numasciicol(filename, delimiter=None, headerlines=0):
+    '''
+    Returns the number of columns in an ASCII file.
+    
+    :param filename: (*string*) The ASCII file name.
+    :param delimiter: (*string*) Field delimiter character. Default is ``None``, means space or tab 
+        delimiter.
+    :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``.
+    
+    :returns: The number of columns in the file.
+    '''
     ncol = ArrayUtil.numASCIICol(filename, delimiter, headerlines)
     return ncol
         
 def asciiread(filename, **kwargs):
+    '''
+    Read data from an ASCII file.
+    
+    :param filename: (*string*) The ASCII file name.
+    :param delimiter: (*string*) Field delimiter character. Default is ``None``, means space or tab 
+        delimiter.
+    :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``.
+    :param shape: (*string*) Data array dimension shape. Default is ``None``, the file content will
+        be readed as one dimension array.
+    
+    :returns: (*MIArray*) The data array.
+    '''
     delimiter = kwargs.pop('delimiter', None)
     datatype = kwargs.pop('datatype', None)
     headerlines = kwargs.pop('headerlines', 0)
@@ -521,6 +827,24 @@ def asciiread(filename, **kwargs):
     return MIArray(a)
         
 def readtable(filename, **kwargs):
+    '''
+    Create table by reading column oriented data from a file.
+    
+    :param filename: (*string*) File name for reading.
+    :param delimiter: (*string*) Field delimiter character. Default is ``None``, means space or tab 
+        delimiter.
+    :param format: (*string*) Colomn format of the file. Default is ``None``, means all columns were
+        read as string field. ``%s``: string; ``%i``: integer; ``%f``: float; ``%{yyyyMMdd...}D``: 
+        date time.
+    :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``. The line
+        after the skip lines will be read as filed names of the table. the ``headerlines`` should set
+        as ``-1`` if there is no field name line at beginning of the file.
+    :param encoding: (*string*) Character encoding scheme associated with the file. Default is ``UTF8``.
+    :param colnames: (*string*) Specified field names for the readed table. Default is ``None``, means
+        the field names should be read from the file.
+        
+    :returns: (*PyTableData*) The table.
+    '''
     delimiter = kwargs.pop('delimiter', None)
     format = kwargs.pop('format', None)
     headerlines = kwargs.pop('headerlines', 0)
@@ -535,6 +859,13 @@ def readtable(filename, **kwargs):
     return r
     
 def geotiffread(filename):
+    '''
+    Return data array from a GeoTiff data file.
+    
+    :param filename: (*string*) The GeoTiff file name.
+    
+    :returns: (*MIArray*) Readed data array.
+    '''
     geotiff = GeoTiff(filename)
     geotiff.read()
     r = geotiff.readArray()
@@ -1250,6 +1581,16 @@ def reshape(a, *args):
     return a.reshape(*args)
         
 def meshgrid(x, y):
+    '''
+    Returns 2-D grid coordinates based on the coordinates contained in vectors x and y. is a matrix 
+    where each row is a copy of x, and Y is a matrix where each column is a copy of y. The grid 
+    represented by the coordinates X and Y has length(y) rows and length(x) columns.
+
+    :param x: (*array_like*) 1-D array representing the x coordinate of a grid. 
+    :param y: (*array_like*) 1-D array representing the y coordinate of a grid.
+    
+    :returns X, Y: 2-D array. 2-D arrays.
+    '''
     if isinstance(x, list):
         x = array(x)
     if isinstance(y, list):
@@ -1300,6 +1641,15 @@ def corrcoef(x, y):
     return r
         
 def linregress(x, y):
+    '''
+    Calculate a linear least-squares regression for two sets of measurements.
+    
+    :param x, y: (*array_like*) Two sets of measurements. Both arrays should have the same length.
+    
+    :returns slope, intercept, rvalue, pvalue, dnum: Result slope, intercept, relative coefficient,
+        two-sided p-value for a hypothesis test whose null hypothesis is that the slope is zero, validate
+        data number (remove NaN values).
+    '''
     if isinstance(x, list):
         x = array(x)
     if isinstance(y, list):
@@ -1328,6 +1678,13 @@ def polyval(p, x):
     return MIArray(ArrayMath.polyVal(p, x.asarray()))
     
 def transpose(a, dim1=0, dim2=1):
+    '''
+    Transpose 2-D array.
+    
+    :param a: (*array*) 2-D array to be transposed.
+    
+    :returns: Transposed array.
+    '''
     r = ArrayMath.transpose(a.asarray(), dim1, dim2)
     if isinstance(a, MIArray):
         return MIArray(r)
@@ -1508,6 +1865,14 @@ def p2h(press):
 
 # Performs a centered difference operation on a array in a specific direction    
 def cdiff(a, dimidx):
+    '''
+    Performs a centered difference operation on a array in a specific direction
+    
+    :param a: (*array*) The input array.
+    :param dimidx: (*int*) Demension index of the specific direction.
+    
+    :returns: Result array.
+    '''
     if isinstance(a, DimArray):
         r = ArrayMath.cdiff(a.asarray(), dimidx)
         return DimArray(MIArray(r), a.dims, a.fill_value, a.proj)
@@ -1516,6 +1881,14 @@ def cdiff(a, dimidx):
 
 # Calculates the vertical component of the curl (ie, vorticity)    
 def hcurl(u, v):
+    '''
+    Calculates the vertical component of the curl (ie, vorticity). The data should be lon/lat projection.
+    
+    :param u: (*array*) U component array.
+    :param v: (*array*) V component array.
+    
+    :returns: Array of the vertical component of the curl.
+    '''
     if isinstance(u, DimArray) and isinstance(v, DimArray):
         ydim = u.ydim()
         xdim = u.xdim()
@@ -1524,14 +1897,29 @@ def hcurl(u, v):
 
 #  Calculates the horizontal divergence using finite differencing        
 def hdivg(u, v):
+    '''
+    Calculates the horizontal divergence using finite differencing. The data should be lon/lat projection.
+    
+    :param u: (*array*) U component array.
+    :param v: (*array*) V component array.
+    
+    :returns: Array of the horizontal divergence.
+    '''
     if isinstance(u, DimArray) and isinstance(v, DimArray):
         ydim = u.ydim()
         xdim = u.xdim()
         r = ArrayMath.hdivg(u.asarray(), v.asarray(), xdim.getDimValue(), ydim.getDimValue())
         return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
-        
-#  Calculates the horizontal divergence using finite differencing        
+              
 def magnitude(u, v):
+    '''
+    Performs the calculation: sqrt(u*u+v*v).
+    
+    :param u: (*array*) U component array.
+    :param v: (*array*) V component array.
+    
+    :returns: Result array.
+    '''
     if isinstance(u, DimArray) and isinstance(v, DimArray):
         r = ArrayMath.magnitude(u.asarray(), v.asarray())
         return DimArray(MIArray(r), u.dims, u.fill_value, u.proj)
@@ -1543,6 +1931,13 @@ def magnitude(u, v):
         return r
 
 def asarray(data):
+    '''
+    Get array from array_like data (ie., MIArray, DimArray and list).
+    
+    :param data: (*array_like*) The input data.
+    
+    :returns: Array data.
+    '''
     if isinstance(data, Array):
         return data
     elif isinstance(data, (DimArray, MIArray)):
@@ -1551,6 +1946,13 @@ def asarray(data):
         return array(data).asarray()
 
 def asmiarray(data):
+    '''
+    Convert the array_like data to MIArray data.
+    
+    :param data: (*array_like*) The input data.
+    
+    :returns: MIArray data.
+    '''
     if isinstance(data, Array):
         return MIArray(data)
     elif isinstance(data, DimArray):
@@ -1603,6 +2005,13 @@ def asstationdata(data, x, y, fill_value=-9999.0):
     return PyStationData(stdata)
         
 def shaperead(fn):   
+    '''
+    Returns a layer readed from a shape file.
+    
+    :param fn: (*string*) The shape file name (.shp).
+    
+    :returns: (*MILayer*) The created layer.
+    '''
     if os.path.exists(fn):        
         try:
             layer = MILayer(MapDataManage.loadLayer(fn))
@@ -1617,19 +2026,27 @@ def shaperead(fn):
         raise
     
 def georead(fn):
-    layer = MILayer(MapDataManage.loadLayer(fn))
-    if layer.isvectorlayer():
-        lb = layer.legend().getLegendBreaks()[0]
-        if lb.getBreakType() == BreakTypes.PolygonBreak:
-            lb.setDrawFill(False)
-    return layer
+    '''
+    Returns a layer readed from a supported geo-data file.
     
-def polygon(*args):
-    if len(args) == 1:
-        polygon = ShapeUtil.createPolygonShape(args[0])
+    :param fn: (*string*) The supported geo-data file name (shape file, wmp, geotiff, image, bil...).
+    
+    :returns: (*MILayer*) The created layer.
+    '''
+    return shaperead(fn)
+    
+def polygon(x, y = None):
+    '''
+    Create polygon from coordinate data.
+    
+    :param x: (*array_like*) X coordinate array. If y is ``None``, x should be 2-D array contains x and y.
+    :param y: (*array_like*) Y coordinate array.
+    
+    :returns: (*PolygonShape*) Created polygon.
+    '''
+    if y is None:
+        polygon = ShapeUtil.createPolygonShape(x)
     else:
-        x = args[0]
-        y = args[1]
         if isinstance(x, MIArray):
             x = x.aslist()
         if isinstance(y, MIArray):
@@ -1638,6 +2055,15 @@ def polygon(*args):
     return polygon
     
 def inpolygon(x, y, polygon):
+    '''
+    Judge if a point is inside a polygon or not.
+    
+    :param x: (*float*) X coordinate of the point.
+    :param y: (*float*) Y coordinate of the point.
+    :param polygon: (*PolygonShape*) The polygon.
+    
+    :returns: (*boolean*) Inside or not.
+    '''
     return GeoComputation.pointInPolygon(polygon, x, y)
     
 def distance(x, y, islonlat=False):
@@ -1658,6 +2084,13 @@ def distance(x, y, islonlat=False):
     return r
     
 def polyarea(*args, **kwargs):
+    '''
+    Calculate area of polygon.
+    
+    Parameter is a polygon object or x, y coordinate arrays.
+    
+    :return: The area of the polygon.
+    '''
     islonlat = kwargs.pop('islonlat', False)
     if len(args) == 1:
         if islonlat:
@@ -1773,8 +2206,27 @@ def interpn(points, values, xi):
     return r
     
 def griddata(points, values, xi=None, **kwargs):
+    '''
+    Interpolate scattered data to grid data.
+    
+    :param points: (*list*) The list contains x and y coordinate arrays of the scattered data.
+    :param values: (*array_like*) The scattered data array.
+    :param xi: (*list*) The list contains x and y coordinate arrays of the grid data. Default is ``None``,
+        the grid x and y coordinate size were both 500.
+    :param method: (*string*) The interpolation method. [idw | cressman | neareast | inside | inside_min
+        | inside_max | inside_count | surface]
+    :param fill_value: (*float*) Fill value, Default is ``nan``.
+    :param pointnum: (*int*) Only used for 'idw' method. The number of the points to be used for each grid
+        value interpolation.
+    :param radius: (*float*) Used for 'idw', 'cressman' and 'neareast' methods. The searching raduis. Default 
+        is ``None`` in 'idw' method, means no raduis was used. Default is ``[10, 7, 4, 2, 1]`` in cressman 
+        method.
+    :param convexHull: (*boolean*) If the convexHull will be used to mask result grid data. Default is ``False``.
+    
+    :returns: (*array*) Interpolated grid data (2-D array)
+    '''
     method = kwargs.pop('method', 'idw')
-    fill_value = kwargs.pop('file_value', nan)
+    fill_value = kwargs.pop('fill_value', nan)
     x_s = points[0]
     y_s = points[1]
     if xi is None:
@@ -1936,18 +2388,38 @@ def projectxy(lon, lat, xnum, ynum, dx, dy, toproj, fromproj=None, pos='lowerlef
     return xx, yy
     
 def addtimedim(infn, outfn, t, tunit='hours'):
+    '''
+    Add a time dimension to a netCDF data file.
+    
+    :param infn: (*string*) Input netCDF file name.
+    :param outfn: (*string*) Output netCDF file name.
+    :param t: (*DateTime*) A time value.
+    :param tunit: (*string*) Time unite, Default is ``hours``.
+    
+    :returns: The new netCDF with time dimension.
+    '''
     cal = Calendar.getInstance()
     cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
     nt = cal.getTime()
     NetCDFDataInfo.addTimeDimension(infn, outfn, nt, tunit)
         
 def joinncfile(infns, outfn, tdimname):
+    '''
+    Join several netCDF files to one netCDF file.
+    
+    :param infns: (*list*) Input netCDF file name list.
+    :param outfn: (*string*) Output netCDF file name.
+    :param tdimname: (*string*) Time dimension name.
+    
+    :returns: Joined netCDF file.
+    '''
     NetCDFDataInfo.joinDataFiles(infns, outfn, tdimname)
     
 def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     """
     Read data array from a binary file.
     
+    :param fn: (*string*) The binary file name for data reading. 
     :param dim: (*list*) Dimensions.
     :param datatype: (*string*) Data type string.
     :param skip: (*int*) Skip bytes number.
@@ -1971,6 +2443,11 @@ def binwrite(fn, data, byteorder='little_endian', append=False):
     
 # Get month abstract English name
 def monthname(m):  
+    '''
+    Get month abstract English name.
+    
+    :param m: (*int*) Month number (1 to 12).
+    '''
     mmm = 'jan'
     if m == 1:
         mmm = 'jan'

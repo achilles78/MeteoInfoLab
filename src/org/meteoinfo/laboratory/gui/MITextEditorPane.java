@@ -51,44 +51,64 @@ public class MITextEditorPane extends TextEditorPane {
         this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
+                type(e);
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
                 if (popup.isVisible()) {
-                    popup.type(e);
-                    return;
-                }
-                switch (e.getKeyCode()) {
-                    case (KeyEvent.VK_PERIOD):
-                        showPopup();
-                        e.consume();
-                        break;
-                    case (KeyEvent.VK_SPACE):
-                        String command = getCurrentText();
-                        Matcher match = FROM_PACKAGE_IMPORT.matcher(command);
-                        if (match.matches()) {
-                            showPopup();
-                        }
-                        e.consume();
-                        break;
-                    case (KeyEvent.VK_9):
-                        if (e.isShiftDown()) {
-                            showTip();
-                        }
-                        e.consume();
-                        break;
-                    case (KeyEvent.VK_0):
-                        if (e.isShiftDown()) {
-                            tip.setVisible(false);
-                        }
-                        e.consume();
-                        break;
-                    case (KeyEvent.VK_LEFT):
-                    case (KeyEvent.VK_BACK_SPACE):
-                    case (KeyEvent.VK_DELETE):
-                        if (tip.isVisible()) {
-                            tip.setVisible(false);
-                        }
+                    if (e.getID() == KeyEvent.KEY_PRESSED) {
+                        popup.type(e);
+                    }
                 }
             }
+
+            @Override
+            public void keyTyped(KeyEvent e) {                
+            }
         });
+    }
+
+    private synchronized void type(KeyEvent e) {
+        if (this.popup.isVisible()) {
+            if (e.getID() == KeyEvent.KEY_PRESSED) {
+                this.popup.type(e);
+            }
+            return;
+        }
+
+        switch (e.getKeyCode()) {
+            case (KeyEvent.VK_PERIOD):
+                showPopup();
+                e.consume();
+                break;
+            case (KeyEvent.VK_SPACE):
+                String command = getCurrentText();
+                Matcher match = FROM_PACKAGE_IMPORT.matcher(command);
+                if (match.matches()) {
+                    showPopup();
+                }
+                e.consume();
+                break;
+            case (KeyEvent.VK_9):
+                if (e.isShiftDown()) {
+                    showTip();
+                }
+                e.consume();
+                break;
+            case (KeyEvent.VK_0):
+                if (e.isShiftDown()) {
+                    tip.setVisible(false);
+                }
+                e.consume();
+                break;
+            case (KeyEvent.VK_LEFT):
+            case (KeyEvent.VK_BACK_SPACE):
+            case (KeyEvent.VK_DELETE):
+                if (tip.isVisible()) {
+                    tip.setVisible(false);
+                }
+        }
     }
 
     // </editor-fold>
