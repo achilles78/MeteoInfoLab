@@ -5,7 +5,12 @@
 # Note: Jython
 #-----------------------------------------------------
 
+from org.meteoinfo.data import ArrayMath
 import minum as np
+import dimarray
+import miarray
+from miarray import MIArray
+from dimarray import DimArray
 
 P0 = 1000.          #reference pressure for potential temperature (hPa)
 R = 8.3144598       #molar gas constant (J / K / mol)
@@ -17,6 +22,38 @@ Cp_d = 1005         #Specific heat at constant pressure for dry air (J kg^-1)
 epsilon = Mw / Md
 kappa = 0.286
 degCtoK=273.15        # Temperature offset between K and C (deg C)
+
+def uv2ds(u, v):
+    '''
+    Calculate wind direction and wind speed from U/V.
+    
+    :param u: (*array_like*) U component of wind field.
+    :param v: (*array_like*) V component of wind field.
+    
+    :returns: Wind direction and wind speed.
+    '''
+    if isinstance(u, (MIArray, DimArray)):
+        r = ArrayMath.uv2ds(u.asarray(), v.asarray())
+        return MIArray(r[0]), MIArray(r[1])
+    else:
+        r = ArrayMath.uv2ds(u, v)
+        return r[0], r[1]
+        
+def ds2uv(d, s):
+    '''
+    Calculate U/V from wind direction and wind speed.
+    
+    :param d: (*array_like*) Wind direction.
+    :param s: (*array_like*) Wind speed.
+    
+    :returns: Wind U/V.
+    '''
+    if isinstance(d, (MIArray, DimArray)):
+        r = ArrayMath.ds2uv(d.asarray(), s.asarray())
+        return MIArray(r[0]), MIArray(r[1])
+    else:
+        r = ArrayMath.ds2uv(d, s)
+        return r[0], r[1]
 
 def potential_temperature(pressure, temperature):
     """
