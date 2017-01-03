@@ -782,12 +782,15 @@ def bar(*args, **kwargs):
     :param width: (*array_like*) Optional, the widths of the bars default: 0.8.
     :param bottom: (*array_like*) Optional, the y coordinates of the bars default: None
     :param color: (*Color*) Optional, the color of the bar faces.
-    :param edgecolor: (*Color*) Optional, the color of the bar edge.
+    :param edgecolor: (*Color*) Optional, the color of the bar edge. Default is black color.
+        Edge line will not be plotted if ``edgecolor`` is ``None``.
     :param linewidth: (*int*) Optional, width of bar edge.
     :param label: (*string*) Label of the bar series.
     :param hatch: (*string*) Hatch string.
     :param hatchsize: (*int*) Hatch size. Default is None (8).
     :param bgcolor: (*Color*) Background color, only valid with hatch.
+    :param barswidth: (*float*) Bars width (0 - 1), only used for automatic bar with plot
+        (only one argument widthout ``width`` augument). Defaul is 0.8.
     
     :returns: Bar legend break.
     
@@ -828,8 +831,8 @@ def bar(*args, **kwargs):
         xdata = args[0]
         ydata = args[1]
         width = args[2]
-        autowidth = False
-        
+        autowidth = False        
+    
     if xdata is None:
         xdata = []
         for i in range(1, len(args[0]) + 1):
@@ -896,6 +899,9 @@ def bar(*args, **kwargs):
             plot = XY2DPlot()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
+    if autowidth:
+        barswidth = kwargs.pop('barswidth', 0.8)
+        plot.setBarsWidth(barswidth)
     
     #Create figure
     if chartpanel is None:
@@ -2137,7 +2143,10 @@ def cla():
     '''
     global gca
     if not gca is None:
-        chartpanel.getChart().removePlot(gca)
+        if not chartpanel is None:
+            chart = chartpanel.getChart()
+            if not chart is None:
+                chartpanel.getChart().removePlot(gca)
         gca = None
         draw_if_interactive()
 
@@ -4656,6 +4665,7 @@ def quiverkey(*args, **kwargs):
     :param Q: (*MILayer or GraphicCollection*) The quiver layer instance returned by a call to quiver/quiverm.
     :param X: (*float*) The location x of the key.
     :param Y: (*float*) The location y of the key.
+    :param U: (*float*) The length of the key.
     :param label: (*string*) A string with the length and units of the key.
     :param coordinates=['axes'|'figure'|'data'|'inches']: (*string*) Coordinate system and units for 
         *X, Y*. 'axes' and 'figure' are normalized coordinate system with 0,0 in the lower left and 
@@ -4979,7 +4989,8 @@ def clabel(layer, **kwargs):
     
     :param layer: (*MILayer*) The contour layer.
     :param fontname, fontsize: The font auguments.
-    :param color: (*color*) The label color. Default is ``black``.
+    :param color: (*color*) The label color. Default is ``None``, the label color will be set as
+        same as color of the line.
     :param dynamic: (*boolean*) Draw labels dynamic or not. Default is ``True``.
     :param drawshadow: (*boolean*) Draw shadow under labels or not.
     :param fieldname: (*string*) The field name used for label.
@@ -4988,15 +4999,14 @@ def clabel(layer, **kwargs):
     :param avoidcoll: (*boolean*) Avoid labels collision or not.
     '''
     font = __getfont(**kwargs)
-    cstr = kwargs.pop('color', 'black')
-    color = __getcolor(cstr)
+    color = kwargs.pop('color', None)    
     gc = layer
     if isinstance(layer, MILayer):
         gc = layer.layer   
     dynamic = kwargs.pop('dynamic', True)
     if gc.getShapeType() != ShapeTypes.Polyline:
         dynamic = False
-    drawshadow = kwargs.pop('drawshadow', dynamic)
+    drawshadow = kwargs.pop('drawshadow', dynamic)    
     labelset = gc.getLabelSet()
     if isinstance(gc, MapLayer):
         fieldname = kwargs.pop('fieldname', labelset.getFieldName())
@@ -5004,7 +5014,12 @@ def clabel(layer, **kwargs):
             fieldname = gc.getFieldName(0)
         labelset.setFieldName(fieldname)
     labelset.setLabelFont(font)
-    labelset.setLabelColor(color)
+    if color is None:
+        labelset.setColorByLegend(True)
+    else:
+        labelset.setColorByLegend(False)
+        color = __getcolor(color)
+        labelset.setLabelColor(color)
     labelset.setDrawShadow(drawshadow)
     xoffset = kwargs.pop('xoffset', 0)
     labelset.setXOffset(xoffset)
