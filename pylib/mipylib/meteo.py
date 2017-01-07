@@ -85,6 +85,84 @@ def h2p(height):
         return DimArray(MIArray(ArrayMath.height2Press(height.asarray())), height.dims, height.fill_value, height.proj)
     else:
         return MeteoMath.height2Press(height)
+        
+def tf2tc(tf):
+    """
+    Fahrenheit temperature to Celsius temperature
+        
+    tf: DimArray or MIArray or number 
+        Fahrenheit temperature - degree f   
+        
+    return: DimArray or MIArray or number
+        Celsius temperature - degree c
+    """    
+    if isinstance(tf, MIArray):
+        return MIArray(ArrayMath.tf2tc(tf.asarray()))
+    elif isinstance(tf, DimArray):
+        return DimArray(MIArray(ArrayMath.tf2tc(tf.asarray())), tf.dims, tf.fill_value, tf.proj)
+    else:
+        return MeteoMath.tf2tc(tf)
+        
+def tc2tf(tc):
+    """
+    Celsius temperature to Fahrenheit temperature
+        
+    tc: DimArray or MIArray or number 
+        Celsius temperature - degree c    
+        
+    return: DimArray or MIArray or number
+        Fahrenheit temperature - degree f
+    """    
+    if isinstance(tc, MIArray):
+        return MIArray(ArrayMath.tc2tf(tc.asarray()))
+    elif isinstance(tc, DimArray):
+        return DimArray(MIArray(ArrayMath.tc2tf(tc.asarray())), tc.dims, tc.fill_value, tc.proj)
+    else:
+        return MeteoMath.tc2tf(tc)
+
+def qair2rh(qair, temp, press=1013.25):
+    """
+    Specific humidity to relative humidity
+        
+    qair: DimArray or MIArray or number 
+        Specific humidity - dimensionless (e.g. kg/kg) ratio of water mass / total air mass
+    temp: DimArray or MIArray or number
+        Temperature - degree c
+    press: DimArray or MIArray or number
+        Pressure - hPa (mb)
+    
+    return: DimArray or MIArray or number
+        Relative humidity - %
+    """    
+    if isinstance(press, MIArray) or isinstance(press, DimArray):
+        p = press.asarray()
+    else:
+        p = press
+    if isinstance(qair, MIArray):
+        return MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p))
+    elif isinstance(qair, DimArray):
+        return DimArray(MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p)), qair.dims, qair.fill_value, qair.proj)
+    else:
+        return MeteoMath.qair2rh(qair, temp, press)
+        
+def dewpoint2rh(dewpoint, temp):    
+    """
+    Dew point to relative humidity
+        
+    dewpoint: DimArray or MIArray or number 
+        Dew point - degree c
+    temp: DimArray or MIArray or number
+        Temperature - degree c
+        
+    return: DimArray or MIArray or number
+        Relative humidity - %
+    """    
+    if isinstance(dewpoint, MIArray):
+        return MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray()))
+    elif isinstance(dewpoint, DimArray):
+        return DimArray(MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray())), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
+    else:
+        return MeteoMath.dewpoint2rh(temp, dewpoint)     
 
 def potential_temperature(pressure, temperature):
     """

@@ -9,6 +9,8 @@ import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
@@ -65,6 +67,17 @@ public class MITextEditorPane extends TextEditorPane {
 
             @Override
             public void keyTyped(KeyEvent e) {                
+            }
+        });
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (tip.isVisible()) {
+                    tip.setVisible(false);
+                }
+                if (popup.isVisible()) {
+                    popup.setVisible(false);
+                }
             }
         });
     }
@@ -208,7 +221,7 @@ public class MITextEditorPane extends TextEditorPane {
         }
 
         int x = (int) (screenPoint.getX() + caretPoint.getX() + this.dotWidth);
-        int y = (int) (screenPoint.getY() + caretPoint.getY() + this.textHeight);
+        int y = (int) (screenPoint.getY() + caretPoint.getY() + this.textHeight) + 5;
         if (y < 0) {
             //y = this.getY() + this.getHeight();
             y = this.getLocationOnScreen().y;
