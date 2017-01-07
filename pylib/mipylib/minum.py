@@ -1767,6 +1767,21 @@ def trapz(y, x=None, dx=1.0, axis=-1):
                 if i != axis:
                     dims.append(y.dims[i])
             return DimArray(MIArray(r), dims, y.fill_value, y.proj)
+            
+def rolling_mean(x, window, center=False):
+    '''
+    Moving average function
+    
+    :param x: (*array_like*) Input data array. Must be vector (one dimension).
+    :param window: (*int*) Size of the moving window.
+    :param center: (*boolean*) Set the labels at the center of the window. Default is ``False``.
+    
+    :returns: (*array_like*) Moving averaged array.
+    '''
+    if isinstance(x, list):
+        x = array(x)
+    r = ArrayMath.rolling_mean(x.asarray(), window, center)
+    return MIArray(r)
 
 def tf2tc(tf):
     """
@@ -1844,24 +1859,7 @@ def dewpoint2rh(dewpoint, temp):
     elif isinstance(dewpoint, DimArray):
         return DimArray(MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray())), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
     else:
-        return MeteoMath.dewpoint2rh(temp, dewpoint)
-        
-def p2h(press):
-    """
-    Pressure to height
-    
-    press: number
-        Pressure - hPa
-    
-    return: number
-        Height - meter
-    """
-    if isinstance(press, MIArray):
-        return MIArray(ArrayMath.press2Height(press.asarray()))
-    elif isinstance(press, DimArray):
-        return DimArray(MIArray(ArrayMath.press2Height(press.asarray())), press.dims, press.fill_value, press.proj)
-    else:
-        return MeteoMath.press2Height(press)
+        return MeteoMath.dewpoint2rh(temp, dewpoint)        
 
 # Performs a centered difference operation on a array in a specific direction    
 def cdiff(a, dimidx):

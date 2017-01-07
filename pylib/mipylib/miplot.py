@@ -4330,7 +4330,7 @@ def contourm(*args, **kwargs):
         to draw, in increasing order.
     :param cmap: (*string*) Color map string.
     :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        string, like ``r`` or ``red``, all levels will be plotted in this color. If a tuple of matplotlib 
         color args (string, float, rgb, etc), different levels will be plotted in different colors in 
         the order specified.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.

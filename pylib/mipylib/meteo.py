@@ -6,6 +6,7 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.data import ArrayMath
+from org.meteoinfo.data.analysis import MeteoMath
 import minum as np
 import dimarray
 import miarray
@@ -54,6 +55,36 @@ def ds2uv(d, s):
     else:
         r = ArrayMath.ds2uv(d, s)
         return r[0], r[1]
+        
+def p2h(press):
+    """
+    Pressure to height
+    
+    :param press: (*float*) Pressure - hPa.
+    
+    :returns: (*float*) Height - meter.
+    """
+    if isinstance(press, MIArray):
+        return MIArray(ArrayMath.press2Height(press.asarray()))
+    elif isinstance(press, DimArray):
+        return DimArray(MIArray(ArrayMath.press2Height(press.asarray())), press.dims, press.fill_value, press.proj)
+    else:
+        return MeteoMath.press2Height(press)
+        
+def h2p(height):
+    """
+    Height to pressure
+    
+    :param height: (*float*) Height - meter.
+    
+    :returns: (*float*) Pressure - hPa.
+    """
+    if isinstance(height, MIArray):
+        return MIArray(ArrayMath.height2Press(height.asarray()))
+    elif isinstance(height, DimArray):
+        return DimArray(MIArray(ArrayMath.height2Press(height.asarray())), height.dims, height.fill_value, height.proj)
+    else:
+        return MeteoMath.height2Press(height)
 
 def potential_temperature(pressure, temperature):
     """
