@@ -2180,6 +2180,14 @@ def cll():
         elif isinstance(gca, MapPlot):
             gca.removeLastLayer()
         draw_if_interactive()
+        
+def clc():
+    '''
+    Clear command window.
+    '''
+    if not milapp1 is None:
+        console = milapp1.getConsoleDockable().getConsole()
+        console.getTextPane().setText('')
 
 def __getplotstyle(style, caption, **kwargs):    
     linewidth = kwargs.pop('linewidth', 1.0)

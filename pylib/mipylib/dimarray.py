@@ -609,6 +609,14 @@ class DimArray():
     def sum(self):
         return self.array.sum()
         
+    def prod(self):
+        '''
+        Return the product of array elements.
+        
+        :returns: (*float*) Produce value.
+        '''
+        return self.array.prod()
+        
     def ave(self):
         return self.array.ave()
         

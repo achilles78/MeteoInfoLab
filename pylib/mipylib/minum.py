@@ -22,7 +22,7 @@ from org.meteoinfo.global import PointD
 from org.meteoinfo.shape import ShapeUtil
 from org.meteoinfo.legend import BreakTypes
 from ucar.nc2 import NetcdfFileWriter
-from ucar.ma2 import Array
+from ucar.ma2 import Array, DataType
 
 import dimdatafile
 import dimvariable
@@ -1055,6 +1055,36 @@ def zeros(shape, dtype='float'):
         shapelist = shape
     return MIArray(ArrayUtil.zeros(shapelist, dtype))
     
+def zeros_like(a, dtype=None):
+    '''
+    Return an array of zeros with the same shape and type as a given array.
+    
+    :param a: (*array*) The shape and data-type of a define these same attributes of the returned array.
+    :param dtype: (*string*) Overrides the data type of the result. Default is ``None``, keep the data
+        type of array ``a``.
+        
+    :returns: Array of zeros with the same shape and type as a.
+    '''
+    shape = a.shape
+    if dtype is None:
+        dtype = ArrayUtil.dataTypeString(a.dtype)
+    return MIArray(ArrayUtil.zeros(shape, dtype))
+    
+def ones_like(a, dtype=None):
+    '''
+    Return an array of ones with the same shape and type as a given array.
+    
+    :param a: (*array*) The shape and data-type of a define these same attributes of the returned array.
+    :param dtype: (*string*) Overrides the data type of the result. Default is ``None``, keep the data
+        type of array ``a``.
+        
+    :returns: Array of ones with the same shape and type as a.
+    '''
+    shape = a.shape
+    if dtype is None:
+        dtype = ArrayUtil.dataTypeString(a.dtype)
+    return MIArray(ArrayUtil.ones(shape, dtype))
+    
 def ones(shape, dtype='float'):
     """
     Create a new aray of given shape and type, filled with ones.
@@ -1081,6 +1111,35 @@ def ones(shape, dtype='float'):
     else:
         shapelist = shape
     return MIArray(ArrayUtil.ones(shapelist, dtype))
+    
+def identity(n, dtype='float'):
+    '''
+    Return the identity array - a square array with ones on the main diagonal.
+    
+    :param n: (*int*) Number of rows (and columns) in ``n x n`` output.
+    :param dtype: (*string*) The desired data-type for the array, including 'int', 
+        'float' and 'double'. Default is ``float``.
+        
+    :returns: (*MIArray*) ``n x n`` array with its main diagonal set to one, and all other elements 0.
+    '''
+    return MIArray(ArrayUtil.identity(n, dtype))
+    
+def eye(n, m=None, k=0, dtype='float'):
+    '''
+    Return a 2-D array with ones on the diagonal and zeros elsewhere.
+    
+    :param n: (*int*) Number of rows in the output.
+    :param m: (*int*) Number of columns in the output. If ``None``, defaults to ``n``.
+    :param k: (*int*) Index of the diagonal: 0 (the default) refers to the main diagonal, a positive value 
+        refers to an upper diagonal, and a negative value to a lower diagonal.
+    :param dtype: (*string*) The desired data-type for the array, including 'int', 
+        'float' and 'double'. Default is ``float``.
+        
+    :returns: (*MIArray*) ``n x n`` array with its main diagonal set to one, and all other elements 0.
+    '''
+    if m is None:
+        m = n
+    return MIArray(ArrayUtil.eye(n, m, k, dtype))
     
 def rand(*args):
     """

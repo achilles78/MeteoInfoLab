@@ -295,6 +295,14 @@ class MIArray():
         else:
             return ArrayMath.sumDouble(self.array, fill_value)
             
+    def prod(self):
+        '''
+        Return the product of array elements.
+        
+        :returns: (*float*) Produce value.
+        '''
+        return ArrayMath.prodDouble(self.array)
+            
     def ave(self, fill_value=None):
         if fill_value == None:
             return ArrayMath.aveDouble(self.array)
