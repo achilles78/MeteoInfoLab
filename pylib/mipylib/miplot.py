@@ -2110,7 +2110,7 @@ def savefig(fname, width=None, height=None, dpi=None):
     """
     if (not width is None) and (not height is None):
         chartpanel.setSize(width, height)
-    chartpanel.paintGraphics()
+    #chartpanel.paintGraphics()
     if dpi != None:
         chartpanel.saveImage(fname, dpi)
     else:

@@ -1546,6 +1546,22 @@ def sort(a, axis=-1):
         a = array(a)
     r = ArrayUtil.sort(a.asarray(), axis)
     return MIArray(r)
+    
+def concatenate(arrays, axis=0):
+    '''
+    Join a sequence of arrays along an existing axis.
+    
+    :param arrays: (list of arrays) The arrays must have the same shape, except in the dimension 
+        corresponding to axis (the first, by default).
+    :param axis: (*int*) The axis along which the arrays will be joined. Default is 0.
+    
+    :returns: (*array_like*) The concatenated array.
+    '''
+    ars = []
+    for a in arrays:
+        ars.append(a.asarray())
+    r = ArrayUtil.concatenate(ars, axis)
+    return MIArray(r)
                 
 def dot(a, b):
     """

@@ -20,7 +20,7 @@ import datetime
         
 # The encapsulate class of Array
 class MIArray():
-    
+        
     # array must be a ucar.ma2.Array object
     def __init__(self, array):
         self.array = array
@@ -35,7 +35,7 @@ class MIArray():
             self.sizestr = str(self.shape[0])
             if self.ndim > 1:
                 for i in range(1, self.ndim):
-                    self.sizestr = self.sizestr + '*%s' % self.shape[i]
+                    self.sizestr = self.sizestr + '*%s' % self.shape[i]                       
         
     def __len__(self):
         return int(self.array.getSize())         
@@ -63,15 +63,25 @@ class MIArray():
         ranges = []
         flips = []
         iszerodim = True
-        for i in range(0, self.ndim):   
-            if isinstance(indices[i], int):
-                sidx = indices[i]
-                eidx = indices[i]
+        onlyrange = True
+        for i in range(0, self.ndim):  
+            k = indices[i]
+            if isinstance(k, int):
+                sidx = k
+                eidx = k
                 step = 1
+            elif isinstance(k, slice):
+                sidx = 0 if k.start is None else k.start
+                eidx = self.getshape()[i]-1 if k.stop is None else k.stop-1
+                step = 1 if k.step is None else k.step
+            elif isinstance(k, (list, tuple)):
+                onlyrange = False
+                ranges.append(k)
+                iszerodim = False
+                continue
             else:
-                sidx = 0 if indices[i].start is None else indices[i].start
-                eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop-1
-                step = 1 if indices[i].step is None else indices[i].step
+                print k
+                return None
             if sidx != eidx:
                 iszerodim = False
             if step < 0:
@@ -81,7 +91,10 @@ class MIArray():
                 raise IndexError()
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
-        r = ArrayMath.section(self.array, ranges)
+        if onlyrange:
+            r = ArrayMath.section(self.array, ranges)
+        else:
+            r = ArrayMath.take(self.array, ranges)
         if iszerodim:
             return r.getObject(0)
         else:
@@ -327,6 +340,12 @@ class MIArray():
     def aslist(self):
         return ArrayMath.asList(self.array)
         
+    def tolist(self):
+        '''
+        Convert to a list
+        '''
+        return ArrayMath.asList(self.array)
+        
     def asarray(self):
         return self.array
         
@@ -341,6 +360,42 @@ class MIArray():
                 shape.append(arg)
         shape = jarray.array(shape, 'i')
         return MIArray(self.array.reshape(shape))
+        
+    def transpose(self):
+        '''
+        Transpose 2-D array.
+        
+        :param a: (*array*) 2-D array to be transposed.
+        
+        :returns: Transposed array.
+        '''
+        dim1 = 0
+        dim2 = 1
+        r = ArrayMath.transpose(self.asarray(), dim1, dim2)
+        return MIArray(r)
+        
+    T = property(transpose)
+        
+    def flatten(self):
+        '''
+        Return a copy of the array collapsed into one dimension.
+        
+        :returns: (*MIArray*) A copy of the input array, flattened to one dimension.
+        '''
+        r = self.reshape(int(self.array.getSize()))
+        return r
+        
+    def take(self, indices):
+        '''
+        Take elements from an array along an axis.
+        
+        :param indices: (*array_like*) The indices of the values to extract.
+        
+        :returns: (*array*) The returned array has the same type as a.
+        '''
+        ilist = [indices]
+        r = ArrayMath.take(self.array, ilist)
+        return MIArray(r)
     
     def asdimarray(self, x, y, fill_value=-9999.0):
         dims = []

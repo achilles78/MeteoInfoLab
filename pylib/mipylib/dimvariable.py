@@ -9,6 +9,7 @@ from org.meteoinfo.data import ArrayMath, ArrayUtil
 from org.meteoinfo.global import PointD
 from org.meteoinfo.projection import KnownCoordinateSystems, Reproject
 from ucar.nc2 import Attribute
+from ucar.ma2 import Range
 import dimarray
 from dimarray import DimArray, PyGridData
 import miarray
@@ -82,13 +83,15 @@ class DimVariable():
                 dim = self.dims[i]
                 if dim.getDimType() == DimensionType.X:                    
                     k = indices[i]
-                    if isinstance(k, (tuple, list)):
-                        xlim = k
+                    if isinstance(k, basestring):
+                        xlims = k.split(':')
+                        xlim = [float(xlims[0]), float(xlims[1])]
                         xidx = i
                 elif dim.getDimType() == DimensionType.Y:
                     k = indices[i]
-                    if isinstance(k, (tuple, list)):
-                        ylim = k
+                    if isinstance(k, basestring):
+                        ylims = k.split(':')
+                        ylim = [float(ylims[0]), float(ylims[1])]
                         yidx = i
             if not xlim is None and not ylim is None:                
                 fromproj=KnownCoordinateSystems.geographic.world.WGS1984
@@ -101,9 +104,9 @@ class DimVariable():
                 indices1 = []
                 for i in range(0, self.ndim):
                     if i == xidx:
-                        indices1.append(xlim)
+                        indices1.append(str(xlim[0]) + ':' + str(xlim[1]))
                     elif i == yidx:
-                        indices1.append(ylim)
+                        indices1.append(str(ylim[0]) + ':' + str(ylim[1]))
                     else:
                         indices1.append(indices[i])
                 indices = indices1
@@ -111,8 +114,11 @@ class DimVariable():
         origin = []
         size = []
         stride = []
+        ranges = []
         dims = []
+        onlyrange = True
         for i in range(0, self.ndim):  
+            isrange = True
             dimlen = self.dimlen(i)
             k = indices[i]
             if isinstance(k, int):
@@ -123,16 +129,21 @@ class DimVariable():
                 sidx = 0 if k.start is None else k.start
                 eidx = self.dimlen(i)-1 if k.stop is None else k.stop
                 step = 1 if k.step is None else k.step
-            elif isinstance(k, (tuple, list)):
+            elif isinstance(k, tuple):
+                onlyrange = False
+                isrange = False
+                ranges.append(k)
+            elif isinstance(k, list):
                 dim = self.variable.getDimension(i)
                 sv = k[0]
                 if isinstance(sv, datetime.datetime):
                     sv = miutil.date2num(sv)
+                dim = self.variable.getDimension(i)
                 sidx = dim.getValueIndex(sv)
                 if len(k) == 1:
                     eidx = sidx
                     step = 1
-                else:                    
+                else:
                     ev = k[1]
                     if isinstance(ev, datetime.datetime):
                         ev = miutil.date2num(ev)
@@ -140,7 +151,33 @@ class DimVariable():
                     if len(k) == 2:
                         step = 1
                     else:
-                        step = int(ev / dim.getDeltaValue)
+                        nv = k[2]
+                        if isinstance(nv, datetime.timedelta):
+                            nv = miutil.date2num(k[0] + k[2]) - sv
+                        step = int(nv / dim.getDeltaValue())
+                    if sidx > eidx:
+                        iidx = eidx
+                        eidx = sidx
+                        sidx = iidx
+            elif isinstance(k, basestring):
+                dim = self.variable.getDimension(i)
+                kvalues = k.split(':')
+                sv = float(kvalues[0])
+                if isinstance(sv, datetime.datetime):
+                    sv = miutil.date2num(sv)
+                sidx = dim.getValueIndex(sv)
+                if len(kvalues) == 1:
+                    eidx = sidx
+                    step = 1
+                else:                    
+                    ev = float(kvalues[1])
+                    if isinstance(ev, datetime.datetime):
+                        ev = miutil.date2num(ev)
+                    eidx = dim.getValueIndex(ev)
+                    if len(kvalues) == 2:
+                        step = 1
+                    else:
+                        step = int(float(kvalues[2]) / dim.getDeltaValue())
                     if sidx > eidx:
                         iidx = eidx
                         eidx = sidx
@@ -148,19 +185,30 @@ class DimVariable():
             else:
                 print k
                 return None
-            if eidx >= dimlen:
-                print 'Index out of range!'
-                return None
-            origin.append(sidx)
-            n = eidx - sidx + 1
-            size.append(n)                   
-            if n > 1:
-                dim = self.variable.getDimension(i)
-                if dim.isReverse():
-                    step = -step
-                dims.append(dim.extract(sidx, eidx, step))
-            stride.append(step) 
-        rr = self.dataset.read(self.name, origin, size, stride).reduce()
+            if isrange:
+                if eidx >= dimlen:
+                    print 'Index out of range!'
+                    return None
+                origin.append(sidx)
+                n = eidx - sidx + 1
+                size.append(n)                   
+                if n > 1:
+                    dim = self.variable.getDimension(i)
+                    if dim.isReverse():
+                        step = -step
+                    dims.append(dim.extract(sidx, eidx, step))
+                stride.append(step) 
+                rr = Range(sidx, eidx, step)
+                ranges.append(rr)
+            else:
+                if len(k) > 1:
+                    dim = self.variable.getDimension(i)
+                    dims.append(dim.extract(k))
+        #rr = self.dataset.read(self.name, origin, size, stride).reduce()
+        if onlyrange:
+            rr = self.dataset.dataset.read(self.name, ranges).reduce()
+        else:
+            rr = self.dataset.dataset.take(self.name, ranges).reduce()
         if rr.getSize() == 1:
             return rr.getObject(0)
         ArrayMath.missingToNaN(rr, self.fill_value)
@@ -175,8 +223,24 @@ class DimVariable():
     def dimlen(self, idx):
         return self.dims[idx].getLength()
         
-    def dimvalue(self, idx):
-        return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
+    def dimvalue(self, idx, convert=False):
+        '''
+        Get dimension values.
+        
+        :param idx: (*int*) Dimension index.
+        :param convert: (*boolean*) If convert to real values (i.e. datetime). Default
+            is ``False``.
+        
+        :returns: (*array_like*) Dimension values
+        '''
+        dim = self.dims[idx]
+        if convert:
+            if dim.getDimType() == DimensionType.T:
+                return miutil.nums2dates(dim.getDimValue())
+            else:
+                return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
+        else:
+            return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
         
     def attrvalue(self, key):
         attr = self.variable.findAttribute(key)
