@@ -109,8 +109,8 @@ public class MeteoInfoLab {
         interp.exec("from milab import *");
         interp.exec("sys.path.append('" + toolboxPath + "')");
         interp.exec("from toolbox import *");
-        interp.exec("mipylib.miplot.batchmode = True");
-        interp.exec("mipylib.miplot.isinteractive = False");
+        interp.exec("mipylib.plotlib.miplot.batchmode = True");
+        interp.exec("mipylib.plotlib.miplot.isinteractive = False");
         System.out.println("mipylib is loaded...");
         try {            
 //            File file = new File(fn);    
@@ -161,8 +161,8 @@ public class MeteoInfoLab {
         interp.exec("from milab import *");
         interp.exec("sys.path.append('" + toolboxPath + "')");
         interp.exec("from toolbox import *");
-        interp.exec("mipylib.miplot.batchmode = True");
-        interp.exec("mipylib.miplot.isinteractive = False");
+        interp.exec("mipylib.plotlib.miplot.batchmode = True");
+        interp.exec("mipylib.plotlib.miplot.isinteractive = False");
         System.out.println("mipylib is loaded...");
         try {            
             File file = new File(fn);            
@@ -201,7 +201,7 @@ public class MeteoInfoLab {
             console.exec("from toolbox import *");
             //console.exec("import mipylib");
             //console.exec("from mipylib.miscript import *");
-            console.exec("mipylib.miplot.isinteractive = True");
+            console.exec("mipylib.plotlib.miplot.isinteractive = True");
             //console.exec("from meteoinfo.numeric.JNumeric import *");
             //console.exec("import mipylib.miscript as plt");
             //console.exec("import meteoinfo.numeric.JNumeric as np");

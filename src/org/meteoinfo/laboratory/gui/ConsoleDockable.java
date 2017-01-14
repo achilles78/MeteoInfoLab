@@ -49,7 +49,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         JIntrospect nameComplete = new JIntrospect(this.interp);
         console.setNameCompletion(nameComplete);
 
-        this.getContentPane().add(console, BorderLayout.CENTER);
+        this.getContentPane().add(console, BorderLayout.CENTER);        
     }
 
     /**
@@ -107,9 +107,9 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
         new Thread(interp).start();
         try {
-            interp.exec("mipylib.miplot.isinteractive = True");
-            interp.exec("mipylib.miplot.milapp1 = milapp");
-            interp.exec("mipylib.minum.currentfolder = '" + currentPath + "'");
+            interp.exec("mipylib.plotlib.miplot.isinteractive = True");
+            interp.exec("mipylib.plotlib.miplot.milapp1 = milapp");
+            interp.exec("mipylib.dataset.midata.currentfolder = '" + currentPath + "'");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,7 +165,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         } catch (Exception e) {
         } finally {
             this.interp.out.print(">>> ");
-            interp.exec("mipylib.miplot.isinteractive = True");
+            interp.exec("mipylib.plotlib.miplot.isinteractive = True");
         }
     }
 
@@ -180,7 +180,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         this.interp.exec(command);
         //this.interp.push(command);
         this.interp.out.print(">>> ");
-        interp.exec("mipylib.miplot.isinteractive = True");
+        interp.exec("mipylib.plotlib.miplot.isinteractive = True");
     }
 
     /**
@@ -288,16 +288,16 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
                 String encoding = "utf-8";
                 try {
-                    interp.exec("mipylib.miplot.isinteractive = False");
+                    interp.exec("mipylib.plotlib.miplot.isinteractive = False");
                     interp.exec("clf()");
                     interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
-                    interp.exec("mipylib.miplot.isinteractive = True");
+                    interp.exec("mipylib.plotlib.miplot.isinteractive = True");
                 } catch (Exception e) {
                     e.printStackTrace();
                     interp.console.print(">>> ", Color.red);
                     interp.console.setStyle(Color.black);
                     //interp.console.setForeground(Color.black);
-                    interp.exec("mipylib.miplot.isinteractive = True");
+                    interp.exec("mipylib.plotlib.miplot.isinteractive = True");
                 }
 
                 //String encoding = EncodingUtil.findEncoding(code);                

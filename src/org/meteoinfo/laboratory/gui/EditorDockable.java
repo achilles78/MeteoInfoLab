@@ -21,14 +21,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.TextEditorPane;
 import org.meteoinfo.global.GenericFileFilter;
 import org.meteoinfo.laboratory.codecomplete.JIntrospect;
-import org.meteoinfo.laboratory.codecomplete.JythonCompletionProvider;
-import org.meteoinfo.laboratory.codecomplete.JythonLanguageSupport;
-import org.meteoinfo.laboratory.codecomplete.JythonSourceCompletionProvider;
 import org.meteoinfo.ui.ButtonTabComponent;
 import org.python.util.PythonInterpreter;
 
