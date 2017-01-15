@@ -18,13 +18,20 @@ def solve(a, b):
     '''
     Solve a linear matrix equation, or system of linear scalar equations.
     
-    Computes the “exact” solution, x, of the well-determined, i.e., full rank, linear 
-    matrix equation ax = b.
+    Computes the "exact" solution, ``x``, of the well-determined, i.e., full
+    rank, linear matrix equation ``ax = b``.
     
-    :param a: (*array_like*) Coefficient matrix.
-    :param b: (*array_like*) Ordinate or “dependent variable” values.
-    
-    :returns: (*array_like*) Solution to the system a x = b. Returned shape is identical to b.
+    ``Parameters``
+
+    a : (M, M) array_like
+        Coefficient matrix.
+    b : {(M), (M, K)}, array_like
+        Ordinate or "dependent variable" values.
+        
+    ``Returns``
+
+    x : {(M), (M, K)} ndarray
+        Solution to the system a x = b.  Returned shape is identical to ``b``.
     '''
     x = LinalgUtil.solve(a.asarray(), b.asarray())
     return MIArray(x)
@@ -33,14 +40,23 @@ def cholesky(a):
     '''
     Cholesky decomposition.
     
-    Return the Cholesky decomposition, L * L.H, of the square matrix a, where L is lower-triangular 
-    and .H is the conjugate transpose operator (which is the ordinary transpose if a is real-valued). 
-    a must be Hermitian (symmetric if real-valued) and positive-definite. Only L is actually returned.
+    Return the Cholesky decomposition, `L * L.H`, of the square matrix `a`,
+    where `L` is lower-triangular and .H is the conjugate transpose operator
+    (which is the ordinary transpose if `a` is real-valued).  `a` must be
+    Hermitian (symmetric if real-valued) and positive-definite.  Only `L` is
+    actually returned.
     
-    :param a: (*array_like* M, M) Hermitian (symmetric if all elements are real), positive-definite input matrix.
-    
-    :returns: (*array_like* M, M) Upper or lower-triangular Cholesky factor of a. Returns a matrix object if 
-        a is a matrix object.
+    Parameters
+    ----------
+    a : (M, M) array_like
+        Hermitian (symmetric if all elements are real), positive-definite
+        input matrix.
+        
+    Returns
+    -------
+    L : (M, M) array_like
+        Upper or lower-triangular Cholesky factor of `a`.  Returns a
+        matrix object if `a` is a matrix object.
     '''
     r = LinalgUtil.cholesky(a.asarray())
     return MIArray(r)
