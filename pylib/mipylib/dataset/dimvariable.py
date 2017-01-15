@@ -12,7 +12,7 @@ from ucar.nc2 import Attribute
 from ucar.ma2 import Range
 from mipylib.numeric.dimarray import DimArray, PyGridData
 from mipylib.numeric.miarray import MIArray
-import mipylib.miutil
+import mipylib.miutil as miutil
 import datetime
 
 # Dimension variable
@@ -193,9 +193,11 @@ class DimVariable():
                 if n > 1:
                     dim = self.variable.getDimension(i)
                     if dim.isReverse():
-                        step = -step
+                        step = -step                    
                     dims.append(dim.extract(sidx, eidx, step))
                 stride.append(step) 
+                if step < 0:
+                    step = -step
                 rr = Range(sidx, eidx, step)
                 ranges.append(rr)
             else:

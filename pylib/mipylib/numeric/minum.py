@@ -55,7 +55,7 @@ __all__ = [
     'pi','e','inf','nan','addtimedim','arange','arange1',    
     'array','asarray','asciiread','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','binread','binwrite','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','dot','exp','eye','fmax','fmin',
+    'corrcoef','cos','diag','dim_array','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isgriddata','isstationdata','joinncfile','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','meshgrid','minimum','monthname',
@@ -509,6 +509,17 @@ def array(object):
     """
     return MIArray(ArrayUtil.array(object))
     
+def dim_array(a, dims):
+    '''
+    Create a dimension array (DimArray).
+    
+    :param a: (*array_like*) Array (MIArray) or data list.
+    :param dims: (*list*) List of dimensions.
+    
+    :returns: (*DimArray*) Dimension array.
+    '''
+    return DimArray(a, dims)
+    
 def arange(*args):
     """
     Return evenly spaced values within a given interval
@@ -751,6 +762,35 @@ def eye(n, m=None, k=0, dtype='float'):
     if m is None:
         m = n
     return MIArray(ArrayUtil.eye(n, m, k, dtype))
+    
+def diag(v, k=0):
+    '''
+    Extract a diagonal or construct a diagonal array.
+    
+    See the more detailed documentation for ``numpy.diagonal`` if you use this
+    function to extract a diagonal and wish to write to the resulting array;
+    whether it returns a copy or a view depends on what version of numpy you
+    are using.
+    
+    Parameters
+    ----------
+    v : array_like
+        If `v` is a 2-D array, return a copy of its `k`-th diagonal.
+        If `v` is a 1-D array, return a 2-D array with `v` on the `k`-th
+        diagonal.
+    k : int, optional
+        Diagonal in question. The default is 0. Use `k>0` for diagonals
+        above the main diagonal, and `k<0` for diagonals below the main
+        diagonal.
+        
+    Returns
+    -------
+    out : ndarray
+        The extracted diagonal or constructed diagonal array.
+    '''
+    if isinstance(v, (list, tuple)):
+        v = array(v)
+    return MIArray(ArrayUtil.diag(v.asarray(), k))
     
 def rand(*args):
     """

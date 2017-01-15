@@ -36,7 +36,7 @@ from mipylib.numeric.dimarray import DimArray, PyGridData, PyStationData
 from mipylib.numeric.miarray import MIArray
 import mipylib.numeric.minum as minum
 from mipylib.geolib.milayer import MILayer, MIXYListData
-import mipylib.miutil
+import mipylib.miutil as miutil
 
 ## Global ##
 milapp1 = None
@@ -3652,7 +3652,7 @@ def quiver(*args, **kwargs):
     iscolor = False
     cdata = None
     xaxistype = None
-    if n < 4:
+    if n < 4 or (n == 4 and isinstance(args[3], int)):
         x = args[0].dimvalue(1)
         y = args[0].dimvalue(0)
         x, y = minum.meshgrid(x, y)
@@ -3834,7 +3834,7 @@ def barbs(*args, **kwargs):
     iscolor = False
     cdata = None
     xaxistype = None
-    if n <= 3:
+    if n <= 3 or (n == 4 and isinstance(args[3], int)):
         x = args[0].dimvalue(1)
         y = args[0].dimvalue(0)
         x, y = minum.meshgrid(x, y)
@@ -4430,12 +4430,9 @@ def contourfm(*args, **kwargs):
     if interpolate:
         gdata = gdata.interpolate()
     isplot = kwargs.pop('isplot', True)
-    if isplot:
-        plot = gca
-    else:
-        plot = None
+    plot = gca
     smooth = kwargs.pop('smooth', True)
-    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order, smooth=smooth)
+    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order, smooth=smooth, isplot=isplot)
     select = kwargs.pop('select', True)
     if select:
         plot.setSelectedLayer(layer)
@@ -4873,7 +4870,7 @@ def streamplotm(*args, **kwargs):
     vdata = None
     return MILayer(layer)
         
-def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True):
+def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True, isplot=True):
     #print 'GridData...'
     if type == 'contourf':
         layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', smooth)
@@ -4892,7 +4889,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True)
     if (proj != None):
         layer.setProjInfo(proj)
         
-    if not plot is None:
+    if isplot:
         shapetype = layer.getShapeType()
         if order is None:
             if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:

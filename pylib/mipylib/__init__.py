@@ -2,6 +2,8 @@ import miutil
 import numeric
 from .numeric import *
 import numeric as np
+import numeric.random as random
+import numeric.linalg as linalg
 import geolib
 from .geolib import *
 import geolib.topology as topo

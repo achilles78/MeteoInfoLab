@@ -5,10 +5,14 @@
 # Note: Jython
 #-----------------------------------------------------
 
+import datetime
+
 from org.meteoinfo.data import TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
 
 import miarray
 from miarray import MIArray
+
+from java.util import Calendar, Date
 
 ###############################################################        
 #  The encapsulate class of TableData

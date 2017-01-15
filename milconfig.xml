@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\verification">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math">
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\onedim"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\qaqc"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\scatter"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\verification"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="146,12" MainFormSize="1385,768"/>
+  <Startup MainFormLocation="119,40" MainFormSize="1385,768"/>
 </MeteoInfo>

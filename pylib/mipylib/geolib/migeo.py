@@ -23,7 +23,7 @@ from mipylib.numeric.dimarray import DimArray
 from java.util import ArrayList
 
 __all__ = [
-    'distance','georead','geotiffread','inpolygon','maskout','polyarea','polygon','rmaskout',
+    'arrayinpolygon','distance','georead','geotiffread','inpolygon','maskout','polyarea','polygon','rmaskout',
     'shaperead'
     ]
 
@@ -102,6 +102,37 @@ def inpolygon(x, y, polygon):
     '''
     return GeoComputation.pointInPolygon(polygon, x, y)
     
+def arrayinpolygon(a, polygon, x=None, y=None):
+    '''
+    Set array element value as 1 if inside a polygon or set value as -1.
+    
+    :param a: (*array_like*) The array.
+    :param polygon: (*PolygonShape*) The polygon.
+    :param x: (*float*) X coordinate of the point. Default is ``None``, for DimArray
+    :param y: (*float*) Y coordinate of the point. Default is ``None``, for DimArray
+    
+    :returns: (*array_like*) Result array.
+    '''
+    if isinstance(a, DimArray):
+        if x is None or y is None:
+            x = self.dimvalue(1)
+            y = self.dimvalue(0)
+    if not x is None and not y is None:
+        if isinstance(polygon, tuple):
+            x_p = polygon[0]
+            y_p = polygon[1]
+            if isinstance(x_p, MIArray):
+                x_p = x_p.aslist()
+            if isinstance(y_p, MIArray):
+                y_p = y_p.aslist()
+            return MIArray(ArrayMath.inPolygon(a.asarray(), x.aslist(), y.aslist(), x_p, y_p))
+        else:
+            if isinstance(polygon, MILayer):
+                polygon = polygon.layer
+            return MIArray(ArrayMath.inPolygon(a.asarray(), x.aslist(), y.aslist(), polygon))
+    else:
+        return None
+            
 def distance(x, y, islonlat=False):
     """
     Get distance of a line.
