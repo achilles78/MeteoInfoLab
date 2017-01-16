@@ -9,7 +9,7 @@ from org.meteoinfo.data import ArrayMath, ArrayUtil
 from org.meteoinfo.global import PointD
 from org.meteoinfo.projection import KnownCoordinateSystems, Reproject
 from ucar.nc2 import Attribute
-from ucar.ma2 import Range
+from ucar.ma2 import Range, Array, MAMath
 from mipylib.numeric.dimarray import DimArray, PyGridData
 from mipylib.numeric.miarray import MIArray
 import mipylib.miutil as miutil
@@ -114,6 +114,7 @@ class DimVariable():
         stride = []
         ranges = []
         dims = []
+        flips = []
         onlyrange = True
         for i in range(0, self.ndim):  
             isrange = True
@@ -197,7 +198,8 @@ class DimVariable():
                     dims.append(dim.extract(sidx, eidx, step))
                 stride.append(step) 
                 if step < 0:
-                    step = -step
+                    step = abs(step)
+                    flips.append(i)
                 rr = Range(sidx, eidx, step)
                 ranges.append(rr)
             else:
@@ -206,15 +208,21 @@ class DimVariable():
                     dims.append(dim.extract(k))
         #rr = self.dataset.read(self.name, origin, size, stride).reduce()
         if onlyrange:
-            rr = self.dataset.dataset.read(self.name, ranges).reduce()
+            rr = self.dataset.dataset.read(self.name, ranges)
         else:
-            rr = self.dataset.dataset.take(self.name, ranges).reduce()
+            rr = self.dataset.dataset.take(self.name, ranges)
         if rr.getSize() == 1:
             return rr.getObject(0)
-        ArrayMath.missingToNaN(rr, self.fill_value)
-        array = MIArray(rr)
-        data = DimArray(array, dims, self.fill_value, self.dataset.proj)
-        return data
+        else:
+            for i in flips:
+                rr = rr.flip(i)
+            rr = rr.reduce()
+            ArrayMath.missingToNaN(rr, self.fill_value)
+            rrr = Array.factory(rr.getDataType(), rr.getShape());
+            MAMath.copy(rrr, rr);
+            array = MIArray(rrr)
+            data = DimArray(array, dims, self.fill_value, self.dataset.proj)
+            return data
     
     def read(self):
         return MIArray(self.dataset.read(self.name))
