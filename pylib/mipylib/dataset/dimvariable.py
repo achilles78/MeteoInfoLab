@@ -12,6 +12,7 @@ from ucar.nc2 import Attribute
 from ucar.ma2 import Range, Array, MAMath
 from mipylib.numeric.dimarray import DimArray, PyGridData
 from mipylib.numeric.miarray import MIArray
+import mipylib.numeric.minum as minum
 import mipylib.miutil as miutil
 import datetime
 
@@ -301,3 +302,118 @@ class DimVariable():
         
     def addattr(self, attrname, attrvalue):
         self.ncvariable.addAttribute(Attribute(attrname, attrvalue))
+
+# Variable in multiple data files (DimDataFiles) - only time dimension is different.
+class TDimVariable():
+    
+    # variable must be org.meteoinfo.data.meteodata.Variable
+    # dataset is DimDataFiles
+    def __init__(self, variable, dataset):
+        self.variable = variable
+        self.dataset = dataset
+        self.name = variable.getName()
+        self.datatype = variable.getDataType()        
+        self.ndim = variable.getDimNumber()
+        self.fill_value = variable.getFillValue()
+        self.scale_factor = variable.getScaleFactor()
+        self.add_offset = variable.getAddOffset()
+        dims = variable.getDimensions()
+        tdim = Dimension(DimensionType.T)
+        times = []
+        for t in self.dataset.times:
+            times.append(miutil.date2num(t))
+        tdim.setDimValues(times)
+        dims[0] = tdim
+        self.dims = dims
+        self.tnum = len(times)
+        
+    def __getitem__(self, indices):
+        if len(indices) != self.ndim:
+            print 'indices must be ' + str(self.ndim) + ' dimensions!'
+            return None
+        
+        k = indices[0]
+        if isinstance(k, int):
+            sidx = k
+            eidx = k
+            step = 1
+        elif isinstance(k, slice):
+            sidx = 0 if k.start is None else k.start
+            eidx = self.tnum-1 if k.stop is None else k.stop
+            step = 1 if k.step is None else k.step
+        elif isinstance(k, list):
+            sidx = self.dataset.timeindex(k[0])
+            if len(k) == 1:
+                eidx = sidx
+                step = 1
+            else:
+                eidx = self.dataset.timeindex(k[1])
+                if len(k) == 3:
+                    tt = self.dataset.timeindex(k[0] + k[3])
+                    step = tt - sidx
+                else:
+                    step = 1
+        
+        sfidx = self.dataset.datafileindex(sidx)
+        si = sidx
+        isfirst = True
+        times = []
+        fidx = sfidx
+        aa = None
+        var = None
+        for i in range(sidx, eidx + 1, step):
+            times.append(miutil.date2num(self.dataset.gettime(i)))
+            fidx = self.dataset.datafileindex(i) 
+            if fidx > sfidx:
+                ei = i - step
+                ddf = self.dataset[sfidx]
+                var = ddf[self.name]
+                ii, ssi = self.dataset.dftindex(si)
+                ii, eei = self.dataset.dftindex(ei)
+                nindices = list(indices)
+                nindices[0] = slice(ssi, eei, step)
+                nindices = tuple(nindices)
+                aa = var.__getitem__(nindices)
+                if si == ei:
+                    aa.addtdim(self.dataset.gettime(si))
+                if isfirst:
+                    data = aa
+                    isfirst = False
+                else:
+                    data = minum.concatenate([data, aa])
+                si = i
+                sfidx = fidx
+                
+        if si < eidx + 1:
+            ei = eidx + 1 - step
+            ddf = self.dataset[sfidx]
+            var = ddf[self.name]
+            ii, ssi = self.dataset.dftindex(si)
+            ii, eei = self.dataset.dftindex(ei)
+            nindices = list(indices)
+            nindices[0] = slice(ssi, eei, step)
+            nindices = tuple(nindices)
+            aa = var.__getitem__(nindices)
+            if si == ei:
+                aa.addtdim(self.dataset.gettime(si))
+            if isfirst:
+                data = aa
+                isfirst = False
+            else:
+                data = minum.concatenate([data, aa])
+        
+        if aa is None:
+            sfidx = self.dataset.datafileindex(sidx)
+            ddf = self.dataset[sfidx]
+            var = ddf[self.name]
+            ii, ssi = self.dataset.dftindex(sidx)
+            nindices = list(indices)
+            nindices[0] = slice(ssi, ssi, step)
+            nindices = tuple(nindices)
+            aa = var.__getitem__(nindices)
+            return aa
+        
+        dims = aa.dims
+        dims[0].setDimValues(times)
+        r = DimArray(data, dims, aa.fill_value, aa.proj)
+        return r

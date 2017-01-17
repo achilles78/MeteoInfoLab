@@ -8,12 +8,13 @@ from org.meteoinfo.data.meteodata import MeteoDataInfo
 from ucar.ma2 import Section, DataType
 from ucar.nc2 import Attribute
 import dimvariable
-from dimvariable import DimVariable
+from dimvariable import DimVariable, TDimVariable
 from mipylib.numeric.dimarray import DimArray, PyGridData, PyStationData
 from mipylib.geolib.milayer import MILayer, MIXYListData
 from mipylib.numeric.miarray import MIArray
+import mipylib.miutil as miutil
 
-from datetime import datetime
+import datetime
 
 from java.util import Calendar
 from java.lang import Float
@@ -35,7 +36,7 @@ class DimDataFile():
         self.bufrdata = bufrdata
         
     def __getitem__(self, key):
-        if isinstance(key, str):
+        if isinstance(key, basestring):
             #print key
             return DimVariable(self.dataset.getDataInfo().getVariable(key), self)
         return None
@@ -160,24 +161,33 @@ class DimDataFile():
         return self.dataset.getDataInfo().getTimeNum()
     
     def gettime(self, idx):
-        date = self.dataset.getDataInfo().getTimes().get(idx)
-        cal = Calendar.getInstance()
-        cal.setTime(date)
-        year = cal.get(Calendar.YEAR)
-        month = cal.get(Calendar.MONTH) + 1
-        day = cal.get(Calendar.DAY_OF_MONTH)
-        hour = cal.get(Calendar.HOUR_OF_DAY)
-        minute = cal.get(Calendar.MINUTE)
-        second = cal.get(Calendar.SECOND)
-        dt = datetime(year, month, day, hour, minute, second)
-        return dt
+        '''
+        Get time by index.
+        
+        :param idx: (*int*) Time index.
+        
+        :returns: (*datetime*) The time
+        '''
+        t = self.dataset.getDataInfo().getTimes().get(idx)     
+        t = miutil.pydate(t)
+        return t
+        
+    def gettimes(self):
+        '''
+        Get time list.
+        '''
+        tt = self.dataset.getDataInfo().getTimes()
+        times = []
+        for t in tt:
+            times.append(miutil.pydate(t))
+        return times
         
     def bigendian(self, big_endian):
         if self.dataset.getDataInfo().getDataType().isGrADS():
             self.dataset.getDataInfo().setBigEndian(big_endian)
             
     def tostation(self, varname, x, y, z, t):
-        if isinstance(t, datetime):
+        if isinstance(t, datetime.datetime):
             cal = Calendar.getInstance()
             cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
             t = cal.getTime()
@@ -325,3 +335,130 @@ class DimDataFile():
         
     def write_end(self):
         return self.bufrdata.writeEndSection()
+
+#*********************************************
+# Created by addfiles function in midata module - multiple data files with difference only 
+# on time dimension.      
+class DimDataFiles(list):
+    
+    # dataset must be list of DimDataFile
+    def __init__(self, dataset=[]):
+        list.__init__([])
+        self.extend(dataset)
+        self.times = []
+        self.tnums = []
+        self.tnum = 0
+        for ds in dataset:
+            tts = ds.gettimes()
+            self.times.extend(tts)
+            self.tnums.append(len(tts))
+            self.tnum += len(tts)
+        
+    def append(self, ddf):
+        self.append(ddf)
+        tts = ddf.gettimes()
+        self.times.extend(tts)
+        self.tnums.append(len(tts))
+        self.tnum += len(tts)
+        
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            #print key
+            return TDimVariable(self[0].dataset.getDataInfo().getVariable(key), self)
+        else:
+            return list.__getitem__(self, key)
+    
+    def filenames(self):
+        '''
+        Get file names.
+        
+        :returns: File name list
+        '''
+        fns = []
+        for df in self:
+            fns.append(df.filename)
+        return fns
+    
+    def datafileindex(self, t):
+        """
+        Get data file by time
+        
+        :param t: (*datetime or idx*) Time value of index.
+        
+        :returns: (*int*) Data file index
+        """
+        if isinstance(t, datetime.datetime):
+            t = self.timeindex(t)
+        nn = 0
+        idx = 0
+        for n in self.tnums:
+            nn += n
+            if t < nn:
+                break
+            idx += 1
+        return idx
+        
+    def datafile(self, t):
+        """
+        Get data file by time
+        
+        :param t: (*datetime or idx*) Time value of index.
+        
+        :returns: (*DimDataFile*) Data file
+        """
+        idx = self.datafileindex(t)
+        return self[idx]
+        
+    def dftindex(self, t):
+        '''
+        Get data file index and time index of it.
+        
+        :param t: (*datetime or idx*) Time value of index.
+        
+        :returns: (*list of int*) Data file index and time index of it.
+        '''
+        if isinstance(t, datetime.datetime):
+            t = self.timeindex(t)
+        nn = 0
+        dfidx = 0
+        tidx = 0
+        sn = 0
+        for n in self.tnums:
+            nn += n
+            if t < n:
+                tidx = t - sn
+                break
+            dfidx += 1
+            sn = nn
+        return dfidx, tidx
+        
+    def timeindex(self, t):
+        '''
+        Get time index.
+        
+        :param t: (*datetime*) Given time
+        
+        :returns: (*int*) Time index
+        '''
+        idx = 0
+        for tt in self.times:
+            if t >= tt:
+                break
+            idx += 1
+        return idx
+    
+    def gettime(self, idx):
+        '''
+        Get time by index.
+        
+        :param idx: (*int*) Time index.
+        
+        :returns: (*datetime*) The time
+        '''        
+        return self.times[idx]
+        
+    def varnames(self):
+        '''
+        Get variable names
+        '''
+        return self[0].varnames()

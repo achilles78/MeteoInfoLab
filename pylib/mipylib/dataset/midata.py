@@ -11,12 +11,12 @@ from org.meteoinfo.data.meteodata import MeteoDataInfo, Dimension, DimensionType
 
 from  mipylib.numeric.dimarray import PyGridData, DimArray, PyStationData
 import dimdatafile
-from dimdatafile import DimDataFile
+from dimdatafile import DimDataFile, DimDataFiles
 
 currentfolder = None
 
 __all__ = [
-    'addfile','addfile_arl','addfile_ascii_grid','addfile_awx','addfile_geotiff',
+    'addfile','addfiles','addfile_arl','addfile_ascii_grid','addfile_awx','addfile_geotiff',
     'addfile_grads','addfile_hyconc','addfile_hytraj','addfile_lonlat','addfile_micaps',
     'addfile_mm5','addfile_nc','addfile_surfer',
     'getgriddata','getstationdata'
@@ -50,6 +50,19 @@ def __getfilename(fname):
         else:
             print 'File not exist: ' + fname
             return None, isweb
+            
+def addfiles(fnames):
+    '''
+    Open multiple data files.
+    
+    :param fnames: (*list of string*) Data file names to be opened.
+    
+    :returns: (*DimDataFiles*) DimDataFiles object.
+    '''
+    dfs = []
+    for fname in fnames:
+        dfs.append(addfile(fname))
+    return DimDataFiles(dfs)
           
 def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
     """

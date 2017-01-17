@@ -17,7 +17,7 @@ from miarray import MIArray
 #from milayer import MILayer
 import math
 import datetime
-import mipylib.miutil
+import mipylib.miutil as miutil
 from java.lang import Double
 
 nan = Double.NaN
@@ -499,6 +499,22 @@ class DimArray():
             else:
                 self.dims.insert(index, dim)
         self.ndim = len(self.dims)
+        
+    def addtdim(self, t):
+        '''
+        Add a time dimension as first dimension.
+        '''
+        if self.tdim() is None:
+            dim = Dimension(DimensionType.T)
+            t = miutil.date2num(t)
+            dim.setDimValues([t])
+            self.dims.insert(0, dim)
+            self.ndim = len(self.dims)
+            ss = list(self.shape)
+            ss.insert(0, 1)
+            ss = tuple(ss)
+            self.array = self.array.reshape(ss)
+            self.shape = self.array.shape
         
     def xdim(self):
         for dim in self.dims:
