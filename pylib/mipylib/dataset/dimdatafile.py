@@ -344,11 +344,27 @@ class DimDataFiles(list):
     # dataset must be list of DimDataFile
     def __init__(self, dataset=[]):
         list.__init__([])
-        self.extend(dataset)
+        ndataset = []
+        ftimes = []
+        for ds in dataset:
+            if len(ndataset) == 0:
+                ndataset.append(ds)
+                ftimes.append(ds.gettime(0))
+            else:
+                idx = len(ndataset)
+                ftime = ds.gettime(0)
+                for i in range(len(ndataset)):                    
+                    if ftime < ftimes[i]:
+                        idx = i
+                        break
+                ndataset.insert(idx, ds)
+                ftimes.insert(idx, ftime)
+                
+        self.extend(ndataset)
         self.times = []
         self.tnums = []
         self.tnum = 0
-        for ds in dataset:
+        for ds in ndataset:
             tts = ds.gettimes()
             self.times.extend(tts)
             self.tnums.append(len(tts))
