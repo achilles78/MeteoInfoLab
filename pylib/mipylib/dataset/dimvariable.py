@@ -415,5 +415,8 @@ class TDimVariable():
         
         dims = aa.dims
         dims[0].setDimValues(times)
-        r = DimArray(data, dims, aa.fill_value, aa.proj)
-        return r
+        if isinstance(data, DimArray):
+            return data
+        else:
+            r = DimArray(data, dims, aa.fill_value, aa.proj)
+            return r

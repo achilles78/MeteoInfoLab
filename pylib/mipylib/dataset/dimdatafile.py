@@ -425,7 +425,7 @@ class DimDataFiles(list):
         sn = 0
         for n in self.tnums:
             nn += n
-            if t < n:
+            if t < nn:
                 tidx = t - sn
                 break
             dfidx += 1
