@@ -4849,7 +4849,7 @@ def streamplotm(*args, **kwargs):
     isuv = kwargs.pop('isuv', True)
     density = kwargs.pop('density', 4)
     n = len(args)
-    if n <= 4:
+    if n < 4:
         udata = minum.asgriddata(args[0])
         vdata = minum.asgriddata(args[1])
         args = args[2:]
