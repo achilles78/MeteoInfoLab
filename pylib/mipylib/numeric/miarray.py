@@ -346,7 +346,10 @@ class MIArray():
         return MIArray(ArrayMath.log10(self.array))
             
     def aslist(self):
-        return ArrayMath.asList(self.array)
+        r = []
+        for i in range(self.array.getSize()):
+            r.append(self.array.getObject(i))
+        return r
         
     def tolist(self):
         '''

@@ -679,13 +679,13 @@ class DimArray():
             return r
      
     def aslist(self):
-        return ArrayMath.asList(self.array.array)
+        return self.array.aslist()
         
     def tolist(self):
         '''
         Convert to a list
         '''
-        return ArrayMath.asList(self.array.array)
+        return self.array.tolist()
         
     def asarray(self):
         return self.array.array

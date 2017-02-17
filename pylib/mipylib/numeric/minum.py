@@ -427,14 +427,16 @@ def asciiread(filename, **kwargs):
     :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``.
     :param shape: (*string*) Data array dimension shape. Default is ``None``, the file content will
         be readed as one dimension array.
+    :param readfirstcol: (*boolean*) Read first column data or not. Default is ``True``.
     
     :returns: (*MIArray*) The data array.
     '''
     delimiter = kwargs.pop('delimiter', None)
     datatype = kwargs.pop('datatype', None)
     headerlines = kwargs.pop('headerlines', 0)
-    shape = kwargs.pop('shape', None)    
-    a = ArrayUtil.readASCIIFile(filename, delimiter, headerlines, datatype, shape)
+    shape = kwargs.pop('shape', None)
+    rfirstcol = kwargs.pop('readfirstcol', True)
+    a = ArrayUtil.readASCIIFile(filename, delimiter, headerlines, datatype, shape, rfirstcol)
     return MIArray(a)
         
 def readtable(filename, **kwargs):
@@ -442,17 +444,19 @@ def readtable(filename, **kwargs):
     Create table by reading column oriented data from a file.
     
     :param filename: (*string*) File name for reading.
-    :param delimiter: (*string*) Field delimiter character. Default is ``None``, means space or tab 
+    :param delimiter: (*string*) Variable delimiter character. Default is ``None``, means space or tab 
         delimiter.
     :param format: (*string*) Colomn format of the file. Default is ``None``, means all columns were
-        read as string field. ``%s``: string; ``%i``: integer; ``%f``: float; ``%{yyyyMMdd...}D``: 
+        read as string variable. ``%s``: string; ``%i``: integer; ``%f``: float; ``%{yyyyMMdd...}D``: 
         date time.
     :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``. The line
-        after the skip lines will be read as filed names of the table. the ``headerlines`` should set
+        after the skip lines will be read as variable names of the table. the ``headerlines`` should set
         as ``-1`` if there is no field name line at beginning of the file.
     :param encoding: (*string*) Character encoding scheme associated with the file. Default is ``UTF8``.
-    :param colnames: (*string*) Specified field names for the readed table. Default is ``None``, means
-        the field names should be read from the file.
+    :param varnames: (*string*) Specified variable names for the readed table. Default is ``None``, means
+        the variable names should be read from the file.
+    :param readvarnames: (*boolean*) Read variable names or not. Default is ``True``.
+    :param readrownames: (*boolean*) Read row names or not. Default is ``False``.
         
     :returns: (*PyTableData*) The table.
     '''
@@ -464,9 +468,10 @@ def readtable(filename, **kwargs):
     readrownames = kwargs.pop('readrownames', False)
     tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
     r = PyTableData(tdata)
-    colnames = kwargs.pop('colnames', None)
-    if not colnames is None:
-        r.setcolnames(colnames)
+    varnames = kwargs.pop('colnames', None)
+    varnames = kwargs.pop('varnames', varnames)
+    if not varnames is None:
+        r.setcolnames(varnames)
     return r
     
 def geotiffread(filename):

@@ -3301,7 +3301,7 @@ def imshow(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY1DPlot)):
+    if gca is None or (not isinstance(gca, XY2DPlot)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -4123,13 +4123,14 @@ def scatterm(*args, **kwargs):
                 gdata = minum.asgriddata(a, x, y, fill_value)
     
     ls = kwargs.pop('symbolspec', None)
+    isplot = kwargs.pop('isplot', True)
     if ls is None:
         ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
         ls = __setlegendscheme_point(ls, **kwargs)    
     if isinstance(gdata, PyGridData):
-        layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
+        layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
     else:
-        layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj, order=order)
+        layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
     gdata = None
     return MILayer(layer)
     
@@ -4912,7 +4913,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True,
         draw_if_interactive()
     return layer
     
-def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
+def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=True):
     #print 'GridData...'
     if type == 'scatter':
         layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
@@ -4925,19 +4926,20 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None):
     if (proj != None):
         layer.setProjInfo(proj)
  
-    plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent().clone())
-    plot.setExtent(layer.getExtent().clone())
-    
-    if chartpanel is None:
-        figure()
-    
-    #chart = Chart(plot)
-    #chart.setAntiAlias(True)
-    #chartpanel.setChart(chart)
-    #global gca
-    #gca = plot
-    draw_if_interactive()
+    if isplot:
+        plot.addLayer(layer)
+        plot.setDrawExtent(layer.getExtent().clone())
+        plot.setExtent(layer.getExtent().clone())
+        
+        if chartpanel is None:
+            figure()
+        
+        #chart = Chart(plot)
+        #chart.setAntiAlias(True)
+        #chartpanel.setChart(chart)
+        #global gca
+        #gca = plot
+        draw_if_interactive()
     return layer
 
 def __plot_uvdata_m(plot, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
@@ -5090,7 +5092,7 @@ def geoshow(*args, **kwargs):
             #LegendScheme
             ls = kwargs.pop('symbolspec', None)
             if ls is None:
-                if len(kwargs) > 0:
+                if len(kwargs) > 0 and layer.getLegendScheme().getBreakNum() == 1:
                     lb = layer.getLegendScheme().getLegendBreaks().get(0)
                     btype = lb.getBreakType()
                     geometry = 'point'
