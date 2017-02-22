@@ -6,10 +6,11 @@
 #-----------------------------------------------------
 
 import datetime
-import mipylib.numeric.minum
-import mipylib.miutil
+import mipylib.numeric.minum as minum
+import mipylib.miutil as miutil
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
+import midata as midata
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 
 __all__ = [
@@ -24,12 +25,13 @@ def convert2nc(infn, outfn, version='netcdf3'):
     :param outfn: (*string*) Output netCDF data file name.
     """
     #Open input data file
-    f = minum.addfile(infn)
+    f = midata.addfile(infn)
     #New netCDF file
-    ncfile = minum.addfile(outfn, 'c', version=version)
+    ncfile = midata.addfile(outfn, 'c', version=version)
     #Add dimensions
+    dims = []
     for dim in f.dimensions():
-        ncfile.adddim(dim.getShortName(), dim.getLength())
+        dims.append(ncfile.adddim(dim.getShortName(), dim.getLength()))
     #Add global attributes
     for attr in f.attributes():
         ncfile.addgroupattr(attr.getName(), attr.getValues())
@@ -39,7 +41,21 @@ def convert2nc(infn, outfn, version='netcdf3'):
         #print 'Variable: ' + var.getShortName()
         if var.hasNullDimension():
             continue
-        nvar = ncfile.addvar(var.getShortName(), var.getDataType(), var.getDimensions())
+        vdims = []
+        missdim = False
+        for vdim in var.getDimensions():
+            isvalid = False
+            for dim in dims:
+                if dim.getShortName() == vdim.getShortName():
+                    vdims.append(dim)
+                    isvalid = True
+                    break
+            if not isvalid:
+                missdim = True
+                break
+        if missdim:
+            continue
+        nvar = ncfile.addvar(var.getShortName(), var.getDataType(), vdims)
         for attr in var.getAttributes():
             nvar.addattr(attr.getName(), attr.getValues())
         variables.append(nvar)
@@ -63,12 +79,12 @@ def grads2nc(infn, outfn, big_endian=None):
     :param big_endian: (*boolean*) Is GrADS data big_endian or not.
     """
     #Open GrADS file
-    f = minum.addfile_grads(infn)
+    f = midata.addfile_grads(infn)
     if not big_endian is None:
         f.bigendian(big_endian)
 
     #New netCDF file
-    ncfile = minum.addfile(outfn, 'c')
+    ncfile = midata.addfile(outfn, 'c')
 
     #Add dimensions
     dims = []
@@ -206,7 +222,7 @@ def ncwrite(fn, data, varname, dims=None, attrs=None):
         else:
             dims = data.dims
     #New netCDF file
-    ncfile = minum.addfile(fn, 'c')
+    ncfile = midata.addfile(fn, 'c')
     #Add dimensions
     ncdims = []
     for dim in dims:    
@@ -240,7 +256,7 @@ def ncwrite(fn, data, varname, dims=None, attrs=None):
             var.addattr('axis', 'null')
         dimvars.append(var)
     #Add variable
-    var = ncfile.addvar(varname, data.datatype, ncdims)
+    var = ncfile.addvar(varname, data.dtype, ncdims)
     if attrs is None:    
         var.addattr('name', varname)
     else:

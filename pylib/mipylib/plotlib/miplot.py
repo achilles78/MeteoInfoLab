@@ -2765,6 +2765,28 @@ def text(x, y, s, **kwargs):
     text.setColor(c)
     text.setX(x)
     text.setY(y)
+    bbox = kwargs.pop('bbox', None)
+    if not bbox is None:
+        fill = bbox.pop('fill', None)
+        if not fill is None:
+            text.setFill(fill)
+        facecolor = bbox.pop('facecolor', None)
+        if not facecolor is None:
+            facecolor = __getcolor(facecolor)
+            text.setFill(True)
+            text.setBackground(facecolor)
+        edge = bbox.pop('edge', None)
+        if not edge is None:
+            text.setDrawNeatline(edge)
+        edgecolor = bbox.pop('edgecolor', None)
+        if not edgecolor is None:
+            edgecolor = __getcolor(edgecolor)
+            text.setNeatlineColor(edgecolor)
+            text.setDrawNeatline(True)
+        linewidth = bbox.pop('linewidth', None)
+        if not linewidth is None:
+            text.setNeatlineSize(linewidth)
+            text.setDrawNeatline(True)
     coordinates = kwargs.pop('coordinates', 'data')
     text.setCoordinates(coordinates)
     if coordinates == 'figure':
@@ -3114,10 +3136,12 @@ def set(obj, **kwargs):
     
 def __getcolormap(**kwargs):
     colors = kwargs.pop('colors', None)
+    issingle = False
     if colors is None:
         colors = kwargs.pop('color', None)
+        issingle = True
     if not colors is None:
-        if isinstance(colors, str):
+        if issingle or isinstance(colors, str):
             c = __getcolor(colors)
             cmap = ColorMap(c)
         else:
