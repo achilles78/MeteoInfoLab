@@ -19,7 +19,7 @@ from java.lang import Double
 import datetime
         
 # The encapsulate class of Array
-class MIArray():
+class MIArray(object):
         
     # array must be a ucar.ma2.Array object
     def __init__(self, array):
@@ -29,13 +29,33 @@ class MIArray():
         s1 = []
         for i in range(len(s)):
             s1.append(s[i])
-        self.shape = tuple(s1)
+        self._shape = tuple(s1)
         self.dtype = array.getDataType()
         if self.ndim > 0:
             self.sizestr = str(self.shape[0])
             if self.ndim > 1:
                 for i in range(1, self.ndim):
-                    self.sizestr = self.sizestr + '*%s' % self.shape[i]                       
+                    self.sizestr = self.sizestr + '*%s' % self.shape[i]
+    
+    #---- shape property
+    def get_shape(self):
+        return self._shape
+        
+    def set_shape(self, value):
+        if -1 in value:
+            nvalue = list(value)
+            l = 1
+            for i in nvalue:
+                if i >= 0:
+                    l *= i
+            idx = nvalue.index(-1)
+            nvalue[idx] = int(self.array.getSize() / l)
+            value = tuple(nvalue)
+        self._shape = value
+        nshape = jarray.array(value, 'i')
+        self.array = self.array.reshape(nshape)
+        
+    shape = property(get_shape, set_shape)
         
     def __len__(self):
         return int(self.array.getSize())         

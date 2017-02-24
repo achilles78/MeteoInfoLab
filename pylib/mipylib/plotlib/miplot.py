@@ -1563,7 +1563,8 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     draw_if_interactive()
     return graphics
     
-def boxplot(x, showmeans=False, meanline=False):
+def boxplot(x, sym=None, positions=None, widths=None, showmeans=False, meanline=False, boxprops=None, \
+    medianprops=None, meanprops=None, whiskerprops=None, capprops=None, flierprops=None):
     """
     Make a box and whisker plot.
     
@@ -1572,9 +1573,22 @@ def boxplot(x, showmeans=False, meanline=False):
     the range of the data. Flier points are those past the end of the whiskers.
     
     :param x: (*Array or a sequence of vectors*) The input data.
+    :param sym: (*string*) The default symbol for flier points. Enter an empty string ('') if you don’t 
+        want to show fliers. If None, then the fliers default to ‘b+’ If you want more control use the 
+        flierprops kwarg.
+    :param positions: (*array_like*) Sets the positions of the boxes. The ticks and limits are automatically 
+        set to match the positions. Defaults to range(1, N+1) where N is the number of boxes to be drawn.
+    :param widths: (*scalar or array_like*) Sets the width of each box either with a scalar or a sequence. 
+        The default is 0.5, or 0.15*(distance between extreme positions), if that is smaller.
     :param showmeans: (*boolean*) Default is ``False``. Show the mean or not.
     :param meanline: (*boolean*) Default is ``False``. If ``True`` (and showmeans is ``True``), will try to render
         the mean as a line spanning. Otherwise, means will be shown as points.
+    :param boxprops: (*dict*) Specifies the style of the box.
+    :param medianprops: (*dict*) Specifies the style of the median.
+    :param meanprops: (*dict*) Specifies the style of the mean.
+    :param whiskerprops: (*dict*) Specifies the style of the whiskers.
+    :param capprops: (*dict*) Specifies the style of the caps.
+    :param flierprops: (*dict*) Specifies the style of the fliers.
     """
     #Get current axes
     global gca   
@@ -1588,8 +1602,46 @@ def boxplot(x, showmeans=False, meanline=False):
         x = __getplotdata(x)
         x = [x]
     
+    if not positions is None:
+        if isinstance(positions, (MIArray, DimArray)):
+            positions = positions.tolist()
+    
+    if not widths is None:
+        if isinstance(widths, (int, float)):
+            nwidths = []
+            for i in range(len(x)):
+                nwidths.append(widths)
+            widths = nwidths
+        elif isinstance(widths, (MIArray, DimArray)):
+            widths = widths.tolist()
+        
+    #Get box plot properties
+    if not sym is None:
+        sym = __getplotstyle(sym, '')
+    if not boxprops is None:
+        boxprops = __getlegendbreak('polygon', **boxprops)[0]
+    if not medianprops is None:
+        medianprops = __getlegendbreak('line', **medianprops)[0]
+    if not whiskerprops is None:
+        whiskerprops = __getlegendbreak('line', **whiskerprops)[0]
+    if not capprops is None:
+        capprops = __getlegendbreak('line', **capprops)[0]
+    if meanline:
+        if not meanprops is None:
+            meanprops = __getlegendbreak('line', **meanprops)[0]
+        else:
+            meanprops = PolylineBreak()
+    else:
+        if not meanprops is None:
+            meanprops = __getlegendbreak('point', **meanprops)[0]
+    if not flierprops is None:
+        flierprops = __getlegendbreak('point', **flierprops)[0]
+    else:
+        flierprops = sym
+    
     #Create graphics
-    graphics = GraphicFactory.createBox(x, showmeans)
+    graphics = GraphicFactory.createBox(x, positions, widths, showmeans, boxprops, medianprops, whiskerprops, \
+        capprops, meanprops, flierprops)
     
     #Create XYPlot
     if gca is None:
@@ -1616,8 +1668,8 @@ def boxplot(x, showmeans=False, meanline=False):
     
     chartpanel.setChart(chart)
     gca = plot
-    xlim(0.5, len(x) + 0.5)
-    xticks(minum.arange(1, len(x) + 1, 1))
+    #xlim(0.5, len(x) + 0.5)
+    #xticks(minum.arange(1, len(x) + 1, 1))
     draw_if_interactive()
     return graphics
  
