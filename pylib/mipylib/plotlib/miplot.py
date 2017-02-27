@@ -1597,8 +1597,8 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     draw_if_interactive()
     return graphics
     
-def boxplot(x, sym=None, positions=None, widths=None, color=None, showmeans=False, meanline=False, boxprops=None, \
-    medianprops=None, meanprops=None, whiskerprops=None, capprops=None, flierprops=None):
+def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True, showfliers=True, showmeans=False, \
+    meanline=False, boxprops=None, medianprops=None, meanprops=None, whiskerprops=None, capprops=None, flierprops=None):
     """
     Make a box and whisker plot.
     
@@ -1615,6 +1615,8 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showmeans=Fals
     :param widths: (*scalar or array_like*) Sets the width of each box either with a scalar or a sequence. 
         The default is 0.5, or 0.15*(distance between extreme positions), if that is smaller.
     :param color: (*Color*) Color for all parts of the box plot. Defaul is None.
+    :param showcaps: (*boolean*) Show the caps on the ends of whiskers. Default is ``True``.
+    :param showfliers: (*boolean*) Show the outliers beyond the caps. Defaul is ``True``.
     :param showmeans: (*boolean*) Default is ``False``. Show the mean or not.
     :param meanline: (*boolean*) Default is ``False``. If ``True`` (and showmeans is ``True``), will try to render
         the mean as a line spanning. Otherwise, means will be shown as points.
@@ -1705,8 +1707,8 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showmeans=Fals
         flierprops.setStyle(PointStyle.Plus)
     
     #Create graphics
-    graphics = GraphicFactory.createBox(x, positions, widths, showmeans, boxprops, medianprops, whiskerprops, \
-        capprops, meanprops, flierprops)
+    graphics = GraphicFactory.createBox(x, positions, widths, showcaps, showfliers, showmeans, boxprops, \
+        medianprops, whiskerprops, capprops, meanprops, flierprops)
     
     #Create XYPlot
     if gca is None:
