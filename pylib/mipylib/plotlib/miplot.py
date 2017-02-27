@@ -1597,7 +1597,7 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     draw_if_interactive()
     return graphics
     
-def boxplot(x, sym=None, positions=None, widths=None, showmeans=False, meanline=False, boxprops=None, \
+def boxplot(x, sym=None, positions=None, widths=None, color=None, showmeans=False, meanline=False, boxprops=None, \
     medianprops=None, meanprops=None, whiskerprops=None, capprops=None, flierprops=None):
     """
     Make a box and whisker plot.
@@ -1614,6 +1614,7 @@ def boxplot(x, sym=None, positions=None, widths=None, showmeans=False, meanline=
         set to match the positions. Defaults to range(1, N+1) where N is the number of boxes to be drawn.
     :param widths: (*scalar or array_like*) Sets the width of each box either with a scalar or a sequence. 
         The default is 0.5, or 0.15*(distance between extreme positions), if that is smaller.
+    :param color: (*Color*) Color for all parts of the box plot. Defaul is None.
     :param showmeans: (*boolean*) Default is ``False``. Show the mean or not.
     :param meanline: (*boolean*) Default is ``False``. If ``True`` (and showmeans is ``True``), will try to render
         the mean as a line spanning. Otherwise, means will be shown as points.
@@ -1650,28 +1651,58 @@ def boxplot(x, sym=None, positions=None, widths=None, showmeans=False, meanline=
             widths = widths.tolist()
         
     #Get box plot properties
+    if not color is None:
+        color = __getcolor(color)
     if not sym is None:
         sym = __getplotstyle(sym, '')
-    if not boxprops is None:
+        sym.setDrawFill(False)
+        if not color is None:
+            sym.setColor(color)
+            sym.setOutlineColor(color)
+    if boxprops is None:
+        boxprops = PolygonBreak()
+        boxprops.setDrawFill(False)
+        boxprops.setOutlineColor(color is None and Color.blue or color)
+    else:
         boxprops = __getlegendbreak('polygon', **boxprops)[0]
-    if not medianprops is None:
+    if medianprops is None:
+        medianprops = PolylineBreak()
+        medianprops.setColor(color is None and Color.red or color)
+    else:
         medianprops = __getlegendbreak('line', **medianprops)[0]
-    if not whiskerprops is None:
+    if whiskerprops is None:
+        whiskerprops = PolylineBreak()
+        whiskerprops.setColor(color is None and Color.black or color)
+        whiskerprops.setStyle(LineStyles.Dash)
+    else:
         whiskerprops = __getlegendbreak('line', **whiskerprops)[0]
-    if not capprops is None:
+    if capprops is None:
+        capprops = PolylineBreak()
+        capprops.setColor(color is None and Color.black or color)
+    else:
         capprops = __getlegendbreak('line', **capprops)[0]
     if meanline:
         if not meanprops is None:
             meanprops = __getlegendbreak('line', **meanprops)[0]
         else:
             meanprops = PolylineBreak()
+            meanprops.setColor(color is None and Color.black or color)
     else:
-        if not meanprops is None:
+        if meanprops is None:
+            meanprops = PointBreak()
+            meanprops.setStyle(PointStyle.Square)
+            meanprops.setColor(color is None and Color.red or color)
+            meanprops.setOutlineColor(color is None and Color.black or color)
+        else:
             meanprops = __getlegendbreak('point', **meanprops)[0]
     if not flierprops is None:
         flierprops = __getlegendbreak('point', **flierprops)[0]
     else:
         flierprops = sym
+    if flierprops is None:
+        flierprops = PointBreak()
+        flierprops.setColor(color is None and Color.red or color)
+        flierprops.setStyle(PointStyle.Plus)
     
     #Create graphics
     graphics = GraphicFactory.createBox(x, positions, widths, showmeans, boxprops, medianprops, whiskerprops, \
