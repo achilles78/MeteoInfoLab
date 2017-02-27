@@ -61,7 +61,7 @@ __all__ = [
     'logspace','magnitude','maximum','mean','meshgrid','minimum','monthname',
     'numasciicol','numasciirow','ones','ones_like','polyval','pow',
     'power','project','projectxy','projinfo','readtable','reshape',
-    'rolling_mean','rot90','sin','sort','sqrt','tan','transpose','trapz','vdot',
+    'rolling_mean','rot90','sin','sort','argsort','sqrt','tan','transpose','trapz','vdot',
     'zeros','zeros_like'
     ]
 
@@ -1249,7 +1249,7 @@ def ave_month(data, colnames, t):
                 
 def sort(a, axis=-1):
     """
-    Return a sorted copy of an array.
+    Returns the indices that would sort an array.
     
     :param a: (*array_like*) Array to be sorted.
     :param axis: (*int or None*) Optional. Axis along which to sort. If None, the array is
@@ -1260,6 +1260,22 @@ def sort(a, axis=-1):
     if isinstance(a, list):
         a = array(a)
     r = ArrayUtil.sort(a.asarray(), axis)
+    return MIArray(r)
+    
+def argsort(a, axis=-1):
+    """
+    Return a sorted copy of an array.
+    
+    :param a: (*array_like*) Array to be sorted.
+    :param axis: (*int or None*) Optional. Axis along which to sort. If None, the array is
+        flattened after sorting. The default is ``-1`` , which sorts along the last axis.
+        
+    :returns: (*MIArray*) Array of indices that sort a along the specified axis. If a is 
+        one-dimensional, a[index_array] yields a sorted a.
+    """
+    if isinstance(a, list):
+        a = array(a)
+    r = ArrayUtil.argSort(a.asarray(), axis)
     return MIArray(r)
     
 def concatenate(arrays, axis=0):
@@ -1935,7 +1951,8 @@ def griddata(points, values, xi=None, **kwargs):
     elif method == 'inside_min':
         r = ArrayUtil.interpolation_Inside_Min(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist())
     elif method == 'inside_count':
-        r = ArrayUtil.interpolation_Inside_Count(x_s.aslist(), y_s.aslist(), x_g.aslist(), y_g.aslist())
+        r = ArrayUtil.interpolation_Inside_Count(x_s.aslist(), y_s.aslist(), x_g.aslist(), y_g.aslist(), True)
+        return MIArray(r[0]), x_g, y_g, MIArray(r[1])
     elif method == 'surface':        
         r = ArrayUtil.interpolation_Surface(x_s.asarray(), y_s.asarray(), values, x_g.asarray(), y_g.asarray())
     else:

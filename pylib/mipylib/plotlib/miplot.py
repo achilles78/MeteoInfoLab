@@ -1169,7 +1169,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     :param x: (*array_like*) Input x data.
     :param y: (*array_like*) Input y data.
     :param s: (*int*) Size of points.
-    :param c: (*Color*) Color of the points.
+    :param c: (*Color*) Color of the points. Or z vlaues.
     :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
     :param marker: (*string*) Marker of the points.
     :param label: (*string*) Label of the points series.
@@ -1188,7 +1188,30 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     pb.setCaption(label)
     pstyle = __getpointstyle(marker)    
     pb.setStyle(pstyle)
-    colors = __getcolors(c, alpha)
+    isvalue = False
+    ls = None
+    colors = None
+    if len(c) > 1:
+        if isinstance(c[0], (int, long, float)):
+            isvalue = True            
+    if isvalue:
+        if isinstance(c, (list, tuple)):
+            c = minum.array(c)
+        levels = kwargs.pop('levels', None)
+        if levels is None:
+            cnum = kwargs.pop('cnum', None)
+            if cnum is None:
+                ls = __getlegendscheme([], c.min(), c.max(), **kwargs)
+            else:
+                ls = __getlegendscheme([cnum], c.min(), c.max(), **kwargs)
+        else:
+            ls = __getlegendscheme([levels], c.min(), c.max(), **kwargs)
+        colors = []
+        for cb in ls.getLegendBreaks():
+            colors.append(cb.getColor())
+    else:
+        colors = __getcolors(c, alpha)
+        
     pbs = []
     if isinstance(s, int):   
         pb.setSize(s)
@@ -1215,9 +1238,20 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
                 npb.setSize(s[i])
                 npb.setColor(colors[i])
                 pbs.append(npb)
+    if not ls is None:
+        for i in range(0, len(pbs)):
+            pb = pbs[i]
+            lb = ls.getLegendBreaks()[i]
+            pb.setStartValue(lb.getStartValue())
+            pb.setEndValue(lb.getEndValue())
+        ls = makelegend(pbs)
                 
     #Create graphics
-    graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
+    if ls is None:
+        graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
+    else:
+        graphics = GraphicFactory.createPoints(xdata, ydata, c.asarray(), ls)
+    
     if gca is None:
         plot = XY2DPlot()
     else:
@@ -1238,7 +1272,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
-    return pb 
+    return pbs
     
 def scatter_bak(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
             alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
@@ -2484,6 +2518,19 @@ def __getcolors(cs, alpha=None):
         colors.append(__getcolor(cs, alpha))
     return colors
     
+def __getcolors_value(v, n=None, cmap='matlab_jet'):
+    min = v.min()
+    max = v.max()
+    cmap = __getcolormap(cmap=cmap)
+    if n is None:
+        cs = ColorUtil.createColors(cmap, min, max)
+    else:
+        cs = ColorUtil.createColors(cmap, min, max, n)
+    colors = []
+    for c in cs:
+        colors.append(c)
+    return colors
+    
 def __getsymbolinterval(n):
     i = 1
     v = 20
@@ -3204,6 +3251,8 @@ def __getcolormap(**kwargs):
             cmap = ColorMap(cs)
     else:
         cmapstr = kwargs.pop('cmap', 'matlab_jet')
+        if cmapstr is None:
+            cmapstr = 'matlab_jet'
         alpha = kwargs.pop('alpha', None)
         if alpha is None:
             cmap = ColorUtil.getColorMap(cmapstr)

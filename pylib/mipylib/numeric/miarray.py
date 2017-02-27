@@ -94,7 +94,9 @@ class MIArray(object):
                 sidx = 0 if k.start is None else k.start
                 eidx = self.getshape()[i]-1 if k.stop is None else k.stop-1
                 step = 1 if k.step is None else k.step
-            elif isinstance(k, (list, tuple)):
+            elif isinstance(k, (list, tuple, MIArray)):
+                if isinstance(k, MIArray):
+                    k = k.aslist()
                 onlyrange = False
                 ranges.append(k)
                 iszerodim = False
