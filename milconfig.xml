@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
-    <RecentFolder Folder="C:\TEMP\mingjing"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+  <Path OpenPath="V:\EMI\script\aqi">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\scatter"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="C:\TEMP"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="V:\EMI\script\model"/>
+    <RecentFolder Folder="V:\EMI\script"/>
+    <RecentFolder Folder="V:\EMI\script\aqi"/>
+    <RecentFolder Folder="V:\EMI\script\evaluation"/>
+    <RecentFolder Folder="V:\EMI\script\test"/>
   </Path>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
