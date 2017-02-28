@@ -1161,7 +1161,7 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
     draw_if_interactive()
     return lb
     
-def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
+def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
             alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
     """
     Make a scatter plot of x vs y, where x and y are sequence like objects of the same lengths.
@@ -1190,7 +1190,6 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     pb.setStyle(pstyle)
     isvalue = False
     ls = None
-    colors = None
     if len(c) > 1:
         if isinstance(c[0], (int, long, float)):
             isvalue = True            
@@ -1206,51 +1205,47 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
                 ls = __getlegendscheme([cnum], c.min(), c.max(), **kwargs)
         else:
             ls = __getlegendscheme([levels], c.min(), c.max(), **kwargs)
-        colors = []
-        for cb in ls.getLegendBreaks():
-            colors.append(cb.getColor())
-    else:
-        colors = __getcolors(c, alpha)
-        
-    pbs = []
-    if isinstance(s, int):   
-        pb.setSize(s)
-        if len(colors) == 1:
-            pb.setColor(colors[0])
-            pbs.append(pb)
+        ls = __setlegendscheme_point(ls, **kwargs)
+        if isinstance(s, int):
+            for lb in ls.getLegendBreaks():
+                lb.setSize(s)
         else:
-            n = len(colors)
+            n = len(s)
             for i in range(0, n):
-                npb = pb.clone()
-                npb.setColor(colors[i])
-                pbs.append(npb)
-    else:
-        n = len(s)
-        if len(colors) == 1:
-            pb.setColor(colors[0])
-            for i in range(0, n):
-                npb = pb.clone()
-                npb.setSize(s[i])
-                pbs.append(npb)
-        else:
-            for i in range(0, n):
-                npb = pb.clone()
-                npb.setSize(s[i])
-                npb.setColor(colors[i])
-                pbs.append(npb)
-    if not ls is None:
-        for i in range(0, len(pbs)):
-            pb = pbs[i]
-            lb = ls.getLegendBreaks()[i]
-            pb.setStartValue(lb.getStartValue())
-            pb.setEndValue(lb.getEndValue())
-        ls = makelegend(pbs)
-                
-    #Create graphics
-    if ls is None:
-        graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
-    else:
+                ls.getLegendBreaks()[i].setSize(s[i])
+        #Create graphics
         graphics = GraphicFactory.createPoints(xdata, ydata, c.asarray(), ls)
+    else:
+        colors = __getcolors(c, alpha)   
+        pbs = []
+        if isinstance(s, int):   
+            pb.setSize(s)
+            if len(colors) == 1:
+                pb.setColor(colors[0])
+                pbs.append(pb)
+            else:
+                n = len(colors)
+                for i in range(0, n):
+                    npb = pb.clone()
+                    npb.setColor(colors[i])
+                    pbs.append(npb)
+        else:
+            n = len(s)
+            if len(colors) == 1:
+                pb.setColor(colors[0])
+                for i in range(0, n):
+                    npb = pb.clone()
+                    npb.setSize(s[i])
+                    pbs.append(npb)
+            else:
+                for i in range(0, n):
+                    npb = pb.clone()
+                    npb.setSize(s[i])
+                    npb.setColor(colors[i])
+                    pbs.append(npb)
+        #Create graphics
+        graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
+        ls = obs
     
     if gca is None:
         plot = XY2DPlot()
@@ -1272,7 +1267,7 @@ def scatter(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
-    return pbs
+    return ls
     
 def scatter_bak(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
             alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
