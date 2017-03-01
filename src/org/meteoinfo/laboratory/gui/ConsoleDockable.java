@@ -335,16 +335,5 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             }
         };
         worker.execute();
-
-//        //For figure hase web map layer
-//        ChartPanel cp = parent.getFigureDock().getCurrentFigure();
-//        if (cp != null) {
-//            if (cp.hasWebMap()) {
-//                Thread.sleep(500);
-//                if (worker.isDone()) {
-//                    cp.paintGraphics();
-//                }
-//            }
-//        }
     }
 }
