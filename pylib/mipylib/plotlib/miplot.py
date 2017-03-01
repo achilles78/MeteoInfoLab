@@ -12,6 +12,7 @@ import datetime
 from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, GridData, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage
+from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, PiePlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
@@ -22,7 +23,7 @@ from org.meteoinfo.drawing import PointStyle, MarkerType
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.global.image import AnimatedGifEncoder
-from org.meteoinfo.layer import LayerTypes, MapLayer
+from org.meteoinfo.layer import LayerTypes, MapLayer, WebMapLayer
 from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
 from org.meteoinfo.laboratory.gui import FrmMain
@@ -64,13 +65,14 @@ __all__ = [
     'gca','antialias','axes','axesm','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
     'contourfm','contourm','currentplot','display','draw_if_interactive','errorbar',
-    'figure','fill_between','gca','geoshow','gifaddframe','gifanimation','giffinish',
+    'figure','fill_between','gca','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatterm',
     'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','suptitle',
     'surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
-    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks'    
+    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','repaint',
+    'isinteractive'
     ]
     
 def map(map=True):
@@ -104,6 +106,9 @@ def __getplotdata(data):
 def draw_if_interactive():
     if isinteractive:
 		chartpanel.paintGraphics()
+        
+def repaint():
+    chartpanel.repaint()
         
 def plot(*args, **kwargs):
     """
@@ -2220,7 +2225,7 @@ def antialias(b=None):
     chartpanel.getChart().setAntiAlias(b)
     draw_if_interactive()
     
-def savefig(fname, width=None, height=None, dpi=None):
+def savefig(fname, width=None, height=None, dpi=None, sleep=None):
     """
     Save the current figure.
     
@@ -2231,14 +2236,15 @@ def savefig(fname, width=None, height=None, dpi=None):
         is None, the output figure size is same as *figures* window.
     :param height: (*int*) Optional, height of the output figure with pixel units. Default
         is None, the output figure size is same as *figures* window.
+    :param sleep: (*int*) Sleep seconds. For web map tiles loading.
     """
     if (not width is None) and (not height is None):
         chartpanel.setSize(width, height)
     #chartpanel.paintGraphics()
     if dpi != None:
-        chartpanel.saveImage(fname, dpi)
+        chartpanel.saveImage(fname, dpi, sleep)
     else:
-        chartpanel.saveImage(fname)   
+        chartpanel.saveImage(fname, sleep)   
         
 def savefig_jpeg(fname, width=None, height=None, dpi=None):
     """
@@ -5216,7 +5222,23 @@ def worldmap():
     chart.setPlot(plot)
     global gca
     gca = plot
-    return plot    
+    return plot
+
+def webmap(provider='OpenStreetMap', order=0):
+    '''
+    Add a new web map layer.
+    
+    :param provider: (*string*) Web map provider.
+    :param order: (*int) Layer order.
+    
+    :returns: Web map layer
+    '''
+    layer = WebMapLayer()
+    provider = WebMapProvider.valueOf(provider)
+    layer.setWebMapProvider(provider)
+    gca.addLayer(order, layer)
+    draw_if_interactive()
+    return MILayer(layer)
         
 def geoshow(*args, **kwargs):
     '''

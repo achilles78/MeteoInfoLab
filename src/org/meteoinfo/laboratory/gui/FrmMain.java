@@ -147,6 +147,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
                 
         this.editorDock.setInterp(this.consoleDock.getInterpreter());
         this.editorDock.addNewTextEditor("New file");
+        this.editorDock.openFiles(this.options.getOpenedFiles());
         
         //Load applications        
         String toolboxPath = this.startupPath + File.separator + "toolbox";
@@ -292,6 +293,14 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
      */
     public String getStartupPath() {
         return this.startupPath;
+    }
+    
+    /**
+     * Get configure options
+     * @return Configure options
+     */
+    public Options getOptions(){
+        return this.options;
     }
 
     /**
@@ -752,7 +761,11 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         }
 
         String code = te.getTextArea().getText();
-        this.consoleDock.runPythonScript(code);
+        try {
+            this.consoleDock.runPythonScript(code);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton_RunScriptActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -1044,13 +1057,15 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         String fn = this.options.getFileName();
         try {
             List<String> cfolders = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 15; i++) {
                 if (i >= this.jComboBox_CurrentFolder.getItemCount()) {
                     break;
                 }
                 cfolders.add(this.jComboBox_CurrentFolder.getItemAt(i).toString());
             }
             this.options.setRecentFolders(cfolders);
+            List<String> ofiles = this.editorDock.getOpenedFiles();
+            this.options.setOpenedFiles(ofiles);
             this.options.setMainFormLocation(this.getLocation());
             this.options.setMainFormSize(this.getSize());
             this.options.saveConfigFile(fn);

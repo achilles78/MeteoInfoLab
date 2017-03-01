@@ -49,7 +49,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         JIntrospect nameComplete = new JIntrospect(this.interp);
         console.setNameCompletion(nameComplete);
 
-        this.getContentPane().add(console, BorderLayout.CENTER);        
+        this.getContentPane().add(console, BorderLayout.CENTER);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         //Issue java.lang.IllegalArgumentException: Cannot create PyString with non-byte value
         try {
             Py.getSystemState().setdefaultencoding("utf-8");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         interp = new PythonInteractiveInterpreter(console);
@@ -75,7 +75,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         if (isDebug) {
             path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfoLab/pylib";
             toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
-        }        
+        }
         //console.println(path);
         //console.println(toolboxPath);
 
@@ -90,7 +90,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("from milab import *");
             interp.exec("sys.path.append('" + toolboxPath + "')");
             interp.exec("import toolbox");
-            interp.exec("from toolbox import *");            
+            interp.exec("from toolbox import *");
             //interp.exec("import mipylib");
             //interp.exec("from mipylib.miscript import *");
             //interp.set("mipylib.miplot.milapp", parent);                        
@@ -263,8 +263,9 @@ public class ConsoleDockable extends DefaultSingleCDockable {
      * Run Jython script
      *
      * @param code
+     * @throws java.lang.InterruptedException
      */
-    public void runPythonScript(final String code) {
+    public void runPythonScript(final String code) throws InterruptedException {
 
         SwingWorker worker = new SwingWorker<String, String>() {
             PrintStream oout = System.out;
@@ -279,7 +280,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 JTextPane jTextPane_Output = interp.console.getTextPane();
                 JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
                 JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
-                
+
                 interp.console.println("run script...");
                 interp.setOut(writer);
                 interp.setErr(writer);
@@ -328,11 +329,22 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 System.setOut(oout);
                 System.setErr(oerr);
                 ChartPanel cp = parent.getFigureDock().getCurrentFigure();
-                if (cp != null){
+                if (cp != null) {
                     cp.paintGraphics();
                 }
             }
         };
         worker.execute();
+
+//        //For figure hase web map layer
+//        ChartPanel cp = parent.getFigureDock().getCurrentFigure();
+//        if (cp != null) {
+//            if (cp.hasWebMap()) {
+//                Thread.sleep(500);
+//                if (worker.isDone()) {
+//                    cp.paintGraphics();
+//                }
+//            }
+//        }
     }
 }

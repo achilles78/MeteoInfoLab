@@ -55,6 +55,8 @@ public class Options {
     private Dimension mainFormSize = new Dimension(1000, 650);
     private String currentFolder;
     private List<String> recentFolders = new ArrayList<>();
+    private List<String> openedFiles = new ArrayList<>();
+    private List<String> recentFiels = new ArrayList<>();
     // </editor-fold>
     // <editor-fold desc="Constructor">
     
@@ -151,9 +153,52 @@ public class Options {
     public void setRecentFolders(List<String> value){
         this.recentFolders = value;
     }
+    
+    /**
+     * Get opened python files
+     * @return Opened files
+     */
+    public List<String> getOpenedFiles(){
+        return this.openedFiles;
+    }
+    
+    /**
+     * Set opened python files
+     * @param value Opened files
+     */
+    public void setOpenedFiles(List<String> value) {
+        this.openedFiles = value;
+    }
+    
+    /**
+     * Get recent python files
+     * @return Recent files
+     */
+    public List<String> getRecentFiles(){
+        return this.recentFiels;
+    }
+    
+    /**
+     * Set recent python files
+     * @param value Recent files
+     */
+    public void setRecentFiles(List<String> value){
+        this.recentFiels = value;
+    }
     // </editor-fold>
     // <editor-fold desc="Methods">
 
+    /**
+     * Add a rencent opened file name
+     * @param fileName Recent opened file name
+     */
+    public void addRecentFile(String fileName){
+        this.recentFiels.add(fileName);
+        while (this.recentFiels.size() > 15){
+            this.recentFiels.remove(0);
+        }
+    }
+    
     /**
      * Save configure file
      *
@@ -187,6 +232,28 @@ public class Options {
             folderElem.setAttributeNode(fAttr);
             path.appendChild(folderElem);
         }
+        
+        //Python files
+        Element file = doc.createElement("File");
+        Element ofiles = doc.createElement("OpenedFiles");
+        for (String ofile : this.openedFiles){
+            Element ofileElem = doc.createElement("OpenedFile");
+            Attr fAttr = doc.createAttribute("File");
+            fAttr.setValue(ofile);
+            ofileElem.setAttributeNode(fAttr);
+            ofiles.appendChild(ofileElem);
+        }
+        file.appendChild(ofiles);
+        Element rfiles = doc.createElement("RecentFiles");
+        for (String rfile : this.openedFiles){
+            Element rfileElem = doc.createElement("RecentFile");
+            Attr fAttr = doc.createAttribute("File");
+            fAttr.setValue(rfile);
+            rfileElem.setAttributeNode(fAttr);
+            rfiles.appendChild(rfileElem);
+        }
+        file.appendChild(rfiles);
+        root.appendChild(file);
 
         //Font
         Element font = doc.createElement("Font");
@@ -262,12 +329,34 @@ public class Options {
                 this.currentFolder = System.getProperty("user.dir");
             }
             this.recentFolders = new ArrayList<>();
-            NodeList rfolders = (path).getElementsByTagName("RecentFolder");
+            NodeList rfolders = path.getElementsByTagName("RecentFolder");
             if (rfolders != null){
                 for (int i = 0; i < rfolders.getLength(); i++){
                     Node rfolder = rfolders.item(i);
                     String folder = rfolder.getAttributes().getNamedItem("Folder").getNodeValue();
                     this.recentFolders.add(folder);
+                }
+            }
+            
+            //python files
+            Element ofiles = (Element)root.getElementsByTagName("OpenedFiles").item(0);
+            this.openedFiles = new ArrayList<>();
+            NodeList ofs = ofiles.getElementsByTagName("OpenedFile");
+            if (ofs != null){
+                for (int i = 0; i < ofs.getLength(); i++){
+                    Node ofile = ofs.item(i);
+                    String file = ofile.getAttributes().getNamedItem("File").getNodeValue();
+                    this.openedFiles.add(file);
+                }
+            }
+            Element rfiles = (Element)root.getElementsByTagName("RecentFiles").item(0);
+            this.recentFiels = new ArrayList<>();
+            NodeList rfs = rfiles.getElementsByTagName("RecentFile");
+            if (rfs != null){
+                for (int i = 0; i < rfs.getLength(); i++){
+                    Node rfile = rfs.item(i);
+                    String file = rfile.getAttributes().getNamedItem("File").getNodeValue();
+                    this.openedFiles.add(file);
                 }
             }
 

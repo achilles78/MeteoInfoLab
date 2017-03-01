@@ -15,6 +15,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -34,7 +36,7 @@ import org.python.util.PythonInterpreter;
  */
 public class EditorDockable extends DefaultSingleCDockable {
 
-    private FrmMain parent;
+    private final FrmMain parent;
     //private String startupPath;
     private final JTabbedPane tabbedPanel;
     private Font textFont;
@@ -280,6 +282,28 @@ public class EditorDockable extends DefaultSingleCDockable {
             this.openFiles(files);
         }
     }
+    
+    /**
+     * Open files
+     * @param fileNames File name list
+     */
+    public void openFiles(List<String> fileNames){
+        List<File> files = new ArrayList<>();
+        for (String fn : fileNames){
+            File file = new File(fn);
+            if (file.exists()){
+                files.add(file);
+            }
+        }
+        
+        if (files.size() > 0){
+            File[] fs = new File[files.size()];
+            for (int i = 0; i < files.size(); i++){
+                fs[i] = files.get(i);
+            }
+            this.openFiles(fs);
+        }
+    }
 
     /**
      * Open script files
@@ -339,7 +363,22 @@ public class EditorDockable extends DefaultSingleCDockable {
         if (!isExist) {
             TextEditor editor = addNewTextEditor(file.getName());
             editor.openFile(file);
+            this.parent.getOptions().addRecentFile(file.getAbsolutePath());
         }
+    }
+    
+    /**
+     * Get opened file names
+     * @return Opened file names
+     */
+    public List<String> getOpenedFiles(){
+        List<String> fns = new ArrayList<>();
+        for (int i = 0; i < this.tabbedPanel.getTabCount(); i++) {
+            TextEditor te = (TextEditor) this.tabbedPanel.getComponentAt(i);
+            fns.add(te.getFileName());
+        }
+        
+        return fns;
     }
 
     /**
