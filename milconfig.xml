@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
+  <Path OpenPath="C:\TEMP\grads2arl">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
+    <RecentFolder Folder="C:\TEMP\grads2arl"/>
+    <RecentFolder Folder="C:\TEMP"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\webmap_1.py"/>
+      <OpenedFile File="C:\TEMP\grads2arl\read_test.py"/>
+      <OpenedFile File="C:\TEMP\grads2arl\test-1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\webmap_1.py"/>
+      <RecentFile File="C:\TEMP\grads2arl\read_test.py"/>
+      <RecentFile File="C:\TEMP\grads2arl\test-1.py"/>
     </RecentFiles>
   </File>
   <Font>

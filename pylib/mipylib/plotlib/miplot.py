@@ -5229,7 +5229,7 @@ def webmap(provider='OpenStreetMap', order=0):
     Add a new web map layer.
     
     :param provider: (*string*) Web map provider.
-    :param order: (*int) Layer order.
+    :param order: (*int*) Layer order.
     
     :returns: Web map layer
     '''
