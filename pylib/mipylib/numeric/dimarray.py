@@ -19,6 +19,7 @@ import math
 import datetime
 import mipylib.miutil as miutil
 from java.lang import Double
+from java.util import ArrayList
 
 nan = Double.NaN
 
@@ -675,7 +676,10 @@ class DimArray():
         else:
             x = self.dims[1].getDimValue()
             y = self.dims[0].getDimValue()
-            r = DimArray(self.array.maskout(mask, x, y), self.dims, self.fill_value, self.proj)
+            if not isinstance(mask, (list, ArrayList)):
+                mask = [mask]
+            r = ArrayMath.maskout(self.asarray(), x, y, mask)
+            r = DimArray(MIArray(r), self.dims, self.fill_value, self.proj)
             return r
      
     def aslist(self):
