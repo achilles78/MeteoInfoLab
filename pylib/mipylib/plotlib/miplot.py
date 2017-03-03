@@ -2964,7 +2964,7 @@ def axism(limits=None):
             ymax = limits[3]
             extent = Extent(xmin, xmax, ymin, ymax)
             gca.setLonLatExtent(extent)
-            gca.setExtent(extent.clone())
+            gca.setExtent(gca.getDrawExtent().clone())
             draw_if_interactive()
         else:
             print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
