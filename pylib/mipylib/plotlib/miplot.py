@@ -2110,11 +2110,11 @@ def twinx(ax):
 
 def xaxis(ax=None, **kwargs):
     """
-    Set y axis of the axes.
+    Set x axis of the axes.
     
     :param ax: The axes.
-    :param color: (*Color*) Color of the y axis. Default is 'black'.
-    :param shift: (*int) Y axis shif along x direction. Units is pixel. Default is 0.
+    :param color: (*Color*) Color of the x axis. Default is 'black'.
+    :param shift: (*int) X axis shif along x direction. Units is pixel. Default is 0.
     """
     if ax is None:
         ax = gca
@@ -2920,6 +2920,9 @@ def text(x, y, s, **kwargs):
         if not linewidth is None:
             text.setNeatlineSize(linewidth)
             text.setDrawNeatline(True)
+        gap = bbox.pop('gap', None)
+        if not gap is None:
+            text.setGap(gap)
     coordinates = kwargs.pop('coordinates', 'data')
     text.setCoordinates(coordinates)
     if coordinates == 'figure':
