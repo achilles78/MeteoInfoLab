@@ -129,36 +129,34 @@ class DimVariable():
                 sidx = 0 if k.start is None else k.start
                 eidx = self.dimlen(i)-1 if k.stop is None else k.stop
                 step = 1 if k.step is None else k.step
-            elif isinstance(k, tuple):
-                onlyrange = False
-                isrange = False
-                ranges.append(k)
             elif isinstance(k, list):
-                dim = self.variable.getDimension(i)
-                sv = k[0]
-                if isinstance(sv, datetime.datetime):
-                    sv = miutil.date2num(sv)
-                dim = self.variable.getDimension(i)
-                sidx = dim.getValueIndex(sv)
-                if len(k) == 1:
-                    eidx = sidx
-                    step = 1
+                if not isinstance(k[0], datetime.datetime):
+                    onlyrange = False
+                    isrange = False
+                    ranges.append(k)
                 else:
-                    ev = k[1]
-                    if isinstance(ev, datetime.datetime):
-                        ev = miutil.date2num(ev)
-                    eidx = dim.getValueIndex(ev)
-                    if len(k) == 2:
+                    dim = self.variable.getDimension(i)
+                    sv = k[0]
+                    sv = miutil.date2num(sv)
+                    dim = self.variable.getDimension(i)
+                    sidx = dim.getValueIndex(sv)
+                    if len(k) == 1:
+                        eidx = sidx
                         step = 1
                     else:
-                        nv = k[2]
-                        if isinstance(nv, datetime.timedelta):
+                        ev = k[1]
+                        ev = miutil.date2num(ev)
+                        eidx = dim.getValueIndex(ev)
+                        if len(k) == 2:
+                            step = 1
+                        else:
+                            nv = k[2]
                             nv = miutil.date2num(k[0] + k[2]) - sv
-                        step = int(nv / dim.getDeltaValue())
-                    if sidx > eidx:
-                        iidx = eidx
-                        eidx = sidx
-                        sidx = iidx
+                            step = int(nv / dim.getDeltaValue())
+                        if sidx > eidx:
+                            iidx = eidx
+                            eidx = sidx
+                            sidx = iidx
             elif isinstance(k, basestring):
                 dim = self.variable.getDimension(i)
                 kvalues = k.split(':')

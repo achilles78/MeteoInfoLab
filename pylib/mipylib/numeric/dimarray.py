@@ -70,7 +70,7 @@ class DimArray():
         
         if len(indices) != self.ndim:
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
-            return None
+            raise IndexError()
             
         if not self.proj is None and not self.proj.isLonLat():
             xlim = None
@@ -132,35 +132,33 @@ class DimArray():
                 sidx = 0 if k.start is None else k.start
                 eidx = self.dims[i].getLength()-1 if k.stop is None else k.stop-1
                 step = 1 if k.step is None else k.step
-            elif isinstance(k, tuple):
-                onlyrange = False
-                isrange = False
-                ranges.append(k)
             elif isinstance(k, list):
-                sv = k[0]
-                if isinstance(sv, datetime.datetime):
-                    sv = miutil.date2num(sv)
-                dim = self.dims[i]
-                sidx = dim.getValueIndex(sv)
-                if len(k) == 1:
-                    eidx = sidx
-                    step = 1
+                if not isinstance(k[0], datetime.datetime):
+                    onlyrange = False
+                    isrange = False
+                    ranges.append(k)
                 else:
-                    ev = k[1]
-                    if isinstance(ev, datetime.datetime):
-                        ev = miutil.date2num(ev)
-                    eidx = dim.getValueIndex(ev)
-                    if len(k) == 2:
+                    sv = k[0]
+                    sv = miutil.date2num(sv)
+                    dim = self.dims[i]
+                    sidx = dim.getValueIndex(sv)
+                    if len(k) == 1:
+                        eidx = sidx
                         step = 1
                     else:
-                        nv = k[2]
-                        if isinstance(nv, datetime.timedelta):
+                        ev = k[1]
+                        ev = miutil.date2num(ev)
+                        eidx = dim.getValueIndex(ev)
+                        if len(k) == 2:
+                            step = 1
+                        else:
+                            nv = k[2]
                             nv = miutil.date2num(k[0] + k[2]) - sv
-                        step = int(nv / dim.getDeltaValue())
-                    if sidx > eidx:
-                        iidx = eidx
-                        eidx = sidx
-                        sidx = iidx
+                            step = int(nv / dim.getDeltaValue())
+                        if sidx > eidx:
+                            iidx = eidx
+                            eidx = sidx
+                            sidx = iidx
             elif isinstance(k, basestring):
                 dim = self.dims[i]
                 kvalues = k.split(':')
@@ -180,7 +178,7 @@ class DimArray():
                         sidx = iidx
             else:                
                 print k
-                return None
+                raise IndexError()
                 
             if isrange:
                 if sidx >= self.shape[i]:

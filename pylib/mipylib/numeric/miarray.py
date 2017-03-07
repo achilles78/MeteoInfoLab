@@ -78,7 +78,7 @@ class MIArray(object):
         
         if len(indices) != self.ndim:
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
-            return None
+            raise IndexError()
 
         ranges = []
         flips = []
@@ -378,6 +378,16 @@ class MIArray(object):
         Convert to a list
         '''
         return ArrayMath.asList(self.array)
+        
+    def index(self, v):
+        '''
+        Get index of a value in the array.
+        
+        :param v: (*object*) Value object.
+        
+        :returns: (*int*) Value index.
+        '''
+        return self.tolist().index(v)
         
     def asarray(self):
         return self.array

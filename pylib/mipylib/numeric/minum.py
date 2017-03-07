@@ -37,6 +37,8 @@ from miarray import MIArray
 #from milayer import MILayer
 import mitable
 from mitable import PyTableData
+import series
+from series import Series
 
 from java.awt import Color
 from java.lang import Math, Double
@@ -55,7 +57,7 @@ __all__ = [
     'pi','e','inf','nan','addtimedim','arange','arange1',    
     'array','asarray','asciiread','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','binread','binwrite','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','diag','dim_array','dot','exp','eye','fmax','fmin',
+    'corrcoef','cos','diag','dim_array','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isgriddata','isstationdata','joinncfile','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','meshgrid','minimum','monthname',
@@ -524,6 +526,15 @@ def dim_array(a, dims):
     :returns: (*DimArray*) Dimension array.
     '''
     return DimArray(a, dims)
+    
+def series(data, index=None):
+    '''
+    One-dimensional array with axis labels (including time series).
+        
+    :param data: (*array_like*) One-dimensional array data.
+    :param index: (*list*) Data index list. Values must be unique and hashable, same length as data.
+    '''
+    return Series(data, index)
     
 def arange(*args):
     """
@@ -1693,37 +1704,6 @@ def asgridarray(data, x=None, y=None, fill_value=-9999.0):
 def asstationdata(data, x, y, fill_value=-9999.0):
     stdata = StationData(data.asarray(), x.asarray(), y.asarray(), fill_value)
     return PyStationData(stdata)
-        
-def shaperead(fn):   
-    '''
-    Returns a layer readed from a shape file.
-    
-    :param fn: (*string*) The shape file name (.shp).
-    
-    :returns: (*MILayer*) The created layer.
-    '''
-    if os.path.exists(fn):        
-        try:
-            layer = MILayer(MapDataManage.loadLayer(fn))
-            lb = layer.legend().getLegendBreaks()[0]
-            if lb.getBreakType() == BreakTypes.PolygonBreak:
-                lb.setDrawFill(False)
-            return layer
-        except:
-            raise
-    else:
-        print 'File not exists: ' + fn
-        raise
-    
-def georead(fn):
-    '''
-    Returns a layer readed from a supported geo-data file.
-    
-    :param fn: (*string*) The supported geo-data file name (shape file, wmp, geotiff, image, bil...).
-    
-    :returns: (*MILayer*) The created layer.
-    '''
-    return shaperead(fn)
     
 def polygon(x, y = None):
     '''

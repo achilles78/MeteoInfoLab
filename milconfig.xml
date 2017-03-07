@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis">
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\onedim"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
-    <RecentFolder Folder="C:\TEMP\grads2arl"/>
-    <RecentFolder Folder="C:\TEMP"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
-    <RecentFolder Folder="C:\TEMP\mingjing"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\scatter"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\test"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\verification"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="C:\TEMP\mingjing\plot_satellite precipitation_wind_loop-1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\tostation.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\tostation_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\tostation_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\tutorial.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\xy_1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="C:\TEMP\mingjing\plot_satellite precipitation_wind_loop-1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\tostation.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\tostation_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\tostation_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\tutorial.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\xy_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="124,47" MainFormSize="1369,767"/>
+  <Startup MainFormLocation="123,48" MainFormSize="1370,766"/>
 </MeteoInfo>

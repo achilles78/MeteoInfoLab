@@ -11,7 +11,7 @@ from org.meteoinfo.shape import PolygonShape, ShapeTypes
 from java.util import Date, Calendar
 from java.awt import Font
 from datetime import datetime
-import mipylib.miutil
+import mipylib.miutil as miutil
 
 class MILayer():
     def __init__(self, layer=None, shapetype=None):

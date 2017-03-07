@@ -1250,7 +1250,7 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
                     pbs.append(npb)
         #Create graphics
         graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
-        ls = obs
+        ls = pbs
     
     if gca is None:
         plot = XY2DPlot()

@@ -23,8 +23,8 @@ from mipylib.numeric.dimarray import DimArray
 from java.util import ArrayList
 
 __all__ = [
-    'arrayinpolygon','distance','georead','geotiffread','inpolygon','maskout','polyarea','polygon','rmaskout',
-    'shaperead'
+    'arrayinpolygon','distance','georead','geotiffread','maplayer','inpolygon','maskout',
+    'polyarea','polygon','rmaskout','shaperead'
     ]
 
 def shaperead(fn):   
@@ -38,9 +38,10 @@ def shaperead(fn):
     if os.path.exists(fn):        
         try:
             layer = MILayer(MapDataManage.loadLayer(fn))
-            lb = layer.legend().getLegendBreaks()[0]
-            if lb.getBreakType() == BreakTypes.PolygonBreak:
-                lb.setDrawFill(False)
+            if not layer.legend() is None:
+                lb = layer.legend().getLegendBreaks()[0]
+                if lb.getBreakType() == BreakTypes.PolygonBreak:
+                    lb.setDrawFill(False)
             return layer
         except:
             raise
@@ -70,6 +71,14 @@ def geotiffread(filename):
     geotiff.read()
     r = geotiff.readArray()
     return MIArray(r)
+    
+def maplayer(shapetype='polygon'):
+    '''
+    Create a new map layer.
+    
+    :param shapetype: (*string*) Shape type of the layer. ['point' | 'line' | 'polygon'].
+    '''
+    return MILayer(shapetype=shapetype)
     
 def polygon(x, y = None):
     '''
