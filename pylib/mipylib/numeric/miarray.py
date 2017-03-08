@@ -368,16 +368,15 @@ class MIArray(object):
         return MIArray(ArrayMath.log10(self.array))
             
     def aslist(self):
-        r = []
-        for i in range(self.array.getSize()):
-            r.append(self.array.getObject(i))
-        return r
+        r = ArrayMath.asList(self.array)
+        return list(r)
         
     def tolist(self):
         '''
         Convert to a list
         '''
-        return ArrayMath.asList(self.array)
+        r = ArrayMath.asList(self.array)
+        return list(r)
         
     def index(self, v):
         '''

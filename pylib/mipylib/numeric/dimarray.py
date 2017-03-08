@@ -689,6 +689,16 @@ class DimArray():
         '''
         return self.array.tolist()
         
+    def index(self, v):
+        '''
+        Get index of a value in the array.
+        
+        :param v: (*object*) Value object.
+        
+        :returns: (*int*) Value index.
+        '''
+        return self.tolist().index(v)
+        
     def asarray(self):
         return self.array.array
         
