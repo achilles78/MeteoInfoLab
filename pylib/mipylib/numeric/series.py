@@ -5,6 +5,8 @@
 # Note: Jython
 #-----------------------------------------------------
 
+from org.meteoinfo.data import ArrayUtil
+
 import miarray
 from miarray import MIArray
 import dimarray
@@ -28,8 +30,8 @@ class Series(object):
         self.data = data
         if index is None:
             index = range(0, len(data))
-        if isinstance(index, (list, tuple)):
-            index = minum.array(index)
+        # if isinstance(index, (list, tuple)):
+            # index = minum.array(index)
         elif isinstance(index, DimArray):
             index = index.array
         self._index = index
@@ -39,8 +41,8 @@ class Series(object):
         return self._index
         
     def set_index(self, value):
-        if isinstance(value, (list, tuple)):
-            value = minum.array(value)
+        # if isinstance(value, (list, tuple)):
+            # value = minum.array(value)
         self._index = value
         
     index = property(get_index, set_index)
@@ -49,16 +51,17 @@ class Series(object):
         ikey = self.__getkey(key)
         rdata = self.data.__getitem__(ikey)
         if isinstance(rdata, (list, MIArray, DimArray)):
-            rindex = self.index.__getitem__(ikey)
+            if isinstance(self.index, list) and isinstance(ikey, list):
+                rindex = ArrayUtil.subList(self.index, ikey)
+            else:
+                rindex = self.index.__getitem__(ikey)
             if isinstance(key, (list, MIArray, DimArray)) and isinstance(key[0], basestring):
                 if len(rindex) < len(key):
-                    nrdata = []
-                    for k in key:
-                        if k in rindex:
-                            nrdata.append(rdata[rindex.index(k)])
-                        else:
-                            nrdata.append(nan)
-                    rdata = nrdata
+                    if isinstance(key, (MIArray, DimArray)):
+                        key = key.tolist()
+                    if isinstance(rindex, (MIArray, DimArray)):
+                        rindex = rindex.tolist()
+                    rdata = MIArray(ArrayUtil.fillKeyList(key, rindex, rdata.asarray()))   
             r = Series(rdata, key)
             return r
         else:
@@ -75,13 +78,16 @@ class Series(object):
             except:
                 raise KeyError(key)
         elif isinstance(key, (list, tuple, MIArray, DimArray)) and isinstance(key[0], basestring):
-            nkey = []
-            for k in key:
-                if k in self.index:
-                    nkey.append(self.index.index(k))
-            if len(nkey) == 0:
+            if isinstance(key, (MIArray, DimArray)):
+                key = key.asarray()
+            ii = self.index
+            if isinstance(ii, (MIArray, DimArray)):
+                ii = ii.tolist()
+            key = ArrayUtil.getIndices(ii, key)            
+            if len(key) == 0:
                 raise KeyError()
-            key = nkey
+            else:
+                key = list(key)
         return key
         
     def __iter__(self):
