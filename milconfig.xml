@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\fitting">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
@@ -15,13 +15,11 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\poly_fit.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm_clabel.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\pow_fit-1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\poly_fit.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm_clabel.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\pow_fit-1.py"/>
     </RecentFiles>
   </File>
   <Font>

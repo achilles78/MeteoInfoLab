@@ -106,4 +106,9 @@ def predict(func, x):
     
     :returns: (*float*) y value.
     '''
-    return func.predict(x)
+    if isinstance(x, (int, float, long)):
+        return func.predict(x)
+        
+    if isinstance(x, list):
+        x = MIArray(ArrayUtil.array(x))
+    return MIArray(FittingUtil.predict(x.asarray(), func))
