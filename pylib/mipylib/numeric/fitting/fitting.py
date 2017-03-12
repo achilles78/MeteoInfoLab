@@ -7,14 +7,15 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.math.fitting import FittingUtil
+from org.meteoinfo.data import ArrayMath, ArrayUtil
 
 from mipylib.numeric.miarray import MIArray
 
 __all__ = [
-    'power_fit', 'exp_fit','poly_fit','predict'
+    'powerfit', 'expfit','polyfit','polyval','predict'
     ]
 
-def power_fit(x, y, func=False):
+def powerfit(x, y, func=False):
     '''
     Power law fitting.
     
@@ -25,16 +26,16 @@ def power_fit(x, y, func=False):
     :returns: Fitting parameters and function (optional).
     '''
     if isinstance(x, list):
-        x = minum.array(x)
+        x = MIArray(ArrayUtil.array(x))
     if isinstance(y, list):
-        y = minum.array(y)
+        y = MIArray(ArrayUtil.array(y))
     r = FittingUtil.powerFit(x.asarray(), y.asarray())
     if func:
         return r[0], r[1], r[2], r[3]
     else:
         return r[0], r[1], r[2]
         
-def exp_fit(x, y, func=False):
+def expfit(x, y, func=False):
     '''
     Exponent fitting.
     
@@ -45,16 +46,16 @@ def exp_fit(x, y, func=False):
     :returns: Fitting parameters and function (optional).
     '''
     if isinstance(x, list):
-        x = minum.array(x)
+        x = MIArray(ArrayUtil.array(x))
     if isinstance(y, list):
-        y = minum.array(y)
+        y = MIArray(ArrayUtil.array(y))
     r = FittingUtil.expFit(x.asarray(), y.asarray())
     if func:
         return r[0], r[1], r[2], r[3]
     else:
         return r[0], r[1], r[2]
         
-def poly_fit(x, y, degree, func=False):
+def polyfit(x, y, degree, func=False):
     '''
     Polynomail fitting.
     
@@ -65,14 +66,36 @@ def poly_fit(x, y, degree, func=False):
     :returns: Fitting parameters and function (optional).
     '''
     if isinstance(x, list):
-        x = minum.array(x)
+        x = MIArray(ArrayUtil.array(x))
     if isinstance(y, list):
-        y = minum.array(y)
+        y = MIArray(ArrayUtil.array(y))
     r = FittingUtil.polyFit(x.asarray(), y.asarray(), degree)
     if func:
         return r[0], r[1], r[2]
     else:
         return r[0], r[1]
+        
+def polyval(p, x):
+    """
+    Evaluate a polynomial at specific values.
+    
+    If p is of length N, this function returns the value:
+    
+    p[0]*x**(N-1) + p[1]*x**(N-2) + ... + p[N-2]*x + p[N-1]
+    
+    If x is a sequence, then p(x) is returned for each element of x. If x is another polynomial then the 
+    composite polynomial p(x(t)) is returned.
+    
+    :param p: (*array_like*) 1D array of polynomial coefficients (including coefficients equal to zero) 
+        from highest degree to the constant term.
+    :param x: (*array_like*) A number, an array of numbers, or an instance of poly1d, at which to evaluate 
+        p.
+        
+    :returns: Polynomial value
+    """
+    if isinstance(x, list):
+        x = MIArray(ArrayUtil.array(x))
+    return MIArray(ArrayMath.polyVal(p, x.asarray()))
     
 def predict(func, x):
     '''
