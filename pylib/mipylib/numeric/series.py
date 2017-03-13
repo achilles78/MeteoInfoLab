@@ -50,7 +50,7 @@ class Series(object):
     def __getitem__(self, key):
         ikey = self.__getkey(key)
         rdata = self.data.__getitem__(ikey)
-        if isinstance(rdata, (list, MIArray, DimArray)):
+        if isinstance(key, (list, MIArray, DimArray)):
             if isinstance(self.index, list) and isinstance(ikey, list):
                 rindex = ArrayUtil.subList(self.index, ikey)
             else:
@@ -61,7 +61,9 @@ class Series(object):
                         key = key.tolist()
                     if isinstance(rindex, (MIArray, DimArray)):
                         rindex = rindex.tolist()
-                    rdata = MIArray(ArrayUtil.fillKeyList(key, rindex, rdata.asarray()))   
+                    if not isinstance(rdata, (MIArray, DimArray)):
+                        rdata = minum.array(rdata)
+                    rdata = MIArray(ArrayUtil.fillKeyList(key, rindex, rdata.asarray()))                    
             r = Series(rdata, key)
             return r
         else:
