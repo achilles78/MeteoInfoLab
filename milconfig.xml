@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\micaps">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\fitting">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\micaps"/>
@@ -14,14 +14,18 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\series_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\series_micaps1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_ave.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\poly_fit-2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\pow_fit.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\poly_fit.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\exp_fit.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\pow_fit-1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\array\series_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\array\series_micaps1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_ave.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\poly_fit-2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\pow_fit.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\poly_fit.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\exp_fit.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\fitting\pow_fit-1.py"/>
     </RecentFiles>
   </File>
   <Font>
