@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\micaps">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\micaps"/>
@@ -11,13 +10,18 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\2017\事务\国家野外台站十三五发展规划\New\plot_station.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\series_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\series_micaps1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_ave.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\2017\事务\国家野外台站十三五发展规划\New\plot_station.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\series_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\series_micaps1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_ave.py"/>
     </RecentFiles>
   </File>
   <Font>

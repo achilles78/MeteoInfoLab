@@ -5,7 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.data import ArrayUtil
+from org.meteoinfo.data import SeriesUtil
 
 import miarray
 from miarray import MIArray
@@ -30,10 +30,13 @@ class Series(object):
         self.data = data
         if index is None:
             index = range(0, len(data))
+        else:
+            if len(data) != len(index):
+                raise ValueError('Wrong length of index!')
         # if isinstance(index, (list, tuple)):
             # index = minum.array(index)
-        elif isinstance(index, DimArray):
-            index = index.array
+        if isinstance(index, (MIArray, DimArray)):
+            index = index.tolist()
         self._index = index
         
     #---- Index property
@@ -48,49 +51,57 @@ class Series(object):
     index = property(get_index, set_index)
         
     def __getitem__(self, key):
-        ikey = self.__getkey(key)
+        rr = self.__getkey(key)
+        ikey = rr[0]
         rdata = self.data.__getitem__(ikey)
-        if isinstance(key, (list, MIArray, DimArray)):
-            if isinstance(self.index, list) and isinstance(ikey, list):
-                rindex = ArrayUtil.subList(self.index, ikey)
-            else:
-                rindex = self.index.__getitem__(ikey)
-            if isinstance(key, (list, MIArray, DimArray)) and isinstance(key[0], basestring):
-                if len(rindex) < len(key):
-                    if isinstance(key, (MIArray, DimArray)):
-                        key = key.tolist()
-                    if isinstance(rindex, (MIArray, DimArray)):
-                        rindex = rindex.tolist()
-                    if not isinstance(rdata, (MIArray, DimArray)):
-                        rdata = minum.array(rdata)
-                    rdata = MIArray(ArrayUtil.fillKeyList(key, rindex, rdata.asarray()))                    
-            r = Series(rdata, key)
-            return r
-        else:
+        if isinstance(ikey, int): 
             return rdata
+        else: 
+            rindex = rr[1]
+            if rindex is None:
+                rindex = self.index.__getitem__(ikey)
+            else:
+                if len(rr) == 4:
+                    rfdata = rr[2]
+                    rindex = list(rr[3])
+                    rdata = MIArray(SeriesUtil.fillKeyList(rdata.asarray(), rfdata))
+            r = Series(rdata, rindex)
+            return r
         
     def __setitem__(self, key, value):
-        key = self.__getkey(key)
-        self.data.__setitem__(key, value)
+        ikey = self.__getkey(key)[0]
+        self.data.__setitem__(ikey, value)
     
     def __getkey(self, key):
+        ii = self.index
+        if isinstance(ii, (MIArray, DimArray)):
+            ii = ii.tolist()
         if isinstance(key, basestring):
-            try:
-                key = self.index.index(key)
-            except:
+            rkey = SeriesUtil.getIndices(ii, key)
+            ikey = rkey[0]
+            rindex = rkey[1]
+            if len(ikey) == 1:
+                ikey = ikey[0]
+            elif len(ikey) > 1:
+                ikey = list(ikey)
+            else:
                 raise KeyError(key)
+            return ikey, rindex
         elif isinstance(key, (list, tuple, MIArray, DimArray)) and isinstance(key[0], basestring):
             if isinstance(key, (MIArray, DimArray)):
-                key = key.asarray()
-            ii = self.index
-            if isinstance(ii, (MIArray, DimArray)):
-                ii = ii.tolist()
-            key = ArrayUtil.getIndices(ii, key)            
-            if len(key) == 0:
+                key = key.asarray()            
+            rkey = SeriesUtil.getIndices(ii, key)
+            ikey = rkey[0]
+            rindex = rkey[1]
+            rdata = rkey[2]
+            rrindex = rkey[3]
+            if len(ikey) == 0:
                 raise KeyError()
             else:
-                key = list(key)
-        return key
+                ikey = list(ikey)
+            return ikey, rindex, rdata, rrindex
+        else:
+            return key, None
         
     def __iter__(self):
         """
