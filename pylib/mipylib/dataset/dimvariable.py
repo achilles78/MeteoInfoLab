@@ -122,12 +122,18 @@ class DimVariable():
             dimlen = self.dimlen(i)
             k = indices[i]
             if isinstance(k, int):
+                if k < 0:
+                    k = self.dims[i].getLength() + k
                 sidx = k
                 eidx = k
                 step = 1
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.dimlen(i) + sidx
                 eidx = self.dimlen(i)-1 if k.stop is None else k.stop
+                if eidx < 0:
+                    eidx = self.dimlen(i) + eidx
                 step = 1 if k.step is None else k.step
             elif isinstance(k, list):
                 if not isinstance(k[0], datetime.datetime):

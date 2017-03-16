@@ -87,12 +87,18 @@ class MIArray(object):
         for i in range(0, self.ndim):  
             k = indices[i]
             if isinstance(k, int):
+                if k < 0:
+                    k = self.getshape()[i] + k
                 sidx = k
                 eidx = k
                 step = 1
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.getshape()[i] + sidx
                 eidx = self.getshape()[i]-1 if k.stop is None else k.stop-1
+                if eidx < 0:
+                    eidx = self.getshape()[i] + eidx
                 step = 1 if k.step is None else k.step
             elif isinstance(k, (list, tuple, MIArray)):
                 if isinstance(k, MIArray):

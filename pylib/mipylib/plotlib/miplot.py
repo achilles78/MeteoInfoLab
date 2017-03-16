@@ -2118,9 +2118,11 @@ def xaxis(ax=None, **kwargs):
     """
     if ax is None:
         ax = gca
+    visible = kwargs.pop('visible', True)
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
+    tickvisible = kwargs.pop('tickvisible', True)
     minortick = kwargs.pop('minortick', False)
     tickin = kwargs.pop('tickin', True)
     axistype = kwargs.pop('axistype', None)
@@ -2138,11 +2140,19 @@ def xaxis(ax=None, **kwargs):
         font = Font(tickfontname, Font.BOLD, tickfontsize)
     else:
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    locs = [Location.BOTTOM, Location.TOP]
-    for loc in locs:
+    location = kwargs.pop('location', 'both')
+    if location == 'top':
+        locs = [Location.TOP]
+    elif location == 'bottom':
+        locs = [Location.BOTTOM]
+    else:
+        locs = [Location.BOTTOM, Location.TOP]
+    for loc in locs:    
         axis = ax.getAxis(loc)
+        axis.setVisible(visible)
         axis.setShift(shift)
         axis.setColor_All(c)
+        axis.setDrawTickLine(tickvisible)
         axis.setMinorTickVisible(minortick)
         axis.setInsideTick(tickin)
         axis.setTickLabelFont(font)
@@ -2158,9 +2168,11 @@ def yaxis(ax=None, **kwargs):
     """
     if ax is None:
         ax = gca
+    visible = kwargs.pop('visible', True)
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
+    tickvisible = kwargs.pop('tickvisible', True)
     minortick = kwargs.pop('minortick', False)
     tickin = kwargs.pop('tickin', True)
     axistype = kwargs.pop('axistype', None)
@@ -2178,11 +2190,19 @@ def yaxis(ax=None, **kwargs):
         font = Font(tickfontname, Font.BOLD, tickfontsize)
     else:
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    locs = [Location.LEFT, Location.RIGHT]
+    location = kwargs.pop('location', 'both')
+    if location == 'left':
+        locs = [Location.LEFT]
+    elif location == 'right':
+        locs = [Location.RIGHT]
+    else:
+        locs = [Location.LEFT, Location.RIGHT]
     for loc in locs:
         axis = ax.getAxis(loc)
+        axis.setVisible(visible)
         axis.setShift(shift)
         axis.setColor_All(c)
+        axis.setDrawTickLine(tickvisible)
         axis.setMinorTickVisible(minortick)
         axis.setInsideTick(tickin)
         axis.setTickLabelFont(font)

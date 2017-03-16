@@ -125,12 +125,18 @@ class DimArray():
             isrange = True
             k = indices[i]
             if isinstance(k, int):
+                if k < 0:
+                    k = self.dims[i].getLength() + k
                 sidx = k
                 eidx = k
                 step = 1                
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.dims[i].getLength() + sidx
                 eidx = self.dims[i].getLength()-1 if k.stop is None else k.stop-1
+                if eidx < 0:
+                    eidx = self.dims[i].getLength() + eidx
                 step = 1 if k.step is None else k.step
             elif isinstance(k, list):
                 if not isinstance(k[0], datetime.datetime):
