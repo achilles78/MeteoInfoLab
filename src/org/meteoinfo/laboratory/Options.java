@@ -35,6 +35,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -375,7 +376,7 @@ public class Options {
             String size = startForm.getAttributes().getNamedItem("MainFormSize").getNodeValue();
             this.mainFormSize.width = Integer.parseInt(size.split(",")[0]);
             this.mainFormSize.height = Integer.parseInt(size.split(",")[1]);
-        } catch (Exception e) {
+        } catch (DOMException | NumberFormatException e) {
         }
     }
     // </editor-fold>

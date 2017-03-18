@@ -1082,7 +1082,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public void setCurrentPath(String path) {
         this.options.setCurrentFolder(path);
         List<String> paths = new ArrayList<>();
-        if (this.jComboBox_CurrentFolder.getItemCount() > 10) {
+        if (this.jComboBox_CurrentFolder.getItemCount() > 15) {
             this.jComboBox_CurrentFolder.removeItemAt(0);
         }
         for (int i = 0; i < this.jComboBox_CurrentFolder.getItemCount(); i++) {
