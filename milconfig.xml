@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\math">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
@@ -15,15 +15,11 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\kendalltau.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\corrcoef.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\corrcoef-spatial.py"/>
-      <OpenedFile File=""/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp2d_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\kendalltau.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\math\corrcoef.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\math\corrcoef-spatial.py"/>
-      <RecentFile File=""/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp2d_1.py"/>
     </RecentFiles>
   </File>
   <Font>
