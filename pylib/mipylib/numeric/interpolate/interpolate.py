@@ -14,7 +14,7 @@ from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 
 __all__ = [
-    'interp1d','interp2d'
+    'interp1d','RectBivariateSpline'
     ]
 
 class interp1d(object):
@@ -22,11 +22,9 @@ class interp1d(object):
     Interpolate a 1-D function.
     
     :param x: (*array_like*) A 1-D array of real values.
-    :param y: (*array_like*) A N-D array of real values. The length of y along the interpolation 
-        axis must be equal to the length of x.
+    :param y: (*array_like*) A 1-D array of real values. The length of y must be equal to the length of x.
     :param kind: (*boolean*) Specifies the kind of interpolation as a string (‘linear’, 
-        ‘cubic’) or as an integer specifying the order of the spline interpolator to use. 
-        Default is ‘linear’.
+        ‘cubic’,‘akima’,‘divided’,‘loess’,‘neville’). Default is ‘linear’.
     '''
     def __init__(self, x, y, kind='linear'):        
         if isinstance(x, list):
@@ -51,32 +49,24 @@ class interp1d(object):
         else:
             return MIArray(r)
             
-class interp2d(object):
+class RectBivariateSpline(object):
     '''
-    Interpolate over a 2-D grid.
+    Bivariate spline approximation over a rectangular mesh.
     
-    x, y and z are arrays of values used to approximate some function f: z = f(x, y). This class 
-    returns a function whose call method uses spline interpolation to find the value of new 
-    points.
+    Can be used for both smoothing and interpolating data.
     
-    Note that calling interp2d with NaNs present in input values results in undefined behaviour.
-    
-    :param x: (*array_like*) A 1-D array of real values.
-    :param y: (*array_like*) A N-D array of real values. The length of y along the interpolation 
-        axis must be equal to the length of x.
-    :param z: (*array_like*) The values of the function to interpolate at the data points.
-    :param kind: (*boolean*) Specifies the kind of interpolation as a string (‘linear’, 
-        ‘cubic’) or as an integer specifying the order of the spline interpolator to use. 
-        Default is ‘linear’.
+    :param x: (*array_like*) 1-D arrays of x coordinate in strictly ascending order.
+    :param y: (*array_like*) 1-D arrays of y coordinate in strictly ascending order.
+    :param z: (*array_like*) 2-D array of data with shape (x.size,y.size).
     '''
-    def __init__(self, x, y, z, kind='linear'):        
+    def __init__(self, x, y, z):        
         if isinstance(x, list):
             x = MIArray(ArrayUtil.array(x))
         if isinstance(y, list):
             y = MIArray(ArrayUtil.array(y))
         if isinstance(z, list):
             z = MIArray(ArrayUtil.array(z))
-        self._func = InterpUtil.getInterpFunc(x.asarray(), y.asarray(), z.asarray(), kind)
+        self._func = InterpUtil.getBiInterpFunc(x.asarray(), y.asarray(), z.asarray())
 
     def __call__(self, x, y):
         '''

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
@@ -11,15 +11,21 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
     <RecentFolder Folder="D:\Temp\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\kendalltau.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp2d_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp1d_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\hist_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\kendalltau.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp2d_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp1d_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\hist_1.py"/>
     </RecentFiles>
   </File>
   <Font>

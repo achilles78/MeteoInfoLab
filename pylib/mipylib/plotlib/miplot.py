@@ -3116,13 +3116,16 @@ def legend(*args, **kwargs):
                 for i in range(0, len(lbs)):
                     labels = args[1]
                     lbs[i].setCaption(labels[i])
-            ls = LegendScheme()
-            ls.setLegendBreaks(lbs)
-            if clegend is None:
-                clegend = ChartLegend(ls)
-                plot.setLegend(clegend)
+            if isinstance(lbs[0], basestring):
+                clegend.setTickLabels(lbs)
             else:
-                clegend.setLegendScheme(ls)
+                ls = LegendScheme()
+                ls.setLegendBreaks(lbs)
+                if clegend is None:
+                    clegend = ChartLegend(ls)
+                    plot.setLegend(clegend)
+                else:
+                    clegend.setLegendScheme(ls)
     else:
         if clegend is None:
             clegend = ChartLegend(ls)
