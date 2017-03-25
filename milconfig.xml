@@ -13,19 +13,19 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\kendalltau.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp2d_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp1d_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\hist_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\polar_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\polar_bar_3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\windrose.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\kendalltau.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp2d_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\interp1d_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\hist_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\polar_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\polar_bar_3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\windrose.py"/>
     </RecentFiles>
   </File>
   <Font>

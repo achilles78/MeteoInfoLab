@@ -155,12 +155,18 @@ class MIArray(object):
         flips = []
         for i in range(0, self.ndim):   
             if isinstance(indices[i], int):
+                if indices[i] < 0:
+                    indices[i] = self.getshape()[i]+indices[i]
                 sidx = indices[i]
                 eidx = indices[i]
                 step = 1
             else:
                 sidx = 0 if indices[i].start is None else indices[i].start
+                if sidx < 0:
+                    sidx = self.getshape()[i] + sidx
                 eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop
+                if eidx < 0:
+                    eidx = self.getshape()[i] + eidx
                 step = 1 if indices[i].step is None else indices[i].step
             if step < 0:
                 step = abs(step)

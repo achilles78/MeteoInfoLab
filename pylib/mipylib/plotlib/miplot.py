@@ -14,7 +14,7 @@ from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, 
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, PiePlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
+from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, PiePlot, PolarPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
@@ -63,7 +63,7 @@ if os.path.exists(mapfn):
 
 __all__ = [
     'gca','antialias','axes','axesm','axis','axism','bar','barbs','barbsm','bgcolor','box',
-    'boxplot','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
+    'boxplot','windrose','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
     'contourfm','contourm','currentplot','display','draw_if_interactive','errorbar',
     'figure','fill_between','gca','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
@@ -699,7 +699,8 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     
     #Get plot data style
     if fmt == '':
-        line = __getlegendbreak('line' **kwargs)[0]
+        line = __getlegendbreak('line', **kwargs)[0]
+        line.setCaption(label)
     else:
         line = __getplotstyle(fmt, label, **kwargs)
     
@@ -710,7 +711,10 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     if gca is None:
         plot = XY2DPlot()
     else:
-        plot = gca
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -719,7 +723,7 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None:
+    if gca is None or (not isinstance(gca, XY2DPlot)):
         chart.clearPlots()
         chart.setPlot(plot)
     #chart.setAntiAlias(True)
@@ -854,6 +858,7 @@ def bar(*args, **kwargs):
             xdata.append(i)
     xdata = __getplotdata(xdata)
     ydata = __getplotdata(ydata)
+    width = __getplotdata(width)
     yerr = kwargs.pop('yerr', None)
     if not yerr is None:
         if not isinstance(yerr, (int, float)):
@@ -929,7 +934,7 @@ def bar(*args, **kwargs):
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
-    return lb
+    return barbreaks
     
 def bar_bak(*args, **kwargs):
     """
@@ -1739,6 +1744,51 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     #xticks(minum.arange(1, len(x) + 1, 1))
     draw_if_interactive()
     return graphics
+    
+def windrose(wd, ws, wdbins=None, wsbins=None, degree=False):
+    '''
+    Plot windrose chart.
+    
+    :param wd: (*array_like*) Wind direction.
+    :param ws: (*array_like*) Wind speed.
+    :param wdbins: (*array_like*) Wind direction bins.
+    :param wsbins: (*array_like*) Wind speed bins.
+    :param degree: (*boolean*) The unit of wind direction is degree or radians.
+    '''
+    if wdbins is None:
+        wdbins = minum.linspace(0.0, 2 * minum.pi, 9)
+    if wsbins is None:
+        wsbins = minum.arange(0., 6.1, 1.2).tolist()
+        wsbins.append(100)
+        wsbins = minum.array(wsbins)
+    if isinstance(wd, list):
+        wd = minum.array(wd)
+    if isinstance(ws, list):
+        ws = minum.array(ws)
+        
+    wdN = len(wdbins) - 1
+    wsN = len(wsbins) - 1
+    cols = makecolors(wsN, alpha=0.5)
+    global gca
+    if gca is None:
+        gca = axes(polar=True)
+    else:
+        if not isinstance(gca, PolarPlot):
+            gca = axes(polar=True)
+    theta = minum.ones(wdN)
+    for i in range(wdN):
+        theta[i] = wdbins[i] - minum.pi/wdN/2
+    
+    bars = []
+    for i in range(wsN):
+        idx = minum.where(ws>=wsbins[i] * ws<wsbins[i+1])
+        s_wd = wd[idx]        
+        wdhist = minum.histogram(s_wd, wdbins)[0]
+        wdhist = wdhist / wdN        
+        bb = bar(theta, wdhist, minum.pi/wdN, color=cols[i], edgecolor='gray')
+        bars.append(bb)
+        
+    draw_if_interactive()
  
 def figure(bgcolor=None, figsize=None, newfig=True):
     """
@@ -1836,14 +1886,6 @@ def currentplot(plot_number):
     
     return plot
     
-def gca():
-    """
-    Get current axes.
-    
-    :returns: Current axes.
-    """
-    return gca
-    
 def axes(*args, **kwargs):
     """
     Add an axes to the figure.
@@ -1897,7 +1939,11 @@ def axes(*args, **kwargs):
     yreverse = kwargs.pop('yreverse', False)
     xaxistype = kwargs.pop('xaxistype', None)
     bgcobj = kwargs.pop('bgcolor', None)    
-    plot = XY2DPlot()
+    polar = kwargs.pop('polar', False)
+    if polar:
+        plot = PolarPlot()
+    else:
+        plot = XY2DPlot()
     plot.setPosition(position[0], position[1], position[2], position[3])    
     if bottomaxis == False:
         plot.getAxis(Location.BOTTOM).setVisible(False)
@@ -2132,7 +2178,8 @@ def xaxis(ax=None, **kwargs):
             __setXAxisType(ax, axistype)
         else:
             __setXAxisType(ax, axistype, timetickformat)
-        ax.updateDrawExtent()
+        #ax.updateDrawExtent()
+        ax.setAutoExtent()
     tickfontname = kwargs.pop('tickfontname', 'Arial')
     tickfontsize = kwargs.pop('tickfontsize', 14)
     tickbold = kwargs.pop('tickbold', False)
@@ -2168,7 +2215,7 @@ def yaxis(ax=None, **kwargs):
     """
     if ax is None:
         ax = gca
-    visible = kwargs.pop('visible', True)
+    visible = kwargs.pop('visible', None)
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
@@ -2199,13 +2246,15 @@ def yaxis(ax=None, **kwargs):
         locs = [Location.LEFT, Location.RIGHT]
     for loc in locs:
         axis = ax.getAxis(loc)
-        axis.setVisible(visible)
-        axis.setShift(shift)
-        axis.setColor_All(c)
-        axis.setDrawTickLine(tickvisible)
-        axis.setMinorTickVisible(minortick)
-        axis.setInsideTick(tickin)
-        axis.setTickLabelFont(font)
+        if not visible is None:
+            axis.setVisible(visible)
+        if axis.isVisible():
+            axis.setShift(shift)
+            axis.setColor_All(c)
+            axis.setDrawTickLine(tickvisible)
+            axis.setMinorTickVisible(minortick)
+            axis.setInsideTick(tickin)
+            axis.setTickLabelFont(font)
     draw_if_interactive()
     
 def box(ax=None, on=None):
@@ -3024,11 +3073,16 @@ def grid(b=None, which='major', axis='both', **kwargs):
     if not color is None:
         c = __getcolor(color)
         gridline.setColor(c)
-    linewidth = kwargs.pop('linewidth', 1)
-    gridline.setSize(linewidth)
-    linestyle = kwargs.pop('linestyle', '--')
-    linestyle = __getlinestyle(linestyle)
-    gridline.setStyle(linestyle)
+    linewidth = kwargs.pop('linewidth', None)
+    if not linewidth is None:
+        gridline.setSize(linewidth)
+    linestyle = kwargs.pop('linestyle', None)
+    if not linestyle is None:
+        linestyle = __getlinestyle(linestyle)
+        gridline.setStyle(linestyle)
+    top = kwargs.pop('top', None)
+    if not top is None:
+        gridline.setTop(top)
     draw_if_interactive()
     
 def xlim(xmin, xmax):
@@ -3120,7 +3174,9 @@ def legend(*args, **kwargs):
                 clegend.setTickLabels(lbs)
             else:
                 ls = LegendScheme()
-                ls.setLegendBreaks(lbs)
+                for lb in lbs:
+                    ls.addLegendBreak(lb)
+                #ls.setLegendBreaks(lbs)
                 if clegend is None:
                     clegend = ChartLegend(ls)
                     plot.setLegend(clegend)
@@ -3169,6 +3225,19 @@ def legend(*args, **kwargs):
         font = Font(fontname, Font.PLAIN, fontsize)
     clegend.setLabelFont(font)
     clegend.setLabelColor(labcolor)
+    markerscale = kwargs.pop('markerscale', None)
+    if not markerscale is None:
+        clegend.setSymbolScale(markerscale)
+    markerwidth = kwargs.pop('markerwidth', None)
+    markerheight = kwargs.pop('markerheight', None)
+    if not markerwidth is None:
+        clegend.setSymbolWidth(markerwidth)
+    if not markerheight is None:
+        clegend.setSymbolHeight(markerheight)
+    ncol = kwargs.pop('ncol', None)
+    if not ncol is None:
+        clegend.setColumnNumber(ncol)
+        clegend.setAutoRowColNum(False)
     draw_if_interactive()
     
 def readlegend(fn):

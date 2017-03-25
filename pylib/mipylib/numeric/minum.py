@@ -56,15 +56,15 @@ currentfolder = None
 __all__ = [
     'pi','e','inf','nan','addtimedim','arange','arange1',    
     'array','asarray','asciiread','asgridarray','asgriddata','asin','asmiarray','asstationdata',
-    'atan','atan2','ave_month','binread','binwrite','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','diag','dim_array','series','dot','exp','eye','fmax','fmin',
+    'atan','atan2','ave_month','histogram','binread','binwrite','broadcast_to','cdiff','concatenate',
+    'corrcoef','cos','degrees','diag','dim_array','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isgriddata','isstationdata','joinncfile','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','meshgrid','minimum','monthname',
-    'numasciicol','numasciirow','ones','ones_like','polyval','pow',
-    'power','project','projectxy','projinfo','readtable','reshape',
+    'numasciicol','numasciirow','nonzero','ones','ones_like','polyval','pow',
+    'power','project','projectxy','projinfo','radians','readtable','reshape',
     'rolling_mean','rot90','sin','sort','argsort','sqrt','tan','transpose','trapz','vdot',
-    'zeros','zeros_like'
+    'where','zeros','zeros_like'
     ]
 
 def isgriddata(gdata):
@@ -874,6 +874,36 @@ def pow(x1, x2):
             
 def power(x1, x2):
     return pow(x1, x2)
+    
+def degrees(x):
+    '''
+    Convert radians to degrees.
+    
+    :param x: (*array_like*) Array in radians.
+    
+    :returns: (*array_like*) Array in degrees.
+    '''
+    if isinstance(x, (list, tuple)):
+        x = array(x)
+    if isinstance(x, (DimArray, MIArray)):
+        return MIArray(ArrayMath.toDegrees(x.asarray()))
+    else:
+        return math.degrees(x)
+        
+def radians(x):
+    '''
+    Convert degrees to radians.
+    
+    :param x: (*array_like*) Array in degrees.
+    
+    :returns: (*array_like*) Array in radians.
+    '''
+    if isinstance(x, (list, tuple)):
+        x = array(x)
+    if isinstance(x, (DimArray, MIArray)):
+        return MIArray(ArrayMath.toRadians(x.asarray()))
+    else:
+        return math.radians(x)
 
 def sin(x):
     """
@@ -1257,6 +1287,23 @@ def ave_month(data, colnames, t):
             a.append(d.asarray())
     r = TableUtil.ave_Month(a, colnames, jt)
     return PyTableData(TableData(r))
+    
+def histogram(a, bins=10):
+    '''
+    Compute the histogram of a set of data.
+    
+    :param a: (*array_like*) Input data. The histogram is computed over the flattened array.
+    :param bins: (*int or list*) If bins is an int, it defines the number of equal-width bins in the given 
+        range (10, by default). If bins is a sequence, it defines the bin edges, including the rightmost edge, allowing for non-uniform bin widths.
+    
+    :returns: The values of the histogram (hist) and the bin edges (length(hist)+1).
+    '''
+    if isinstance(a, list):
+        a = array(a)
+    if isinstance(bins, list):
+        bins = array(bins)
+    r = ArrayUtil.histogram(a.asarray(), bins.asarray())
+    return MIArray(r[0]), MIArray(r[1])
                 
 def sort(a, axis=-1):
     """
@@ -1288,6 +1335,40 @@ def argsort(a, axis=-1):
         a = array(a)
     r = ArrayUtil.argSort(a.asarray(), axis)
     return MIArray(r)
+    
+def nonzero(a):
+    '''
+    Return the indices of the elements that are non-zero.
+    
+    Returns a tuple of arrays, one for each dimension of a, containing the indices of the 
+    non-zero elements in that dimension.
+        
+    :param a: (*array_like*) Input array.
+    
+    :returns: (*tuple*) Indices of elements that are non-zero.
+    '''
+    if isinstance(a, list):
+        a = array(a)
+    ra = ArrayMath.nonzero(a.asarray())
+    if ra is None:
+        return None
+        
+    r = []
+    for aa in ra:
+        r.append(MIArray(aa))
+    return tuple(r)
+    
+def where(condition):
+    '''
+    Return elements, either from x or y, depending on condition.
+
+    If only condition is given, return condition.nonzero().
+    
+    :param condition: (*array_like*) Input array.
+    
+    :returns: (*tuple*) Indices of elements that are non-zero.
+    '''
+    return nonzero(condition)
     
 def concatenate(arrays, axis=0):
     '''
