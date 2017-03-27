@@ -135,6 +135,8 @@ class MIArray(object):
     def __setitem__(self, indices, value):
         #print type(indices) 
         if isinstance(indices, MIArray):
+            if isinstance(value, MIArray):
+                value = value.asarray()
             ArrayMath.setValue(self.array, indices.array, value)
             return None
         

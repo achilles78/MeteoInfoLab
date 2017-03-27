@@ -8,6 +8,7 @@
 import os
 import inspect
 import datetime
+import math
 
 from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, GridData, ArrayUtil
@@ -38,6 +39,7 @@ from mipylib.numeric.miarray import MIArray
 import mipylib.numeric.minum as minum
 from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
+from mipylib.plotlib.axes import PolarAxes
 
 ## Global ##
 milapp1 = None
@@ -1745,50 +1747,103 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     draw_if_interactive()
     return graphics
     
-def windrose(wd, ws, wdbins=None, wsbins=None, degree=False):
+def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='matlab_jet', \
+    alpha=0.7, rmax=None, rtickloc=None, rticks=None, rlabelpos=60, xticks=None):
     '''
     Plot windrose chart.
     
     :param wd: (*array_like*) Wind direction.
     :param ws: (*array_like*) Wind speed.
-    :param wdbins: (*array_like*) Wind direction bins.
+    :param nwdbins: (*int*) Number of wind direction bins [4 | 8 | 16].
     :param wsbins: (*array_like*) Wind speed bins.
     :param degree: (*boolean*) The unit of wind direction is degree or radians.
-    '''
-    if wdbins is None:
-        wdbins = minum.linspace(0.0, 2 * minum.pi, 9)
-    if wsbins is None:
-        wsbins = minum.arange(0., 6.1, 1.2).tolist()
-        wsbins.append(100)
-        wsbins = minum.array(wsbins)
+    :param colors: (*color list*) The colors.
+    '''    
+    if not nwdbins in [4, 8, 16]:
+        print 'nwdbins must be 4, 8 or 16!'
+        raise ValueError(nwdbins)
+        
     if isinstance(wd, list):
         wd = minum.array(wd)
     if isinstance(ws, list):
         ws = minum.array(ws)
+    
+    wdbins = minum.linspace(0.0, 2 * minum.pi, nwdbins + 1)    
+    if wsbins is None:
+        wsbins = minum.arange(0., ws.max(), 2.).tolist()
+        wsbins.append(100)
+        wsbins = minum.array(wsbins)            
+    
+    dwdbins = minum.degrees(wdbins)
+    dwdbins = dwdbins - 90
+    for i in range(len(dwdbins)):
+        if dwdbins[i] < 0:
+            dwdbins[i] += 360
+    for i in range(len(dwdbins)):
+        d = dwdbins[i]
+        d = 360 - d
+        dwdbins[i] = d
+    rwdbins = minum.radians(dwdbins)
         
-    wdN = len(wdbins) - 1
+    N = len(wd)
+    wdN = nwdbins
     wsN = len(wsbins) - 1
-    cols = makecolors(wsN, alpha=0.5)
+    if colors is None:
+        colors = makecolors(wsN, cmap=cmap, alpha=alpha)
+    
+    wd = wd + 360./wdN/2
+    wd[wd>360] = wd - 360
+    rwd = minum.radians(wd)    
+    
     global gca
     if gca is None:
         gca = axes(polar=True)
     else:
-        if not isinstance(gca, PolarPlot):
+        if not isinstance(gca, PolarAxes):
             gca = axes(polar=True)
     theta = minum.ones(wdN)
     for i in range(wdN):
-        theta[i] = wdbins[i] - minum.pi/wdN/2
+        theta[i] = rwdbins[i] - minum.pi/wdN/2
     
     bars = []
+    hhist = 0
+    rrmax = 0
     for i in range(wsN):
-        idx = minum.where(ws>=wsbins[i] * ws<wsbins[i+1])
-        s_wd = wd[idx]        
-        wdhist = minum.histogram(s_wd, wdbins)[0]
-        wdhist = wdhist / wdN        
-        bb = bar(theta, wdhist, minum.pi/wdN, color=cols[i], edgecolor='gray')
+        idx = minum.where((ws>=wsbins[i]) * (ws<wsbins[i+1]))
+        if idx is None:
+            continue
+        print wsbins[i], wsbins[i+1]
+        s_wd = rwd[idx]
+        wdhist = minum.histogram(s_wd, wdbins)[0].astype('float')
+        wdhist = wdhist / N
+        rrmax = max(rrmax, wdhist.max())
+        lab = '%s - %s' % (wsbins[i], wsbins[i+1])
+        bb = bar(theta, wdhist, minum.pi/wdN, bottom=hhist, color=colors[i], \
+            edgecolor='gray', label=lab)[0]
+        bb.setStartValue(wsbins[i])
+        bb.setEndValue(wsbins[i+1])
         bars.append(bb)
-        
+        hhist = hhist + wdhist
+    
+    if rmax is None:
+        rmax = math.ceil(rrmax)
+    gca.set_rmax(rmax)
+    if not rtickloc is None:
+        gca.set_rtick_locations(rtickloc)
+    if not rticks is None:
+        gca.set_rticks(rticks)
+    gca.set_rtick_format('%')
+    gca.set_rlabel_position(rlabelpos)
+    gca.set_xtick_locations(minum.arange(0., 360., 360./wdN))
+    step = 16 / nwdbins
+    if xticks is None:
+        xticks = ['E','ENE','NE','NNE','N','NNW','NW','WNW','W','WSW',\
+            'SW','SSW','S','SSE','SE','ESE']
+        xticks = xticks[::step]
+    gca.set_xticks(xticks)
+    colorbar(bars, shrink=0.6, vmintick=True, vmaxtick=True, xshift=10)    
     draw_if_interactive()
+    return gca, bars
  
 def figure(bgcolor=None, figsize=None, newfig=True):
     """
@@ -1941,7 +1996,8 @@ def axes(*args, **kwargs):
     bgcobj = kwargs.pop('bgcolor', None)    
     polar = kwargs.pop('polar', False)
     if polar:
-        plot = PolarPlot()
+        #plot = PolarPlot()
+        plot = PolarAxes()
     else:
         plot = XY2DPlot()
     plot.setPosition(position[0], position[1], position[2], position[3])    
@@ -3238,6 +3294,13 @@ def legend(*args, **kwargs):
     if not ncol is None:
         clegend.setColumnNumber(ncol)
         clegend.setAutoRowColNum(False)
+    xshift = kwargs.pop('xshift', None)
+    if not xshift is None:
+        clegend.setXShift(xshift)
+    yshift = kwargs.pop('yshift', None)
+    if not yshift is None:
+        clegend.setYShift(yshift)
+    
     draw_if_interactive()
     
 def readlegend(fn):
@@ -3337,6 +3400,16 @@ def colorbar(mappable, **kwargs):
     ticks = kwargs.pop('ticks', None)
     if not ticks is None:
         legend.setTickLabels(ticks)
+    xshift = kwargs.pop('xshift', None)
+    if not xshift is None:
+        legend.setXShift(xshift)
+    yshift = kwargs.pop('yshift', None)
+    if not yshift is None:
+        legend.setYShift(yshift)
+    vmintick = kwargs.pop('vmintick', False)
+    vmaxtick = kwargs.pop('vmaxtick', False)
+    legend.setDrawMinLabel(vmintick)
+    legend.setDrawMaxLabel(vmaxtick)
     cax.setDrawLegend(True)
     draw_if_interactive()
 
@@ -5462,18 +5535,18 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
 
     :returns: (*list*) Created colors.
     '''
-    ocmap = ColorUtil.getColorMap(cmap)
-    if reverse:
-        ocmap.reverse()
-    if alpha is None:
-        cols = ocmap.getColorList(n)    
+    if isinstance(n, list):
+        cols = __getcolors(n, alpha)
     else:
-        alpha = (int)(alpha * 255)
-        cols = ocmap.getColorList(n, alpha)
-    colors = []
-    for c in cols:
-        colors.append(c)
-    return colors
+        ocmap = ColorUtil.getColorMap(cmap)
+        if reverse:
+            ocmap.reverse()
+        if alpha is None:
+            cols = ocmap.getColorList(n)    
+        else:
+            alpha = (int)(alpha * 255)
+            cols = ocmap.getColorList(n, alpha)
+    return list(cols)
 
 def makelegend(source):
     '''
