@@ -1765,6 +1765,8 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
     :param rticks: (*list of string*) Radial ticks.
     :param rlabelpos: (*float*) Radial label position in degree.
     :param xticks: (*list of string*) X ticks.
+    
+    :returns: Polar axes and bars
     '''    
     if not nwdbins in [4, 8, 16]:
         print 'nwdbins must be 4, 8 or 16!'
@@ -1847,8 +1849,7 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
         xticks = ['E','ENE','NE','NNE','N','NNW','NW','WNW','W','WSW',\
             'SW','SSW','S','SSE','SE','ESE']
         xticks = xticks[::step]
-    gca.set_xticks(xticks)
-    colorbar(bars, shrink=0.6, vmintick=True, vmaxtick=True, xshift=10)    
+    gca.set_xticks(xticks)       
     draw_if_interactive()
     return gca, bars
  
@@ -3240,6 +3241,10 @@ def legend(*args, **kwargs):
                 for lb in lbs:
                     ls.addLegendBreak(lb)
                 #ls.setLegendBreaks(lbs)
+                if lbs[0].getStartValue() == lbs[1].getEndValue():
+                    ls.setLegendType(LegendType.UniqueValue)
+                else:
+                    ls.setLegendType(LegendType.GraduatedColor)
                 if clegend is None:
                     clegend = ChartLegend(ls)
                     plot.setLegend(clegend)
@@ -3340,6 +3345,8 @@ def colorbar(mappable, **kwargs):
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
     :param label: (*string*) Label. Default is ``None`` .
+    :param labelloc: (*string*) Label location ['in' | 'out' | 'top' | 'bottom' | 'left' | 'right'].
+        Defaul is ``out``.
     :param extendrect: (*boolean*) If ``True`` the minimum and maximum colorbar extensions will be
         rectangular (the default). If ``False`` the extensions will be triangular.
     :param extendfrac: [None | 'auto' | length] If set to *None*, both the minimum and maximum triangular
@@ -3392,6 +3399,9 @@ def colorbar(mappable, **kwargs):
     label = kwargs.pop('label', None)
     if not label is None:
         legend.setLabel(label)
+    labelloc = kwargs.pop('labelloc', None)
+    if not labelloc is None:
+        legend.setLabelLocation(labelloc)
     if orientation == 'horizontal':
         legend.setPlotOrientation(PlotOrientation.HORIZONTAL)
         legend.setPosition(LegendPosition.LOWER_CENTER_OUTSIDE)
@@ -5567,7 +5577,7 @@ def makelegend(source):
         ls = LegendScheme()
         ls.importFromXMLFile(source, False)
     else:
-        ls = LegendScheme(source)    
+        ls = LegendScheme(source)
     return ls
     
 def makesymbolspec(geometry, *args, **kwargs):
