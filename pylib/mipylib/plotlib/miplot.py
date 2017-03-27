@@ -1758,6 +1758,13 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
     :param wsbins: (*array_like*) Wind speed bins.
     :param degree: (*boolean*) The unit of wind direction is degree or radians.
     :param colors: (*color list*) The colors.
+    :param cmap: (*string*) Color map.
+    :param alpha: (*float*) Color alpha (0 - 1).
+    :param rmax: (*float*) Radial maximum value.
+    :param rtickloc: (*list of float*) Radial tick locations.
+    :param rticks: (*list of string*) Radial ticks.
+    :param rlabelpos: (*float*) Radial label position in degree.
+    :param xticks: (*list of string*) X ticks.
     '''    
     if not nwdbins in [4, 8, 16]:
         print 'nwdbins must be 4, 8 or 16!'
