@@ -8,6 +8,7 @@
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
+from org.meteoinfo.math import Complex
 from ucar.ma2 import Array, Range, MAMath
 import jarray
 
@@ -124,7 +125,11 @@ class MIArray(object):
         else:
             r = ArrayMath.take(self.array, ranges)
         if iszerodim:
-            return r.getObject(0)
+            r = r.getObject(0)
+            if isinstance(r, Complex):
+                return complex(r.getReal(), r.getImaginary())
+            else:
+                return r
         else:
             for i in flips:
                 r = r.flip(i)

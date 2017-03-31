@@ -49,19 +49,6 @@ maplayout = MapLayout()
 chartpanel = None
 isholdon = True
 gca = None
-ismap = False
-maplayer = None
-#mapfn = os.path.join(inspect.getfile(inspect.currentframe()), '../../../map/country1.shp')
-mapfn = os.path.join(inspect.getfile(inspect.currentframe()), 'D:/Temp/map/country1.shp')
-mapfn = os.path.abspath(mapfn)
-""""
-if os.path.exists(mapfn):
-    print 'Default map file: ' + mapfn
-    maplayer = MapDataManage.loadLayer(mapfn)
-    pgb = maplayer.getLegendScheme().getLegendBreaks().get(0)
-    pgb.setDrawFill(False)
-    pgb.setOutlineColor(Color.darkGray)    
-"""
 
 __all__ = [
     'gca','antialias','axes','axesm','axis','axism','bar','barbs','barbsm','bgcolor','box',
@@ -76,15 +63,6 @@ __all__ = [
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','repaint',
     'isinteractive'
     ]
-    
-def map(map=True):
-    global ismap
-    if map:
-        ismap = True
-        print 'Switch to map mode'
-    else:
-        ismap = False
-        print 'Switch to figure mode'
 
 def hold(ishold):
     global isholdon
@@ -309,212 +287,6 @@ def plot(*args, **kwargs):
     else:
         return lines[0]
         
-def plot_bak(*args, **kwargs):
-    """
-    Plot lines and/or markers to the axes. *args* is a variable length argument, allowing
-    for multiple *x, y* pairs with an optional format string.
-    
-    :param x: (*array_like*) Input x data.
-    :param y: (*array_like*) Input y data.
-    :param style: (*string*) Line style for plot.
-    
-    :returns: Legend breaks of the lines.
-    
-    The following format string characters are accepted to control the line style or marker:
-    
-      =========  ===========
-      Character  Description
-      =========  ===========
-      '-'         solid line style
-      '--'        dashed line style
-      '-.'        dash-dot line style
-      ':'         dotted line style
-      '.'         point marker
-      ','         pixel marker
-      'o'         circle marker
-      'v'         triangle_down marker
-      '^'         triangle_up marker
-      '<'         triangle_left marker
-      '>'         triangle_right marker
-      's'         square marker
-      'p'         pentagon marker
-      '*'         star marker
-      'x'         x marker
-      'D'         diamond marker
-      =========  ===========
-      
-    The following color abbreviations are supported:
-      
-      =========  =====
-      Character  Color  
-      =========  =====
-      'b'        blue
-      'g'        green
-      'r'        red
-      'c'        cyan
-      'm'        magenta
-      'y'        yellow
-      'k'        black
-      =========  =====
-    """
-    global gca
-    if isholdon:
-        if gca == None:
-            dataset = XYListDataset()
-        else:
-            if not isinstance(gca, XY1DPlot):
-                dataset = XYListDataset()
-            else:
-                dataset = gca.getDataset()
-                if dataset is None:
-                    dataset = XYListDataset()
-    else:
-        dataset = XYListDataset()
-    
-    xdatalist = []
-    ydatalist = []    
-    styles = []
-    xaxistype = None
-    isxylistdata = False
-    if len(args) == 1:
-        if isinstance(args[0], MIXYListData):
-            dataset = args[0].data
-            snum = args[0].size()
-            isxylistdata = True
-        else:
-            ydata = args[0]
-            if isinstance(args[0], DimArray):
-                xdata = args[0].dimvalue(0)
-                if args[0].islondim(0):
-                    xaxistype = 'lon'
-                elif args[0].islatdim(0):
-                    xaxistype = 'lat'
-                elif args[0].istimedim(0):
-                    xaxistype = 'time'
-            else:
-                xdata = []
-                for i in range(0, len(args[0])):
-                    xdata.append(i)
-            xdatalist.append(xdata)
-            ydatalist.append(ydata)
-    elif len(args) == 2:
-        if isinstance(args[1], basestring):
-            ydata = args[0]
-            if isinstance(args[0], DimArray):
-                xdata = args[0].dimvalue(0)
-                if args[0].islondim(0):
-                    xaxistype = 'lon'
-                elif args[0].islatdim(0):
-                    xaxistype = 'lat'
-                elif args[0].istimedim(0):
-                    xaxistype = 'time'
-            else:
-                xdata = []
-                for i in range(0, len(args[0])):
-                    xdata.append(i)
-            styles.append(args[1])
-        else:
-            xdata = args[0]
-            ydata = args[1]
-        xdatalist.append(xdata)
-        ydatalist.append(ydata)
-    else:
-        c = 'x'
-        for arg in args: 
-            if c == 'x':
-                #xdatalist.append(__getplotdata(arg))    
-                xdatalist.append(arg)
-                c = 'y'
-            elif c == 'y':
-                #ydatalist.append(__getplotdata(arg))
-                ydatalist.append(arg)
-                c = 's'
-            elif c == 's':
-                if isinstance(arg, basestring):
-                    styles.append(arg)
-                    c = 'x'
-                else:
-                    styles.append('-')
-                    #xdatalist.append(__getplotdata(arg))
-                    xdatalist.append(arg)
-                    c = 'y'
-    if len(styles) == 0:
-        styles = None
-    else:
-        while len(styles) < len(xdatalist):
-            styles.append('-')
-    
-    if not isxylistdata:
-        #Add data series
-        snum = len(xdatalist)
-        for i in range(0, snum):
-            label = kwargs.pop('label', 'S_' + str(i + 1))
-            xdata = __getplotdata(xdatalist[i])
-            ydata = __getplotdata(ydatalist[i])
-            dataset.addSeries(label, xdata, ydata)
-    
-    #Create XY1DPlot
-    if gca is None:
-        plot = XY1DPlot()
-    else:
-        if isinstance(gca, XY1DPlot):
-            plot = gca
-        else:
-            plot = XY1DPlot()
-    
-    if xaxistype == 'lon':
-        plot.setXAxis(LonLatAxis('Longitude', True))
-    elif xaxistype == 'lat':
-        plot.setXAxis(LonLatAxis('Latitude', True, False))
-    elif xaxistype == 'time':
-        plot.setXAxis(TimeAxis('Time', True))
-    timetickformat = kwargs.pop('timetickformat', None)
-    if not timetickformat is None:
-        if not xaxistype == 'time':
-            plot.setXAxis(TimeAxis('Time', True))
-        plot.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
-        plot.getAxis(Location.TOP).setTimeFormat(timetickformat)
-    plot.setDataset(dataset)
-            
-    #Set plot data styles
-    lines = []
-    legend = kwargs.pop('legend', None)
-    if not legend is None:
-        lbs = legend.getLegendBreaks()
-        for i in range(0, snum):
-            line = lbs[i]
-            plot.setLegendBreak(i, line)
-            lines.append(line)
-    else:
-        if styles != None:
-            for i in range(0, len(styles)):
-                idx = dataset.getSeriesCount() - len(styles) + i
-                #print 'Series index: ' + str(idx)
-                line = __setplotstyle(plot, idx, styles[i], len(xdatalist[i]), **kwargs)
-                lines.append(line)
-        else:
-            for i in range(0, snum):
-                idx = dataset.getSeriesCount() - snum + i
-                line = __setplotstyle(plot, idx, None, 1, **kwargs)
-                lines.append(line)
-    
-    #Paint dataset
-    if chartpanel is None:
-        figure()
-        
-    chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY1DPlot)):
-        chart.clearPlots()
-        chart.setPlot(plot)
-    gca = plot
-    #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    draw_if_interactive()
-    if len(lines) > 1:
-        return lines
-    else:
-        return lines[0]
-
 def semilogy(*args, **kwargs):
     """
     Make a plot with log scaling on the y axis.
@@ -734,63 +506,6 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     draw_if_interactive()
     return graphics 
     
-
-    
-def errorbar_bak(x, y, yerr=None, xerr=None, fmt='', **kwargs):
-    global gca
-    if gca is None:
-        dataset = XYListDataset()
-    else:
-        dataset = gca.getDataset()
-        if dataset is None:
-            dataset = XYListDataset()    
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = __getplotdata(x)
-    ydata = __getplotdata(y)
-    esdata = XYErrorSeriesData()
-    esdata.setKey(label)
-    esdata.setXdata(xdata)
-    esdata.setYdata(ydata)
-    if not yerr is None:
-        if not isinstance(yerr, (int, float)):
-            yerr = __getplotdata(yerr)
-        esdata.setYerror(yerr)
-    if not xerr is None:
-        if not isinstance(xerr, (int, float)):
-            xerr = __getplotdata(xerr)
-        esdata.setXerror(xerr)
-    dataset.addSeries(esdata)
-    
-    #Create XY1DPlot
-    if gca is None:
-        plot = XY1DPlot(dataset)
-    else:
-        plot = gca
-        plot.setDataset(dataset)
-    
-    #Set plot data styles
-    idx = dataset.getSeriesCount() - 1
-    if fmt == '':
-        line = __setplotstyle(plot, idx, None, 1, **kwargs)
-    else:
-        line = __setplotstyle(plot, idx, fmt, len(x), **kwargs)
-    
-    #Paint dataset
-    if chartpanel is None:
-        figure()
-        
-    chart = chartpanel.getChart()
-    if gca is None:
-        chart.clearPlots()
-        chart.setPlot(plot)
-    #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return line 
-        
 def bar(*args, **kwargs):
     """
     Make a bar plot.
@@ -937,160 +652,7 @@ def bar(*args, **kwargs):
     gca = plot
     draw_if_interactive()
     return barbreaks
-    
-def bar_bak(*args, **kwargs):
-    """
-    Make a bar plot.
-    
-    Make a bar plot with rectangles bounded by:
-        left, left + width, bottom, bottom + height
-    
-    :param left: (*array_like*) The x coordinates of the left sides of the bars.
-    :param height: (*array_like*) The height of the bars.
-    :param width: (*array_like*) Optional, the widths of the bars default: 0.8.
-    :param bottom: (*array_like*) Optional, the y coordinates of the bars default: None
-    :param color: (*Color*) Optional, the color of the bar faces.
-    :param edgecolor: (*Color*) Optional, the color of the bar edge.
-    :param linewidth: (*int*) Optional, width of bar edge.
-    :param label: (*string*) Label of the bar series.
-    :param hatch: (*string*) Hatch string.
-    :param hatchsize: (*int*) Hatch size. Default is None (8).
-    :param bgcolor: (*Color*) Background color, only valid with hatch.
-    
-    :returns: Bar legend break.
-    
-    
-    The following format string characters are accepted to control the hatch style:
-      =========  ===========
-      Character  Description
-      =========  ===========
-      '-'         horizontal hatch style
-      '|'         vertical hatch style
-      '\\'        forward_diagonal hatch style
-      '/'         backward_diagonal hatch style
-      '+'         cross hatch style
-      'x'         diagonal_cross hatch style
-      '.'         dot hatch style
-      =========  ===========
-      
-    """
-    #Get dataset
-    global gca
-    if gca is None:
-        dataset = XYListDataset()
-    else:
-        dataset = gca.getDataset()
-        if dataset is None:
-            dataset = XYListDataset()
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = None
-    autowidth = True
-    width = 0.8
-    if len(args) == 1:
-        ydata = args[0]
-    elif len(args) == 2:
-        if isinstance(args[1], (int, float)):
-            ydata = args[0]
-            width = args[1]
-            autowidth = False
-        else:
-            xdata = args[0]
-            ydata = args[1]
-    else:
-        xdata = args[0]
-        ydata = args[1]
-        width = args[2]
-        autowidth = False
-        
-    if xdata is None:
-        xdata = []
-        for i in range(1, len(args[0]) + 1):
-            xdata.append(i)
-    else:
-        xdata = __getplotdata(xdata)
-    ydata = __getplotdata(ydata)
-    esdata = XYErrorSeriesData()
-    esdata.setKey(label)
-    esdata.setXdata(xdata)
-    esdata.setYdata(ydata)
-    yerr = kwargs.pop('yerr', None)
-    if not yerr is None:
-        if not isinstance(yerr, (int, float)):
-            yerr = __getplotdata(yerr)
-        esdata.setYerror(yerr)
-    bottom = kwargs.pop('bottom', None)
-    if not bottom is None:
-        esdata.setBottom(bottom)
-    dataset.addSeries(esdata)   
-
-    #Create bar plot
-    if gca is None:
-        plot = XY1DPlot()
-    else:
-        if isinstance(gca, XY1DPlot):
-            plot = gca
-        else:
-            plot = XY1DPlot()
-    plot.setDataset(dataset)
-    if not autowidth:
-        plot.setAutoBarWidth(autowidth)
-        plot.setBarWidth(width)
-    
-    #Set plot data styles
-    fcobj = kwargs.pop('color', None)
-    if fcobj is None:
-        fcobj = kwargs.pop('facecolor', 'b')
-    if isinstance(fcobj, (tuple, list)):
-        colors = __getcolors(fcobj)
-    else:
-        color = __getcolor(fcobj)
-        colors = [color]
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = __getcolor(ecobj)
-    linewidth = kwargs.pop('linewidth', 1.0) 
-    hatch = kwargs.pop('hatch', None)
-    hatch = __gethatch(hatch) 
-    hatchsize = kwargs.pop('hatchsize', None)
-    bgcolor = kwargs.pop('bgcolor', None)
-    bgcolor = __getcolor(bgcolor)
-    slb = SeriesLegend()
-    for color in colors:
-        lb = PolygonBreak()
-        lb.setCaption(label)
-        lb.setColor(color)    
-        if edgecolor is None:
-            lb.setDrawOutline(False)
-        else:
-            lb.setOutlineColor(edgecolor)  
-        lb.setOutlineSize(linewidth)   
-        if not hatch is None:
-            lb.setStyle(hatch)
-            if not bgcolor is None:
-                lb.setBackColor(bgcolor)
-            if not hatchsize is None:
-                lb.setStyleSize(hatchsize)
-        slb.addLegendBreak(lb)
-    slb.setPlotMethod(ChartPlotMethod.BAR)
-    ecolor = kwargs.pop('ecolor', 'k')
-    ecolor = __getcolor(ecolor)
-    slb.setErrorColor(ecolor)
-    plot.setLegendBreak(dataset.getSeriesCount() - 1, slb)
-    
-    #Create figure
-    if chartpanel is None:
-        figure()
-    
-    #Set chart
-    chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY1DPlot)):
-        chart.setCurrentPlot(plot)
-    chartpanel.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return lb
-        
+          
 def hist(x, bins=10, range=None, normed=False, cumulative=False,
         bottom=None, histtype='bar', align='mid',
         orientation='vertical', rwidth=None, log=False, **kwargs):
@@ -1281,94 +843,6 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     draw_if_interactive()
     return ls
     
-def scatter_bak(x, y, s=8, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None,
-            alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
-    """
-    Make a scatter plot of x vs y, where x and y are sequence like objects of the same lengths.
-    
-    :param x: (*array_like*) Input x data.
-    :param y: (*array_like*) Input y data.
-    :param s: (*int*) Size of points.
-    :param c: (*Color*) Color of the points.
-    :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
-    :param marker: (*string*) Marker of the points.
-    :param label: (*string*) Label of the points series.
-    
-    :returns: Points legend break.
-    """
-    #Get dataset
-    global gca
-    if gca is None:
-        dataset = XYListDataset()
-    else:
-        dataset = gca.getDataset()
-        if dataset is None:
-            dataset = XYListDataset()    
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = __getplotdata(x)
-    ydata = __getplotdata(y)
-    dataset.addSeries(label, xdata, ydata)
-    
-    #Create XY1DPlot
-    if gca is None:
-        plot = XY1DPlot(dataset)
-    else:
-        plot = gca
-        plot.setDataset(dataset)
-    
-    #Set plot data styles
-    pb, isunique = __getlegendbreak('point', **kwargs)
-    pb.setCaption(label)
-    pstyle = __getpointstyle(marker)    
-    pb.setStyle(pstyle)
-    colors = __getcolors(c, alpha)
-    seriesIdx = dataset.getSeriesCount() - 1
-    if isinstance(s, int):   
-        pb.setSize(s)
-        if len(colors) == 1:
-            pb.setColor(colors[0])
-            plot.setLegendBreak(seriesIdx, pb)
-        else:
-            n = len(colors)
-            slegend = SeriesLegend(n)
-            for i in range(0, n):
-                npb = pb.clone()
-                npb.setColor(colors[i])
-                slegend.setLegendBreak(i, npb)
-            plot.setLegendBreak(seriesIdx, slegend)
-    else:
-        n = len(s)
-        slegend = SeriesLegend(n)
-        if len(colors) == 1:
-            pb.setColor(colors[0])
-            for i in range(0, n):
-                npb = pb.clone()
-                npb.setSize(s[i])
-                slegend.setLegendBreak(i, npb)  
-        else:
-            for i in range(0, n):
-                npb = pb.clone()
-                npb.setSize(s[i])
-                npb.setColor(colors[i])
-                slegend.setLegendBreak(i, npb) 
-        plot.setLegendBreak(seriesIdx, slegend)
-    
-    #Paint dataset
-    if chartpanel is None:
-        figure()
-        
-    chart = chartpanel.getChart()
-    if gca is None:
-        chart.clearPlots()
-        chart.setPlot(plot)
-    #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return pb 
-    
 def fill_between(x, y1, y2=0, where=None, **kwargs):
     """
     Make filled polygons between two curves (y1 and y2) where ``where==True``.
@@ -1437,86 +911,7 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     gca = plot
     draw_if_interactive()
     return pb 
-    
-def fill_between_bak(x, y1, y2=0, where=None, **kwargs):
-    """
-    Make filled polygons between two curves (y1 and y2) where ``where==True``.
-    
-    :param x: (*array_like*) An N-length array of the x data.
-    :param y1: (*array_like*) An N-length array (or scalar) of the y data.
-    :param y2: (*array_like*) An N-length array (or scalar) of the y data.
-    :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
-        N-length boolean array and the fill will only happen over the regions where ``where==True``.
-    """
-    #Get dataset
-    global gca
-    if gca is None:
-        dataset = XYListDataset()
-    else:
-        dataset = gca.getDataset()
-        if dataset is None:
-            dataset = XYListDataset()    
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    dn = len(x)
-    xdata = __getplotdata(x)
-    if isinstance(y1, (int, long, float)):
-        yy = []
-        for i in range(dn):
-            yy.append(y1)
-        y1 = minum.array(yy).array
-    else:
-        y1 = __getplotdata(y1)
-    if isinstance(y2, (int, long, float)):
-        yy = []
-        for i in range(dn):
-            yy.append(y2)
-        y2 = minum.array(yy).array
-    else:
-        y2 = __getplotdata(y2)
-    ss = XYYSeriesData()
-    ss.setKey(label)
-    ss.setXdata(xdata)
-    ss.setYdata(y1)
-    ss.setY2data(y2)
-    if not where is None:
-        if isinstance(where, (tuple, list)):
-            where = minum.array(where)
-        ss.setWhere(where.asarray())
-    dataset.addSeries(ss)
-    
-    #Create XY1DPlot
-    if gca is None:
-        plot = XY1DPlot(dataset)
-    else:
-        plot = gca
-        plot.setDataset(dataset)
-    
-    #Set plot data styles
-    pb, isunique = __getlegendbreak('polygon', **kwargs)
-    pb.setCaption(label)
-    pb.setDrawOutline(False)
-    seriesIdx = dataset.getSeriesCount() - 1
-    slb = SeriesLegend()
-    slb.addLegendBreak(pb)
-    slb.setPlotMethod(ChartPlotMethod.FILL)
-    plot.setLegendBreak(seriesIdx, slb)
-    
-    #Paint dataset
-    if chartpanel is None:
-        figure()
         
-    chart = chartpanel.getChart()
-    if gca is None:
-        chart.clearPlots()
-        chart.setPlot(plot)
-    #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return pb 
-    
 def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6, shadow=False, 
     labeldistance=1.1, startangle=0, radius=None, hold=None, **kwargs):
     """
@@ -3650,50 +3045,7 @@ def imshow(*args, **kwargs):
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
-    return ls
-    
-def imshow_bak(*args, **kwargs):
-    """
-    Display an image on the axes.
-    
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param z: (*array_like*) 2-D or 3-D (RGB) z value array.
-    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
-        to draw, in increasing order.
-    :param cmap: (*string*) Color map string.
-    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-        the order specified.
-    
-    :returns: (*RasterLayer*) RasterLayer created from array data.
-    """
-    n = len(args)
-    cmap = __getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    if n <= 2:
-        gdata = minum.asgridarray(args[0])
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgridarray(a, x, y, fill_value)
-        args = args[3:]    
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createImageLegend(gdata, cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
-    else:
-        ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    layer = __plot_griddata(gdata, ls, 'imshow')
-    return MILayer(layer)
+    return ls    
       
 def contour(*args, **kwargs):
     """
@@ -3782,58 +3134,6 @@ def contour(*args, **kwargs):
     draw_if_interactive()
     return igraphic
     
-def contour_bak(*args, **kwargs):
-    """
-    Plot contours.
-    
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param z: (*array_like*) 2-D z value array.
-    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
-        to draw, in increasing order.
-    :param cmap: (*string*) Color map string.
-    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-        the order specified.
-    
-    :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
-    """
-    n = len(args)
-    cmap = __getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    xaxistype = None
-    if n <= 2:
-        gdata = minum.asgriddata(args[0])
-        if isinstance(args[0], DimArray):
-            if args[0].islondim(1):
-                xaxistype = 'lon'
-            elif args[0].islatdim(1):
-                xaxistype = 'lat'
-            elif args[0].istimedim(1):
-                xaxistype = 'time'
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-    layer = __plot_griddata(gdata, ls, 'contour', xaxistype=xaxistype)        
-    
-    return MILayer(layer)
-
 def contourf(*args, **kwargs):
     """
     Plot filled contours.
@@ -3918,57 +3218,6 @@ def contourf(*args, **kwargs):
     draw_if_interactive()
     return igraphic
     
-def contourf_bak(*args, **kwargs):
-    """
-    Plot filled contours.
-    
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param z: (*array_like*) 2-D z value array.
-    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
-        to draw, in increasing order.
-    :param cmap: (*string*) Color map string.
-    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-        the order specified.
-    
-    :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
-    """
-    n = len(args)    
-    cmap = __getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    xaxistype = None
-    if n <= 2:
-        gdata = minum.asgriddata(args[0])
-        if isinstance(args[0], DimArray):
-            if args[0].islondim(1):
-                xaxistype = 'lon'
-            elif args[0].islatdim(1):
-                xaxistype = 'lat'
-            elif args[0].istimedim(1):
-                xaxistype = 'time'
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-    layer = __plot_griddata(gdata, ls, 'contourf', xaxistype=xaxistype)
-    return MILayer(layer)
-
 def quiver(*args, **kwargs):
     """
     Plot a 2-D field of arrows.
@@ -3978,6 +3227,8 @@ def quiver(*args, **kwargs):
     :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
     :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
     :param z: (*array_like*) Optional, 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+        vectors to draw, in increasing order.
     :param cmap: (*string*) Color map string.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
     :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
@@ -4030,16 +3281,16 @@ def quiver(*args, **kwargs):
     
     if iscolor:
         if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+            cn = args[0]
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
         else:
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            levs = kwargs.pop('levs', None)
+            if levs is None:
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            else:
+                if isinstance(levs, MIArray):
+                    levs = levs.tolist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
     else:    
         if cmap.getColorCount() == 1:
             c = cmap.getColor(0)
@@ -4081,76 +3332,6 @@ def quiver(*args, **kwargs):
     draw_if_interactive()
     return igraphic
     
-def quiver_bak(*args, **kwargs):
-    """
-    Plot a 2-D field of arrows.
-    
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
-    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
-    :param z: (*array_like*) Optional, 2-D z value array.
-    :param cmap: (*string*) Color map string.
-    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
-    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
-    :param size: (*float*) Base size of the arrows.
-    :param order: (*int*) Z-order of created layer for display.
-    
-    :returns: (*VectoryLayer*) Created quiver VectoryLayer.
-    """
-    plot = gca
-    cmap = __getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    order = kwargs.pop('order', None)
-    isuv = kwargs.pop('isuv', True)
-    n = len(args) 
-    iscolor = False
-    cdata = None
-    if n <= 4:
-        udata = minum.asgriddata(args[0])
-        vdata = minum.asgriddata(args[1])
-        args = args[2:]
-        if len(args) > 0:
-            cdata = minum.asgriddata(args[0])
-            iscolor = True
-            args = args[1:]
-    elif n <= 6:
-        x = args[0]
-        y = args[1]
-        u = args[2]
-        v = args[3]
-        udata = minum.asgriddata(u, x, y, fill_value)
-        vdata = minum.asgriddata(v, x, y, fill_value)
-        args = args[4:]
-        if len(args) > 0:
-            cdata = minum.asgriddata(args[0], x, y, fill_value)
-            iscolor = True
-            args = args[1:]
-    if iscolor:
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
-        else:
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
-    else:    
-        if cmap.getColorCount() == 1:
-            c = cmap.getColor(0)
-        else:
-            c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = __setlegendscheme_point(ls, **kwargs)
-    layer = __plot_uvgriddata(udata, vdata, cdata, ls, 'quiver', isuv)
-    udata = None
-    vdata = None
-    cdata = None
-    return MILayer(layer)
-
 def barbs(*args, **kwargs):
     """
     Plot a 2-D field of barbs.
@@ -4160,6 +3341,8 @@ def barbs(*args, **kwargs):
     :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
     :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
     :param z: (*array_like*) Optional, 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+        barbs to draw, in increasing order.
     :param cmap: (*string*) Color map string.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
     :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
@@ -4212,16 +3395,16 @@ def barbs(*args, **kwargs):
     
     if iscolor:
         if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+            cn = args[0]
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
         else:
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            levs = kwargs.pop('levs', None)
+            if levs is None:
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            else:
+                if isinstance(levs, MIArray):
+                    levs = levs.aslist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
     else:    
         if cmap.getColorCount() == 1:
             c = cmap.getColor(0)
@@ -4262,76 +3445,6 @@ def barbs(*args, **kwargs):
     gca = plot
     draw_if_interactive()
     return igraphic
-    
-def barbs_bak(*args, **kwargs):
-    """
-    Plot a 2-D field of barbs.
-    
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
-    :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
-    :param z: (*array_like*) Optional, 2-D z value array.
-    :param cmap: (*string*) Color map string.
-    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
-    :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
-    :param size: (*float*) Base size of the arrows.
-    :param order: (*int*) Z-order of created layer for display.
-    
-    :returns: (*VectoryLayer*) Created barbs VectoryLayer.
-    """
-    plot = gca
-    cmap = __getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    order = kwargs.pop('order', None)
-    isuv = kwargs.pop('isuv', True)
-    n = len(args) 
-    iscolor = False
-    cdata = None
-    if n <= 4:
-        udata = minum.asgriddata(args[0])
-        vdata = minum.asgriddata(args[1])
-        args = args[2:]
-        if len(args) > 0:
-            cdata = minum.asgriddata(args[0])
-            iscolor = True
-            args = args[1:]
-    elif n <= 6:
-        x = args[0]
-        y = args[1]
-        u = args[2]
-        v = args[3]
-        udata = minum.asgriddata(u, x, y, fill_value)
-        vdata = minum.asgriddata(v, x, y, fill_value)
-        args = args[4:]
-        if len(args) > 0:
-            cdata = minum.asgriddata(args[0], x, y, fill_value)
-            iscolor = True
-            args = args[1:]
-    if iscolor:
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
-        else:
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
-    else:    
-        if cmap.getColorCount() == 1:
-            c = cmap.getColor(0)
-        else:
-            c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = __setlegendscheme_point(ls, **kwargs)
-    layer = __plot_uvgriddata(udata, vdata, cdata, ls, 'barbs', isuv)
-    udata = None
-    vdata = None
-    cdata = None
-    return MILayer(layer)
     
 def __plot_griddata(gdata, ls, type, xaxistype=None):
     #print 'GridData...'
@@ -4946,6 +4059,8 @@ def quiverm(*args, **kwargs):
     :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
     :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
     :param z: (*array_like*) Optional, 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+        vectors to draw, in increasing order.
     :param cmap: (*string*) Color map string.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
     :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
@@ -4992,16 +4107,16 @@ def quiverm(*args, **kwargs):
             args = args[1:]
     if iscolor:
         if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+            cn = args[0]
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
         else:
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            levs = kwargs.pop('levs', None)
+            if levs is None:
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            else:
+                if isinstance(levs, MIArray):
+                    levs = levs.tolist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
     else:    
         if cmap.getColorCount() == 1:
             c = cmap.getColor(0)
@@ -5095,6 +4210,8 @@ def barbsm(*args, **kwargs):
     :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
     :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
     :param z: (*array_like*) Optional, 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+        barbs to draw, in increasing order.
     :param cmap: (*string*) Color map string.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
     :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
@@ -5140,16 +4257,16 @@ def barbsm(*args, **kwargs):
             args = args[1:]
     if iscolor:
         if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), level_arg, cmap)
+            cn = args[0]
+            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
         else:
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            levs = kwargs.pop('levs', None)
+            if levs is None:
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+            else:
+                if isinstance(levs, MIArray):
+                    levs = levs.tolist()
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
     else:    
         if cmap.getColorCount() == 1:
             c = cmap.getColor(0)

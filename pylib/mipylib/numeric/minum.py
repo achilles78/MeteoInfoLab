@@ -7,6 +7,7 @@
 import os
 import sys
 import math
+import cmath
 import datetime
 from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
 from org.meteoinfo.data.meteodata import MeteoDataInfo, Dimension, DimensionType
@@ -61,8 +62,8 @@ __all__ = [
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isgriddata','isstationdata','joinncfile','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','meshgrid','minimum','monthname',
-    'numasciicol','numasciirow','nonzero','ones','ones_like','polyval','pow',
-    'power','project','projectxy','projinfo','radians','readtable','reshape',
+    'numasciicol','numasciirow','nonzero','ones','ones_like','polyval','power',
+    'project','projectxy','projinfo','radians','readtable','reshape',
     'rolling_mean','rot90','sin','sort','argsort','sqrt','tan','transpose','trapz','vdot',
     'where','zeros','zeros_like'
     ]
@@ -848,7 +849,7 @@ def sqrt(x):
     else:
         return math.sqrt(x)
         
-def pow(x1, x2):
+def power(x1, x2):
     """
     First array elements raised to powers from second array, element-wise.
     
@@ -870,10 +871,10 @@ def pow(x1, x2):
         if isinstance(x2, (DimArray, MIArray)):
             return MIArray(ArrayMath.pow(x1, x2.asarray()))
         else:
-            return math.pow(x1, x2)
-            
-def power(x1, x2):
-    return pow(x1, x2)
+            if isinstance(x1, complex):
+                return pow(x1, x2)
+            else:
+                return math.pow(x1, x2)
     
 def degrees(x):
     '''
@@ -925,7 +926,10 @@ def sin(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.sin()
     else:
-        return math.sin(x)
+        if isinstance(x, complex):
+            return cmath.sin(x)
+        else:
+            return math.sin(x)
     
 def cos(x):
     """
@@ -945,7 +949,10 @@ def cos(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.cos()
     else:
-        return math.cos(x)
+        if isinstance(x, complex):
+            return cmath.cos(x)
+        else:
+            return math.cos(x)
         
 def tan(x):
     """
@@ -965,7 +972,10 @@ def tan(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.tan()
     else:
-        return math.tan(x)
+        if isinstance(x, complex):
+            return cmath.tan(x)
+        else:
+            return math.tan(x)
         
 def asin(x):
     """
@@ -986,7 +996,10 @@ def asin(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.asin()
     else:
-        return math.asin(x)
+        if isinstance(x, complex):
+            return cmath.asin(x)
+        else:
+            return math.asin(x)
         
 def acos(x):
     """
@@ -1008,7 +1021,10 @@ def acos(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.acos()
     else:
-        return math.acos(x)
+        if isinstance(x, complex):
+            return cmath.acos(x)
+        else:
+            return math.acos(x)
         
 def atan(x):
     """
@@ -1031,7 +1047,10 @@ def atan(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.atan()
     else:
-        return math.atan(x)
+        if isinstance(x, complex):
+            return cmath.atan(x)
+        else:
+            return math.atan(x)
         
 def atan2(x1, x2):
     """
@@ -1053,7 +1072,10 @@ def atan2(x1, x2):
     if isinstance(x1, DimArray) or isinstance(x1, MIArray):
         return MIArray(ArrayMath.atan2(x1.asarray(), x2.asarray()))
     else:
-        return math.atan2(x1, x2)
+        if isinstance(x, complex):
+            return cmath.atan2(x)
+        else:
+            return math.atan2(x1, x2)
         
 def exp(x):
     """
@@ -1076,7 +1098,10 @@ def exp(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.exp()
     else:
-        return math.exp(x)
+        if isinstance(x, complex):
+            return cmath.exp(x)
+        else:
+            return math.exp(x)
         
 def log(x):
     """
@@ -1099,7 +1124,10 @@ def log(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.log()
     else:
-        return math.log(x)
+        if isinstance(x, complex):
+            return cmath.exp(x)
+        else:
+            return math.log(x)
         
 def log10(x):
     """
@@ -1119,7 +1147,10 @@ def log10(x):
     elif isinstance(x, (DimArray, MIArray)):
         return x.log10()
     else:
-        return math.log10(x)
+        if isinstance(x, complex):
+            return cmath.log10(x)
+        else:
+            return math.log10(x)
         
 def mean(x, axis=None):
     """

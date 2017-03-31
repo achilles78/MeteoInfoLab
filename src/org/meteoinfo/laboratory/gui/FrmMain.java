@@ -533,7 +533,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
         jComboBox_CurrentFolder.setEditable(true);
         jComboBox_CurrentFolder.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox_CurrentFolder.setPreferredSize(new java.awt.Dimension(300, 21));
+        jComboBox_CurrentFolder.setPreferredSize(new java.awt.Dimension(400, 21));
         jComboBox_CurrentFolder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox_CurrentFolderActionPerformed(evt);
@@ -562,7 +562,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         jPanel_Status.setLayout(jPanel_StatusLayout);
         jPanel_StatusLayout.setHorizontalGroup(
             jPanel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 699, Short.MAX_VALUE)
+            .addGap(0, 777, Short.MAX_VALUE)
         );
         jPanel_StatusLayout.setVerticalGroup(
             jPanel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

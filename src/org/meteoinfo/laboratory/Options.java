@@ -335,7 +335,8 @@ public class Options {
                 for (int i = 0; i < rfolders.getLength(); i++){
                     Node rfolder = rfolders.item(i);
                     String folder = rfolder.getAttributes().getNamedItem("Folder").getNodeValue();
-                    this.recentFolders.add(folder);
+                    if (!this.recentFolders.contains(folder))
+                        this.recentFolders.add(folder);
                 }
             }
             

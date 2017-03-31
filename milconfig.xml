@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\io">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\array">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
@@ -16,17 +15,18 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\awx_station.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\complex_1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\io\awx_station.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\complex_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="133,33" MainFormSize="1370,766"/>
+  <Startup MainFormLocation="133,33" MainFormSize="1412,766"/>
 </MeteoInfo>
