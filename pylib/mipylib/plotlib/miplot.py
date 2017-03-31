@@ -747,6 +747,8 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
     :param marker: (*string*) Marker of the points.
     :param label: (*string*) Label of the points series.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+        points to draw, in increasing order.
     
     :returns: Points legend break.
     """
@@ -770,7 +772,9 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     if isvalue:
         if isinstance(c, (list, tuple)):
             c = minum.array(c)
-        levels = kwargs.pop('levels', None)
+        levels = kwargs.pop('levs', None)
+        if levels is None:
+            levels = kwargs.pop('levels', None)
         if levels is None:
             cnum = kwargs.pop('cnum', None)
             if cnum is None:
