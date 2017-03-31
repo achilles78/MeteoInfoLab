@@ -7,6 +7,7 @@
 
 from org.meteoinfo.global import PointD
 from org.meteoinfo.global.util import DateUtil
+from org.meteoinfo.math import Complex
 from org.meteoinfo.shape import PointShape, PolylineShape, PolygonShape, ShapeUtil
 from java.util import Calendar, Locale
 from java.text import SimpleDateFormat
@@ -116,6 +117,16 @@ def dateformat(t, format, language=None):
         locale = Locale(language)
         df = SimpleDateFormat(format, locale)
     return df.format(jt)
+    
+def jcomplex(v):
+    '''
+    Convert Python complex number to Java Complex object.
+    
+    :param v: (*complex*) Python complex number.
+    
+    :returns: (*Complex*) Java Complex object.
+    '''
+    return Complex(v.real, v.img)
 
 def makeshapes(x, y, type=None):
     """
