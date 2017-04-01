@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\ascii">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
@@ -16,10 +15,17 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
   </Path>
   <File>
-    <OpenedFiles/>
-    <RecentFiles/>
+    <OpenedFiles>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread_160_plot.py"/>
+    </OpenedFiles>
+    <RecentFiles>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread_160_plot.py"/>
+    </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>

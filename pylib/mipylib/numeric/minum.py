@@ -55,12 +55,12 @@ c_meteodata = None
 currentfolder = None
 
 __all__ = [
-    'pi','e','inf','nan','addtimedim','arange','arange1',    
-    'array','asarray','asciiread','asgridarray','asgriddata','asin','asmiarray','asstationdata',
-    'atan','atan2','ave_month','histogram','binread','binwrite','broadcast_to','cdiff','concatenate',
+    'pi','e','inf','nan','arange','arange1',    
+    'array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
+    'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
     'corrcoef','cos','degrees','diag','dim_array','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
-    'interpn','isgriddata','isstationdata','joinncfile','linregress','linspace','log','log10',
+    'interpn','isgriddata','isstationdata','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','meshgrid','minimum','monthname',
     'numasciicol','numasciirow','nonzero','ones','ones_like','polyval','power',
     'project','projectxy','projinfo','radians','readtable','reshape',
