@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\ascii">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\dataconvert">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
@@ -16,15 +13,18 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread_160_plot.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\dataconvert\test.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\dataconvert\micaps4_nc.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\asciiread_160_plot.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\dataconvert\test.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\dataconvert\micaps4_nc.py"/>
     </RecentFiles>
   </File>
   <Font>

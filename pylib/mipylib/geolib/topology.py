@@ -8,6 +8,12 @@
 
 from org.meteoinfo.data import ArrayUtil
 from org.meteoinfo.shape import Graphic
+
+__all__ = [
+    'buffer','contains','convexhull','coveredby','covers','crosses','difference',
+    'disjoint','equals','intersection','overlaps','reform','union','symdifference',
+    'split','touches','within','asshape'
+    ]
             
 def asshape(a):
     if isinstance(a, Graphic):

@@ -14,6 +14,12 @@ from datetime import datetime
 import mipylib.miutil as miutil
 
 class MILayer():
+    '''
+    Map layer
+    
+    :param layer: (*MapLayer*) MapLayer object.
+    :param shapetype: (*ShapeTypes*) Shape type ['point' | 'line' | 'polygon']
+    '''
     def __init__(self, layer=None, shapetype=None):
         if layer is None:
             if shapetype is None:
@@ -39,6 +45,14 @@ class MILayer():
         return self.layer.getLayerType() == LayerTypes.VectorLayer
     
     def cellvalue(self, fieldname, shapeindex):
+        '''
+        Get attribute table cell value.
+        
+        :param fieldname: (*string*) Field name.
+        :param shapeindex: (*int*) Shape index.
+        
+        :returns: The value in attribute table identified by field name and shape index.
+        '''
         v = self.layer.getCellValue(fieldname, shapeindex)
         if isinstance(v, Date):
             cal = Calendar.getInstance()
@@ -55,6 +69,13 @@ class MILayer():
             return v
             
     def setcellvalue(self, fieldname, shapeindex, value):
+        '''
+        Set cell value in attribute table.
+        
+        :param fieldname: (*string*) Field name.
+        :param shapeindex: (*int*) Shape index.
+        :param value: (*object*) Cell value to be asigned.
+        '''
         self.layer.editCellValue(fieldname, shapeindex, value)
             
     def shapes(self):

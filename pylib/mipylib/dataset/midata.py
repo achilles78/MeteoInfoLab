@@ -90,14 +90,13 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
         fname = fname.strip()
         fname, isweb = __getfilename(fname)
         if fname is None:
-            return None
+            raise IOError(fname)
 
         if isweb:
             return addfile_nc(fname, False)
         
         if not os.path.exists(fname):
-            print 'File not exist: ' + fname
-            return None
+            raise IOError(fname)
         
         fsufix = os.path.splitext(fname)[1].lower()
         if fsufix == '.ctl':
@@ -264,6 +263,8 @@ def addfile_hytraj(fname, getfn=True):
     if isinstance(fname, basestring):
         if getfn:
             fname, isweb = __getfilename(fname)
+    if not os.path.exists(fname):
+        raise IOError('No such file: ' + fname)
     meteodata = MeteoDataInfo()
     meteodata.openHYSPLITTrajData(fname)
     datafile = DimDataFile(meteodata)
@@ -280,6 +281,8 @@ def addfile_hyconc(fname, getfn=True):
     '''
     if getfn:
         fname, isweb = __getfilename(fname)
+    if not os.path.exists(fname):
+        raise IOError('No such file: ' + fname)
     meteodata = MeteoDataInfo()
     meteodata.openHYSPLITConcData(fname)
     datafile = DimDataFile(meteodata)
@@ -296,6 +299,8 @@ def addfile_geotiff(fname, getfn=True):
     '''
     if getfn:
         fname, isweb = __getfilename(fname)
+    if not os.path.exists(fname):
+        raise IOError('No such file: ' + fname)
     meteodata = MeteoDataInfo()
     meteodata.openGeoTiffData(fname)
     datafile = DimDataFile(meteodata)
@@ -313,6 +318,8 @@ def addfile_awx(fname, getfn=True):
     '''
     if getfn:
         fname, isweb = __getfilename(fname)
+    if not os.path.exists(fname):
+        raise IOError('No such file: ' + fname)
     meteodata = MeteoDataInfo()
     meteodata.openAWXData(fname)
     datafile = DimDataFile(meteodata)
@@ -330,8 +337,7 @@ def addfile_ascii_grid(fname, getfn=True):
     if getfn:
         fname, isweb = __getfilename(fname)
     if not os.path.exists(fname):
-        print 'File not exist: ' + fname
-        return None
+        raise IOError('No such file: ' + fname)
     meteodata = MeteoDataInfo()
     meteodata.openASCIIGridData(fname)
     datafile = DimDataFile(meteodata)
@@ -376,6 +382,8 @@ def asciiread(filename, **kwargs):
     
     :returns: (*MIArray*) The data array.
     '''
+    if not os.path.exists(filename):
+        raise IOError('No such file: ' + filename)
     delimiter = kwargs.pop('delimiter', None)
     datatype = kwargs.pop('datatype', None)
     headerlines = kwargs.pop('headerlines', 0)
@@ -396,12 +404,14 @@ def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     
     :returns: (*MIArray*) Data array
     """
+    if not os.path.exists(fn):
+        raise IOError('No such file: ' + fn)
     r = ArrayUtil.readBinFile(fn, dim, datatype, skip, byteorder);
     return MIArray(r)
         
 def binwrite(fn, data, byteorder='little_endian', append=False):
     """
-    Create a binary data file from an array variable.
+    Write array data into a binary data file.
     
     :param fn: (*string*) Path needed to locate binary file.
     :param data: (*array_like*) A numeric array variable of any dimensionality.
