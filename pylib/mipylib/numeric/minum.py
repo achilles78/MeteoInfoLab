@@ -61,7 +61,7 @@ __all__ = [
     'corrcoef','cos','degrees','diag','dim_array','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isgriddata','isstationdata','linregress','linspace','log','log10',
-    'logspace','magnitude','maximum','mean','meshgrid','minimum','monthname',
+    'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
     'numasciicol','numasciirow','nonzero','ones','ones_like','polyval','power',
     'project','projectxy','projinfo','radians','readtable','reshape',
     'rolling_mean','rot90','sin','sort','argsort','sqrt','tan','transpose','trapz','vdot',
@@ -1154,7 +1154,7 @@ def log10(x):
         
 def mean(x, axis=None):
     """
-    Compute tha arithmetic mean
+    Compute tha arithmetic mean along the specified axis.
     
     :param x: (*array_like or list*) Input values.
     
@@ -1177,13 +1177,58 @@ def mean(x, axis=None):
             r = DataMath.mean(a)
             return PyStationData(r)
         else:
-            return None
+            x = array(x)
+            r = ArrayMath.mean(x.asarray())
+            return r
     else:
         if axis is None:
             r = ArrayMath.mean(x.asarray())
             return r
         else:
             r = ArrayMath.mean(x.asarray(), axis)
+            if isinstance(x, MIArray):
+                return MIArray(r)
+            else:
+                dims = []
+                for i in range(0, x.ndim):
+                    if i != axis:
+                        dims.append(x.dims[i])
+                return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+                
+def median(x, axis=None):
+    """
+    Compute tha median along the specified axis.
+    
+    :param x: (*array_like or list*) Input values.
+    
+    returns: (*array_like*) Median result
+    """
+    if isinstance(x, list):
+        if isinstance(x[0], (MIArray, DimArray)):
+            a = []
+            for xx in x:
+                a.append(xx.asarray())
+            r = ArrayMath.median(a)
+            if isinstance(x[0], MIArray):            
+                return MIArray(r)
+            else:
+                return DimArray(MIArray(r), x[0].dims, x[0].fill_value, x[0].proj)
+        elif isinstance(x[0], PyStationData):
+            a = []
+            for xx in x:
+                a.append(xx.data)
+            r = DataMath.median(a)
+            return PyStationData(r)
+        else:
+            x = array(x)
+            r = ArrayMath.median(x.asarray())
+            return r
+    else:
+        if axis is None:
+            r = ArrayMath.median(x.asarray())
+            return r
+        else:
+            r = ArrayMath.median(x.asarray(), axis)
             if isinstance(x, MIArray):
                 return MIArray(r)
             else:

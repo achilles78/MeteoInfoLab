@@ -647,6 +647,9 @@ class DimArray():
     def ave(self):
         return self.array.ave()
         
+    def median(self, axis=None):
+        return self.array.median(axis)
+        
     def setdata(self, v, x=None, y=None, method='mean'):
         '''
         Set data values according the locations.

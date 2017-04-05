@@ -356,6 +356,12 @@ class MIArray(object):
         else:
             return ArrayMath.aveDouble(self.array, fill_value)
             
+    def median(self, axis=None):
+        if axis is None:
+            return ArrayMath.median(self.array)
+        else:
+            return MIArray(ArrayMath.median(self.array, axis))
+            
     def sqrt(self):
         return MIArray(ArrayMath.sqrt(self.array))
     
