@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\dataconvert">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
@@ -19,12 +19,12 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\dataconvert\test.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\dataconvert\micaps4_nc.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_3.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\dataconvert\test.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\dataconvert\micaps4_nc.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_3.py"/>
     </RecentFiles>
   </File>
   <Font>
