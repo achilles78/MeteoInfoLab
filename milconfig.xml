@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
     <RecentFolder Folder="D:\Temp\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
@@ -16,15 +14,15 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\MeteoInfoLab"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -2106,8 +2106,36 @@ def __getsymbolinterval(n):
         i = n / v
     
     return i
+
+def __getfont(fontdic, **kwargs):
+    basefont = kwargs.pop('basefont', None)
+    if basefont is None:
+        name = 'Arial'
+        size = 14
+        bold = False
+        italic = False
+    else:
+        name = basefont.getName()
+        size = basefont.getSize()
+        bold = basefont.isBold()
+        italic = basefont.isItalic()
+    name = fontdic.pop('name', name)
+    size = fontdic.pop('size', size)
+    bold = fontdic.pop('bold', bold)
+    italic = fontdic.pop('italic', italic)
+    if bold:
+        if italic:
+            font = Font(name, Font.BOLD | Font.ITALIC, size)
+        else:
+            font = Font(name, Font.BOLD, size)
+    else:
+        if italic:
+            font = Font(name, Font.ITALIC, size)
+        else:
+            font = Font(name, Font.PLAIN, size)
+    return font
     
-def __getfont(**kwargs):
+def __getfont_1(**kwargs):
     fontname = kwargs.pop('fontname', 'Arial')
     fontsize = kwargs.pop('fontsize', 14)
     bold = kwargs.pop('bold', False)
@@ -2762,20 +2790,22 @@ def colorbar(mappable, **kwargs):
     shrink = kwargs.pop('shrink', 1)
     orientation = kwargs.pop('orientation', 'vertical')
     aspect = kwargs.pop('aspect', 20)
-    fontname = kwargs.pop('fontname', 'Arial')
-    fontsize = kwargs.pop('fontsize', 14)
-    bold = kwargs.pop('bold', False)
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
+    tickfontdic = kwargs.pop('tickfont', None)
+    if tickfontdic is None:
+        tickfont = __getfont_1(**kwargs)    
     else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    fontname = kwargs.pop('labelfontname', fontname)
-    fontsize = kwargs.pop('labelfontsize', fontsize)
-    bold = kwargs.pop('labelbold', bold)
-    if bold:
-        labelfont = Font(fontname, Font.BOLD, fontsize)
+        tickfont = __getfont(tickfontdic)
+    labelfontdic = kwargs.pop('labelfont', None)
+    if labelfontdic is None:
+        labfontname = kwargs.pop('labelfontname', tickfont.getName())
+        labfontsize = kwargs.pop('labelfontsize', tickfont.getSize())
+        labbold = kwargs.pop('labelbold', tickfont.isBold())
+        if labbold:
+            labelfont = Font(labfontname, Font.BOLD, labfontsize)
+        else:
+            labelfont = Font(labfontname, Font.PLAIN, labfontsize)    
     else:
-        labelfont = Font(fontname, Font.PLAIN, fontsize)    
+        labelfont = __getfont(labelfontdic)
     if isinstance(mappable, MILayer):
         ls = mappable.legend()
     elif isinstance(mappable, LegendScheme):
@@ -2793,7 +2823,7 @@ def colorbar(mappable, **kwargs):
     legend.setColorbar(True)   
     legend.setShrink(shrink)
     legend.setAspect(aspect)
-    legend.setTickFont(font)
+    legend.setTickFont(tickfont)
     legend.setLabelFont(labelfont)
     label = kwargs.pop('label', None)
     if not label is None:
@@ -4479,8 +4509,7 @@ def clabel(layer, **kwargs):
     :param xoffset: (*int*) X offset of the labels.
     :param yoffset: (int*) Y offset of the labels.
     :param avoidcoll: (*boolean*) Avoid labels collision or not.
-    '''
-    font = __getfont(**kwargs)
+    '''    
     color = kwargs.pop('color', None)    
     gc = layer
     if isinstance(layer, MILayer):
@@ -4495,7 +4524,13 @@ def clabel(layer, **kwargs):
         if fieldname is None:
             fieldname = gc.getFieldName(0)
         labelset.setFieldName(fieldname)
-    labelset.setLabelFont(font)
+    fontdic = kwargs.pop('font', None)
+    if not fontdic is None:
+        font = __getfont(fontdic)
+        labelset.setLabelFont(font)
+    else:
+        font = __getfont_1(**kwargs)
+        labelset.setLabelFont(font)
     if color is None:
         labelset.setColorByLegend(True)
     else:
