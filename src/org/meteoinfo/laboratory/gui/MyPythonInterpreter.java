@@ -5,6 +5,7 @@
  */
 package org.meteoinfo.laboratory.gui;
 
+import java.io.InputStream;
 import org.python.core.PyObject;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
@@ -29,6 +30,22 @@ public class MyPythonInterpreter extends PythonInterpreter{
      */
     public MyPythonInterpreter(PyObject obj, PySystemState state){
         super(obj, state);
+        this.cflags.source_is_utf8 = true;
+    }
+    
+    @Override
+    public void execfile(InputStream s){
+        this.cflags.source_is_utf8 = false;
+        this.systemState.setdefaultencoding("utf-8");
+        super.execfile(s);
+        this.cflags.source_is_utf8 = true;
+    }
+    
+    @Override
+    public void execfile(String fn){
+        this.cflags.source_is_utf8 = false;
+        this.systemState.setdefaultencoding("utf-8");
+        super.execfile(fn);
         this.cflags.source_is_utf8 = true;
     }
 }
