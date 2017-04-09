@@ -1770,13 +1770,19 @@ def savefig(fname, width=None, height=None, dpi=None, sleep=None):
         is None, the output figure size is same as *figures* window.
     :param sleep: (*int*) Sleep seconds. For web map tiles loading.
     """
-    if (not width is None) and (not height is None):
-        chartpanel.setSize(width, height)
+    #if (not width is None) and (not height is None):
+    #    chartpanel.setSize(width, height)
     #chartpanel.paintGraphics()
     if dpi != None:
-        chartpanel.saveImage(fname, dpi, sleep)
+        if (not width is None) and (not height is None):
+            chartpanel.saveImage(fname, dpi, width, height, sleep)
+        else:
+            chartpanel.saveImage(fname, dpi, sleep)
     else:
-        chartpanel.saveImage(fname, sleep)   
+        if (not width is None) and (not height is None):
+            chartpanel.saveImage(fname, width, height, sleep)
+        else:
+            chartpanel.saveImage(fname, sleep)  
         
 def savefig_jpeg(fname, width=None, height=None, dpi=None):
     """
@@ -1790,13 +1796,19 @@ def savefig_jpeg(fname, width=None, height=None, dpi=None):
     :param height: (*int*) Optional, height of the output figure with pixel units. Default
         is None, the output figure size is same as *figures* window.
     """
-    if (not width is None) and (not height is None):
-        chartpanel.setSize(width, height)
-    chartpanel.paintGraphics()
+    #if (not width is None) and (not height is None):
+    #    chartpanel.setSize(width, height)
+    #chartpanel.paintGraphics()
     if not dpi is None:
-        chartpanel.saveImage_Jpeg(fname, dpi)
+        if (not width is None) and (not height is None):
+            chartpanel.saveImage_Jpeg(fname, width, height, dpi)
+        else:
+            chartpanel.saveImage_Jpeg(fname, dpi)
     else:
-        chartpanel.saveImage(fname)  
+        if (not width is None) and (not height is None):
+            chartpanel.saveImage(fname, width, height)
+        else:
+            chartpanel.saveImage(fname)  
 
 # Clear current axes
 def cla():

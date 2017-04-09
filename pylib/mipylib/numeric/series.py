@@ -18,12 +18,13 @@ nan = Double.NaN
 
 class Series(object):
 
-    def __init__(self, data=None, index=None):
+    def __init__(self, data=None, index=None, name=None):
         '''
         One-dimensional array with axis labels (including time series).
         
         :param data: (*array_like*) One-dimensional array data.
         :param index: (*list*) Data index list. Values must be unique and hashable, same length as data.
+        :param name: (*string*) Series name.
         '''
         if isinstance(data, (list, tuple)):
             data = minum.array(data)
@@ -38,6 +39,7 @@ class Series(object):
         if isinstance(index, (MIArray, DimArray)):
             index = index.tolist()
         self._index = index
+        self.name = name
         
     #---- Index property
     def get_index(self):
