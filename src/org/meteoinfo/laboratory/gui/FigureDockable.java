@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -47,7 +48,7 @@ public class FigureDockable extends DefaultSingleCDockable {
                         ex.printStackTrace();
                     }
                 } else {
-                    interp.set("cp", tabbedPanel.getSelectedComponent());
+                    interp.set("cp", getCurrentFigure());
                     interp.exec("mipylib.plotlib.miplot.chartpanel = cp");
                     interp.exec("mipylib.plotlib.miplot.c_plot = None");
                 }
@@ -154,17 +155,18 @@ public class FigureDockable extends DefaultSingleCDockable {
      * @return Figure chart panel
      */
     public final ChartPanel addNewFigure(String title, final ChartPanel cp) {
-        this.tabbedPanel.add(cp, title);
-        this.tabbedPanel.setSelectedComponent(cp);
+        final JScrollPane sp = new JScrollPane(cp);
+        this.tabbedPanel.add(sp, title);
+        this.tabbedPanel.setSelectedComponent(sp);
         ButtonTabComponent btc = new ButtonTabComponent(tabbedPanel);
         JButton button = btc.getTabButton();
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tabbedPanel.remove(cp);
+                tabbedPanel.remove(sp);
             }
         });
-        tabbedPanel.setTabComponentAt(tabbedPanel.indexOfComponent(cp), btc);
+        tabbedPanel.setTabComponentAt(tabbedPanel.indexOfComponent(sp), btc);
 
         return cp;
     }
@@ -208,14 +210,15 @@ public class FigureDockable extends DefaultSingleCDockable {
             }
         }
 
-        this.tabbedPanel.add(ncp, "Figure " + String.valueOf(idx));
-        this.tabbedPanel.setSelectedComponent(ncp);
+        final JScrollPane sp = new JScrollPane(ncp);
+        this.tabbedPanel.add(sp, "Figure " + String.valueOf(idx));
+        this.tabbedPanel.setSelectedComponent(sp);
         ButtonTabComponent btc = new ButtonTabComponent(tabbedPanel);
         JButton button = btc.getTabButton();
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tabbedPanel.remove(ncp);
+                tabbedPanel.remove(sp);
                 PythonInteractiveInterpreter interp = parent.getConsoleDockable().getInterpreter();
                 if (tabbedPanel.getTabCount() == 0) {
                     try {
@@ -225,13 +228,13 @@ public class FigureDockable extends DefaultSingleCDockable {
                         ex.printStackTrace();
                     }
                 } else {
-                    interp.set("cp", tabbedPanel.getSelectedComponent());
+                    interp.set("cp", getCurrentFigure());
                     interp.exec("mipylib.plotlib.miplot.chartpanel = cp");
                     interp.exec("mipylib.plotlib.miplot.c_plot = None");
                 }
             }
         });
-        tabbedPanel.setTabComponentAt(tabbedPanel.indexOfComponent(ncp), btc);
+        tabbedPanel.setTabComponentAt(tabbedPanel.indexOfComponent(sp), btc);
 
         return ncp;
     }
@@ -245,8 +248,8 @@ public class FigureDockable extends DefaultSingleCDockable {
         if (this.tabbedPanel.getTabCount() == 0) {
             return null;
         }
-
-        return (ChartPanel) this.tabbedPanel.getSelectedComponent();
+        JScrollPane sp = (JScrollPane)this.tabbedPanel.getSelectedComponent();
+        return (ChartPanel)sp.getViewport().getView();
     }
 
     /**
@@ -257,19 +260,20 @@ public class FigureDockable extends DefaultSingleCDockable {
      */
     public ChartPanel getFigure(int idx) {
         if (this.tabbedPanel.getTabCount() > idx) {
-            return (ChartPanel) this.tabbedPanel.getTabComponentAt(idx);
+            JScrollPane sp = (JScrollPane)this.tabbedPanel.getTabComponentAt(idx);
+            return (ChartPanel)sp.getViewport().getView();
         } else {
             return null;
         }
     }
 
-    /**
-     * Set current figure
-     * @param cp ChartPanel
-     */
-    public void setCurrentFigure(ChartPanel cp){
-        if (this.tabbedPanel.getTabCount() > 0){
-            this.tabbedPanel.setComponentAt(this.tabbedPanel.getSelectedIndex(), cp);
-        }
-    }
+//    /**
+//     * Set current figure
+//     * @param cp ChartPanel
+//     */
+//    public void setCurrentFigure(ChartPanel cp){
+//        if (this.tabbedPanel.getTabCount() > 0){
+//            this.tabbedPanel.setComponentAt(this.tabbedPanel.getSelectedIndex(), cp);
+//        }
+//    }
 }

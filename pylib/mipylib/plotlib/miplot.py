@@ -1273,6 +1273,8 @@ def figure(bgcolor=None, figsize=None, newfig=True):
     if not batchmode:
         show(newfig)
         
+    return chartpanel
+        
 def show(newfig=True):
     if milapp1 == None:
         if not batchmode:            
