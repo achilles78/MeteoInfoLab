@@ -213,12 +213,13 @@ public class FigureDockable extends DefaultSingleCDockable {
         final JScrollPane sp = new JScrollPane(ncp);
         this.tabbedPanel.add(sp, "Figure " + String.valueOf(idx));
         this.tabbedPanel.setSelectedComponent(sp);
-        ButtonTabComponent btc = new ButtonTabComponent(tabbedPanel);
+        final ButtonTabComponent btc = new ButtonTabComponent(tabbedPanel);
         JButton button = btc.getTabButton();
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tabbedPanel.remove(sp);
+                if (tabbedPanel.getTabCount() > 0)
+                    tabbedPanel.remove(tabbedPanel.indexOfTabComponent(btc));
                 PythonInteractiveInterpreter interp = parent.getConsoleDockable().getInterpreter();
                 if (tabbedPanel.getTabCount() == 0) {
                     try {
@@ -267,13 +268,14 @@ public class FigureDockable extends DefaultSingleCDockable {
         }
     }
 
-//    /**
-//     * Set current figure
-//     * @param cp ChartPanel
-//     */
-//    public void setCurrentFigure(ChartPanel cp){
-//        if (this.tabbedPanel.getTabCount() > 0){
-//            this.tabbedPanel.setComponentAt(this.tabbedPanel.getSelectedIndex(), cp);
-//        }
-//    }
+    /**
+     * Set current figure
+     * @param cp ChartPanel
+     */
+    public void setCurrentFigure(ChartPanel cp){
+        if (this.tabbedPanel.getTabCount() > 0){
+            JScrollPane sp = new JScrollPane(cp);
+            this.tabbedPanel.setComponentAt(this.tabbedPanel.getSelectedIndex(), sp);
+        }
+    }
 }
