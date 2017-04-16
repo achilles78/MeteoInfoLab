@@ -1296,6 +1296,11 @@ def show(newfig=True):
     
 # Set figure background color
 def bgcolor(color):
+    '''
+    Set figure background color
+    
+    :param color: (*Color*) Background color    
+    '''
     chart = chartpanel.getChart()
     if color is None:
         chart.setDrawBackground(False)
@@ -1304,7 +1309,7 @@ def bgcolor(color):
         chart.setBackground(__getcolor(color))
     draw_if_interactive()    
     
-def subplot(nrows, ncols, plot_number):
+def subplot(nrows, ncols, plot_number, **kwargs):
     """
     Returen a subplot axes positioned by the given grid definition.
     
@@ -1323,19 +1328,66 @@ def subplot(nrows, ncols, plot_number):
     chart = chartpanel.getChart()
     chart.setRowNum(nrows)
     chart.setColumnNum(ncols)
-    gca = chart.getPlot(plot_number)
-    chart.setCurrentPlot(plot_number - 1)
-    if gca is None:
+    gca = None
+    if isinstance(plot_number, int):
+        gca = chart.getPlot(plot_number)          
+    isnew = gca is None
+    if isnew:
         gca = XY2DPlot()
-        gca.isSubPlot = True
-        plot_number -= 1
-        rowidx = plot_number / ncols
-        colidx = plot_number % ncols
-        gca.rowIndex = rowidx
-        gca.columnIndex = colidx
+        gca.isSubPlot = True        
+        #gca.rowIndex = rowidx
+        #gca.columnIndex = colidx
+    else:
+        chart.setCurrentPlot(plot_number - 1)  
+    position = kwargs.pop('position', None)
+    if position is None:
+        if isnew:
+            if isinstance(plot_number, (list, tuple)):
+                i = 0
+                for pnum in plot_number:
+                    pnum -= 1
+                    rowidx = pnum / ncols
+                    colidx = pnum % ncols
+                    width = 1. / ncols
+                    height = 1. / nrows                    
+                    x = width * colidx
+                    y = 1. - height * (rowidx + 1)
+                    if i == 0:
+                        minx = x
+                        miny = y
+                        maxx = x + width
+                        maxy = y + height
+                    else:
+                        minx = min(x, minx)
+                        miny = min(y, miny)
+                        maxx = max(x + width, maxx)
+                        maxy = max(y + height, maxy)
+                    i += 1
+                x = minx
+                y = miny
+                width = maxx - minx
+                height = maxy - miny
+            else:
+                plot_number -= 1
+                rowidx = plot_number / ncols
+                colidx = plot_number % ncols
+                width = 1. / ncols
+                height = 1. / nrows
+                x = width * colidx
+                y = 1. - height * (rowidx + 1)
+            gca.setPosition(x, y, width, height)
+            gca.setOuterPosition(x, y, width, height)
+            gca.setOuterPosActive(True)
+    else:
+        gca.setPosition(position)
+        gca.setOuterPosActive(False)
+    outerposition = kwargs.pop('outerposition', None)
+    if not outerposition is None:
+        gca.setOuterPosition(outerposition)
+        gca.setOuterPosActive(True)
+    if isnew:
         chart.addPlot(gca)
         chart.setCurrentPlot(chart.getPlots().size() - 1)
-    #gca = plot
     
     return gca
     
@@ -1356,6 +1408,7 @@ def axes(*args, **kwargs):
     
     :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
         height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param outerposition: (*list*) Optional, axes size and location, including labels and margin.
     :param aspect: (*string*) ['equal' | 'auto'] or a number. If a number the ratio of x-unit/y-unit in screen-space.
         Default is 'auto'.
     :param bgcolor: (*Color*) Optional, axes background color.
@@ -1376,7 +1429,7 @@ def axes(*args, **kwargs):
     if len(args) > 0:
         position = args[0]
     else:
-        position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
+        position = kwargs.pop('position', None)
     aspect = kwargs.pop('aspect', 'auto')
     axis = kwargs.pop('axis', True)
     if axis:
@@ -1404,12 +1457,21 @@ def axes(*args, **kwargs):
     xaxistype = kwargs.pop('xaxistype', None)
     bgcobj = kwargs.pop('bgcolor', None)    
     polar = kwargs.pop('polar', False)
+    outerposition = kwargs.pop('outerposition', None)
     if polar:
         #plot = PolarPlot()
         plot = PolarAxes()
     else:
         plot = XY2DPlot()
-    plot.setPosition(position[0], position[1], position[2], position[3])    
+    if position is None:
+        position = [0.13, 0.11, 0.775, 0.815]
+        plot.setOuterPosActive(True)
+    else:        
+        plot.setOuterPosActive(False)        
+    plot.setPosition(position[0], position[1], position[2], position[3])   
+    if not outerposition is None:
+        plot.setOuterPosition(outerposition)
+        plot.setOuterPosActive(True)
     if bottomaxis == False:
         plot.getAxis(Location.BOTTOM).setVisible(False)
     if leftaxis == False:

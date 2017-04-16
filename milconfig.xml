@@ -19,12 +19,14 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\subplot_8plots.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\map_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\polar_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\subplot_4plots.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\subplot_join.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\subplot_8plots.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\map_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\polar_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\subplot_4plots.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\subplot_join.py"/>
     </RecentFiles>
   </File>
   <Font>
