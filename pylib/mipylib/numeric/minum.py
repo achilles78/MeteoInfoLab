@@ -1072,10 +1072,7 @@ def atan2(x1, x2):
     if isinstance(x1, DimArray) or isinstance(x1, MIArray):
         return MIArray(ArrayMath.atan2(x1.asarray(), x2.asarray()))
     else:
-        if isinstance(x, complex):
-            return cmath.atan2(x)
-        else:
-            return math.atan2(x1, x2)
+        return math.atan2(x1, x2)
         
 def exp(x):
     """

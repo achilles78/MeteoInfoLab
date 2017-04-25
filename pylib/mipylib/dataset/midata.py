@@ -398,7 +398,7 @@ def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     
     :param fn: (*string*) The binary file name for data reading. 
     :param dim: (*list*) Dimensions.
-    :param datatype: (*string*) Data type string.
+    :param datatype: (*string*) Data type string [byte | short | int | float | double].
     :param skip: (*int*) Skip bytes number.
     :param byteorder: (*string*) Byte order. ``little_endian`` or ``big_endian``.
     

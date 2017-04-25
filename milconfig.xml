@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\satellite">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\meteo">
     <RecentFolder Folder="D:\Temp\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
@@ -19,10 +19,12 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\satellite\cs2_smos_ice.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\test\wrfout_test-1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\test\wrfout_test.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\satellite\cs2_smos_ice.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\test\wrfout_test-1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\test\wrfout_test.py"/>
     </RecentFiles>
   </File>
   <Font>

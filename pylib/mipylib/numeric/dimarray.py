@@ -779,13 +779,13 @@ class DimArray():
             r = pr[0]
             x = pr[1]
             y = pr[2]
-            dims = []
+            dims = self.dims
             ydim = Dimension(DimensionType.Y)
             ydim.setDimValues(MIArray(y).aslist())
-            dims.append(ydim)
+            dims[-2] = ydim
             xdim = Dimension(DimensionType.X)
             xdim.setDimValues(MIArray(x).aslist())    
-            dims.append(xdim)
+            dims[-1] = xdim
             rr = DimArray(MIArray(r), dims, self.fill_value, toproj)
             return rr
         

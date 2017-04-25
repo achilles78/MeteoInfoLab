@@ -1541,7 +1541,7 @@ def axesm(*args, **kwargs):
     if len(args) > 0:
         position = args[0]
     else:
-        position = kwargs.pop('position', [0.13, 0.11, 0.775, 0.815])
+        position = kwargs.pop('position', None)
     axis = kwargs.pop('axis', True)
     if axis:
         bottomaxis = kwargs.pop('bottomaxis', True)
@@ -1615,8 +1615,25 @@ def axesm(*args, **kwargs):
     global gca
     mapview = MapView(projinfo)
     mapview.setXYScaleFactor(xyscale)
-    gca = MapPlot(mapview)    
-    gca.setPosition(position[0], position[1], position[2], position[3])
+    plot = MapPlot(mapview)  
+    if gca is None:
+        gca = plot
+        if position is None:
+            position = [0.13, 0.11, 0.775, 0.815]
+        gca.setPosition(position[0], position[1], position[2], position[3])
+    else:
+        if gca.isSubPlot:
+            plot.isSubPlot = True
+            if position is None:
+                plot.setPosition(gca.getPosition())
+            else:
+                plot.setPosition(position[0], position[1], position[2], position[3])
+            gca = plot
+        else:
+            gca = plot
+            if position is None:
+                position = [0.13, 0.11, 0.775, 0.815]
+            gca.setPosition(position[0], position[1], position[2], position[3])
     tickfontname = kwargs.pop('tickfontname', 'Arial')
     tickfontsize = kwargs.pop('tickfontsize', 14)
     tickbold = kwargs.pop('tickbold', False)
