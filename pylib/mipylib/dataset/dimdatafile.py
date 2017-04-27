@@ -4,7 +4,7 @@
 # Purpose: MeteoInfo Dataset module
 # Note: Jython
 #-----------------------------------------------------
-from org.meteoinfo.data.meteodata import MeteoDataInfo
+from org.meteoinfo.data.meteodata import MeteoDataInfo, MeteoDataType
 from ucar.ma2 import Section, DataType
 from ucar.nc2 import Attribute
 import dimvariable
@@ -183,8 +183,9 @@ class DimDataFile():
         return times
         
     def bigendian(self, big_endian):
-        if self.dataset.getDataInfo().getDataType().isGrADS():
-            self.dataset.getDataInfo().setBigEndian(big_endian)
+        datatype = self.dataset.getDataInfo().getDataType()
+        if datatype.isGrADS() or datatype == MeteoDataType.HYSPLIT_Conc:
+            self.dataset.getDataInfo().setBigEndian(big_endian)            
             
     def tostation(self, varname, x, y, z, t):
         if isinstance(t, datetime.datetime):

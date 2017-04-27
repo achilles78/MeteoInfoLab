@@ -270,7 +270,7 @@ def addfile_hytraj(fname, getfn=True):
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_hyconc(fname, getfn=True):
+def addfile_hyconc(fname, getfn=True, big_endian=True):
     '''
     Add a HYSPLIT concentration data file.
     
@@ -284,7 +284,7 @@ def addfile_hyconc(fname, getfn=True):
     if not os.path.exists(fname):
         raise IOError('No such file: ' + fname)
     meteodata = MeteoDataInfo()
-    meteodata.openHYSPLITConcData(fname)
+    meteodata.openHYSPLITConcData(fname, big_endian)
     datafile = DimDataFile(meteodata)
     return datafile
     
