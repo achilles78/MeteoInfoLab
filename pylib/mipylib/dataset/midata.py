@@ -27,7 +27,7 @@ currentfolder = None
 __all__ = [
     'addfile','addfiles','addfile_arl','addfile_ascii_grid','addfile_awx','addfile_geotiff',
     'addfile_grads','addfile_hyconc','addfile_hytraj','addfile_lonlat','addfile_micaps',
-    'addfile_mm5','addfile_nc','addfile_surfer',
+    'addfile_mm5','addfile_nc','addfile_grib','addfile_surfer',
     'addtimedim','joinncfile','asciiread','binread','binwrite',
     'convert2nc','dimension','grads2nc','ncwrite'
     ]
@@ -170,6 +170,26 @@ def addfile_nc(fname, getfn=True):
     datafile = DimDataFile(meteodata)
     return datafile
     
+def addfile_grib(fname, getfn=True, version=None):
+    '''
+    Add a GRIB data file.
+    
+    :param fname: (*string*) The GRIB file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    :param version: (*int*) None, GRIB-1 or GRIB-2. Default is None, the version will be read from data.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
+    if getfn:
+        fname, isweb = __getfilename(fname)
+    meteodata = MeteoDataInfo()
+    if version is None:
+        meteodata.openNetCDFData(fname)
+    else:
+        meteodata.openGRIBData(fname, version)
+    datafile = DimDataFile(meteodata)
+    return datafile
+    
 def addfile_arl(fname, getfn=True):
     '''
     Add a ARL data file.
@@ -276,6 +296,7 @@ def addfile_hyconc(fname, getfn=True, big_endian=True):
     
     :param fname: (*string*) The HYSPLIT concentration file name.
     :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    :param big_endian: (*boolean*) Big_endian or little_endian.
     
     :returns: (*DimDataFile*) Opened file object.
     '''
