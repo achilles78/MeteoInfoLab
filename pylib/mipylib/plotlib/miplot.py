@@ -54,7 +54,7 @@ __all__ = [
     'gca','antialias','axes','axesm','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
     'contourfm','contourm','currentplot','display','draw_if_interactive','errorbar',
-    'figure','fill_between','gca','webmap','geoshow','gifaddframe','gifanimation','giffinish',
+    'figure','patch','rectangle','fill_between','gca','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatterm',
@@ -235,7 +235,7 @@ def plot(*args, **kwargs):
                 line.setCaption(label)
                 lines.append(line)
     
-    #Create XY1DPlot
+    #Create XY2DPlot
     if gca is None:
         plot = XY2DPlot()
     else:
@@ -255,9 +255,11 @@ def plot(*args, **kwargs):
     #plot.setDataset(dataset)     
 
     #Add graphics
+    graphics = []
     if isxylistdata:
         graphic = GraphicFactory.createLineString(dataset, lines)
         plot.addGraphic(graphic)
+        graphics.append(graphic)
     else:
         #Add data series
         snum = len(xdatalist)
@@ -267,7 +269,7 @@ def plot(*args, **kwargs):
             ydata = __getplotdata(ydatalist[i])
             graphic = GraphicFactory.createLineString(xdata, ydata, lines[i])
             plot.addGraphic(graphic)
-            #dataset.addSeries(label, xdata, ydata)
+            graphics.append(graphic)
     plot.setAutoExtent()
     
     #Paint dataset
@@ -282,10 +284,10 @@ def plot(*args, **kwargs):
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
     draw_if_interactive()
-    if len(lines) > 1:
-        return lines
+    if len(graphics) > 1:
+        return graphics
     else:
-        return lines[0]
+        return graphics[0]
         
 def semilogy(*args, **kwargs):
     """
@@ -846,6 +848,76 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     gca = plot
     draw_if_interactive()
     return ls
+
+def patch(x, y, **kwargs):
+    '''
+    Create one or more filled polygons.
+    
+    :param x: (*array_like*) X coordinates for each vertex.
+    :param y: (*array_like*) Y coordinates for each vertex.
+    '''
+    lbreak, isunique = __getlegendbreak('polygon', **kwargs)
+    x = __getplotdata(x)
+    y = __getplotdata(y)
+    graphics = GraphicFactory.createPolygons(x, y, lbreak)
+    
+    global gca 
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    plot.addGraphic(graphics)
+    plot.setAutoExtent()
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return graphics
+    
+def rectangle(position, curvature=None, **kwargs):
+    '''
+    Create one or more filled polygons.
+    
+    :param position: (*list*) Position of the rectangle [x, y, width, height].
+    :param curvature: (*list*) Curvature of the rectangle [x, y]. Default is None.
+    '''
+    lbreak, isunique = __getlegendbreak('polygon', **kwargs)
+    if isinstance(curvature, (int, float)):
+        curvature = [curvature, curvature]
+    graphic = GraphicFactory.createRectangle(position, curvature, lbreak)
+    
+    global gca 
+    if gca is None:
+        plot = XY2DPlot()
+    else:
+        if isinstance(gca, XY2DPlot):
+            plot = gca
+        else:
+            plot = XY2DPlot()
+    plot.addGraphic(graphic)
+    plot.setAutoExtent()
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, XY2DPlot)):
+        chart.setCurrentPlot(plot)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return graphic
     
 def fill_between(x, y1, y2=0, where=None, **kwargs):
     """
@@ -1472,6 +1544,12 @@ def axes(*args, **kwargs):
     if not outerposition is None:
         plot.setOuterPosition(outerposition)
         plot.setOuterPosActive(True)
+    if aspect == 'equal':
+        plot.setAutoAspect(False)
+    else:
+        if isinstance(aspect, (int, float)):
+            plot.setAspect(aspect)
+            plot.setAutoAspect(False)
     if bottomaxis == False:
         plot.getAxis(Location.BOTTOM).setVisible(False)
     if leftaxis == False:
@@ -2749,7 +2827,12 @@ def legend(*args, **kwargs):
     ls = kwargs.pop('legend', None)
     if ls is None:
         if len(args) > 0:
-            lbs = args[0]
+            lbs = []
+            for lb in args[0]:
+                if isinstance(lb, (Graphic, GraphicCollection)):
+                    lbs.append(lb.getLegend())
+                else:
+                    lbs.append(lb)
             if len(args) == 2:
                 for i in range(0, len(lbs)):
                     labels = args[1]
