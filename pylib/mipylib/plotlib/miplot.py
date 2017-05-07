@@ -51,14 +51,14 @@ isholdon = True
 gca = None
 
 __all__ = [
-    'gca','antialias','axes','axesm','axis','axism','bar','barbs','barbsm','bgcolor','box',
+    'gca','antialias','axes','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
-    'contourfm','contourm','currentplot','display','draw_if_interactive','errorbar',
-    'figure','patch','rectangle','fill_between','gca','webmap','geoshow','gifaddframe','gifanimation','giffinish',
+    'contourfm','contourm','display','draw_if_interactive','errorbar',
+    'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatterm',
-    'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','suptitle',
+    'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
     'surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','repaint',
     'isinteractive'
@@ -1381,6 +1381,24 @@ def bgcolor(color):
         chart.setBackground(__getcolor(color))
     draw_if_interactive()    
     
+def caxes(ax):
+    '''
+    Set current axes.
+    
+    :param ax: (*Axes or int*) The axes to be set as current axes.
+    '''
+    global gca
+    if isinstance(ax, int):
+        if chartpanel is None:
+            figure()
+                
+        chart = chartpanel.getChart()
+        gca = chart.getPlot(ax)
+        chart.setCurrentPlot(ax - 1)
+    else:
+        gca = ax
+    return gca
+    
 def subplot(nrows, ncols, plot_number, **kwargs):
     """
     Returen a subplot axes positioned by the given grid definition.
@@ -1462,6 +1480,87 @@ def subplot(nrows, ncols, plot_number, **kwargs):
         chart.setCurrentPlot(chart.getPlots().size() - 1)
     
     return gca
+    
+def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
+    subplot_kw=None, wspace=None, hspace=None):
+    '''
+    Create a figure and a set of subplots.
+    
+    :param nrows: (*int*) Number of rows.
+    :param ncols: (*int*) Number of cols.
+    :param position: (*list*) All axes' position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0,0,1,1].
+    :param sharex: (*boolean*) If share x axis.
+    :param sharey: (*boolean*) If share y axis.
+    :param subplot_kw: (*dict*) Subplot key words.
+    :param wspace: (*float*) The amount of width reserved for blank space between subplots,
+        expressed as a fraction of the average axis width.
+    :param hspace: (*float*) The amount of height reserved for blank space between subplots,
+        expressed as a fraction of the average axis height.
+    '''
+    if position is None:
+        if wspace is None and hspace is None:
+            position = [0, 0, 1, 1]
+        else:
+            position = [0.13, 0.11, 0.775, 0.815]
+    left = float(position[0])
+    bottom = float(position[1])
+    width = float(position[2])
+    height = float(position[3])
+    
+    global chartpanel
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    chart.setRowNum(nrows)
+    chart.setColumnNum(ncols)
+    axs = []
+    ax2d = nrows > 1 and ncols > 1
+    w = width / ncols
+    h = height / nrows
+    for i in range(nrows):
+        if ax2d:
+            axs2d = []
+        for j in range(ncols):            
+            x = left + w * j
+            y = (bottom + height) - h * (i + 1)
+            ax = XY2DPlot()
+            ax.isSubPlot = True 
+            if wspace is None and hspace is None:
+                ax.setPosition(x, y, w, h)
+                ax.setOuterPosition(x, y, w, h)
+                ax.setOuterPosActive(True)
+            else:
+                if not wspace is None:
+                    wspace = w * wspace
+                    x += wspace
+                    w = w - wspace * 2
+                if not hspace is None:
+                    hspace = h * hspace
+                    y += hspace
+                    h = h - hspace * 2
+                ax.setPosition(x, y, w, h)
+                ax.setOuterPosActive(False)
+            if sharex:
+                if i < nrows - 1:
+                    ax.getAxis(Location.BOTTOM).setDrawTickLabel(False)
+            if sharey:
+                if j > 0:
+                    ax.getAxis(Location.LEFT).setDrawTickLabel(False)
+            chart.addPlot(ax)
+            if ax2d:
+                axs2d.append(ax)
+            else:
+                axs.append(ax)
+        if ax2d:
+            axs.append(tuple(axs2d))
+    global gca
+    if ax2d:
+        gca = axs[0][0]
+    else:
+        gca = axs[0]
+    return chartpanel, tuple(axs)
     
 def currentplot(plot_number):
     if chartpanel is None:

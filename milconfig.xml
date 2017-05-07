@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\netcdf">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
@@ -19,16 +19,16 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\rectangle_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\netcdf\time_dim.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\subplots_hspace.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\subplots_xshare.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\rectangle_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\netcdf\time_dim.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\subplots_hspace.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\subplots_xshare.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="120,25" MainFormSize="1412,766"/>
+  <Startup MainFormLocation="120,26" MainFormSize="1412,765"/>
 </MeteoInfo>
