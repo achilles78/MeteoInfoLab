@@ -1388,15 +1388,16 @@ def caxes(ax):
     :param ax: (*Axes or int*) The axes to be set as current axes.
     '''
     global gca
+    chart = chartpanel.getChart()
     if isinstance(ax, int):
         if chartpanel is None:
             figure()
-                
-        chart = chartpanel.getChart()
+                        
         gca = chart.getPlot(ax)
         chart.setCurrentPlot(ax - 1)
     else:
         gca = ax
+        chart.setCurrentPlot(chart.getPlotIndex(ax))
     return gca
     
 def subplot(nrows, ncols, plot_number, **kwargs):
@@ -1790,6 +1791,7 @@ def axesm(*args, **kwargs):
     xyscale = kwargs.pop('xyscale', 1)
     
     global gca
+    chart = chartpanel.getChart()
     mapview = MapView(projinfo)
     mapview.setXYScaleFactor(xyscale)
     plot = MapPlot(mapview)  
@@ -1799,6 +1801,7 @@ def axesm(*args, **kwargs):
             position = [0.13, 0.11, 0.775, 0.815]
         gca.setPosition(position[0], position[1], position[2], position[3])
     else:
+        chart.setCurrentPlot(chart.getPlotIndex(gca))
         if gca.isSubPlot:
             plot.isSubPlot = True
             if position is None:
@@ -1841,8 +1844,7 @@ def axesm(*args, **kwargs):
         bgcolor = __getcolor(bgcobj)
         gca.setDrawBackground(True)
         gca.setBackground(bgcolor)
-    #gca.getMapView().projectLayers(projinfo)
-    chart = chartpanel.getChart()
+    #gca.getMapView().projectLayers(projinfo)    
     isnew = kwargs.pop('newaxes', False)
     if isnew:
         chart.addPlot(gca)
