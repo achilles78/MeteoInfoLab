@@ -1574,9 +1574,9 @@ def currentplot(plot_number):
     
     return plot
     
-def axes(*args, **kwargs):
+def __create_axes(*args, **kwargs):
     """
-    Add an axes to the figure.
+    Create an axes.
     
     :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
         height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
@@ -1594,10 +1594,7 @@ def axes(*args, **kwargs):
     :param yreverse: (*boolean*) Optional, set yaxis reverse or not. Default is ``False`` .
     
     :returns: The axes.
-    """
-    if chartpanel is None:
-        figure()
-        
+    """        
     if len(args) > 0:
         position = args[0]
     else:
@@ -1676,17 +1673,239 @@ def axes(*args, **kwargs):
     else:
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
     plot.setAxisLabelFont(font)
+    return plot
+    
+def __create_axesm(*args, **kwargs):  
+    """
+    Create an map axes.
+    
+    :param projinfo: (*ProjectionInfo*) Optional, map projection, default is longlat projection.
+    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param bgcolor: (*Color*) Optional, axes background color.
+    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
+    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
+    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
+    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
+    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
+    :param xyscale: (*int*) Optional, set scale of x and y axis, default is 1. It is only
+        valid in longlat projection.
+    :param gridlabel: (*boolean*) Optional, set axis tick labels visible or not. Default is ``True`` .
+    :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
+    :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
+    :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
+    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``False`` for lon/lat
+        projection, ortherwise is ``True``.
+    :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
+    :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
+    :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
+    
+    :returns: The map axes.
+    """       
+    if len(args) > 0:
+        position = args[0]
+    else:
+        position = kwargs.pop('position', None)
+    axis = kwargs.pop('axis', True)
+    if axis:
+        bottomaxis = kwargs.pop('bottomaxis', True)
+        leftaxis = kwargs.pop('leftaxis', True)
+        topaxis = kwargs.pop('topaxis', True)
+        rightaxis = kwargs.pop('rightaxis', True)
+    else:
+        bottomaxis = False
+        leftaxis = False
+        topaxis = False
+        rightaxis = False
+    xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
+    yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
+    xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
+    ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
+    xscale = kwargs.pop('xscale', 'linear')    #or 'log'
+    yscale = kwargs.pop('yscale', 'linear')    #or 'log'
+    xtick = kwargs.pop('xtick', [])
+    ytick = kwargs.pop('ytick', [])
+    xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
+    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'  
+    projinfo = kwargs.pop('projinfo', None)
+    if projinfo == None:
+        proj = kwargs.pop('proj', 'longlat')
+        origin = kwargs.pop('origin', (0, 0, 0))    
+        lat_0 = origin[0]
+        lon_0 = origin[1]
+        lat_0 = kwargs.pop('lat_0', lat_0)
+        lon_0 = kwargs.pop('lon_0', lon_0)
+        lat_ts = kwargs.pop('truescalelat', 0)
+        lat_ts = kwargs.pop('lat_ts', lat_ts)
+        k = kwargs.pop('scalefactor', 1)
+        k = kwargs.pop('k', k)
+        paralles = kwargs.pop('paralles', (30, 60))
+        lat_1 = paralles[0]
+        if len(paralles) == 2:
+            lat_2 = paralles[1]
+        else:
+            lat_2 = lat_1
+        lat_1 = kwargs.pop('lat_1', lat_1)
+        lat_2 = kwargs.pop('lat_2', lat_2)
+        x_0 = kwargs.pop('falseeasting', 0)
+        y_0 = kwargs.pop('falsenorthing', 0)
+        x_0 = kwargs.pop('x_0', x_0)
+        y_0 = kwargs.pop('y_0', y_0)
+        h = kwargs.pop('h', 0)
+        projstr = '+proj=' + proj \
+            + ' +lat_0=' + str(lat_0) \
+            + ' +lon_0=' + str(lon_0) \
+            + ' +lat_1=' + str(lat_1) \
+            + ' +lat_2=' + str(lat_2) \
+            + ' +lat_ts=' + str(lat_ts) \
+            + ' +k=' + str(k) \
+            + ' +x_0=' + str(x_0) \
+            + ' +y_0=' + str(y_0) \
+            + ' +h=' + str(h)
+        projinfo = ProjectionInfo(projstr)   
+        
+    gridlabel = kwargs.pop('gridlabel', True)
+    gridline = kwargs.pop('gridline', False)
+    griddx = kwargs.pop('griddx', 10)
+    griddy = kwargs.pop('griddy', 10)
+    if projinfo.isLonLat():
+        frameon = kwargs.pop('frameon', False)
+    else:
+        frameon = kwargs.pop('frameon', True)
+    axison = kwargs.pop('axison', None)
+    bgcobj = kwargs.pop('bgcolor', None)
+    xyscale = kwargs.pop('xyscale', 1)     
+    tickfontname = kwargs.pop('tickfontname', 'Arial')
+    tickfontsize = kwargs.pop('tickfontsize', 14)
+    tickbold = kwargs.pop('tickbold', False)
+    if tickbold:
+        font = Font(tickfontname, Font.BOLD, tickfontsize)
+    else:
+        font = Font(tickfontname, Font.PLAIN, tickfontsize)
+        
+    mapview = MapView(projinfo)
+    mapview.setXYScaleFactor(xyscale)
+    plot = MapPlot(mapview) 
+    if position is None:
+       position = [0.13, 0.11, 0.775, 0.815]
+    plot.setPosition(position[0], position[1], position[2], position[3])
+    plot.setAxisLabelFont(font)
+    if not axison is None:
+        plot.setAxisOn(axison)
+    else:
+        if bottomaxis == False:
+            plot.getAxis(Location.BOTTOM).setVisible(False)
+        if leftaxis == False:
+            plot.getAxis(Location.LEFT).setVisible(False)
+        if topaxis == False:
+            plot.getAxis(Location.TOP).setVisible(False)
+        if rightaxis == False:
+            plot.getAxis(Location.RIGHT).setVisible(False)
+    mapframe = plot.getMapFrame()
+    mapframe.setDrawGridLabel(gridlabel)
+    mapframe.setDrawGridTickLine(gridlabel)
+    mapframe.setDrawGridLine(gridline)
+    mapframe.setGridXDelt(griddx)
+    mapframe.setGridYDelt(griddy)
+    plot.setDrawNeatLine(frameon)
+    if not bgcobj is None:
+        bgcolor = __getcolor(bgcobj)
+        plot.setDrawBackground(True)
+        plot.setBackground(bgcolor)
+    #plot.getMapView().projectLayers(projinfo)  
+    return plot
+    
+def axes(*args, **kwargs):
+    """
+    Add an axes to the figure.
+    
+    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param outerposition: (*list*) Optional, axes size and location, including labels and margin.
+    :param aspect: (*string*) ['equal' | 'auto'] or a number. If a number the ratio of x-unit/y-unit in screen-space.
+        Default is 'auto'.
+    :param bgcolor: (*Color*) Optional, axes background color.
+    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
+    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
+    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
+    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
+    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
+    :param xaxistype: (*string*) Optional, set x axis type as 'normal', 'lon', 'lat' or 'time'.
+    :param xreverse: (*boolean*) Optional, set x axis reverse or not. Default is ``False`` .
+    :param yreverse: (*boolean*) Optional, set yaxis reverse or not. Default is ``False`` .
+    
+    :returns: The axes.
+    """
+    if chartpanel is None:
+        figure()
+    global gca
     chart = chartpanel.getChart()
-    isnew = kwargs.pop('newaxes', False)
+    isnew = kwargs.pop('newaxes', True)
+    if not isnew and gca is None:
+        isnew = True
+    plot = __create_axes(*args, **kwargs)
     if isnew:
         chart.addPlot(plot)
     else:
+        chart.setCurrentPlot(chart.getPlotIndex(gca))
+        if gca.isSubPlot:
+            plot.isSubPlot = True
+            position = kwargs.pop('position', None)
+            if position is None:
+                plot.setPosition(gca.getPosition())  
         chart.setCurrentPlot(plot)
-    global gca
     gca = plot
     return plot
 
 def axesm(*args, **kwargs):  
+    """
+    Add an map axes to the figure.
+    
+    :param projinfo: (*ProjectionInfo*) Optional, map projection, default is longlat projection.
+    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param bgcolor: (*Color*) Optional, axes background color.
+    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
+    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
+    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
+    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
+    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
+    :param xyscale: (*int*) Optional, set scale of x and y axis, default is 1. It is only
+        valid in longlat projection.
+    :param gridlabel: (*boolean*) Optional, set axis tick labels visible or not. Default is ``True`` .
+    :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
+    :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
+    :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
+    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``False`` for lon/lat
+        projection, ortherwise is ``True``.
+    :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
+    :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
+    :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
+    
+    :returns: The map axes.
+    """
+    if chartpanel is None:
+        figure()    
+    global gca
+    plot = __create_axesm(*args, **kwargs)
+    isnew = kwargs.pop('newaxes', True)    
+    if not isnew and gca is None:
+        isnew = True
+    chart = chartpanel.getChart()
+    if isnew:
+        chart.addPlot(plot)
+    else:
+        chart.setCurrentPlot(chart.getPlotIndex(gca))
+        if gca.isSubPlot:
+            plot.isSubPlot = True
+            position = kwargs.pop('position', None)
+            if position is None:
+                plot.setPosition(gca.getPosition())
+        chart.setCurrentPlot(plot)
+    gca = plot
+    return plot, plot.getProjInfo()    
+    
+def axesm_bak(*args, **kwargs):  
     """
     Add an map axes to the figure.
     
