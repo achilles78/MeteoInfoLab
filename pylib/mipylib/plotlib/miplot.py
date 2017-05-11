@@ -1219,7 +1219,7 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     return graphics
     
 def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='matlab_jet', \
-    alpha=0.7, rmax=None, rtickloc=None, rticks=None, rlabelpos=60, xticks=None):
+    alpha=0.7, rmax=None, rtickloc=None, rticks=None, rlabelpos=60, xticks=None, **kwargs):
     '''
     Plot windrose chart.
     
@@ -1288,6 +1288,12 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
     bars = []
     hhist = 0
     rrmax = 0
+    width = kwargs.pop('width', 0.5)
+    if width > 1:
+        width = 1
+    if width <= 0:
+        width = 0.2
+    width = 2. * width * minum.pi / wdN
     for i in range(wsN):
         idx = minum.where((ws>=wsbins[i]) * (ws<wsbins[i+1]))
         if idx is None:
@@ -1298,7 +1304,7 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
         wdhist = wdhist / N
         rrmax = max(rrmax, wdhist.max())
         lab = '%s - %s' % (wsbins[i], wsbins[i+1])
-        bb = bar(theta, wdhist, minum.pi/wdN, bottom=hhist, color=colors[i], \
+        bb = bar(theta, wdhist, width, bottom=hhist, color=colors[i], \
             edgecolor='gray', label=lab)[0]
         bb.setStartValue(wsbins[i])
         bb.setEndValue(wsbins[i+1])
@@ -1424,7 +1430,11 @@ def subplot(nrows, ncols, plot_number, **kwargs):
         gca = chart.getPlot(plot_number)          
     isnew = gca is None
     if isnew:
-        gca = XY2DPlot()
+        polar = kwargs.pop('polar', False)
+        if polar:
+            gca = PolarAxes()
+        else:
+            gca = XY2DPlot()
         gca.isSubPlot = True        
         #gca.rowIndex = rowidx
         #gca.columnIndex = colidx

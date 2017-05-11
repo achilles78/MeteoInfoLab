@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\hdf">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
@@ -19,10 +19,10 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\CloudSAT_Swath.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\windrose_data_func.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\CloudSAT_Swath.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\windrose_data_func.py"/>
     </RecentFiles>
   </File>
   <Font>
