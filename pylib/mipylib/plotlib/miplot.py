@@ -769,7 +769,9 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     isvalue = False
     ls = None
     if len(c) > 1:
-        if isinstance(c[0], (int, long, float)):
+        if isinstance(c, (MIArray, DimArray)):
+            isvalue = True
+        elif isinstance(c[0], (int, long, float)):
             isvalue = True            
     if isvalue:
         if isinstance(c, (list, tuple)):
@@ -1281,19 +1283,20 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
     else:
         if not isinstance(gca, PolarAxes):
             gca = axes(polar=True)
-    theta = minum.ones(wdN)
-    for i in range(wdN):
-        theta[i] = rwdbins[i] - minum.pi/wdN/2
     
-    bars = []
-    hhist = 0
-    rrmax = 0
     width = kwargs.pop('width', 0.5)
     if width > 1:
         width = 1
     if width <= 0:
         width = 0.2
+    theta = minum.ones(wdN)
     width = 2. * width * minum.pi / wdN
+    for i in range(wdN):
+        theta[i] = rwdbins[i] - width/2
+        
+    bars = []
+    hhist = 0
+    rrmax = 0       
     for i in range(wsN):
         idx = minum.where((ws>=wsbins[i]) * (ws<wsbins[i+1]))
         if idx is None:
