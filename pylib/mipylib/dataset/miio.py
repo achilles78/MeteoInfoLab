@@ -11,30 +11,71 @@ import mipylib.miutil as miutil
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import midata as midata
+from dimdatafile import DimDataFile
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 
 __all__ = [
     'convert2nc','dimension','grads2nc','ncwrite'
     ]
 
-def convert2nc(infn, outfn, version='netcdf3'):
+def convert2nc(infn, outfn, version='netcdf3', writedimvar=False):
     """
     Convert data file (Grib, HDF...) to netCDF data file.
     
-    :param infn: (*string*) Input data file name.
+    :param infn: (*string or DimDataFile*) Input data file (or file name).
     :param outfn: (*string*) Output netCDF data file name.
+    :param writedimvar: (*boolean*) Write dimension variables or not.
     """
-    #Open input data file
-    f = midata.addfile(infn)
+    if isinstance(infn, DimDataFile):
+        f = infn
+    else:
+        #Open input data file
+        f = midata.addfile(infn)
+        
     #New netCDF file
     ncfile = midata.addfile(outfn, 'c', version=version)
+    
     #Add dimensions
     dims = []
     for dim in f.dimensions():
         dims.append(ncfile.adddim(dim.getShortName(), dim.getLength()))
+        
     #Add global attributes
     for attr in f.attributes():
         ncfile.addgroupattr(attr.getName(), attr.getValues())
+        
+    #Add dimension variables
+    tvar = None
+    if writedimvar:
+        dimvars = []
+        for i in range(len(f.dimensions())):
+            dim = f.dimensions()[i]
+            dname = dim.getShortName()
+            if dim.getDimType() == DimensionType.T:
+                var = ncfile.addvar(dname, 'int', [dims[i]])
+                var.addattr('units', 'hours since 1900-01-01 00:00:0.0')
+                var.addattr('long_name', 'Time')
+                var.addattr('standard_name', 'time')
+                var.addattr('axis', 'T')
+                tvar = var
+            elif dim.getDimType() == DimensionType.Z:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', 'Level')
+                var.addattr('axis', 'Z')
+            elif dim.getDimType() == DimensionType.Y:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', dname)
+                var.addattr('axis', 'Y')
+            elif dim.getDimType() == DimensionType.X:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', dname)
+                var.addattr('axis', 'X')
+            else:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', dname)
+                var.addattr('axis', dname)
+            dimvars.append(var)
+        
     #Add variables
     variables = []
     for var in f.variables():    
@@ -59,13 +100,33 @@ def convert2nc(infn, outfn, version='netcdf3'):
         for attr in var.getAttributes():
             nvar.addattr(attr.getName(), attr.getValues())
         variables.append(nvar)
+        
     #Create netCDF file
     ncfile.create()
-    #Write data
+    
+    #Write dimension variable data
+    if writedimvar:
+        for dimvar, dim in zip(dimvars, f.dimensions()):
+            if dim.getDimType() != DimensionType.T:
+                ncfile.write(dimvar, minum.array(dim.getDimValue()))
+    
+    #Write time dimension variable data
+    if writedimvar and not tvar is None:
+        sst = datetime.datetime(1900,1,1)
+        tnum = f.timenum()
+        hours = []
+        for t in range(0, tnum):
+            st = f.gettime(t)
+            hs = (st - sst).total_seconds() // 3600
+            hours.append(hs)
+        ncfile.write(tvar, minum.array(hours))
+    
+    #Write variable data
     for var in variables:
         print 'Variable: ' + var.name
         data = f[str(var.name)].read()
-        ncfile.write(var, data)
+        ncfile.write(var, data)    
+        
     #Close netCDF file
     ncfile.close()
     print 'Convert finished!'
