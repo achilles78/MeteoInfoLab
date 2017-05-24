@@ -5146,6 +5146,10 @@ def geoshow(*args, **kwargs):
                 else:
                     font = Font(fontname, Font.PLAIN, fontsize)
                 labelset.setLabelFont(font)
+                lcolor = kwargs.pop('labelcolor', None)
+                if not lcolor is None:
+                    lcolor = miutil.getcolor(lcolor)
+                    labelset.setLabelColor(lcolor)
                 xoffset = kwargs.pop('xoffset', 0)
                 labelset.setXOffset(xoffset)
                 yoffset = kwargs.pop('yoffset', 0)

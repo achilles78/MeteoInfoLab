@@ -129,6 +129,10 @@ class MILayer():
         else:
             font = Font(fontname, Font.PLAIN, fontsize)
         labelset.setLabelFont(font)
+        color = kwargs.pop('color', None)
+        if not color is None:
+            color = miutil.getcolor(color)
+            labelset.setLabelColor(color)
         xoffset = kwargs.pop('xoffset', 0)
         labelset.setXOffset(xoffset)
         yoffset = kwargs.pop('yoffset', 0)

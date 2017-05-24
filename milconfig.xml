@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\satellite">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
@@ -19,16 +19,10 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\dataconvert\arl2nc-1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\wrfout2arl.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\hy_conc.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\arl_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\satellite\himawari-8-1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\dataconvert\arl2nc-1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\wrfout2arl.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\hy_conc.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\arl_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\satellite\himawari-8-1.py"/>
     </RecentFiles>
   </File>
   <Font>

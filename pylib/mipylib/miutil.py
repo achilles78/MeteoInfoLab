@@ -11,6 +11,7 @@ from org.meteoinfo.math import Complex
 from org.meteoinfo.shape import PointShape, PolylineShape, PolygonShape, ShapeUtil
 from java.util import Calendar, Locale
 from java.text import SimpleDateFormat
+from java.awt import Color
 import datetime
 
 def pydate(t):    
@@ -154,4 +155,62 @@ def makeshapes(x, y, type=None):
             shapes = ShapeUtil.createPolylineShapes(x, y)
         elif type == 'polygon':
             shapes = ShapeUtil.createPolygonShapes(x, y)
-    return shapes        
+    return shapes     
+
+def getcolor(style, alpha=None):
+    if style is None:
+        return None
+        
+    if isinstance(style, Color):
+        c = style
+        if not alpha is None:
+            alpha = (int)(alpha * 255)
+            c = Color(c.getRed(), c.getGreen(), c.getBlue(), alpha)
+        return c
+        
+    c = Color.black
+    if isinstance(style, str):
+        if style == 'red':
+            c = Color.red
+        elif style == 'black':
+            c = Color.black
+        elif style == 'blue':
+            c = Color.blue
+        elif style == 'green':
+            c = Color.green
+        elif style == 'white':
+            c = Color.white
+        elif style == 'yellow':
+            c = Color.yellow
+        elif style == 'gray':
+            c = Color.gray
+        elif style == 'lightgray':
+            c = Color.lightGray
+        else:
+            if 'r' in style:
+                c = Color.red
+            elif 'k' in style:
+                c = Color.black
+            elif 'b' in style:
+                c = Color.blue
+            elif 'g' in style:
+                c = Color.green
+            elif 'w' in style:
+                c = Color.white
+            elif 'c' in style:
+                c = Color.cyan
+            elif 'm' in style:
+                c = Color.magenta
+            elif 'y' in style:
+                c = Color.yellow 
+    elif isinstance(style, (tuple, list)):
+        if len(style) == 3:
+            c = Color(style[0], style[1], style[2])
+        else:
+            c = Color(style[0], style[1], style[2], style[3])
+    
+    if not alpha is None:
+        alpha = (int)(alpha * 255)
+        c = Color(c.getRed(), c.getGreen(), c.getBlue(), alpha)
+    
+    return c    
