@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\satellite">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\linalg">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
@@ -16,6 +14,8 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
   </Path>
   <File>
     <OpenedFiles>
@@ -28,5 +28,5 @@
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="120,26" MainFormSize="1412,765"/>
+  <Startup MainFormLocation="145,30" MainFormSize="1325,797"/>
 </MeteoInfo>

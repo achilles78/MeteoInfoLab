@@ -3532,38 +3532,75 @@ def imshow(*args, **kwargs):
     cmap = __getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
+    isrgb = False
     if n <= 2:
-        gdata = minum.asgridarray(args[0])
-        if isinstance(args[0], DimArray):
-            if args[0].islondim(1):
-                xaxistype = 'lon'
-            elif args[0].islatdim(1):
-                xaxistype = 'lat'
-            elif args[0].istimedim(1):
-                xaxistype = 'time'
-        args = args[1:]
+        if isinstance(args[0], (list, tuple)):
+            isrgb = True
+            rgbdata = args[0]
+            if isinstance(rgbdata[0], MIArray):
+                x = minum.arange(0, rgbdata[0].shape[1])
+                y = minum.arange(0, rgbdata[0].shape[0])
+            else:
+                x = rgbdata[0].dimvalue(1)
+                y = rgbdata[0].dimvalue(0)
+        elif args[0].ndim > 2:
+            isrgb = True
+            rgbdata = args[0]
+            x = rgbdata.dimvalue(1)
+            y = rgbdata.dimvalue(0)
+        else:
+            gdata = minum.asgridarray(args[0])
+            if isinstance(args[0], DimArray):
+                if args[0].islondim(1):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(1):
+                    xaxistype = 'lat'
+                elif args[0].istimedim(1):
+                    xaxistype = 'time'
+            args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = minum.asgridarray(a, x, y, fill_value)
-        args = args[3:]    
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createImageLegend(gdata, cn, cmap)
+        if isinstance(a, (list, tuple)):
+            isrgb = True
+            rgbdata = a
+        elif a.ndim > 2:
+            isrgb = True
+            rgbdata = a
         else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
-    else:
-        ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    ls = ls.convertTo(ShapeTypes.Image)
-        
-    igraphic = GraphicFactory.createImage(gdata, ls)
+            gdata = minum.asgridarray(a, x, y, fill_value)
+            args = args[3:]   
     
-    #Create bar plot
+    if isrgb:
+        if isinstance(rgbdata, (list, tuple)):
+            rgbd = []
+            for d in rgbdata:
+                rgbd.append(d.asarray())
+            rgbdata = rgbd
+        else:
+            rgbdata = rgbdata.asarray()
+        x = __getplotdata(x)
+        y = __getplotdata(y)
+        igraphic = GraphicFactory.createImage(x, y, rgbdata)
+        ls = None
+    else:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createImageLegend(gdata, cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
+        else:
+            ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+        ls = ls.convertTo(ShapeTypes.Image)
+            
+        igraphic = GraphicFactory.createImage(gdata, ls)
+    
+    #Create plot
     if gca is None:
         plot = XY2DPlot()
     else:
@@ -4301,41 +4338,95 @@ def imshowm(*args, **kwargs):
     order = kwargs.pop('order', None)
     ls = kwargs.pop('symbolspec', None)
     n = len(args) 
+    isrgb = False
     if n <= 2:
-        gdata = minum.asgridarray(args[0])
-        args = args[1:]
+        if isinstance(args[0], (list, tuple)):
+            isrgb = True
+            rgbdata = args[0]
+            if isinstance(rgbdata[0], MIArray):
+                x = minum.arange(0, rgbdata[0].shape[1])
+                y = minum.arange(0, rgbdata[0].shape[0])
+            else:
+                x = rgbdata[0].dimvalue(1)
+                y = rgbdata[0].dimvalue(0)
+        elif args[0].ndim > 2:
+            isrgb = True
+            rgbdata = args[0]
+            x = rgbdata.dimvalue(1)
+            y = rgbdata.dimvalue(0)
+        else:
+            gdata = minum.asgridarray(args[0])
+            args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        gdata = minum.asgridarray(a, x, y, fill_value)
-        args = args[3:]
-    if len(args) > 0:
-        if ls is None:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createImageLegend(gdata, cn, cmap)
+        if isinstance(a, (list, tuple)):
+            isrgb = True
+            rgbdata = a
+        elif a.ndim > 2:
+            isrgb = True
+            rgbdata = a
+        else:
+            gdata = minum.asgridarray(a, x, y, fill_value)
+            args = args[3:]
+    
+    isplot = True
+    if isrgb:
+        if isinstance(rgbdata, (list, tuple)):
+            rgbd = []
+            for d in rgbdata:
+                rgbd.append(d.asarray())
+            rgbdata = rgbd
+        else:
+            rgbdata = rgbdata.asarray()
+        x = __getplotdata(x)
+        y = __getplotdata(y)
+        igraphic = GraphicFactory.createImage(x, y, rgbdata)
+        layer = DrawMeteoData.createImageLayer(x, y, igraphic, 'layer_image')
+        if (proj != None):
+            layer.setProjInfo(proj)
+            
+        if isplot:
+            shapetype = layer.getShapeType()
+            if order is None:
+                if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
+                    plot.addLayer(0, layer)
+                else:
+                    plot.addLayer(layer)
             else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
-    else:    
-        if ls is None:
-            #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-            ls = LegendManage.createImageLegend(gdata, cmap)
-    fill_color = kwargs.pop('fill_color', None)
-    if not fill_color is None:
-        cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
-        if cb.isNoData():
-            cb.setColor(__getcolor(fill_color))
-        # else:  
-            # cb = ColorBreak()
-            # cb.setColor(__getcolor(fill_color))
-            # cb.setNoData(True)
-            # ls.addLegendBreak(cb)
-    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
-    gdata = None
+                plot.addLayer(order, layer)
+            plot.setDrawExtent(layer.getExtent().clone())
+            plot.setExtent(layer.getExtent().clone())
+
+            draw_if_interactive()
+    else:
+        if len(args) > 0:
+            if ls is None:
+                level_arg = args[0]
+                if isinstance(level_arg, int):
+                    cn = level_arg
+                    ls = LegendManage.createImageLegend(gdata, cn, cmap)
+                else:
+                    if isinstance(level_arg, MIArray):
+                        level_arg = level_arg.aslist()
+                    ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
+        else:    
+            if ls is None:
+                #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
+                ls = LegendManage.createImageLegend(gdata, cmap)
+        fill_color = kwargs.pop('fill_color', None)
+        if not fill_color is None:
+            cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
+            if cb.isNoData():
+                cb.setColor(__getcolor(fill_color))
+            # else:  
+                # cb = ColorBreak()
+                # cb.setColor(__getcolor(fill_color))
+                # cb.setNoData(True)
+                # ls.addLegendBreak(cb)
+        layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
+        gdata = None
     return MILayer(layer)
     
 def contourm(*args, **kwargs):  
