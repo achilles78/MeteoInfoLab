@@ -1489,6 +1489,12 @@ def subplot(nrows, ncols, plot_number, **kwargs):
     if not outerposition is None:
         gca.setOuterPosition(outerposition)
         gca.setOuterPosActive(True)
+        
+    if isinstance(gca, MapPlot):
+        __set_axesm(gca, **kwargs)
+    else:
+        __set_axes(gca, **kwargs)
+        
     if isnew:
         chart.addPlot(gca)
         chart.setCurrentPlot(chart.getPlots().size() - 1)
@@ -1594,6 +1600,36 @@ def __create_axes(*args, **kwargs):
     :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
         height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
     :param outerposition: (*list*) Optional, axes size and location, including labels and margin.
+    
+    :returns: The axes.
+    """        
+    if len(args) > 0:
+        position = args[0]
+    else:
+        position = kwargs.pop('position', None)    
+    outerposition = kwargs.pop('outerposition', None)
+    polar = kwargs.pop('polar', False)
+    if polar:
+        #plot = PolarPlot()
+        ax = PolarAxes()
+    else:
+        ax = XY2DPlot()
+    if position is None:
+        position = [0.13, 0.11, 0.775, 0.815]
+        ax.setOuterPosActive(True)
+    else:        
+        ax.setOuterPosActive(False)        
+    ax.setPosition(position[0], position[1], position[2], position[3])   
+    if not outerposition is None:
+        ax.setOuterPosition(outerposition)
+        ax.setOuterPosActive(True)
+    
+    return ax
+    
+def __set_axes(ax, **kwargs):
+    """
+    Set an axes.
+
     :param aspect: (*string*) ['equal' | 'auto'] or a number. If a number the ratio of x-unit/y-unit in screen-space.
         Default is 'auto'.
     :param bgcolor: (*Color*) Optional, axes background color.
@@ -1608,12 +1644,12 @@ def __create_axes(*args, **kwargs):
     
     :returns: The axes.
     """        
-    if len(args) > 0:
-        position = args[0]
-    else:
-        position = kwargs.pop('position', None)
     aspect = kwargs.pop('aspect', 'auto')
     axis = kwargs.pop('axis', True)
+    b_axis = ax.getAxis(Location.BOTTOM)
+    l_axis = ax.getAxis(Location.LEFT)
+    t_axis = ax.getAxis(Location.TOP)
+    r_axis = ax.getAxis(Location.RIGHT)
     if axis:
         bottomaxis = kwargs.pop('bottomaxis', True)
         leftaxis = kwargs.pop('leftaxis', True)
@@ -1637,47 +1673,39 @@ def __create_axes(*args, **kwargs):
     xreverse = kwargs.pop('xreverse', False)
     yreverse = kwargs.pop('yreverse', False)
     xaxistype = kwargs.pop('xaxistype', None)
-    bgcobj = kwargs.pop('bgcolor', None)    
-    polar = kwargs.pop('polar', False)
-    outerposition = kwargs.pop('outerposition', None)
-    if polar:
-        #plot = PolarPlot()
-        plot = PolarAxes()
-    else:
-        plot = XY2DPlot()
-    if position is None:
-        position = [0.13, 0.11, 0.775, 0.815]
-        plot.setOuterPosActive(True)
-    else:        
-        plot.setOuterPosActive(False)        
-    plot.setPosition(position[0], position[1], position[2], position[3])   
-    if not outerposition is None:
-        plot.setOuterPosition(outerposition)
-        plot.setOuterPosActive(True)
+    bgcobj = kwargs.pop('bgcolor', None)        
+    
     if aspect == 'equal':
-        plot.setAutoAspect(False)
+        ax.setAutoAspect(False)
     else:
         if isinstance(aspect, (int, float)):
-            plot.setAspect(aspect)
-            plot.setAutoAspect(False)
+            ax.setAspect(aspect)
+            ax.setAutoAspect(False)
     if bottomaxis == False:
-        plot.getAxis(Location.BOTTOM).setVisible(False)
+        b_axis.setVisible(False)
     if leftaxis == False:
-        plot.getAxis(Location.LEFT).setVisible(False)
+        l_axis.setVisible(False)
     if topaxis == False:
-        plot.getAxis(Location.TOP).setVisible(False)
+        t_axis.setVisible(False)
     if rightaxis == False:
-        plot.getAxis(Location.RIGHT).setVisible(False)
+        r_axis.setVisible(False)
     if xreverse:
-        plot.getXAxis().setInverse(True)
+        b_axis.setInverse(True)
+        t_axis.setInverse(True)
     if yreverse:
-        plot.getYAxis().setInverse(True)
+        l_axis.setInverse(True)
+        r_axis.setInverse(True)        
     if not xaxistype is None:
-        __setXAxisType(plot, xaxistype)
+        __setXAxisType(ax, xaxistype)
     if not bgcobj is None:
         bgcolor = __getcolor(bgcobj)
-        plot.setDrawBackground(True)
-        plot.setBackground(bgcolor)
+        ax.setDrawBackground(True)
+        ax.setBackground(bgcolor)
+    tickline = kwargs.pop('tickline', True)
+    b_axis.setDrawTickLine(tickline)
+    t_axis.setDrawTickLine(tickline)
+    l_axis.setDrawTickLine(tickline)
+    r_axis.setDrawTickLine(tickline)
     tickfontname = kwargs.pop('tickfontname', 'Arial')
     tickfontsize = kwargs.pop('tickfontsize', 14)
     tickbold = kwargs.pop('tickbold', False)
@@ -1685,8 +1713,7 @@ def __create_axes(*args, **kwargs):
         font = Font(tickfontname, Font.BOLD, tickfontsize)
     else:
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    plot.setAxisLabelFont(font)
-    return plot
+    ax.setAxisLabelFont(font)
     
 def __create_axesm(*args, **kwargs):  
     """
@@ -1695,51 +1722,13 @@ def __create_axesm(*args, **kwargs):
     :param projinfo: (*ProjectionInfo*) Optional, map projection, default is longlat projection.
     :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
         height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
-    :param bgcolor: (*Color*) Optional, axes background color.
-    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
-    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
-    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
-    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
-    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
-    :param xyscale: (*int*) Optional, set scale of x and y axis, default is 1. It is only
-        valid in longlat projection.
-    :param gridlabel: (*boolean*) Optional, set axis tick labels visible or not. Default is ``True`` .
-    :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
-    :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
-    :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
-    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``False`` for lon/lat
-        projection, ortherwise is ``True``.
-    :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
-    :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
-    :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
     
     :returns: The map axes.
     """       
     if len(args) > 0:
         position = args[0]
     else:
-        position = kwargs.pop('position', None)
-    axis = kwargs.pop('axis', True)
-    if axis:
-        bottomaxis = kwargs.pop('bottomaxis', True)
-        leftaxis = kwargs.pop('leftaxis', True)
-        topaxis = kwargs.pop('topaxis', True)
-        rightaxis = kwargs.pop('rightaxis', True)
-    else:
-        bottomaxis = False
-        leftaxis = False
-        topaxis = False
-        rightaxis = False
-    xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
-    yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
-    xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
-    ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
-    xscale = kwargs.pop('xscale', 'linear')    #or 'log'
-    yscale = kwargs.pop('yscale', 'linear')    #or 'log'
-    xtick = kwargs.pop('xtick', [])
-    ytick = kwargs.pop('ytick', [])
-    xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
-    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'  
+        position = kwargs.pop('position', None)    
     projinfo = kwargs.pop('projinfo', None)
     if projinfo == None:
         proj = kwargs.pop('proj', 'longlat')
@@ -1777,11 +1766,65 @@ def __create_axesm(*args, **kwargs):
             + ' +h=' + str(h)
         projinfo = ProjectionInfo(projstr)   
         
+    mapview = MapView(projinfo)    
+    ax = MapPlot(mapview) 
+    if position is None:
+       position = [0.13, 0.11, 0.775, 0.815]
+    ax.setPosition(position[0], position[1], position[2], position[3])   
+    #ax.getMapView().projectLayers(projinfo)  
+    return ax
+    
+def __set_axesm(ax, **kwargs):  
+    """
+    Create an map axes.
+    
+    :param bgcolor: (*Color*) Optional, axes background color.
+    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
+    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
+    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
+    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
+    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
+    :param xyscale: (*int*) Optional, set scale of x and y axis, default is 1. It is only
+        valid in longlat projection.
+    :param gridlabel: (*boolean*) Optional, set axis tick labels visible or not. Default is ``True`` .
+    :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
+    :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
+    :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
+    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``False`` for lon/lat
+        projection, ortherwise is ``True``.
+    :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
+    :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
+    :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
+    
+    :returns: The map axes.
+    """       
+    axis = kwargs.pop('axis', True)
+    if axis:
+        bottomaxis = kwargs.pop('bottomaxis', True)
+        leftaxis = kwargs.pop('leftaxis', True)
+        topaxis = kwargs.pop('topaxis', True)
+        rightaxis = kwargs.pop('rightaxis', True)
+    else:
+        bottomaxis = False
+        leftaxis = False
+        topaxis = False
+        rightaxis = False
+    xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
+    yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
+    xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
+    ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
+    xscale = kwargs.pop('xscale', 'linear')    #or 'log'
+    yscale = kwargs.pop('yscale', 'linear')    #or 'log'
+    xtick = kwargs.pop('xtick', [])
+    ytick = kwargs.pop('ytick', [])
+    xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
+    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'  
+        
     gridlabel = kwargs.pop('gridlabel', True)
     gridline = kwargs.pop('gridline', False)
     griddx = kwargs.pop('griddx', 10)
     griddy = kwargs.pop('griddy', 10)
-    if projinfo.isLonLat():
+    if ax.getProjInfo().isLonLat():
         frameon = kwargs.pop('frameon', False)
     else:
         frameon = kwargs.pop('frameon', True)
@@ -1796,37 +1839,33 @@ def __create_axesm(*args, **kwargs):
     else:
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
         
-    mapview = MapView(projinfo)
+    mapview = ax.getMapView()
     mapview.setXYScaleFactor(xyscale)
-    plot = MapPlot(mapview) 
-    if position is None:
-       position = [0.13, 0.11, 0.775, 0.815]
-    plot.setPosition(position[0], position[1], position[2], position[3])
-    plot.setAxisLabelFont(font)
+    ax.setAxisLabelFont(font)
     if not axison is None:
-        plot.setAxisOn(axison)
+        ax.setAxisOn(axison)
     else:
         if bottomaxis == False:
-            plot.getAxis(Location.BOTTOM).setVisible(False)
+            ax.getAxis(Location.BOTTOM).setVisible(False)
         if leftaxis == False:
-            plot.getAxis(Location.LEFT).setVisible(False)
+            ax.getAxis(Location.LEFT).setVisible(False)
         if topaxis == False:
-            plot.getAxis(Location.TOP).setVisible(False)
+            ax.getAxis(Location.TOP).setVisible(False)
         if rightaxis == False:
-            plot.getAxis(Location.RIGHT).setVisible(False)
-    mapframe = plot.getMapFrame()
+            ax.getAxis(Location.RIGHT).setVisible(False)
+    mapframe = ax.getMapFrame()
     mapframe.setDrawGridLabel(gridlabel)
     mapframe.setDrawGridTickLine(gridlabel)
     mapframe.setDrawGridLine(gridline)
     mapframe.setGridXDelt(griddx)
     mapframe.setGridYDelt(griddy)
-    plot.setDrawNeatLine(frameon)
+    ax.setDrawNeatLine(frameon)
     if not bgcobj is None:
         bgcolor = __getcolor(bgcobj)
-        plot.setDrawBackground(True)
-        plot.setBackground(bgcolor)
-    #plot.getMapView().projectLayers(projinfo)  
-    return plot
+        ax.setDrawBackground(True)
+        ax.setBackground(bgcolor)
+ 
+    return ax
     
 def axes(*args, **kwargs):
     """
@@ -1853,22 +1892,23 @@ def axes(*args, **kwargs):
         figure()
     global gca
     chart = chartpanel.getChart()
-    isnew = kwargs.pop('newaxes', True)
-    if not isnew and gca is None:
-        isnew = True
-    plot = __create_axes(*args, **kwargs)
-    if isnew:
-        chart.addPlot(plot)
+    newaxes = kwargs.pop('newaxes', True)
+    if not newaxes and gca is None:
+        newaxes = True
+    ax = __create_axes(*args, **kwargs)
+    __set_axes(ax, **kwargs)
+    if newaxes:
+        chart.addPlot(ax)
     else:
         chart.setCurrentPlot(chart.getPlotIndex(gca))
         if gca.isSubPlot:
-            plot.isSubPlot = True
+            ax.isSubPlot = True
             position = kwargs.pop('position', None)
             if position is None:
-                plot.setPosition(gca.getPosition())  
-        chart.setCurrentPlot(plot)
-    gca = plot
-    return plot
+                ax.setPosition(gca.getPosition())  
+        chart.setCurrentPlot(ax)
+    gca = ax
+    return ax
 
 def axesm(*args, **kwargs):  
     """
@@ -1900,23 +1940,24 @@ def axesm(*args, **kwargs):
     if chartpanel is None:
         figure()    
     global gca
-    plot = __create_axesm(*args, **kwargs)
+    ax = __create_axesm(*args, **kwargs)
+    __set_axesm(ax, **kwargs)
     isnew = kwargs.pop('newaxes', True)    
     if not isnew and gca is None:
         isnew = True
     chart = chartpanel.getChart()
     if isnew:
-        chart.addPlot(plot)
+        chart.addPlot(ax)
     else:
         chart.setCurrentPlot(chart.getPlotIndex(gca))
         if gca.isSubPlot:
-            plot.isSubPlot = True
+            ax.isSubPlot = True
             position = kwargs.pop('position', None)
             if position is None:
-                plot.setPosition(gca.getPosition())
-        chart.setCurrentPlot(plot)
-    gca = plot
-    return plot, plot.getProjInfo()    
+                ax.setPosition(gca.getPosition())
+        chart.setCurrentPlot(ax)
+    gca = ax
+    return ax    
     
 def axesm_bak(*args, **kwargs):  
     """
@@ -2123,7 +2164,8 @@ def xaxis(ax=None, **kwargs):
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
-    tickvisible = kwargs.pop('tickvisible', True)
+    tickline = kwargs.pop('tickline', True)
+    tickline = kwargs.pop('tickvisible', tickline)
     minortick = kwargs.pop('minortick', False)
     tickin = kwargs.pop('tickin', True)
     axistype = kwargs.pop('axistype', None)
@@ -2154,7 +2196,7 @@ def xaxis(ax=None, **kwargs):
         axis.setVisible(visible)
         axis.setShift(shift)
         axis.setColor_All(c)
-        axis.setDrawTickLine(tickvisible)
+        axis.setDrawTickLine(tickline)
         axis.setMinorTickVisible(minortick)
         axis.setInsideTick(tickin)
         axis.setTickLabelFont(font)
@@ -2174,7 +2216,8 @@ def yaxis(ax=None, **kwargs):
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
     c = __getcolor(color)
-    tickvisible = kwargs.pop('tickvisible', True)
+    tickline = kwargs.pop('tickline', True)
+    tickline = kwargs.pop('tickvisible', tickline)
     minortick = kwargs.pop('minortick', False)
     tickin = kwargs.pop('tickin', True)
     axistype = kwargs.pop('axistype', None)
@@ -2206,7 +2249,7 @@ def yaxis(ax=None, **kwargs):
         if axis.isVisible():
             axis.setShift(shift)
             axis.setColor_All(c)
-            axis.setDrawTickLine(tickvisible)
+            axis.setDrawTickLine(tickline)
             axis.setMinorTickVisible(minortick)
             axis.setInsideTick(tickin)
             axis.setTickLabelFont(font)
@@ -3546,8 +3589,12 @@ def imshow(*args, **kwargs):
         elif args[0].ndim > 2:
             isrgb = True
             rgbdata = args[0]
-            x = rgbdata.dimvalue(1)
-            y = rgbdata.dimvalue(0)
+            if isinstance(rgbdata, MIArray):
+                x = minum.arange(0, rgbdata.shape[1])
+                y = minum.arange(0, rgbdata.shape[0])
+            else:
+                x = rgbdata.dimvalue(1)
+                y = rgbdata.dimvalue(0)
         else:
             gdata = minum.asgridarray(args[0])
             if isinstance(args[0], DimArray):
@@ -3625,7 +3672,10 @@ def imshow(*args, **kwargs):
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
-    return ls    
+    if ls is None:
+        return igraphic
+    else:
+        return ls    
       
 def contour(*args, **kwargs):
     """

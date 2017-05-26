@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\linalg">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\image">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
@@ -16,13 +13,16 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\satellite\himawari-8-true_color.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\image\emboss.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\satellite\himawari-8-true_color.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\image\emboss.py"/>
     </RecentFiles>
   </File>
   <Font>

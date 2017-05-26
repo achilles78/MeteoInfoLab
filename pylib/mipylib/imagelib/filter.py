@@ -7,18 +7,20 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.shape import Graphic
+from org.meteoinfo.image import ImageUtil
 from mipylib.geolib.milayer import MILayer
-from com.jhlabs.image import ContrastFilter, SharpenFilter, RGBAdjustFilter, ChannelMixFilter, \
+from mipylib.numeric.miarray import MIArray
+from org.meteoinfo.image.filter import ContrastFilter, SharpenFilter, RGBAdjustFilter, ChannelMixFilter, \
     GainFilter, GammaFilter, GrayFilter, GrayscaleFilter, HSBAdjustFilter, InvertAlphaFilter, \
     InvertFilter, LevelsFilter, MaskFilter, PosterizeFilter, RescaleFilter, SolarizeFilter, \
-    ThresholdFilter, FlipFilter, RotateFilter, EmbossFilter
+    ThresholdFilter, FlipFilter, RotateFilter, EmbossFilter, TritoneFilter, LightFilter, OpacityFilter
 from java.awt.image import BufferedImage
 import math
 
 __all__ = [
     'contrast','sharpen','rgb_adjust','channel_mix','gain','gamma','gray','gray_scale',
     'hsb_adjust','invert_alpha','invert','levels','mask','posterize','rescale','solarize',
-    'threshold','flip','rotate','emboss'
+    'threshold','tritone','flip','rotate','emboss','light','opacity'
     ]
 
 def __getimage(src):
@@ -28,7 +30,22 @@ def __getimage(src):
         return src.getShape().getImage()
     elif isinstance(src, MILayer):
         return src.layer.getImage()
+    elif isinstance(src, MIArray):
+        return ImageUtil.createImage(src.asarray())
     return None
+    
+def __getreturn(src, dst):
+    if isinstance(src, Graphic):
+        src.getShape().setImage(dst)
+        return src
+    elif isinstance(src, MILayer):
+        src.layer.setImage(dst)
+        return src
+    elif isinstance(src, MIArray):
+        r = ImageUtil.imageRead(dst)
+        return MIArray(r)
+    else:
+        return dst
     
 def contrast(src, brightness=1, contrast=1):
     '''
@@ -48,14 +65,8 @@ def contrast(src, brightness=1, contrast=1):
     filter.setBrightness(brightness)
     filter.setContrast(contrast)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
-    filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    filter.filter(image, dst)    
+    return __getreturn(src, dst)
     
 def sharpen(src):
     '''
@@ -72,13 +83,7 @@ def sharpen(src):
     filter = SharpenFilter()  
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def rgb_adjust(src, r=0, g=0, b=0):
     '''
@@ -99,13 +104,7 @@ def rgb_adjust(src, r=0, g=0, b=0):
     filter = RGBAdjustFilter(r, g, b)      
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def channel_mix(src, b_g=0, r_b=0, g_r=0, to_r=0, to_g=0, to_b=0):
     '''
@@ -134,13 +133,7 @@ def channel_mix(src, b_g=0, r_b=0, g_r=0, to_r=0, to_g=0, to_b=0):
     filter.setIntoB(to_b)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def gain(src, gain=0.5, bias=0.5):
     '''
@@ -161,13 +154,7 @@ def gain(src, gain=0.5, bias=0.5):
     filter.setBias(bias)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def gamma(src, gamma=None, rgamma=1, ggamma=1, bgamma=1):
     '''
@@ -191,13 +178,7 @@ def gamma(src, gamma=None, rgamma=1, ggamma=1, bgamma=1):
         filter = GammaFilter(gamma)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def gray(src):
     '''
@@ -214,13 +195,7 @@ def gray(src):
     filter = GrayFilter()
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def gray_scale(src):
     '''
@@ -237,13 +212,7 @@ def gray_scale(src):
     filter = GrayscaleFilter()
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def hsb_adjust(src, h=0, s=0, b=0):
     '''
@@ -264,13 +233,7 @@ def hsb_adjust(src, h=0, s=0, b=0):
     filter = HSBAdjustFilter(h, s, b)      
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def invert_alpha(src):
     '''
@@ -287,13 +250,7 @@ def invert_alpha(src):
     filter = InvertAlphaFilter()
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def invert(src):
     '''
@@ -310,13 +267,7 @@ def invert(src):
     filter = InvertFilter()
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def levels(src, low=0, high=1, low_out=0, high_out=1):
     '''
@@ -341,13 +292,7 @@ def levels(src, low=0, high=1, low_out=0, high_out=1):
     filter.setHighOutputLevel(high_out)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def mask(src, mask=None):
     '''
@@ -368,13 +313,7 @@ def mask(src, mask=None):
         filter.setMask(mask)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def posterize(src, n=None):
     '''
@@ -394,13 +333,7 @@ def posterize(src, n=None):
         filter.setNumLevels(n)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def rescale(src, scale=1):
     '''
@@ -419,13 +352,7 @@ def rescale(src, scale=1):
     filter.setScale(scale)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def solarize(src):
     '''
@@ -442,13 +369,7 @@ def solarize(src):
     filter = SolarizeFilter()
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def threshold(src, t=None, lt=127, ut=127, white=None, black=None):
     '''
@@ -479,13 +400,35 @@ def threshold(src, t=None, lt=127, ut=127, white=None, black=None):
         filter.setBlack(black)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
+    
+def tritone(src, shadow=None, mid=None, high=None):
+    '''
+    A filter which performs a tritone conversion on an image. Given three colors
+    for shadows, midtones and highlights, it converts the image to grayscale and
+    then applies a color mapping based on the colors.
+    
+    :param src: (*image*) Source image.
+    :param shadow: (*int*) Shadow color.
+    :param mid: (*int*) Midtone color.
+    :param high: (*int*) Highlight color
+    
+    :returns: Destination image.
+    '''
+    image = __getimage(src)
+    if image is None:
+        return None
+            
+    filter = TritoneFilter()
+    if not shadow is None:
+        filter.setShadowColor(shadow)
+    if not mid is None:
+        filter.setMidColor(mid)
+    if not high is None:
+        filter.setHighColor(high)
+    dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
+    filter.filter(image, dst)
+    return __getreturn(src, dst)
     
 def flip(src, operation=1):
     '''
@@ -506,13 +449,7 @@ def flip(src, operation=1):
     filter = FlipFilter(operation)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def rotate(src, angle=0, resize=True):
     '''
@@ -531,13 +468,7 @@ def rotate(src, angle=0, resize=True):
     filter = RotateFilter(angle, resize)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
     
 def emboss(src, azimuth=135, elevation=30, emboss=False, bh=1):
     '''
@@ -564,10 +495,54 @@ def emboss(src, azimuth=135, elevation=30, emboss=False, bh=1):
     filter.setBumpHeight(bh)
     dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
     filter.filter(image, dst)
-    if isinstance(src, Graphic):
-        src.getShape().setImage(dst)
-    elif isinstance(src, MILayer):
-        src.layer.setImage(dst)
-    else:
-        src = dst
-    return src
+    return __getreturn(src, dst)
+    
+def light(src, height=None, shape=None, softness=None, source=None):
+    '''
+    A filter which produces lighting and embossing effects.
+    
+    :param src: (*image*) Source image.
+    :param height: (*float*) Bump height.
+    :param shape: (*int*) Bump shape.
+    :param softness: (*float*) Bump softness.
+    :param source: (*int*) Bump source.
+    
+    :returns: Destination image.
+    '''
+    image = __getimage(src)
+    if image is None:
+        return None
+        
+    filter = LightFilter()
+    if not height is None:
+        filter.setBumpHeight(height)
+    if not shape is None:
+        filter.setBumpShape(shape)
+    if not softness is None:
+        filter.setBumpSoftness(softness)
+    if not source is None:
+        filter.setBumpSource(source)
+    dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
+    filter.filter(image, dst)
+    return __getreturn(src, dst)
+    
+def opacity(src, opacity=None):
+    '''
+    Sets the opacity (alpha) of every pixel in an image to a constant value.
+    
+    :param src: (*image*) Source image.
+    :param opacity: (*int*) Opacity value (0-255).
+    
+    :returns: Destination image.
+    '''
+    image = __getimage(src)
+    if image is None:
+        return None
+        
+    filter = OpacityFilter()
+    if not opacity is None:
+        filter.setOpacity(opacity)
+
+    dst = BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB)
+    filter.filter(image, dst)
+    return __getreturn(src, dst)

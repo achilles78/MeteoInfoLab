@@ -17,9 +17,14 @@ import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JPopupMenu.Separator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
@@ -109,10 +114,24 @@ public class EditorDockable extends DefaultSingleCDockable {
         final TextEditor tab = new TextEditor(tabbedPanel, title);
         tabbedPanel.add(tab, title);
         tabbedPanel.setSelectedComponent(tab);
-        MITextEditorPane textArea = (MITextEditorPane)tab.getTextArea();
+        final MITextEditorPane textArea = (MITextEditorPane)tab.getTextArea();
         tab.setTextFont(this.textFont);
         textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
         textArea.discardAllEdits();
+        JPopupMenu popup = textArea.getPopupMenu();
+        JMenuItem evaluate = new JMenuItem("Evaluate Selection");
+        evaluate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    runCodeLines(textArea);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(EditorDockable.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        popup.insert(evaluate, 0);
+        popup.insert(new Separator(), 1);
         tab.getTextArea().setDirty(false);
         tab.setTitle(title);
         
@@ -379,6 +398,11 @@ public class EditorDockable extends DefaultSingleCDockable {
         }
         
         return fns;
+    }
+    
+    private void runCodeLines(MITextEditorPane textArea) throws InterruptedException{
+        String code = textArea.getSelectedText();
+        this.parent.getConsoleDockable().run(code);
     }
 
     /**
