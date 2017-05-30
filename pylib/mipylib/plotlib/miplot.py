@@ -3197,10 +3197,21 @@ def legend(*args, **kwargs):
     :param labcolor: (*color*) Tick label string color. Default is ``black`` .
     """
     plot = gca
-    plot.setDrawLegend(True)   
-    plot.updateLegendScheme()
-    clegend = plot.getLegend()   
+    #plot.setDrawLegend(True)   
+    newlegend = kwargs.pop('newlegend', True)
+    #plot.updateLegendScheme()
+    if isinstance(plot, XY2DPlot):        
+        ols = plot.getLegendScheme()
+    else:
+        ols = None
+    if newlegend:
+        clegend = ChartLegend(ols)
+    else:
+        clegend = plot.getLegend()   
     ls = kwargs.pop('legend', None)
+    if len(args) > 0 and isinstance(args[0], MILayer):
+        ls = args[0].legend()
+        args = args[1:]
     if ls is None:
         if len(args) > 0:
             lbs = []
@@ -3291,6 +3302,8 @@ def legend(*args, **kwargs):
     yshift = kwargs.pop('yshift', None)
     if not yshift is None:
         clegend.setYShift(yshift)
+    if newlegend:
+        plot.addLegend(clegend)
     
     draw_if_interactive()
     
@@ -3366,12 +3379,18 @@ def colorbar(mappable, **kwargs):
         ls = mappable.getLegendScheme()
     else:
         ls = makelegend(mappable)
-    legend = cax.getLegend()   
-    if legend is None:
+    
+    newlegend = kwargs.pop('newlegend', True)
+    if newlegend:
         legend = ChartLegend(ls)
-        cax.setLegend(legend)
+        cax.addLegend(legend)
     else:
-        legend.setLegendScheme(ls)
+        legend = cax.getLegend()   
+        if legend is None:
+            legend = ChartLegend(ls)
+            cax.setLegend(legend)
+        else:
+            legend.setLegendScheme(ls)
     legend.setColorbar(True)   
     legend.setShrink(shrink)
     legend.setAspect(aspect)
@@ -3408,7 +3427,7 @@ def colorbar(mappable, **kwargs):
     vmaxtick = kwargs.pop('vmaxtick', False)
     legend.setDrawMinLabel(vmintick)
     legend.setDrawMaxLabel(vmaxtick)
-    cax.setDrawLegend(True)
+    #cax.setDrawLegend(True)
     draw_if_interactive()
 
 def set(obj, **kwargs):

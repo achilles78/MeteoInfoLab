@@ -129,13 +129,15 @@ def jcomplex(v):
     '''
     return Complex(v.real, v.img)
 
-def makeshapes(x, y, type=None):
+def makeshapes(x, y, type=None, z=None, m=None):
     """
     Make shapes by x and y coordinates.
     
     :param x: (*array_like*) X coordinates.
-    :param y: (*array_like*) Y coordinates.
+    :param y: (*array_like*) Y coordinates.    
     :param type: (*string*) Shape type [point | line | polygon].
+    :param z: (*array_like*) Z coordinates.
+    :param m: (*array_like*) M coordinates.
     
     :returns: Shapes
     """
@@ -158,6 +160,12 @@ def makeshapes(x, y, type=None):
     return shapes     
 
 def getcolor(style, alpha=None):
+    '''
+    Get color.
+    
+    :param style: (*color object*) Color object.
+    :param alpha: (*float*) Color alpha.
+    '''
     if style is None:
         return None
         

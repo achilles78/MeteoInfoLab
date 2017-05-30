@@ -15,6 +15,7 @@ from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.data import ArrayMath
 from org.meteoinfo.data.mapdata import MapDataManage
 
+import mipylib.numeric.minum as minum
 import milayer
 from milayer import MILayer
 from mipylib.numeric.miarray import MIArray
@@ -99,7 +100,7 @@ def polygon(x, y = None):
         if isinstance(y, MIArray):
             y = y.aslist()
         polygon = ShapeUtil.createPolygonShape(x, y)
-    return polygon
+    return polygon    
     
 def inpolygon(x, y, polygon):
     '''

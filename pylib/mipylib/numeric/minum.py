@@ -1797,8 +1797,17 @@ def asarray(data):
         return data
     elif isinstance(data, (DimArray, MIArray)):
         return data.asarray()
+    elif isinstance(data, (list, tuple)):
+        if isinstance(data[0], datetime.datetime):
+            dd = []
+            for d in data:
+                v = miutil.date2num(d)
+                dd.append(v)
+            return array(dd).array
+        else:
+            return array(data).array
     else:
-        return array(data).asarray()
+        return array([data]).array()
 
 def asmiarray(data):
     '''
