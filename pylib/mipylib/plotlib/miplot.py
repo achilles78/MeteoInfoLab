@@ -1957,7 +1957,7 @@ def axesm(*args, **kwargs):
                 ax.setPosition(gca.getPosition())
         chart.setCurrentPlot(ax)
     gca = ax
-    return ax    
+    return ax, ax.getProjInfo()
     
 def axesm_bak(*args, **kwargs):  
     """

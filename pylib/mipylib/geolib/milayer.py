@@ -106,13 +106,13 @@ class MILayer():
     def renamefield(self, fieldname, newfieldname):
         self.layer.editRenameField(fieldname, newfieldname)
         
-    def addshape(self, x, y, fields=None):
+    def addshape(self, x, y, fields=None, z=None, m=None):
         type = 'point'
         if self.shapetype == ShapeTypes.Polyline:
             type = 'line'
         elif self.shapetype == ShapeTypes.Polygon:
             type = 'polygon'
-        shapes = makeshapes(x, y, type)
+        shapes = makeshapes(x, y, type, z, m)
         if len(shapes) == 1:
             self.layer.editAddShape(shapes[0], fields)
         else:
@@ -209,12 +209,12 @@ def makeshapes(x, y, type=None, z=None, m=None):
     else:
         x = minum.asarray(x)
         y = minum.asarray(y)
-        if not z is None:
-            z = minum.asarray(z)
+        if not z is None:            
             if m is None:
                 m = minum.zeros(len(z)).array
             else:
                 m = minum.asarray(m)
+            z = minum.asarray(z)
         if type == 'point':
             if z is None:
                 shapes = ShapeUtil.createPointShapes(x, y)
