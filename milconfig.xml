@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\MeteoInfoLab"/>
@@ -19,12 +19,10 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\plot_traj.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color-2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\yy_subplot.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\plot_traj.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color-2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\yy_subplot.py"/>
     </RecentFiles>
   </File>
   <Font>

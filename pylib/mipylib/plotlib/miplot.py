@@ -1429,8 +1429,8 @@ def subplot(nrows, ncols, plot_number, **kwargs):
     chart.setRowNum(nrows)
     chart.setColumnNum(ncols)
     gca = None
-    if isinstance(plot_number, int):
-        gca = chart.getPlot(plot_number)          
+    #if isinstance(plot_number, int):
+    #    gca = chart.getPlot(plot_number)          
     isnew = gca is None
     if isnew:
         polar = kwargs.pop('polar', False)
@@ -1539,29 +1539,38 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
     ax2d = nrows > 1 and ncols > 1
     w = width / ncols
     h = height / nrows
+    iswspace = False
+    ishspace = False
+    if not wspace is None and ncols > 1:
+        w = (width - wspace * (ncols - 1)) / ncols
+        iswspace = True
+    if not hspace is None and nrows > 1:
+        h = (height - hspace * (nrows - 1)) / nrows
+        ishspace = True
+    y = bottom + height - h
     for i in range(nrows):
         if ax2d:
             axs2d = []
-        for j in range(ncols):            
-            x = left + w * j
-            y = (bottom + height) - h * (i + 1)
+        x = left
+        if ishspace:
+            if i > 0:
+                y -= hspace
+        for j in range(ncols):                        
             ax = XY2DPlot()
-            ax.isSubPlot = True 
-            if wspace is None and hspace is None:
+            ax.isSubPlot = True             
+            if not iswspace and not ishspace:
+                x = left + w * j
+                y = (bottom + height) - h * (i + 1)
                 ax.setPosition(x, y, w, h)
                 ax.setOuterPosition(x, y, w, h)
                 ax.setOuterPosActive(True)
             else:
-                if not wspace is None:
-                    wspace = w * wspace
-                    x += wspace
-                    w = w - wspace * 2
-                if not hspace is None:
-                    hspace = h * hspace
-                    y += hspace
-                    h = h - hspace * 2
+                if iswspace:
+                    if j > 0:
+                        x += wspace                
                 ax.setPosition(x, y, w, h)
                 ax.setOuterPosActive(False)
+                x += w
             if sharex:
                 if i < nrows - 1:
                     ax.getAxis(Location.BOTTOM).setDrawTickLabel(False)
@@ -1575,6 +1584,8 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
                 axs.append(ax)
         if ax2d:
             axs.append(tuple(axs2d))
+        y -= h
+        
     global gca
     if ax2d:
         gca = axs[0][0]
