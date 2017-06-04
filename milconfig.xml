@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+  <Path OpenPath="C:\TEMP">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\MeteoInfoLab"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
@@ -16,13 +15,14 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="C:\TEMP"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\yy_subplot.py"/>
+      <OpenedFile File="C:\TEMP\ss.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\yy_subplot.py"/>
+      <RecentFile File="C:\TEMP\ss.py"/>
     </RecentFiles>
   </File>
   <Font>

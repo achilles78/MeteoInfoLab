@@ -5326,6 +5326,10 @@ def geoshow(*args, **kwargs):
                 yoffset = kwargs.pop('yoffset', 0)
                 labelset.setYOffset(yoffset)
                 avoidcoll = kwargs.pop('avoidcoll', True)
+                decimals = kwargs.pop('decimals', None)
+                if not decimals is None:
+                    labelset.setAutoDecimal(False)
+                    labelset.setDecimalDigits(decimals)
                 labelset.setAvoidCollision(avoidcoll)
                 layer.addLabels()  
         plot.setDrawExtent(layer.getExtent().clone())

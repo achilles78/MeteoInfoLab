@@ -140,6 +140,10 @@ class MILayer():
         labelset.setYOffset(yoffset)
         avoidcoll = kwargs.pop('avoidcoll', True)
         labelset.setAvoidCollision(avoidcoll)
+        decimals = kwargs.pop('decimals', None)
+        if not decimals is None:
+            labelset.setAutoDecimal(False)
+            labelset.setDecimalDigits(decimals)
         self.layer.addLabels()
         
     def getlabel(self, text):
