@@ -48,10 +48,12 @@ class DimDataFile():
         if self.dataset is None:
             return 'None'
         return self.dataset.getInfoText()
-        
+            
     def close(self):
         if not self.dataset is None:
             self.dataset.close()
+        elif not self.ncfile is None:
+            self.ncfile.close()
         elif not self.arldata is None:
             self.arldata.closeDataFile()
         elif not self.bufrdata is None:
@@ -246,15 +248,7 @@ class DimDataFile():
             origin = jarray.array(origin, 'i')
             self.ncfile.write(variable.ncvariable, origin, value)
     def flush(self):
-        self.ncfile.flush()
-        
-    def close(self):
-        if not self.ncfile is None:
-            self.ncfile.close()
-        elif not self.arldata is None:
-            self.arldata.closeDataFile()
-        elif not self.bufrdata is None:
-            self.bufrdata.closeDataFile()
+        self.ncfile.flush()        
         
     def largefile(self, islarge=True):
         self.ncfile.setLargeFile(islarge)

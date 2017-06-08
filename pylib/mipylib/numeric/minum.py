@@ -58,7 +58,7 @@ __all__ = [
     'pi','e','inf','nan','arange','arange1',    
     'array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','degrees','diag','dim_array','series','dot','exp','eye','fmax','fmin',
+    'corrcoef','cos','degrees','diag','dim_array','datatable','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isgriddata','isstationdata','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
@@ -527,6 +527,16 @@ def dim_array(a, dims):
     :returns: (*DimArray*) Dimension array.
     '''
     return DimArray(a, dims)
+    
+def datatable(data=None):
+    '''
+    Create a PyTableData object.
+    
+    :param data: (*TableData*) Table data.
+    
+    :returns: (*PyTableData*) PyTableData object.
+    '''
+    return PyTableData(data)
     
 def series(data, index=None):
     '''

@@ -164,7 +164,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             this.interp.exec(command);
         } catch (Exception e) {
         } finally {
-            this.interp.out.print(">>> ");
+            interp.console.print(">>> ", Color.red);
+            interp.console.setStyle(Color.black);
             interp.exec("mipylib.plotlib.miplot.isinteractive = True");
         }
     }
