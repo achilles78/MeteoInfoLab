@@ -5118,7 +5118,8 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=T
     return layer
 
 def __plot_uvdata_m(plot, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
-    #print 'GridData...'
+    if x.ndim == 1 and u.ndim == 2:
+        x, y = minum.meshgrid(x, y)
     zv = z
     if not z is None:
         zv = z.array

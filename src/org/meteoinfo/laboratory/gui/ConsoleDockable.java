@@ -158,11 +158,13 @@ public class ConsoleDockable extends DefaultSingleCDockable {
      * @param command Command line
      */
     public void run(String command) {
+        interp.console.setStyle(Color.blue);
         this.interp.console.println(command);
-        //this.interp.exec(command);
+        interp.console.setStyle(Color.black);
         try {
             this.interp.exec(command);
         } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             interp.console.print(">>> ", Color.red);
             interp.console.setStyle(Color.black);
