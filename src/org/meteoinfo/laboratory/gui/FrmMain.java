@@ -1095,6 +1095,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
         PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
         try {
+            path = path.replace("\\", "/");
             interp.exec("mipylib.dataset.midata.currentfolder = '" + path + "'");
         } catch (Exception e) {
             e.printStackTrace();
