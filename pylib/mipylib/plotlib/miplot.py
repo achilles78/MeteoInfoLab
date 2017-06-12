@@ -529,6 +529,7 @@ def bar(*args, **kwargs):
     :param bgcolor: (*Color*) Background color, only valid with hatch.
     :param barswidth: (*float*) Bars width (0 - 1), only used for automatic bar with plot
         (only one argument widthout ``width`` augument). Defaul is 0.8.
+    :param morepoints: (*boolean*) More points in bar rectangle. Defaul is False.
     
     :returns: Bar legend break.
     
@@ -605,6 +606,7 @@ def bar(*args, **kwargs):
     bgcolor = __getcolor(bgcolor)
     ecolor = kwargs.pop('ecolor', 'k')
     ecolor = __getcolor(ecolor)
+    morepoints = kwargs.pop('morepoints', False)
     barbreaks = []
     for color in colors:
         lb = BarBreak()
@@ -625,8 +627,12 @@ def bar(*args, **kwargs):
         barbreaks.append(lb)
         
     #Create bar graphics
-    graphics = GraphicFactory.createBars(xdata, ydata, autowidth, width, not yerr is None, yerr, \
-        not bottom is None, bottom, barbreaks)        
+    if morepoints:
+        graphics = GraphicFactory.createBars1(xdata, ydata, autowidth, width, not yerr is None, yerr, \
+            not bottom is None, bottom, barbreaks)
+    else:
+        graphics = GraphicFactory.createBars(xdata, ydata, autowidth, width, not yerr is None, yerr, \
+            not bottom is None, bottom, barbreaks)        
     
     #Create bar plot
     if gca is None:
@@ -1308,7 +1314,7 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
         rrmax = max(rrmax, wdhist.max())
         lab = '%s - %s' % (wsbins[i], wsbins[i+1])
         bb = bar(theta, wdhist, width, bottom=hhist, color=colors[i], \
-            edgecolor='gray', label=lab)[0]
+            edgecolor='gray', label=lab, morepoints=True)[0]
         bb.setStartValue(wsbins[i])
         bb.setEndValue(wsbins[i+1])
         bars.append(bb)
