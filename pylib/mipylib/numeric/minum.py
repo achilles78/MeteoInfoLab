@@ -64,7 +64,7 @@ __all__ = [
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
     'numasciicol','numasciirow','nonzero','ones','ones_like','polyval','power',
     'project','projectxy','projinfo','radians','readtable','reshape',
-    'rolling_mean','rot90','sin','sort','argsort','sqrt','tan','transpose','trapz','vdot',
+    'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','tan','transpose','trapz','vdot',
     'where','zeros','zeros_like'
     ]
 
@@ -1534,6 +1534,16 @@ def squeeze(a):
     :returns: (*array_like*) The input array, but with all or a subset of the dimensions of length 1 
         removed.
     '''
+    da = a.asarray()
+    da = da.reduce()
+    if isinstance(a, MIArray):
+        return MIArray(da)
+    else:
+        dims = []
+        for dim in a.dims:
+            if dim.getLength() > 1:
+                dims.append(dim)
+        return DimArray(MIArray(da), dims, a.fill_value, a.proj)
         
 def meshgrid(x, y):
     '''
