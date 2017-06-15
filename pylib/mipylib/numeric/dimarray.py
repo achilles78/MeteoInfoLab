@@ -273,63 +273,82 @@ class DimArray():
         self.array.array = r
         
     def __add__(self, other):
-        r = None
-        ArrayMath.fill_value = self.fill_value
         if isinstance(other, DimArray):      
-            r = DimArray(self.array.__add__(other.array), self.dims, self.fill_value, self.proj)
+            r = self.array.__add__(other.array)
         else:
-            r = DimArray(self.array.__add__(other), self.dims, self.fill_value, self.proj)
-        return r
+            r = self.array.__add__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __radd__(self, other):
         return DimArray.__add__(self, other)
         
     def __sub__(self, other):
-        r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__sub__(other.array), self.dims, self.fill_value, self.proj)
+            r = self.array.__sub__(other.array)
         else:
-            r = DimArray(self.array.__sub__(other), self.dims, self.fill_value, self.proj)
-        return r
+            r = self.array.__sub__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __rsub__(self, other):
-        r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__rsub__(other.array), self.dims, self.fill_value, self.proj)
+            r = self.array.__rsub__(other.array)
         else:
-            r = DimArray(self.array.__rsub__(other), self.dims, self.fill_value, self.proj)
-        return r
+            r = self.array.__rsub__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __mul__(self, other):
-        r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__mul__(other.array), self.dims, self.fill_value, self.proj)
+            r = self.array.__mul__(other.array)
         else:
-            r = DimArray(self.array.__mul__(other), self.dims, self.fill_value, self.proj)
-        return r
+            r = self.array.__mul__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __rmul__(self, other):
         return DimArray.__mul__(self, other)
         
     def __div__(self, other):
-        r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__div__(other.array), self.dims, self.fill_value, self.proj)
+            r = self.array.__div__(other.array)
         else:
-            r = DimArray(self.array.__div__(other), self.dims, self.fill_value, self.proj)
-        return r
+            r = self.array.__div__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __rdiv__(self, other):
-        r = None
         if isinstance(other, DimArray): 
-            r = DimArray(self.array.__rdiv__(other.array), self.dims, self.fill_value, self.proj)
+            r = self.array.__rdiv__(other.array)
         else:
-            r = DimArray(self.array.__rdiv__(other), self.dims, self.fill_value, self.proj)
-        return r
+            r = self.array.__rdiv__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __pow__(self, other):
-        r = DimArray(self.array.__pow__(other), self.dims, self.fill_value, self.proj)
-        return r
+        if isinstance(other, DimArray): 
+            r = self.array.__pow__(other.array)
+        else:
+            r = self.array.__pow__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
+        
+    def __rpow__(self, other):
+        if isinstance(other, DimArray): 
+            r = self.array.__rpow__(other.array)
+        else:
+            r = self.array.__rpow__(other)
+        if r is None:
+            raise ValueError('Dimension missmatch, can not broadcast!')
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __neg__(self):
         r = DimArray(self.array.__neg__(), self.dims, self.fill_value, self.proj)

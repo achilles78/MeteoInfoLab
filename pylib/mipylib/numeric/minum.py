@@ -1524,6 +1524,16 @@ def reshape(a, *args):
     :returns: Reshaped array.
     """
     return a.reshape(*args)
+    
+def squeeze(a):
+    '''
+    Remove single-dimensional entries from the shape of an array.
+    
+    :param a: (*array_like*) Input data array.
+    
+    :returns: (*array_like*) The input array, but with all or a subset of the dimensions of length 1 
+        removed.
+    '''
         
 def meshgrid(x, y):
     '''
@@ -1562,6 +1572,8 @@ def broadcast_to(a, shape):
     if isinstance(a, list):
         a = array(a)
     r = ArrayUtil.broadcast(a.asarray(), shape)
+    if r is None:
+        raise ValueError('Can not broadcast to the shape!')
     return MIArray(r)
     
 def corrcoef(x, y):

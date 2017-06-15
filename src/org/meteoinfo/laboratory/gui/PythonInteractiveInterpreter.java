@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 import org.meteoinfo.laboratory.event.ConsoleExecEvent;
 import org.meteoinfo.laboratory.event.IConsoleExecListener;
+import org.python.core.PySyntaxError;
 import org.python.util.InteractiveConsole;
 
 /**
@@ -103,7 +104,15 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
                     //this.console.print(ps1, Color.red);
                     this.fireConsoleExecEvent();
                 }
-            } catch (IOException ex) {
+            } catch (Exception e) {
+                out.print(e.toString() + '\n');
+                this.resetbuffer();
+                try {                
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PythonInteractiveInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                this.fireConsoleExecEvent();
             }
         }
     }

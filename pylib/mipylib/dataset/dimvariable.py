@@ -388,7 +388,7 @@ class TDimVariable():
                 si = i
                 sfidx = fidx
                 
-        if si < eidx + 1:
+        if si < eidx + 1:            
             ei = eidx + 1 - step
             ddf = self.dataset[sfidx]
             var = ddf[self.name]
@@ -398,7 +398,7 @@ class TDimVariable():
             nindices[0] = slice(ssi, eei, step)
             nindices = tuple(nindices)
             aa = var.__getitem__(nindices)
-            if si == ei:
+            if si == ei and eidx != sidx:
                 aa.addtdim(self.dataset.gettime(si))
             if isfirst:
                 data = aa
@@ -414,13 +414,13 @@ class TDimVariable():
             nindices = list(indices)
             nindices[0] = slice(ssi, ssi, step)
             nindices = tuple(nindices)
-            aa = var.__getitem__(nindices)
+            aa = var.__getitem__(nindices)            
             return aa
-        
-        dims = aa.dims
-        dims[0].setDimValues(times)
+                
         if isinstance(data, DimArray):
             return data
         else:
+            dims = aa.dims
+            dims[0].setDimValues(times)
             r = DimArray(data, dims, aa.fill_value, aa.proj)
             return r
