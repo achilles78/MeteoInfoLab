@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\meteo">
-    <RecentFolder Folder="C:\TEMP"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+  <Path OpenPath="C:\TEMP\Data\dust\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="C:\"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
@@ -16,13 +13,16 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
+    <RecentFolder Folder="C:\TEMP\Data"/>
+    <RecentFolder Folder="C:\TEMP\Data\dust"/>
+    <RecentFolder Folder="C:\TEMP\Data\dust\script"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\meteo\hdivg.py"/>
+      <OpenedFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\meteo\hdivg.py"/>
+      <RecentFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
     </RecentFiles>
   </File>
   <Font>
