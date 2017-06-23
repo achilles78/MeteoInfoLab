@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="C:\TEMP\Data\dust\script">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
-    <RecentFolder Folder="C:\"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+  <Path OpenPath="C:\TEMP\Data\AOD\PFR\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
@@ -16,17 +13,24 @@
     <RecentFolder Folder="C:\TEMP\Data"/>
     <RecentFolder Folder="C:\TEMP\Data\dust"/>
     <RecentFolder Folder="C:\TEMP\Data\dust\script"/>
+    <RecentFolder Folder="C:\TEMP\Data\AOD"/>
+    <RecentFolder Folder="C:\TEMP\Data\AOD\PFR"/>
+    <RecentFolder Folder="C:\TEMP\Data\AOD\PFR\script"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
+      <OpenedFile File="C:\TEMP\Data\AOD\PFR\script\PFR_L2.py"/>
+      <OpenedFile File="C:\TEMP\Data\AOD\PFR\script\test_mjd-1.py"/>
+      <OpenedFile File="C:\TEMP\Data\AOD\PFR\script\astro.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
+      <RecentFile File="C:\TEMP\Data\AOD\PFR\script\PFR_L2.py"/>
+      <RecentFile File="C:\TEMP\Data\AOD\PFR\script\test_mjd-1.py"/>
+      <RecentFile File="C:\TEMP\Data\AOD\PFR\script\astro.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="112,32" MainFormSize="1446,797"/>
+  <Startup MainFormLocation="95,25" MainFormSize="1446,797"/>
 </MeteoInfo>
