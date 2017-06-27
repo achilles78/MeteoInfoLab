@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="C:\TEMP\Data\AOD\PFR\script">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
@@ -16,17 +15,24 @@
     <RecentFolder Folder="C:\TEMP\Data\AOD"/>
     <RecentFolder Folder="C:\TEMP\Data\AOD\PFR"/>
     <RecentFolder Folder="C:\TEMP\Data\AOD\PFR\script"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="C:\TEMP\Data\AOD\PFR\script\PFR_L2.py"/>
       <OpenedFile File="C:\TEMP\Data\AOD\PFR\script\test_mjd-1.py"/>
       <OpenedFile File="C:\TEMP\Data\AOD\PFR\script\astro.py"/>
+      <OpenedFile File="C:\TEMP\Data\AOD\PFR\script\PFR_L3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer\cal_aod.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer\test.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="C:\TEMP\Data\AOD\PFR\script\PFR_L2.py"/>
       <RecentFile File="C:\TEMP\Data\AOD\PFR\script\test_mjd-1.py"/>
       <RecentFile File="C:\TEMP\Data\AOD\PFR\script\astro.py"/>
+      <RecentFile File="C:\TEMP\Data\AOD\PFR\script\PFR_L3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer\cal_aod.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer\test.py"/>
     </RecentFiles>
   </File>
   <Font>
