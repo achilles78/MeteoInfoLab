@@ -627,6 +627,9 @@ class DimArray():
         return r
         
     def acos(self):
+        '''
+        Calculate acos value.
+        '''
         r = DimArray(self.array.acos(), self.dims, self.fill_value, self.proj)
         return r
         

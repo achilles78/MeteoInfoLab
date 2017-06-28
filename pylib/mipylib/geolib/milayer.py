@@ -120,6 +120,19 @@ class MILayer():
                 self.layer.editAddShape(shape, field)
                     
     def addlabels(self, fieldname, **kwargs):
+        '''
+        Add labels
+        
+        :param fieldname: (*string*) Field name
+        :param fontname: (*string*) Font name. Default is ``Arial``.
+        :param fontsize: (*string*) Font size. Default is ``14``.
+        :param bold: (*boolean*) Font bold or not. Default is ``False``.
+        :param color: (*color*) Label color. Default is ``None`` with black color.
+        :param xoffset: (*int*) X coordinate offset. Default is ``0``.
+        :param yoffset: (*int*) Y coordinate offset. Default is ``1``.
+        :param avoidcoll: (*boolean*) Avoid labels collision or not. Default is ``True``.
+        :param decimals: (*int*) Number of decimals of labels.
+        '''
         labelset = self.layer.getLabelSet()
         labelset.setFieldName(fieldname)
         fontname = kwargs.pop('fontname', 'Arial')

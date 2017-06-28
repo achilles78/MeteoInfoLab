@@ -6,16 +6,14 @@
 package org.meteoinfo.laboratory;
 
 import java.awt.GraphicsEnvironment;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
@@ -248,7 +246,8 @@ public class MeteoInfoLab {
         //System.setProperty("-Dsun.java2d.dpiaware", "false");
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
+        //java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
 //                new Thread() {

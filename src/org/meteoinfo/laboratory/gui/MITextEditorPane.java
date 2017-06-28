@@ -208,7 +208,8 @@ public class MITextEditorPane extends TextEditorPane {
         String tipstr = callTip[2];
         if (!tipstr.isEmpty()) {
             Point displayPoint = this.getDisplayPoint();
-            this.tip.showTip(tipstr, displayPoint);
+            this.tip.setText(tipstr);
+            this.tip.showTip(displayPoint);
         }
     }
 

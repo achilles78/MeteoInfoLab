@@ -348,8 +348,9 @@ public class JIntrospect implements NameCompletion {
                 String name = func.__doc__.toString();
                 callTip[2] = name;
             } else if (object instanceof PyMethod){
-                PyMethod func = (PyMethod)object;
-                String name = func.toString();
+                PyMethod method = (PyMethod)object;
+                PyFunction func = (PyFunction)method.__func__;
+                String name = func.__doc__.toString();
                 callTip[2] = name;
             } else {
                 callTip[2] = object.toString();

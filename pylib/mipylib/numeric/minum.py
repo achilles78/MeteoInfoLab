@@ -515,6 +515,10 @@ def array(object):
         array([[1.0, 2.0]
               [3.0, 4.0]])
     """
+    if isinstance(object, DimArray):
+        return object.array
+    elif isinstance(object, MIArray):
+        return object
     return MIArray(ArrayUtil.array(object))
     
 def dim_array(a, dims):
@@ -2040,8 +2044,20 @@ def interp2d(*args, **kwargs):
         z = args[2]
         xq = args[3]
         yq = args[4]
-    r = ArrayUtil.resample_Bilinear(z.asarray(), x.asarray(), y.asarray(), xq.asarray(), yq.asarray())
-    return MIArray(r)
+    x = array(x).array
+    y = array(y).array
+    z = array(z).array
+    xq = array(xq).array
+    yq = array(yq).array
+    kind = kwargs.pop('kind', 'linear')
+    if kind == 'neareast':
+        r = ArrayUtil.resample_Neighbor(z, x, y, xq, yq)
+    else:
+        r = ArrayUtil.resample_Bilinear(z, x, y, xq, yq)
+    if r.getSize() == 1:
+        return r.getDouble(0)
+    else:
+        return MIArray(r)
 
 def interpn(points, values, xi):
     """
