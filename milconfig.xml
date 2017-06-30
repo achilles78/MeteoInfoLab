@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\grads">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
@@ -16,13 +15,16 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\onedim"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\grads\interp2d.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\windrose_contourf.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\test.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\grads\interp2d.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\windrose_contourf.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\test.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -6,12 +6,25 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.chart.plot import PolarPlot
+from org.meteoinfo.chart.plot import XY2DPlot, PolarPlot
 
 from java.awt import Font
 
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
+
+class Axes(XY2DPlot):
+    '''
+    Axes with Cartesian coordinate.
+    '''
+    
+    def add_graphic(self, graphic):
+        '''
+        Add a graphic
+        
+        :param graphic: (*Graphic*) The graphic to be added.
+        '''
+        self.addGraphic(graphic)
 
 class PolarAxes(PolarPlot):
     '''

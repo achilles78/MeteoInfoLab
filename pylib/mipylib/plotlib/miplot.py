@@ -39,7 +39,7 @@ from mipylib.numeric.miarray import MIArray
 import mipylib.numeric.minum as minum
 from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
-from mipylib.plotlib.axes import PolarAxes
+from mipylib.plotlib.axes import Axes, PolarAxes
 
 ## Global ##
 milapp1 = None
@@ -855,19 +855,23 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
-    return ls
+    return graphics
 
-def patch(x, y, **kwargs):
+def patch(x, y=None, **kwargs):
     '''
     Create one or more filled polygons.
     
-    :param x: (*array_like*) X coordinates for each vertex.
+    :param x: (*array_like*) X coordinates for each vertex. X should be PolygonShape if y
+        is None.
     :param y: (*array_like*) Y coordinates for each vertex.
     '''
     lbreak, isunique = __getlegendbreak('polygon', **kwargs)
-    x = __getplotdata(x)
-    y = __getplotdata(y)
-    graphics = GraphicFactory.createPolygons(x, y, lbreak)
+    if y is None:
+        graphics = Graphic(x, lbreak)
+    else:
+        x = __getplotdata(x)
+        y = __getplotdata(y)
+        graphics = GraphicFactory.createPolygons(x, y, lbreak)
     
     global gca 
     if gca is None:
@@ -1630,7 +1634,8 @@ def __create_axes(*args, **kwargs):
         #plot = PolarPlot()
         ax = PolarAxes()
     else:
-        ax = XY2DPlot()
+        #ax = XY2DPlot()
+        ax = Axes()
     if position is None:
         position = [0.13, 0.11, 0.775, 0.815]
         ax.setOuterPosActive(True)
@@ -3855,33 +3860,35 @@ def contourf(*args, **kwargs):
     smooth = kwargs.pop('smooth', True)
     igraphic = GraphicFactory.createContourPolygons(gdata.data, ls, smooth)
     
-    #Create plot
-    if gca is None:
-        plot = XY2DPlot()
-    else:
-        if isinstance(gca, XY2DPlot):
-            plot = gca
-        else:
+    visible = kwargs.pop('visible', True)
+    if visible:
+        #Create plot
+        if gca is None:
             plot = XY2DPlot()
-    if not xaxistype is None:
-        __setXAxisType(plot, xaxistype)
-        plot.updateDrawExtent()
-    plot.addGraphic(igraphic)
-    #plot.setAutoExtent()
-    plot.setExtent(igraphic.getExtent())
-    plot.setDrawExtent(igraphic.getExtent())
-    
-    #Create figure
-    if chartpanel is None:
-        figure()
-    
-    #Set chart
-    chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
-        chart.setCurrentPlot(plot)
-    chartpanel.setChart(chart)
-    gca = plot
-    draw_if_interactive()
+        else:
+            if isinstance(gca, XY2DPlot):
+                plot = gca
+            else:
+                plot = XY2DPlot()
+        if not xaxistype is None:
+            __setXAxisType(plot, xaxistype)
+            plot.updateDrawExtent()
+        plot.addGraphic(igraphic)
+        #plot.setAutoExtent()
+        plot.setExtent(igraphic.getExtent())
+        plot.setDrawExtent(igraphic.getExtent())
+        
+        #Create figure
+        if chartpanel is None:
+            figure()
+        
+        #Set chart
+        chart = chartpanel.getChart()
+        if gca is None or (not isinstance(gca, XY2DPlot)):
+            chart.setCurrentPlot(plot)
+        chartpanel.setChart(chart)
+        gca = plot
+        draw_if_interactive()    
     return igraphic
     
 def quiver(*args, **kwargs):

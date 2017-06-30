@@ -62,7 +62,7 @@ __all__ = [
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isgriddata','isstationdata','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
-    'numasciicol','numasciirow','nonzero','ones','ones_like','polyval','power',
+    'numasciicol','numasciirow','nonzero','ones','ones_like','pol2cart','polyval','power',
     'project','projectxy','projinfo','radians','readtable','reshape',
     'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','tan','transpose','trapz','vdot',
     'where','zeros','zeros_like'
@@ -2102,7 +2102,7 @@ def griddata(points, values, xi=None, **kwargs):
     :param radius: (*float*) Used for 'idw', 'cressman' and 'neareast' methods. The searching raduis. Default 
         is ``None`` in 'idw' method, means no raduis was used. Default is ``[10, 7, 4, 2, 1]`` in cressman 
         method.
-    :param convexHull: (*boolean*) If the convexHull will be used to mask result grid data. Default is ``False``.
+    :param convexhull: (*boolean*) If the convexhull will be used to mask result grid data. Default is ``False``.
     
     :returns: (*array*) Interpolated grid data (2-D array)
     '''
@@ -2268,6 +2268,42 @@ def projectxy(lon, lat, xnum, ynum, dx, dy, toproj, fromproj=None, pos='lowerlef
         xx = arange1(llx, xnum, dx)
         yy = arange1(lly, ynum, dy)
     return xx, yy
+    
+def pol2cart(theta, rho):
+    '''
+    Transform polar coordinates to Cartesian
+    
+    :param theta: (*array_like*) Theta value in polar coordinates
+    :param rho: (*array_like*) Rho value in polar coordinates
+    
+    :returns: x and y value in Cartesian coordinates
+    '''
+    if isinstance(theta, (int, float)):
+        r = ArrayMath.polarToCartesian(theta, rho)
+        return r[0], r[1]
+    else:
+        theta = array(theta)
+        rho = array(rho)
+        r = ArrayMath.polarToCartesian(theta.array, rho.array)
+        return MIArray(r[0]), MIArray(r[1])
+        
+def cart2pol(x, y):
+    '''
+    Transform Cartesian coordinates to polar
+    
+    :param x: (*array_like*) X value in Cartesian coordinates
+    :param y: (*array_like*) Y value in Cartesian coordinates
+    
+    :returns: Theta and rho value in polar coordinates
+    '''
+    if isinstance(x, (int, float)):
+        r = ArrayMath.cartesianToPolar(x, y)
+        return r[0], r[1]
+    else:
+        x = array(x)
+        y = array(y)
+        r = ArrayMath.cartesianToPolar(x.array, y.array)
+        return MIArray(r[0]), MIArray(r[1])
     
 def addtimedim(infn, outfn, t, tunit='hours'):
     '''
