@@ -17,6 +17,56 @@ class Axes(XY2DPlot):
     '''
     Axes with Cartesian coordinate.
     '''
+
+    def __dir__(self):
+        return [
+            'get_position','set_position','get_outerposition','set_outerposition',
+            'active_outerposition','add_graphic'
+        ]
+            
+    def get_position(self):
+        '''
+        Get axes position             
+
+        :returns: Axes position [left, bottom, width, height] in normalized (0, 1) units
+        '''
+        pos = self.getPosition()
+        return [pos.x, pos.y, pos.width, pos.height]
+        
+    def set_position(self, pos):
+        '''
+        Set axes position
+        
+        :param pos: (*list*) Axes position specified by *position=* [left, bottom, width,
+            height] in normalized (0, 1) units
+        '''
+        self.setPosition(pos)
+        
+    def get_outerposition(self):
+        '''
+        Get axes outer position
+        
+        :returns: Axes outer position [left, bottom, width, height] in normalized (0, 1) units
+        '''
+        pos = self.getPosition()
+        return [pos.x, pos.y, pos.width, pos.height]
+        
+    def set_outerposition(self, pos):
+        '''
+        Set axes outer position
+        
+        :param pos: (*list*) Axes outer position specified by *position=* [left, bottom, width,
+            height] in normalized (0, 1) units
+        '''
+        self.setPosition(pos)
+        
+    def active_outerposition(self, active):
+        '''
+        Set axes outer position active or not.
+        
+        :param active: (*boolean*) Active or not
+        '''
+        sel.setOuterPosActive(active)        
     
     def add_graphic(self, graphic):
         '''
@@ -25,11 +75,19 @@ class Axes(XY2DPlot):
         :param graphic: (*Graphic*) The graphic to be added.
         '''
         self.addGraphic(graphic)
+            
 
 class PolarAxes(PolarPlot):
     '''
     Axes with polar coordinate.
     '''
+    
+    def __dir__(self):
+        return [
+            'set_rmax','set_rlabel_position','set_rticks','set_rtick_format',
+            'set_rtick_locations','set_rtick_font','set_xtick_locations','set_xticks',
+            'set_xtick_font'            
+        ]
     
     def set_rmax(self, rmax):
         '''

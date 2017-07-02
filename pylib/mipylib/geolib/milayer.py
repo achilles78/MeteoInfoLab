@@ -40,7 +40,7 @@ class MILayer():
             self.proj = layer.getProjInfo()
     
     def __repr__(self):
-        return self.layer.getLayerInfo()
+        return self.layer.getLayerInfo()            
     
     def isvectorlayer(self):
         return self.layer.getLayerType() == LayerTypes.VectorLayer

@@ -1641,7 +1641,7 @@ def __create_axes(*args, **kwargs):
         ax.setOuterPosActive(True)
     else:        
         ax.setOuterPosActive(False)        
-    ax.setPosition(position[0], position[1], position[2], position[3])   
+    ax.setPosition(position)   
     if not outerposition is None:
         ax.setOuterPosition(outerposition)
         ax.setOuterPosActive(True)
