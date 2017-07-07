@@ -6,14 +6,14 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.chart.plot import XY2DPlot, PolarPlot
+from org.meteoinfo.chart.plot import Plot2D, PolarPlot
 
 from java.awt import Font
 
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
 
-class Axes(XY2DPlot):
+class Axes(Plot2D):
     '''
     Axes with Cartesian coordinate.
     '''
@@ -75,8 +75,14 @@ class Axes(XY2DPlot):
         :param graphic: (*Graphic*) The graphic to be added.
         '''
         self.addGraphic(graphic)
-            
 
+##############################################        
+class MapAxes(Axes):
+    '''
+    Axes with geological map coordinate.
+    '''
+            
+###############################################
 class PolarAxes(PolarPlot):
     '''
     Axes with polar coordinate.

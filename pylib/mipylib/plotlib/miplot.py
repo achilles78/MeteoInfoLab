@@ -15,7 +15,7 @@ from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, 
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import Plot, XY1DPlot, XY2DPlot, PiePlot, PolarPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
+from org.meteoinfo.chart.plot import Plot, Plot2D, PiePlot, PolarPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
@@ -235,14 +235,14 @@ def plot(*args, **kwargs):
                 line.setCaption(label)
                 lines.append(line)
     
-    #Create XY2DPlot
+    #Create axes
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     
     if not xaxistype is None:
         __setXAxisType(plot, xaxistype)    
@@ -277,7 +277,7 @@ def plot(*args, **kwargs):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.clearPlots()
         chart.setPlot(plot)
     gca = plot
@@ -483,14 +483,14 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     #Create graphics
     graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerr, yerr, line)
     
-    #Create XY2DPlot
+    #Create Plot2D
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -499,7 +499,7 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.clearPlots()
         chart.setPlot(plot)
     #chart.setAntiAlias(True)
@@ -636,12 +636,12 @@ def bar(*args, **kwargs):
     
     #Create bar plot
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     if autowidth:
@@ -654,7 +654,7 @@ def bar(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -721,12 +721,12 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
     
     #Create bar plot
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -736,7 +736,7 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -836,12 +836,12 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
         ls = pbs
     
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -850,7 +850,7 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -875,12 +875,12 @@ def patch(x, y=None, **kwargs):
     
     global gca 
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -889,7 +889,7 @@ def patch(x, y=None, **kwargs):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -910,12 +910,12 @@ def rectangle(position, curvature=None, **kwargs):
     
     global gca 
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     plot.addGraphic(graphic)
     plot.setAutoExtent()
     
@@ -924,7 +924,7 @@ def rectangle(position, curvature=None, **kwargs):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -975,14 +975,14 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     #Create graphics
     graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb)    
     
-    #Create XY1DPlot
+    #Create axes
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot() 
+            plot = Plot2D() 
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -1202,12 +1202,12 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     
     #Create XYPlot
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     plot.addGraphic(graphics)
     plot.setAutoExtent()
     
@@ -1218,7 +1218,7 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     chart = chartpanel.getChart()
     if gca is None:
         chart.setCurrentPlot(plot)
-    elif not isinstance(gca, XY2DPlot):
+    elif not isinstance(gca, Plot2D):
         if isinstance(gca, Plot):
             chart.removePlot(gca)
         chart.setCurrentPlot(plot)
@@ -1447,7 +1447,7 @@ def subplot(nrows, ncols, plot_number, **kwargs):
         if polar:
             gca = PolarAxes()
         else:
-            gca = XY2DPlot()
+            gca = Plot2D()
         gca.isSubPlot = True        
         #gca.rowIndex = rowidx
         #gca.columnIndex = colidx
@@ -1566,7 +1566,7 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
             if i > 0:
                 y -= hspace
         for j in range(ncols):                        
-            ax = XY2DPlot()
+            ax = Plot2D()
             ax.isSubPlot = True             
             if not iswspace and not ishspace:
                 x = left + w * j
@@ -1634,7 +1634,7 @@ def __create_axes(*args, **kwargs):
         #plot = PolarPlot()
         ax = PolarAxes()
     else:
-        #ax = XY2DPlot()
+        #ax = Plot2D()
         ax = Axes()
     if position is None:
         position = [0.13, 0.11, 0.775, 0.815]
@@ -2158,7 +2158,7 @@ def twinx(ax):
     """
     ax.getAxis(Location.RIGHT).setVisible(False)
     ax.setSameShrink(True)
-    plot = XY2DPlot()
+    plot = Plot2D()
     plot.setSameShrink(True)
     plot.setPosition(ax.getPosition())
     plot.getAxis(Location.BOTTOM).setVisible(False)
@@ -2405,7 +2405,7 @@ def cll():
     Clear last added layer or plot object.
     '''
     if not gca is None:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             gca.removeLastGraphic()
             gca.setAutoExtent()
         elif isinstance(gca, MapPlot):
@@ -3222,7 +3222,7 @@ def legend(*args, **kwargs):
     #plot.setDrawLegend(True)   
     newlegend = kwargs.pop('newlegend', True)
     #plot.updateLegendScheme()
-    if isinstance(plot, XY2DPlot):        
+    if isinstance(plot, Plot2D):        
         ols = plot.getLegendScheme()
     else:
         ols = None
@@ -3690,12 +3690,12 @@ def imshow(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     if not xaxistype is None:
         __setXAxisType(plot, xaxistype)
         plot.updateDrawExtent()
@@ -3708,7 +3708,7 @@ def imshow(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -3778,12 +3778,12 @@ def contour(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     if not xaxistype is None:
         __setXAxisType(plot, xaxistype)
         plot.updateDrawExtent()
@@ -3798,7 +3798,7 @@ def contour(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -3864,12 +3864,12 @@ def contourf(*args, **kwargs):
     if visible:
         #Create plot
         if gca is None:
-            plot = XY2DPlot()
+            plot = Plot2D()
         else:
-            if isinstance(gca, XY2DPlot):
+            if isinstance(gca, Plot2D):
                 plot = gca
             else:
-                plot = XY2DPlot()
+                plot = Plot2D()
         if not xaxistype is None:
             __setXAxisType(plot, xaxistype)
             plot.updateDrawExtent()
@@ -3884,7 +3884,7 @@ def contourf(*args, **kwargs):
         
         #Set chart
         chart = chartpanel.getChart()
-        if gca is None or (not isinstance(gca, XY2DPlot)):
+        if gca is None or (not isinstance(gca, Plot2D)):
             chart.setCurrentPlot(plot)
         chartpanel.setChart(chart)
         gca = plot
@@ -3978,12 +3978,12 @@ def quiver(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     if not xaxistype is None:
         __setXAxisType(plot, xaxistype)
         plot.updateDrawExtent()
@@ -3998,7 +3998,7 @@ def quiver(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -4092,12 +4092,12 @@ def barbs(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = XY2DPlot()
+        plot = Plot2D()
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
-            plot = XY2DPlot()
+            plot = Plot2D()
     if not xaxistype is None:
         __setXAxisType(plot, xaxistype)
         plot.updateDrawExtent()
@@ -4112,7 +4112,7 @@ def barbs(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     chartpanel.setChart(chart)
     gca = plot
@@ -4128,17 +4128,17 @@ def __plot_griddata(gdata, ls, type, xaxistype=None):
     elif type == 'imshow':
         layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls)
     
-    #Create XY2DPlot
+    #Create Plot2D
     global gca
     if gca is None:
         mapview = MapView()
-        plot = XY2DPlot(mapview)
+        plot = MapPlot(mapview)
     else:
-        if isinstance(gca, XY2DPlot):
+        if isinstance(gca, Plot2D):
             plot = gca
         else:
             mapview = MapView()
-            plot = XY2DPlot(mapview)
+            plot = MapPlot(mapview)
     
     if xaxistype == 'lon':
         plot.setXAxis(LonLatAxis('Longitude', True))
@@ -4154,7 +4154,7 @@ def __plot_griddata(gdata, ls, type, xaxistype=None):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, XY2DPlot)):
+    if gca is None or (not isinstance(gca, Plot2D)):
         chart.setCurrentPlot(plot)
     gca = plot
     #chart.setAntiAlias(True)
@@ -4177,7 +4177,7 @@ def __plot_uvgriddata(udata, vdata, cdata, ls, type, isuv):
     
     shapetype = layer.getShapeType()
     mapview = MapView()
-    plot = XY2DPlot(mapview)
+    plot = MapPlot(mapview)
     plot.addLayer(layer)
     plot.setDrawExtent(layer.getExtent().clone())
     
@@ -5698,7 +5698,7 @@ def display(data):
         mapview.setLockViewUpdate(True)
         mapview.addLayer(layer)
         mapview.setLockViewUpdate(False)
-        plot = XY2DPlot(mapview)
+        plot = MapPlot(mapview)
         chart = Chart(plot)
         #chart.setAntiAlias(True)
         chartpanel.setChart(chart)
