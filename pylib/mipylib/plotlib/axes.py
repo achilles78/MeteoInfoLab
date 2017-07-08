@@ -6,23 +6,23 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.chart.plot import Plot2D, PolarPlot
+from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot
 
 from java.awt import Font
 
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
 
-class Axes(Plot2D):
+class Axes():
     '''
     Axes with Cartesian coordinate.
     '''
 
-    def __dir__(self):
-        return [
-            'get_position','set_position','get_outerposition','set_outerposition',
-            'active_outerposition','add_graphic'
-        ]
+    def __init__(self, axes=None):
+        if axes is None:
+            self.axes = Plot2D()
+        else:
+            self.axes = axes
             
     def get_position(self):
         '''
@@ -30,7 +30,7 @@ class Axes(Plot2D):
 
         :returns: Axes position [left, bottom, width, height] in normalized (0, 1) units
         '''
-        pos = self.getPosition()
+        pos = self.axes.getPosition()
         return [pos.x, pos.y, pos.width, pos.height]
         
     def set_position(self, pos):
@@ -40,7 +40,7 @@ class Axes(Plot2D):
         :param pos: (*list*) Axes position specified by *position=* [left, bottom, width,
             height] in normalized (0, 1) units
         '''
-        self.setPosition(pos)
+        self.axes.setPosition(pos)
         
     def get_outerposition(self):
         '''
@@ -48,7 +48,7 @@ class Axes(Plot2D):
         
         :returns: Axes outer position [left, bottom, width, height] in normalized (0, 1) units
         '''
-        pos = self.getPosition()
+        pos = self.axes.getPosition()
         return [pos.x, pos.y, pos.width, pos.height]
         
     def set_outerposition(self, pos):
@@ -58,7 +58,7 @@ class Axes(Plot2D):
         :param pos: (*list*) Axes outer position specified by *position=* [left, bottom, width,
             height] in normalized (0, 1) units
         '''
-        self.setPosition(pos)
+        self.axes.setPosition(pos)
         
     def active_outerposition(self, active):
         '''
@@ -66,7 +66,25 @@ class Axes(Plot2D):
         
         :param active: (*boolean*) Active or not
         '''
-        sel.setOuterPosActive(active)        
+        self.axes.setOuterPosActive(active)     
+    
+    def get_axis(self, loc):
+        '''
+        Get axis by location.
+        
+        :param loc: (*Location*) Location enum.
+        
+        :returns: Axis
+        '''
+        return self.axes.getAxis(loc)
+        
+    def set_title(self, title):
+        '''
+        Set title
+        
+        :param title: (*string*) Title
+        '''
+        self.axes.setTitle(title)
     
     def add_graphic(self, graphic):
         '''
@@ -74,26 +92,58 @@ class Axes(Plot2D):
         
         :param graphic: (*Graphic*) The graphic to be added.
         '''
-        self.addGraphic(graphic)
+        self.axes.addGraphic(graphic)
+        
+##############################################
+class PieAxes(Axes):
+    '''
+    Axes for pie plot.       
+    '''
+    
+    def __init__(self, axes=None):
+        if axes is None:        
+            self.axes = PiePlot()
+        else:
+            self.axes = axes
 
 ##############################################        
 class MapAxes(Axes):
     '''
     Axes with geological map coordinate.
     '''
+    
+    def __init__(self, axes=None, mapview=None):
+        if axes is None:        
+            if mapview is None:
+                self.axes = MapPlot()
+            else:
+                self.axes = MapPlot(mapview)
+        else:
+            self.axes = axes
+            
+    def add_layer(self, layer, zorder=None):
+        '''
+        Add a map layer
+        
+        :param layer: (*MapLayer*) The map layer.
+        :param zorder: (*int*) Layer z order.
+        '''
+        if zorder is None:
+            self.axes.addLayer(layer)
+        else:
+            self.axes.addLayer(zorder, layer)
             
 ###############################################
-class PolarAxes(PolarPlot):
+class PolarAxes(Axes):
     '''
     Axes with polar coordinate.
     '''
     
-    def __dir__(self):
-        return [
-            'set_rmax','set_rlabel_position','set_rticks','set_rtick_format',
-            'set_rtick_locations','set_rtick_font','set_xtick_locations','set_xticks',
-            'set_xtick_font'            
-        ]
+    def __init__(self, axes=None):
+        if axes is None:
+            self.axes = PolarPlot()
+        else:
+            self.axes = axes
     
     def set_rmax(self, rmax):
         '''
@@ -101,7 +151,7 @@ class PolarAxes(PolarPlot):
         
         :param rmax: (*float*) Radial max value.
         '''
-        self.setRadius(rmax)
+        self.axes.setRadius(rmax)
         
     def set_rlabel_position(self, pos):
         '''
@@ -111,7 +161,7 @@ class PolarAxes(PolarPlot):
         '''
         if isinstance(pos, (DimArray, MIArray)):
             pos = pos.tolist()
-        self.setYTickLabelPos(pos)
+        self.axes.setYTickLabelPos(pos)
         
     def set_rticks(self, ticks):
         '''
@@ -119,7 +169,7 @@ class PolarAxes(PolarPlot):
         
         :param ticks: (*string list*) Tick labels.
         '''
-        self.setYTickLabels(ticks)
+        self.axes.setYTickLabels(ticks)
         
     def set_rtick_format(self, fmt=''):
         '''
@@ -127,7 +177,7 @@ class PolarAxes(PolarPlot):
         
         :param ftm: (*string*) Tick format ['' | '%'].
         '''
-        self.setYTickFormat(fmt)
+        self.axes.setYTickFormat(fmt)
         
     def set_rtick_locations(self, loc):
         '''
@@ -137,7 +187,7 @@ class PolarAxes(PolarPlot):
         '''
         if isinstance(loc, (DimArray, MIArray)):
             loc = loc.tolist()
-        self.setYTickLocations(loc)
+        self.axes.setYTickLocations(loc)
         
     def set_xtick_locations(self, loc):
         '''
@@ -147,7 +197,7 @@ class PolarAxes(PolarPlot):
         '''
         if isinstance(loc, (DimArray, MIArray)):
             loc = loc.tolist()
-        self.setXTickLocations(loc)
+        self.axes.setXTickLocations(loc)
         
     def set_xticks(self, ticks):
         '''
@@ -155,7 +205,7 @@ class PolarAxes(PolarPlot):
         
         :param ticks: (*string list*) Tick labels.
         '''
-        self.setXTickLabels(ticks)
+        self.axes.setXTickLabels(ticks)
         
     def set_rtick_font(self, name=None, size=None, style=None):
         '''
@@ -165,7 +215,7 @@ class PolarAxes(PolarPlot):
         :param size: (*int*) Font size.
         :param style: (*string*) Font style.
         '''
-        font = self.getYTickFont()
+        font = self.axes.getYTickFont()
         if name is None:
             name = font.getName()
         if size is None:
@@ -180,7 +230,7 @@ class PolarAxes(PolarPlot):
             else:
                 style = Font.PLAIN
         font = Font(name, style, size)
-        self.setYTickFont(font)
+        self.axes.setYTickFont(font)
         
     def set_xtick_font(self, name=None, size=None, style=None):
         '''
@@ -190,7 +240,7 @@ class PolarAxes(PolarPlot):
         :param size: (*int*) Font size.
         :param style: (*string*) Font style.
         '''
-        font = self.getXTickFont()
+        font = self.axes.getXTickFont()
         if name is None:
             name = font.getName()
         if size is None:
@@ -205,4 +255,4 @@ class PolarAxes(PolarPlot):
             else:
                 style = Font.PLAIN
         font = Font(name, style, size)
-        self.setXTickFont(font)
+        self.axes.setXTickFont(font)

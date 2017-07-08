@@ -39,7 +39,7 @@ from mipylib.numeric.miarray import MIArray
 import mipylib.numeric.minum as minum
 from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
-from mipylib.plotlib.axes import Axes, PolarAxes
+from mipylib.plotlib.axes import Axes, MapAxes, PolarAxes, PieAxes
 
 ## Global ##
 milapp1 = None
@@ -237,28 +237,28 @@ def plot(*args, **kwargs):
     
     #Create axes
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
+            plot = Axes()
     
     if not xaxistype is None:
-        __setXAxisType(plot, xaxistype)    
+        __setXAxisType(plot.axes, xaxistype)    
     timetickformat = kwargs.pop('timetickformat', None)
     if not timetickformat is None:
         if not xaxistype == 'time':
-            plot.setXAxis(TimeAxis('Time', True))
-        plot.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
-        plot.getAxis(Location.TOP).setTimeFormat(timetickformat)
+            plot.axes.setXAxis(TimeAxis('Time', True))
+        plot.axes.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
+        plot.axes.getAxis(Location.TOP).setTimeFormat(timetickformat)
     #plot.setDataset(dataset)     
 
     #Add graphics
     graphics = []
     if isxylistdata:
         graphic = GraphicFactory.createLineString(dataset, lines)
-        plot.addGraphic(graphic)
+        plot.add_graphic(graphic)
         graphics.append(graphic)
     else:
         #Add data series
@@ -268,18 +268,18 @@ def plot(*args, **kwargs):
             xdata = __getplotdata(xdatalist[i])
             ydata = __getplotdata(ydatalist[i])
             graphic = GraphicFactory.createLineString(xdata, ydata, lines[i])
-            plot.addGraphic(graphic)
+            plot.add_graphic(graphic)
             graphics.append(graphic)
-    plot.setAutoExtent()
+    plot.axes.setAutoExtent()
     
     #Paint dataset
     if chartpanel is None:
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
+    if gca is None or (not isinstance(gca, Axes)):
         chart.clearPlots()
-        chart.setPlot(plot)
+        chart.setPlot(plot.axes)
     gca = plot
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
@@ -338,8 +338,8 @@ def semilogy(*args, **kwargs):
     """       
     lines = plot(*args, **kwargs)
     global gca
-    __setYAxisType(gca, 'log')
-    gca.setAutoExtent()
+    __setYAxisType(gca.axes, 'log')
+    gca.axes.setAutoExtent()
     return lines
     
 def semilogx(*args, **kwargs):
@@ -391,8 +391,8 @@ def semilogx(*args, **kwargs):
     """       
     lines = plot(*args, **kwargs)
     global gca
-    __setXAxisType(gca, 'log')
-    gca.setAutoExtent()
+    __setXAxisType(gca.axes, 'log')
+    gca.axes.setAutoExtent()
     return lines
     
 def loglog(*args, **kwargs):
@@ -444,9 +444,9 @@ def loglog(*args, **kwargs):
     """       
     lines = plot(*args, **kwargs)
     global gca
-    __setXAxisType(gca, 'log')
-    __setYAxisType(gca, 'log')
-    gca.setAutoExtent()
+    __setXAxisType(gca.axes, 'log')
+    __setYAxisType(gca.axes, 'log')
+    gca.axes.setAutoExtent()
     return lines
         
 def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
@@ -483,25 +483,25 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     #Create graphics
     graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerr, yerr, line)
     
-    #Create Plot2D
+    #Create Axes
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
+            plot = Axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
     
     #Chart panel
     if chartpanel is None:
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
+    if gca is None or (not isinstance(gca, Axes)):
         chart.clearPlots()
-        chart.setPlot(plot)
+        chart.setPlot(plot.axes)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
     gca = plot
@@ -636,17 +636,17 @@ def bar(*args, **kwargs):
     
     #Create bar plot
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
+            plot = Axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
     if autowidth:
         barswidth = kwargs.pop('barswidth', 0.8)
-        plot.setBarsWidth(barswidth)
+        plot.axes.setBarsWidth(barswidth)
     
     #Create figure
     if chartpanel is None:
@@ -654,8 +654,8 @@ def bar(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -721,14 +721,14 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
     
     #Create bar plot
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
+            plot = Axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
     
     #Create figure
     if chartpanel is None:
@@ -736,8 +736,8 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -836,22 +836,22 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
         ls = pbs
     
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
+            plot = Axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
     
     #Paint dataset
     if chartpanel is None:
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -875,22 +875,22 @@ def patch(x, y=None, **kwargs):
     
     global gca 
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
+            plot = Axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
     
     #Paint dataset
     if chartpanel is None:
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -910,22 +910,22 @@ def rectangle(position, curvature=None, **kwargs):
     
     global gca 
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
-    plot.addGraphic(graphic)
-    plot.setAutoExtent()
+            plot = Axes()
+    plot.add_graphic(graphic)
+    plot.axes.setAutoExtent()
     
     #Paint dataset
     if chartpanel is None:
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -977,14 +977,14 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     
     #Create axes
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D() 
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
+            plot = Axes() 
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
     
     #Paint dataset
     if chartpanel is None:
@@ -993,7 +993,7 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     chart = chartpanel.getChart()
     if gca is None:
         chart.clearPlots()
-        chart.setPlot(plot)
+        chart.setPlot(plot.axes)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
     gca = plot
@@ -1054,21 +1054,21 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     graphics = GraphicFactory.createPieArcs(x, colors, labels, startangle, explode, font, fontcolor, \
         autopct)
     
-    #Create PiePlot
+    #Create PieAxes
     if gca is None:
-        plot = PiePlot()
+        plot = PieAxes()
     else:
-        if isinstance(gca, PiePlot):
+        if isinstance(gca, PieAxes):
             plot = gca
         else:
-            plot = PiePlot()
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
-    plot.setAutoAspect(False)
-    plot.getAxis(Location.BOTTOM).setVisible(False)
-    plot.getAxis(Location.LEFT).setVisible(False)
-    plot.getAxis(Location.TOP).setVisible(False)
-    plot.getAxis(Location.RIGHT).setVisible(False)
+            plot = PieAxes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
+    plot.axes.setAutoAspect(False)
+    plot.axes.getAxis(Location.BOTTOM).setVisible(False)
+    plot.axes.getAxis(Location.LEFT).setVisible(False)
+    plot.axes.getAxis(Location.TOP).setVisible(False)
+    plot.axes.getAxis(Location.RIGHT).setVisible(False)
     
     #Paint dataset
     if chartpanel is None:
@@ -1076,11 +1076,11 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
         
     chart = chartpanel.getChart()
     if gca is None:
-        chart.setCurrentPlot(plot)
-    elif not isinstance(gca, PiePlot):
-        if isinstance(gca, Plot):
-            chart.removePlot(gca)
-        chart.setCurrentPlot(plot)
+        chart.setCurrentPlot(plot.axes)
+    elif not isinstance(gca, PieAxes):
+        if isinstance(gca, Axes):
+            chart.removePlot(gca.axes)
+        chart.setCurrentPlot(plot.axes)
     
     chartpanel.setChart(chart)
     gca = plot
@@ -1202,14 +1202,14 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     
     #Create XYPlot
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
-    plot.addGraphic(graphics)
-    plot.setAutoExtent()
+            plot = Axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
     
     #Paint dataset
     if chartpanel is None:
@@ -1217,11 +1217,11 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
         
     chart = chartpanel.getChart()
     if gca is None:
-        chart.setCurrentPlot(plot)
-    elif not isinstance(gca, Plot2D):
+        chart.setCurrentPlot(plot.axes)
+    elif not isinstance(gca, Axes):
         if isinstance(gca, Plot):
             chart.removePlot(gca)
-        chart.setCurrentPlot(plot)
+        chart.setCurrentPlot(plot.axes)
     
     chartpanel.setChart(chart)
     gca = plot
@@ -1412,11 +1412,11 @@ def caxes(ax):
         if chartpanel is None:
             figure()
                         
-        gca = chart.getPlot(ax)
+        gca = __get_axes(chart, ax)
         chart.setCurrentPlot(ax - 1)
     else:
         gca = ax
-        chart.setCurrentPlot(chart.getPlotIndex(ax))
+        chart.setCurrentPlot(chart.getPlotIndex(ax.axes))
     return gca
     
 def subplot(nrows, ncols, plot_number, **kwargs):
@@ -1447,8 +1447,8 @@ def subplot(nrows, ncols, plot_number, **kwargs):
         if polar:
             gca = PolarAxes()
         else:
-            gca = Plot2D()
-        gca.isSubPlot = True        
+            gca = Axes()
+        gca.axes.isSubPlot = True        
         #gca.rowIndex = rowidx
         #gca.columnIndex = colidx
     else:
@@ -1489,24 +1489,24 @@ def subplot(nrows, ncols, plot_number, **kwargs):
                 height = 1. / nrows
                 x = width * colidx
                 y = 1. - height * (rowidx + 1)
-            gca.setPosition(x, y, width, height)
-            gca.setOuterPosition(x, y, width, height)
-            gca.setOuterPosActive(True)
+            gca.set_position([x, y, width, height])
+            gca.set_outerposition([x, y, width, height])
+            gca.active_outerposition(True)
     else:
-        gca.setPosition(position)
-        gca.setOuterPosActive(False)
+        gca.set_position(position)
+        gca.active_outerposition(False)
     outerposition = kwargs.pop('outerposition', None)
     if not outerposition is None:
-        gca.setOuterPosition(outerposition)
-        gca.setOuterPosActive(True)
+        gca.set_outerposition(outerposition)
+        gca.active_outerposition(True)
         
-    if isinstance(gca, MapPlot):
+    if isinstance(gca, MapAxes):
         __set_axesm(gca, **kwargs)
     else:
         __set_axes(gca, **kwargs)
         
     if isnew:
-        chart.addPlot(gca)
+        chart.addPlot(gca.axes)
         chart.setCurrentPlot(chart.getPlots().size() - 1)
     
     return gca
@@ -1566,28 +1566,28 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
             if i > 0:
                 y -= hspace
         for j in range(ncols):                        
-            ax = Plot2D()
-            ax.isSubPlot = True             
+            ax = Axes()
+            ax.axes.isSubPlot = True             
             if not iswspace and not ishspace:
                 x = left + w * j
                 y = (bottom + height) - h * (i + 1)
-                ax.setPosition(x, y, w, h)
-                ax.setOuterPosition(x, y, w, h)
-                ax.setOuterPosActive(True)
+                ax.set_position([x, y, w, h])
+                ax.set_outerposition([x, y, w, h])
+                ax.active_outerposition(True)
             else:
                 if iswspace:
                     if j > 0:
                         x += wspace                
-                ax.setPosition(x, y, w, h)
-                ax.setOuterPosActive(False)
+                ax.set_position([x, y, w, h])
+                ax.active_outerposition(False)
                 x += w
             if sharex:
                 if i < nrows - 1:
-                    ax.getAxis(Location.BOTTOM).setDrawTickLabel(False)
+                    ax.axes.getAxis(Location.BOTTOM).setDrawTickLabel(False)
             if sharey:
                 if j > 0:
-                    ax.getAxis(Location.LEFT).setDrawTickLabel(False)
-            chart.addPlot(ax)
+                    ax.axes.getAxis(Location.LEFT).setDrawTickLabel(False)
+            chart.addPlot(ax.axes)
             if ax2d:
                 axs2d.append(ax)
             else:
@@ -1609,7 +1609,7 @@ def currentplot(plot_number):
         
     global gca
     chart = chartpanel.getChart()
-    gca = chart.getPlot(plot_number)
+    gca = __get_axes(chart, plot_number)
     chart.setCurrentPlot(plot_number - 1)
     
     return plot
@@ -1638,13 +1638,13 @@ def __create_axes(*args, **kwargs):
         ax = Axes()
     if position is None:
         position = [0.13, 0.11, 0.775, 0.815]
-        ax.setOuterPosActive(True)
+        ax.active_outerposition(True)
     else:        
-        ax.setOuterPosActive(False)        
-    ax.setPosition(position)   
+        ax.active_outerposition(False)        
+    ax.set_position(position)   
     if not outerposition is None:
-        ax.setOuterPosition(outerposition)
-        ax.setOuterPosActive(True)
+        ax.set_outerposition(outerposition)
+        ax.active_outerposition(True)
     
     return ax
     
@@ -1668,10 +1668,10 @@ def __set_axes(ax, **kwargs):
     """        
     aspect = kwargs.pop('aspect', 'auto')
     axis = kwargs.pop('axis', True)
-    b_axis = ax.getAxis(Location.BOTTOM)
-    l_axis = ax.getAxis(Location.LEFT)
-    t_axis = ax.getAxis(Location.TOP)
-    r_axis = ax.getAxis(Location.RIGHT)
+    b_axis = ax.get_axis(Location.BOTTOM)
+    l_axis = ax.get_axis(Location.LEFT)
+    t_axis = ax.get_axis(Location.TOP)
+    r_axis = ax.get_axis(Location.RIGHT)
     if axis:
         bottomaxis = kwargs.pop('bottomaxis', True)
         leftaxis = kwargs.pop('leftaxis', True)
@@ -1698,11 +1698,11 @@ def __set_axes(ax, **kwargs):
     bgcobj = kwargs.pop('bgcolor', None)        
     
     if aspect == 'equal':
-        ax.setAutoAspect(False)
+        ax.axes.setAutoAspect(False)
     else:
         if isinstance(aspect, (int, float)):
-            ax.setAspect(aspect)
-            ax.setAutoAspect(False)
+            ax.axes.setAspect(aspect)
+            ax.axes.setAutoAspect(False)
     if bottomaxis == False:
         b_axis.setVisible(False)
     if leftaxis == False:
@@ -1718,11 +1718,11 @@ def __set_axes(ax, **kwargs):
         l_axis.setInverse(True)
         r_axis.setInverse(True)        
     if not xaxistype is None:
-        __setXAxisType(ax, xaxistype)
+        __setXAxisType(ax.axes, xaxistype)
     if not bgcobj is None:
         bgcolor = __getcolor(bgcobj)
-        ax.setDrawBackground(True)
-        ax.setBackground(bgcolor)
+        ax.axes.setDrawBackground(True)
+        ax.axes.setBackground(bgcolor)
     tickline = kwargs.pop('tickline', True)
     b_axis.setDrawTickLine(tickline)
     t_axis.setDrawTickLine(tickline)
@@ -1735,7 +1735,7 @@ def __set_axes(ax, **kwargs):
         font = Font(tickfontname, Font.BOLD, tickfontsize)
     else:
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    ax.setAxisLabelFont(font)
+    ax.axes.setAxisLabelFont(font)
     
 def __create_axesm(*args, **kwargs):  
     """
@@ -1789,10 +1789,11 @@ def __create_axesm(*args, **kwargs):
         projinfo = ProjectionInfo(projstr)   
         
     mapview = MapView(projinfo)    
-    ax = MapPlot(mapview) 
+    #ax = MapPlot(mapview) 
+    ax = MapAxes(mapview=mapview)
     if position is None:
        position = [0.13, 0.11, 0.775, 0.815]
-    ax.setPosition(position[0], position[1], position[2], position[3])   
+    ax.set_position(position)   
     #ax.getMapView().projectLayers(projinfo)  
     return ax
     
@@ -1846,7 +1847,7 @@ def __set_axesm(ax, **kwargs):
     gridline = kwargs.pop('gridline', False)
     griddx = kwargs.pop('griddx', 10)
     griddy = kwargs.pop('griddy', 10)
-    if ax.getProjInfo().isLonLat():
+    if ax.axes.getProjInfo().isLonLat():
         frameon = kwargs.pop('frameon', False)
     else:
         frameon = kwargs.pop('frameon', True)
@@ -1861,32 +1862,42 @@ def __set_axesm(ax, **kwargs):
     else:
         font = Font(tickfontname, Font.PLAIN, tickfontsize)
         
-    mapview = ax.getMapView()
+    mapview = ax.axes.getMapView()
     mapview.setXYScaleFactor(xyscale)
-    ax.setAxisLabelFont(font)
+    ax.axes.setAxisLabelFont(font)
     if not axison is None:
-        ax.setAxisOn(axison)
+        ax.axes.setAxisOn(axison)
     else:
         if bottomaxis == False:
-            ax.getAxis(Location.BOTTOM).setVisible(False)
+            ax.axes.getAxis(Location.BOTTOM).setVisible(False)
         if leftaxis == False:
-            ax.getAxis(Location.LEFT).setVisible(False)
+            ax.axes.getAxis(Location.LEFT).setVisible(False)
         if topaxis == False:
-            ax.getAxis(Location.TOP).setVisible(False)
+            ax.axes.getAxis(Location.TOP).setVisible(False)
         if rightaxis == False:
-            ax.getAxis(Location.RIGHT).setVisible(False)
-    mapframe = ax.getMapFrame()
+            ax.axes.getAxis(Location.RIGHT).setVisible(False)
+    mapframe = ax.axes.getMapFrame()
     mapframe.setDrawGridLabel(gridlabel)
     mapframe.setDrawGridTickLine(gridlabel)
     mapframe.setDrawGridLine(gridline)
     mapframe.setGridXDelt(griddx)
     mapframe.setGridYDelt(griddy)
-    ax.setDrawNeatLine(frameon)
+    ax.axes.setDrawNeatLine(frameon)
     if not bgcobj is None:
         bgcolor = __getcolor(bgcobj)
-        ax.setDrawBackground(True)
-        ax.setBackground(bgcolor)
+        ax.axes.setDrawBackground(True)
+        ax.axes.setBackground(bgcolor)
  
+    return ax
+    
+def __get_axes(chart, idx):
+    ax = chart.getPlot(idx)
+    if isinstance(ax, Plot2D):
+        ax = Axes(ax)
+    elif isinstance(ax, MapPlot):
+        ax = MapAxes(ax)
+    elif isinstance(ax, PolarAxes):
+        ax = PolarAxes(ax)
     return ax
     
 def axes(*args, **kwargs):
@@ -1920,15 +1931,15 @@ def axes(*args, **kwargs):
     ax = __create_axes(*args, **kwargs)
     __set_axes(ax, **kwargs)
     if newaxes:
-        chart.addPlot(ax)
+        chart.addPlot(ax.axes)
     else:
-        chart.setCurrentPlot(chart.getPlotIndex(gca))
-        if gca.isSubPlot:
-            ax.isSubPlot = True
+        chart.setCurrentPlot(chart.getPlotIndex(gca.axes))
+        if gca.axes.isSubPlot:
+            ax.axes.isSubPlot = True
             position = kwargs.pop('position', None)
             if position is None:
-                ax.setPosition(gca.getPosition())  
-        chart.setCurrentPlot(ax)
+                ax.set_position(gca.get_position())  
+        chart.setCurrentPlot(ax.axes)
     gca = ax
     return ax
 
@@ -1969,183 +1980,17 @@ def axesm(*args, **kwargs):
         isnew = True
     chart = chartpanel.getChart()
     if isnew:
-        chart.addPlot(ax)
+        chart.addPlot(ax.axes)
     else:
-        chart.setCurrentPlot(chart.getPlotIndex(gca))
-        if gca.isSubPlot:
-            ax.isSubPlot = True
+        chart.setCurrentPlot(chart.getPlotIndex(gca.axes))
+        if gca.axes.isSubPlot:
+            ax.axes.isSubPlot = True
             position = kwargs.pop('position', None)
             if position is None:
-                ax.setPosition(gca.getPosition())
-        chart.setCurrentPlot(ax)
+                ax.set_position(gca.get_position())
+        chart.setCurrentPlot(ax.axes)
     gca = ax
-    return ax, ax.getProjInfo()
-    
-def axesm_bak(*args, **kwargs):  
-    """
-    Add an map axes to the figure.
-    
-    :param projinfo: (*ProjectionInfo*) Optional, map projection, default is longlat projection.
-    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
-        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
-    :param bgcolor: (*Color*) Optional, axes background color.
-    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
-    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
-    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
-    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
-    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
-    :param xyscale: (*int*) Optional, set scale of x and y axis, default is 1. It is only
-        valid in longlat projection.
-    :param gridlabel: (*boolean*) Optional, set axis tick labels visible or not. Default is ``True`` .
-    :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
-    :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
-    :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
-    :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``False`` for lon/lat
-        projection, ortherwise is ``True``.
-    :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
-    :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
-    :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
-    
-    :returns: The map axes.
-    """
-    if chartpanel is None:
-        figure()
-        
-    if len(args) > 0:
-        position = args[0]
-    else:
-        position = kwargs.pop('position', None)
-    axis = kwargs.pop('axis', True)
-    if axis:
-        bottomaxis = kwargs.pop('bottomaxis', True)
-        leftaxis = kwargs.pop('leftaxis', True)
-        topaxis = kwargs.pop('topaxis', True)
-        rightaxis = kwargs.pop('rightaxis', True)
-    else:
-        bottomaxis = False
-        leftaxis = False
-        topaxis = False
-        rightaxis = False
-    xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
-    yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
-    xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
-    ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
-    xscale = kwargs.pop('xscale', 'linear')    #or 'log'
-    yscale = kwargs.pop('yscale', 'linear')    #or 'log'
-    xtick = kwargs.pop('xtick', [])
-    ytick = kwargs.pop('ytick', [])
-    xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
-    ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'  
-    projinfo = kwargs.pop('projinfo', None)
-    if projinfo == None:
-        proj = kwargs.pop('proj', 'longlat')
-        origin = kwargs.pop('origin', (0, 0, 0))    
-        lat_0 = origin[0]
-        lon_0 = origin[1]
-        lat_0 = kwargs.pop('lat_0', lat_0)
-        lon_0 = kwargs.pop('lon_0', lon_0)
-        lat_ts = kwargs.pop('truescalelat', 0)
-        lat_ts = kwargs.pop('lat_ts', lat_ts)
-        k = kwargs.pop('scalefactor', 1)
-        k = kwargs.pop('k', k)
-        paralles = kwargs.pop('paralles', (30, 60))
-        lat_1 = paralles[0]
-        if len(paralles) == 2:
-            lat_2 = paralles[1]
-        else:
-            lat_2 = lat_1
-        lat_1 = kwargs.pop('lat_1', lat_1)
-        lat_2 = kwargs.pop('lat_2', lat_2)
-        x_0 = kwargs.pop('falseeasting', 0)
-        y_0 = kwargs.pop('falsenorthing', 0)
-        x_0 = kwargs.pop('x_0', x_0)
-        y_0 = kwargs.pop('y_0', y_0)
-        h = kwargs.pop('h', 0)
-        projstr = '+proj=' + proj \
-            + ' +lat_0=' + str(lat_0) \
-            + ' +lon_0=' + str(lon_0) \
-            + ' +lat_1=' + str(lat_1) \
-            + ' +lat_2=' + str(lat_2) \
-            + ' +lat_ts=' + str(lat_ts) \
-            + ' +k=' + str(k) \
-            + ' +x_0=' + str(x_0) \
-            + ' +y_0=' + str(y_0) \
-            + ' +h=' + str(h)
-        projinfo = ProjectionInfo(projstr)   
-        
-    gridlabel = kwargs.pop('gridlabel', True)
-    gridline = kwargs.pop('gridline', False)
-    griddx = kwargs.pop('griddx', 10)
-    griddy = kwargs.pop('griddy', 10)
-    if projinfo.isLonLat():
-        frameon = kwargs.pop('frameon', False)
-    else:
-        frameon = kwargs.pop('frameon', True)
-    axison = kwargs.pop('axison', None)
-    bgcobj = kwargs.pop('bgcolor', None)
-    xyscale = kwargs.pop('xyscale', 1)
-    
-    global gca
-    chart = chartpanel.getChart()
-    mapview = MapView(projinfo)
-    mapview.setXYScaleFactor(xyscale)
-    plot = MapPlot(mapview)  
-    if gca is None:
-        gca = plot
-        if position is None:
-            position = [0.13, 0.11, 0.775, 0.815]
-        gca.setPosition(position[0], position[1], position[2], position[3])
-    else:
-        chart.setCurrentPlot(chart.getPlotIndex(gca))
-        if gca.isSubPlot:
-            plot.isSubPlot = True
-            if position is None:
-                plot.setPosition(gca.getPosition())
-            else:
-                plot.setPosition(position[0], position[1], position[2], position[3])
-            gca = plot
-        else:
-            gca = plot
-            if position is None:
-                position = [0.13, 0.11, 0.775, 0.815]
-            gca.setPosition(position[0], position[1], position[2], position[3])
-    tickfontname = kwargs.pop('tickfontname', 'Arial')
-    tickfontsize = kwargs.pop('tickfontsize', 14)
-    tickbold = kwargs.pop('tickbold', False)
-    if tickbold:
-        font = Font(tickfontname, Font.BOLD, tickfontsize)
-    else:
-        font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    gca.setAxisLabelFont(font)
-    if not axison is None:
-        gca.setAxisOn(axison)
-    else:
-        if bottomaxis == False:
-            gca.getAxis(Location.BOTTOM).setVisible(False)
-        if leftaxis == False:
-            gca.getAxis(Location.LEFT).setVisible(False)
-        if topaxis == False:
-            gca.getAxis(Location.TOP).setVisible(False)
-        if rightaxis == False:
-            gca.getAxis(Location.RIGHT).setVisible(False)
-    mapframe = gca.getMapFrame()
-    mapframe.setDrawGridLabel(gridlabel)
-    mapframe.setDrawGridTickLine(gridlabel)
-    mapframe.setDrawGridLine(gridline)
-    mapframe.setGridXDelt(griddx)
-    mapframe.setGridYDelt(griddy)
-    gca.setDrawNeatLine(frameon)
-    if not bgcobj is None:
-        bgcolor = __getcolor(bgcobj)
-        gca.setDrawBackground(True)
-        gca.setBackground(bgcolor)
-    #gca.getMapView().projectLayers(projinfo)    
-    isnew = kwargs.pop('newaxes', False)
-    if isnew:
-        chart.addPlot(gca)
-    else:
-        chart.setCurrentPlot(gca)
-    return gca, projinfo
+    return ax, ax.axes.getProjInfo()
     
 def twinx(ax):
     """
@@ -2156,18 +2001,18 @@ def twinx(ax):
     
     :returns: The second axes
     """
-    ax.getAxis(Location.RIGHT).setVisible(False)
-    ax.setSameShrink(True)
-    plot = Plot2D()
-    plot.setSameShrink(True)
-    plot.setPosition(ax.getPosition())
-    plot.getAxis(Location.BOTTOM).setVisible(False)
-    plot.getAxis(Location.LEFT).setVisible(False)
-    plot.getAxis(Location.TOP).setVisible(False)
-    axis = plot.getAxis(Location.RIGHT)
+    ax.axes.getAxis(Location.RIGHT).setVisible(False)
+    ax.axes.setSameShrink(True)
+    plot = Axes()
+    plot.axes.setSameShrink(True)
+    plot.axes.setPosition(ax.get_position())
+    plot.axes.getAxis(Location.BOTTOM).setVisible(False)
+    plot.axes.getAxis(Location.LEFT).setVisible(False)
+    plot.axes.getAxis(Location.TOP).setVisible(False)
+    axis = plot.axes.getAxis(Location.RIGHT)
     axis.setDrawTickLabel(True)
     axis.setDrawLabel(True)
-    chartpanel.getChart().addPlot(plot)
+    chartpanel.getChart().addPlot(plot.axes)
     global gca
     gca = plot
     return plot
@@ -2194,11 +2039,11 @@ def xaxis(ax=None, **kwargs):
     timetickformat = kwargs.pop('timetickformat', None)
     if not axistype is None:
         if timetickformat is None:
-            __setXAxisType(ax, axistype)
+            __setXAxisType(ax.axes, axistype)
         else:
-            __setXAxisType(ax, axistype, timetickformat)
+            __setXAxisType(ax.axes, axistype, timetickformat)
         #ax.updateDrawExtent()
-        ax.setAutoExtent()
+        ax.axes.setAutoExtent()
     tickfontname = kwargs.pop('tickfontname', 'Arial')
     tickfontsize = kwargs.pop('tickfontsize', 14)
     tickbold = kwargs.pop('tickbold', False)
@@ -2214,7 +2059,7 @@ def xaxis(ax=None, **kwargs):
     else:
         locs = [Location.BOTTOM, Location.TOP]
     for loc in locs:    
-        axis = ax.getAxis(loc)
+        axis = ax.axes.getAxis(loc)
         axis.setVisible(visible)
         axis.setShift(shift)
         axis.setColor_All(c)
@@ -2246,10 +2091,10 @@ def yaxis(ax=None, **kwargs):
     timetickformat = kwargs.pop('timetickformat', None)
     if not axistype is None:
         if timetickformat is None:
-            __setYAxisType(ax, axistype)
+            __setYAxisType(ax.axes, axistype)
         else:
-            __setYAxisType(ax, axistype, timetickformat)
-        ax.updateDrawExtent()
+            __setYAxisType(ax.axes, axistype, timetickformat)
+        ax.axes.updateDrawExtent()
     tickfontname = kwargs.pop('tickfontname', 'Arial')
     tickfontsize = kwargs.pop('tickfontsize', 14)
     tickbold = kwargs.pop('tickbold', False)
@@ -2265,7 +2110,7 @@ def yaxis(ax=None, **kwargs):
     else:
         locs = [Location.LEFT, Location.RIGHT]
     for loc in locs:
-        axis = ax.getAxis(loc)
+        axis = ax.axes.getAxis(loc)
         if not visible is None:
             axis.setVisible(visible)
         if axis.isVisible():
@@ -2289,10 +2134,10 @@ def box(ax=None, on=None):
     locs_all = [Location.LEFT, Location.BOTTOM, Location.TOP, Location.RIGHT]
     locs = []
     for loc in locs_all:
-        if not ax.getAxis(loc).isDrawTickLabel():
+        if not ax.axes.getAxis(loc).isDrawTickLabel():
             locs.append(loc)
     for loc in locs:
-        axis = ax.getAxis(loc)
+        axis = ax.axes.getAxis(loc)
         if on is None:
             axis.setVisible(not axis.isVisible())
         else:
@@ -2377,7 +2222,7 @@ def cla():
         if not chartpanel is None:
             chart = chartpanel.getChart()
             if not chart is None:
-                chartpanel.getChart().removePlot(gca)
+                chartpanel.getChart().removePlot(gca.axes)
         gca = None
         draw_if_interactive()
 
@@ -2405,11 +2250,11 @@ def cll():
     Clear last added layer or plot object.
     '''
     if not gca is None:
-        if isinstance(gca, Plot2D):
-            gca.removeLastGraphic()
-            gca.setAutoExtent()
-        elif isinstance(gca, MapPlot):
-            gca.removeLastLayer()
+        if isinstance(gca, Axes):
+            gca.axes.removeLastGraphic()
+            gca.axes.setAutoExtent()
+        elif isinstance(gca, MapAxes):
+            gca.axes.removeLastLayer()
         draw_if_interactive()
         
 def clc():
@@ -2823,7 +2668,7 @@ def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     c = __getcolor(color)
     ctitile = ChartText(title, font)
     ctitile.setColor(c)
-    gca.setTitle(ctitile)
+    gca.set_title(ctitile)
     draw_if_interactive()
     
 def suptitle(title, fontname='Arial', fontsize=14, bold=True, color='black'):
@@ -2862,7 +2707,7 @@ def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
     plot = gca
-    axis = plot.getXAxis()
+    axis = plot.axes.getXAxis()
     axis.setLabel(label)
     axis.setDrawLabel(True)
     axis.setLabelFont(font)
@@ -2885,12 +2730,12 @@ def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
     plot = gca
-    axis = plot.getYAxis()
+    axis = plot.axes.getYAxis()
     axis.setLabel(label)
     axis.setDrawLabel(True)
     axis.setLabelFont(font)
     axis.setLabelColor(c)
-    axis_r = plot.getAxis(Location.RIGHT)
+    axis_r = plot.axes.getAxis(Location.RIGHT)
     axis_r.setLabel(label)
     axis_r.setLabelFont(font)
     axis_r.setLabelColor(c)
@@ -2908,8 +2753,8 @@ def xticks(*args, **kwargs):
     :param color: (*color*) Tick label string color. Default is ``black`` .
     :param rotation: (*float*) Tick label rotation angle. Default is 0.
     """
-    axis = gca.getXAxis()
-    axis_t = gca.getAxis(Location.TOP)
+    axis = gca.axes.getXAxis()
+    axis_t = gca.axes.getAxis(Location.TOP)
     if len(args) > 0:
         locs = args[0]
         if isinstance(locs, (MIArray, DimArray)):
@@ -2961,8 +2806,8 @@ def yticks(*args, **kwargs):
     :param color: (*color*) Tick label string color. Default is ``black`` .
     :param rotation: (*float*) Tick label rotation angle. Default is 0.
     """
-    axis = gca.getYAxis()
-    axis_r = gca.getAxis(Location.RIGHT)
+    axis = gca.axes.getYAxis()
+    axis_r = gca.axes.getAxis(Location.RIGHT)
     if len(args) > 0:
         locs = args[0]
         if isinstance(locs, MIArray):
@@ -3057,7 +2902,7 @@ def text(x, y, s, **kwargs):
     if coordinates == 'figure':
         chartpanel.getChart().addText(text)
     else:
-        gca.addText(text)
+        gca.axes.addText(text)
     draw_if_interactive()
     
 def axis(limits):
@@ -3072,8 +2917,8 @@ def axis(limits):
         ymin = limits[2]
         ymax = limits[3]
         extent = Extent(xmin, xmax, ymin, ymax)
-        gca.setDrawExtent(extent)
-        gca.setExtent(extent.clone())
+        gca.axes.setDrawExtent(extent)
+        gca.axes.setExtent(extent.clone())
         draw_if_interactive()
     else:
         print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
@@ -3085,8 +2930,8 @@ def axism(limits=None):
     :param limits: (*list*) Min and max of the x and y map axes.
     """
     if limits is None:
-        gca.setDrawExtent(gca.getMapView().getExtent())
-        gca.setExtent(gca.getDrawExtent().clone())
+        gca.axes.setDrawExtent(gca.axes.getMapView().getExtent())
+        gca.axes.setExtent(gca.axes.getDrawExtent().clone())
         draw_if_interactive()
     else:
         if len(limits) == 4:
@@ -3095,8 +2940,8 @@ def axism(limits=None):
             ymin = limits[2]
             ymax = limits[3]
             extent = Extent(xmin, xmax, ymin, ymax)
-            gca.setLonLatExtent(extent)
-            gca.setExtent(gca.getDrawExtent().clone())
+            gca.axes.setLonLatExtent(extent)
+            gca.axes.setExtent(gca.axes.getDrawExtent().clone())
             draw_if_interactive()
         else:
             print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
@@ -3114,7 +2959,7 @@ def grid(b=None, which='major', axis='both', **kwargs):
     :param kwargs: *kwargs* are used to set the grid line properties.
     """
     plot = gca
-    gridline = plot.getGridLine()
+    gridline = plot.axes.getGridLine()
     isDraw = gridline.isDrawXLine()
     if b is None:
         isDraw = not gridline.isDrawXLine()
@@ -3157,11 +3002,11 @@ def xlim(xmin, xmax):
         xmin = miutil.date2num(xmin)
     if isinstance(xmax, datetime.datetime):
         xmax = miutil.date2num(xmax)    
-    extent = plot.getDrawExtent()
+    extent = plot.axes.getDrawExtent()
     extent.minX = xmin
     extent.maxX = xmax
-    plot.setDrawExtent(extent)
-    plot.setExtent(extent.clone())
+    plot.axes.setDrawExtent(extent)
+    plot.axes.setExtent(extent.clone())
     draw_if_interactive()
             
 def ylim(ymin, ymax):
@@ -3176,25 +3021,25 @@ def ylim(ymin, ymax):
         ymin = miutil.date2num(ymin)
     if isinstance(ymax, datetime.datetime):
         ymax = miutil.date2num(ymax) 
-    extent = plot.getDrawExtent()
+    extent = plot.axes.getDrawExtent()
     extent.minY = ymin
     extent.maxY = ymax
-    plot.setDrawExtent(extent)
-    plot.setExtent(extent.clone())
+    plot.axes.setDrawExtent(extent)
+    plot.axes.setExtent(extent.clone())
     draw_if_interactive()   
 
 def xreverse():
     '''
     Reverse x axis.
     '''
-    gca.getXAxis().setInverse(True)
+    gca.axes.getXAxis().setInverse(True)
     draw_if_interactive()
     
 def yreverse():
     '''
     Reverse y axis.
     '''
-    gca.getYAxis().setInverse(True)
+    gca.axes.getYAxis().setInverse(True)
     draw_if_interactive()
             
 def legend(*args, **kwargs):
@@ -3222,14 +3067,14 @@ def legend(*args, **kwargs):
     #plot.setDrawLegend(True)   
     newlegend = kwargs.pop('newlegend', True)
     #plot.updateLegendScheme()
-    if isinstance(plot, Plot2D):        
-        ols = plot.getLegendScheme()
+    if isinstance(plot, Axes):        
+        ols = plot.axes.getLegendScheme()
     else:
         ols = None
     if newlegend:
         clegend = ChartLegend(ols)
     else:
-        clegend = plot.getLegend()   
+        clegend = plot.axes.getLegend()   
     ls = kwargs.pop('legend', None)
     if len(args) > 0 and isinstance(args[0], MILayer):
         ls = args[0].legend()
@@ -3259,13 +3104,13 @@ def legend(*args, **kwargs):
                     ls.setLegendType(LegendType.GraduatedColor)
                 if clegend is None:
                     clegend = ChartLegend(ls)
-                    plot.setLegend(clegend)
+                    plot.axes.setLegend(clegend)
                 else:
                     clegend.setLegendScheme(ls)
     else:
         if clegend is None:
             clegend = ChartLegend(ls)
-            plot.setLegend(clegend)
+            plot.axes.setLegend(clegend)
         else:
             clegend.setLegendScheme(ls)
         
@@ -3325,7 +3170,7 @@ def legend(*args, **kwargs):
     if not yshift is None:
         clegend.setYShift(yshift)
     if newlegend:
-        plot.addLegend(clegend)
+        plot.axes.addLegend(clegend)
     
     draw_if_interactive()
     
@@ -3405,12 +3250,12 @@ def colorbar(mappable, **kwargs):
     newlegend = kwargs.pop('newlegend', True)
     if newlegend:
         legend = ChartLegend(ls)
-        cax.addLegend(legend)
+        cax.axes.addLegend(legend)
     else:
-        legend = cax.getLegend()   
+        legend = cax.axes.getLegend()   
         if legend is None:
             legend = ChartLegend(ls)
-            cax.setLegend(legend)
+            cax.axes.setLegend(legend)
         else:
             legend.setLegendScheme(ls)
     legend.setColorbar(True)   
@@ -3449,29 +3294,29 @@ def colorbar(mappable, **kwargs):
     vmaxtick = kwargs.pop('vmaxtick', False)
     legend.setDrawMinLabel(vmintick)
     legend.setDrawMaxLabel(vmaxtick)
-    #cax.setDrawLegend(True)
+    #cax.axes.setDrawLegend(True)
     draw_if_interactive()
 
 def set(obj, **kwargs):
     '''
     Set properties to an object. Used to change the plot parameters.
     '''
-    if isinstance(obj, Plot):
+    if isinstance(obj, Axes):
         xminortick = kwargs.pop('xminortick', None)
         if not xminortick is None:
             locs = [Location.BOTTOM, Location.TOP]
             for loc in locs:
-                axis = obj.getAxis(loc)
+                axis = obj.axes.getAxis(loc)
                 axis.setMinorTickVisible(xminortick)
         yminortick = kwargs.pop('yminortick', None)
         if not yminortick is None:
             locs = [Location.LEFT, Location.RIGHT]
             for loc in locs:
-                axis = obj.getAxis(loc)
+                axis = obj.axes.getAxis(loc)
                 axis.setMinorTickVisible(yminortick)
         tickin = kwargs.pop('tickin', None)
         if not tickin is None:
-            obj.setInsideTick(tickin)
+            obj.axes.setInsideTick(tickin)
     draw_if_interactive()
     
 def __getcolormap(**kwargs):
@@ -3690,17 +3535,17 @@ def imshow(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
+            plot = Axes()
     if not xaxistype is None:
         __setXAxisType(plot, xaxistype)
         plot.updateDrawExtent()
-    plot.addGraphic(igraphic)
-    plot.setAutoExtent()
+    plot.add_graphic(igraphic)
+    plot.axes.setAutoExtent()
     
     #Create figure
     if chartpanel is None:
@@ -3708,8 +3553,8 @@ def imshow(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -3778,19 +3623,19 @@ def contour(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
+            plot = Axes()
     if not xaxistype is None:
-        __setXAxisType(plot, xaxistype)
-        plot.updateDrawExtent()
-    plot.addGraphic(igraphic)
-    #plot.setAutoExtent()
-    plot.setExtent(igraphic.getExtent())
-    plot.setDrawExtent(igraphic.getExtent())
+        __setXAxisType(plot.axes, xaxistype)
+        plot.axes.updateDrawExtent()
+    plot.add_graphic(igraphic)
+    #plot.axes.setAutoExtent()
+    plot.axes.setExtent(igraphic.getExtent())
+    plot.axes.setDrawExtent(igraphic.getExtent())
     
     #Create figure
     if chartpanel is None:
@@ -3798,8 +3643,8 @@ def contour(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -3864,19 +3709,19 @@ def contourf(*args, **kwargs):
     if visible:
         #Create plot
         if gca is None:
-            plot = Plot2D()
+            plot = Axes()
         else:
-            if isinstance(gca, Plot2D):
+            if isinstance(gca, Axes):
                 plot = gca
             else:
-                plot = Plot2D()
+                plot = Axes()
         if not xaxistype is None:
-            __setXAxisType(plot, xaxistype)
-            plot.updateDrawExtent()
-        plot.addGraphic(igraphic)
+            __setXAxisType(plot.axes, xaxistype)
+            plot.axes.updateDrawExtent()
+        plot.add_graphic(igraphic)
         #plot.setAutoExtent()
-        plot.setExtent(igraphic.getExtent())
-        plot.setDrawExtent(igraphic.getExtent())
+        plot.axes.setExtent(igraphic.getExtent())
+        plot.axes.setDrawExtent(igraphic.getExtent())
         
         #Create figure
         if chartpanel is None:
@@ -3884,8 +3729,8 @@ def contourf(*args, **kwargs):
         
         #Set chart
         chart = chartpanel.getChart()
-        if gca is None or (not isinstance(gca, Plot2D)):
-            chart.setCurrentPlot(plot)
+        if gca is None or (not isinstance(gca, Axes)):
+            chart.setCurrentPlot(plot.axes)
         chartpanel.setChart(chart)
         gca = plot
         draw_if_interactive()    
@@ -3978,19 +3823,19 @@ def quiver(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
+            plot = Axes()
     if not xaxistype is None:
-        __setXAxisType(plot, xaxistype)
-        plot.updateDrawExtent()
-    plot.addGraphic(igraphic)
-    plot.setAutoExtent()
-    #plot.setExtent(igraphic.getExtent())
-    #plot.setDrawExtent(igraphic.getExtent())
+        __setXAxisType(plot.axes, xaxistype)
+        plot.axes.updateDrawExtent()
+    plot.add_graphic(igraphic)
+    plot.axes.setAutoExtent()
+    #plot.axes.setExtent(igraphic.getExtent())
+    #plot.axes.setDrawExtent(igraphic.getExtent())
     
     #Create figure
     if chartpanel is None:
@@ -3998,8 +3843,8 @@ def quiver(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -4092,19 +3937,19 @@ def barbs(*args, **kwargs):
     
     #Create plot
     if gca is None:
-        plot = Plot2D()
+        plot = Axes()
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
-            plot = Plot2D()
+            plot = Axes()
     if not xaxistype is None:
-        __setXAxisType(plot, xaxistype)
-        plot.updateDrawExtent()
-    plot.addGraphic(igraphic)
-    plot.setAutoExtent()
-    #plot.setExtent(igraphic.getExtent())
-    #plot.setDrawExtent(igraphic.getExtent())
+        __setXAxisType(plot.axes, xaxistype)
+        plot.axes.updateDrawExtent()
+    plot.add_graphic(igraphic)
+    plot.axes.setAutoExtent()
+    #plot.axes.setExtent(igraphic.getExtent())
+    #plot.axes.setDrawExtent(igraphic.getExtent())
     
     #Create figure
     if chartpanel is None:
@@ -4112,8 +3957,8 @@ def barbs(*args, **kwargs):
     
     #Set chart
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
     draw_if_interactive()
@@ -4128,34 +3973,34 @@ def __plot_griddata(gdata, ls, type, xaxistype=None):
     elif type == 'imshow':
         layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls)
     
-    #Create Plot2D
+    #Create Axes
     global gca
     if gca is None:
         mapview = MapView()
-        plot = MapPlot(mapview)
+        plot = MapAxes(mapview)
     else:
-        if isinstance(gca, Plot2D):
+        if isinstance(gca, Axes):
             plot = gca
         else:
             mapview = MapView()
-            plot = MapPlot(mapview)
+            plot = MapAxes(mapview)
     
     if xaxistype == 'lon':
-        plot.setXAxis(LonLatAxis('Longitude', True))
+        plot.axes.setXAxis(LonLatAxis('Longitude', True))
     elif xaxistype == 'lat':
-        plot.setXAxis(LonLatAxis('Latitude', False))
+        plot.axes.setXAxis(LonLatAxis('Latitude', False))
     elif xaxistype == 'time':
-        plot.setXAxis(TimeAxis('Time', True))
+        plot.axes.setXAxis(TimeAxis('Time', True))
     
-    plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent().clone())
+    plot.add_layer(layer)
+    plot.axes.setDrawExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Plot2D)):
-        chart.setCurrentPlot(plot)
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
     gca = plot
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
@@ -4177,14 +4022,14 @@ def __plot_uvgriddata(udata, vdata, cdata, ls, type, isuv):
     
     shapetype = layer.getShapeType()
     mapview = MapView()
-    plot = MapPlot(mapview)
-    plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent().clone())
+    plot = MapAxes(mapview)
+    plot.add_layer(layer)
+    plot.axes.setDrawExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
     
-    chart = Chart(plot)
+    chart = Chart(plot.axes)
     #chart.setAntiAlias(True)
     chartpanel.setChart(chart)
     global gca
@@ -4365,8 +4210,8 @@ def plotm(*args, **kwargs):
     if (proj != None):
         layer.setProjInfo(proj)
  
-    gca.addLayer(layer)
-    gca.setDrawExtent(layer.getExtent())
+    gca.add_layer(layer)
+    gca.axes.setDrawExtent(layer.getExtent())
     
     if chartpanel is None:
         figure()
@@ -4394,8 +4239,8 @@ def stationmodel(smdata, **kwargs):
     if (proj != None):
         layer.setProjInfo(proj)
  
-    gca.addLayer(layer)
-    gca.setDrawExtent(layer.getExtent())
+    gca.add_layer(layer)
+    gca.axes.setDrawExtent(layer.getExtent())
     
     if chartpanel is None:
         figure()
@@ -4484,13 +4329,13 @@ def imshowm(*args, **kwargs):
             shapetype = layer.getShapeType()
             if order is None:
                 if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-                    plot.addLayer(0, layer)
+                    plot.add_layer(layer, 0)
                 else:
-                    plot.addLayer(layer)
+                    plot.add_layer(layer)
             else:
-                plot.addLayer(order, layer)
-            plot.setDrawExtent(layer.getExtent().clone())
-            plot.setExtent(layer.getExtent().clone())
+                plot.add_layer(layer, order)
+            plot.axes.setDrawExtent(layer.getExtent().clone())
+            plot.axes.setExtent(layer.getExtent().clone())
 
             draw_if_interactive()
     else:
@@ -4570,7 +4415,7 @@ def contourm(*args, **kwargs):
     layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj, order=order, smooth=smooth)
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
         
@@ -4620,7 +4465,7 @@ def contourfm(*args, **kwargs):
     layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order, smooth=smooth, isplot=isplot)
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
     
@@ -4667,7 +4512,7 @@ def gridfm(*args, **kwargs):
     layer = __plot_griddata_m(plot, gdata, ls, 'gridf', proj=proj, order=order)
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
     
@@ -4704,7 +4549,7 @@ def surfacem_1(*args, **kwargs):
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo(), order=order)
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     gdata = None
     return MILayer(layer)
     
@@ -4749,26 +4594,26 @@ def surfacem(*args, **kwargs):
         args = args[3:]
     ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)   
     
-    if plot.getProjInfo().isLonLat():
+    if plot.axes.getProjInfo().isLonLat():
         lonlim = 90
     else:
         lonlim = 0
-        x, y = minum.project(x, y, toproj=plot.getProjInfo())
+        x, y = minum.project(x, y, toproj=plot.axes.getProjInfo())
     layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
-    layer.setProjInfo(plot.getProjInfo())
+    layer.setProjInfo(plot.axes.getProjInfo())
     shapetype = layer.getShapeType()
     if order is None:
         if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-            plot.addLayer(0, layer)
+            plot.add_layer(layer, 0)
         else:
-            plot.addLayer(layer)
+            plot.add_layer(layer)
     else:
-        plot.addLayer(order, layer)
-    plot.setDrawExtent(layer.getExtent().clone())
-    plot.setExtent(layer.getExtent().clone())
+        plot.add_layer(layer, order)
+    plot.axes.setDrawExtent(layer.getExtent().clone())
+    plot.axes.setExtent(layer.getExtent().clone())
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     
     if chartpanel is None:
         figure()
@@ -4854,7 +4699,7 @@ def quiverm(*args, **kwargs):
     layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'quiver', isuv, proj=proj)
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     udata = None
     vdata = None
     cdata = None
@@ -4925,7 +4770,7 @@ def quiverkey(*args, **kwargs):
         if not linewidth is None:
             wa.setNeatlineSize(linewidth)
             wa.setDrawNeatline(True)
-    gca.setWindArrow(wa)
+    gca.axes.setWindArrow(wa)
     draw_if_interactive()
     
 def barbsm(*args, **kwargs):
@@ -5004,7 +4849,7 @@ def barbsm(*args, **kwargs):
     layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'barbs', isuv, proj=proj)
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     udata = None
     vdata = None
     cdata = None
@@ -5054,7 +4899,7 @@ def streamplotm(*args, **kwargs):
     layer = __plot_uvgriddata_m(plot, udata, vdata, None, ls, 'streamplot', isuv, proj=proj, density=density)
     select = kwargs.pop('select', True)
     if select:
-        plot.setSelectedLayer(layer)
+        plot.axes.setSelectedLayer(layer)
     udata = None
     vdata = None
     return MILayer(layer)
@@ -5082,13 +4927,13 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True,
         shapetype = layer.getShapeType()
         if order is None:
             if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-                plot.addLayer(0, layer)
+                plot.add_layer(layer, 0)
             else:
-                plot.addLayer(layer)
+                plot.add_layer(layer)
         else:
-            plot.addLayer(order, layer)
-        plot.setDrawExtent(layer.getExtent().clone())
-        plot.setExtent(layer.getExtent().clone())
+            plot.add_layer(layer, order)
+        plot.axes.setDrawExtent(layer.getExtent().clone())
+        plot.axes.setExtent(layer.getExtent().clone())
         
         if chartpanel is None:
             figure()
@@ -5115,9 +4960,9 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=T
         layer.setProjInfo(proj)
  
     if isplot:
-        plot.addLayer(layer)
-        plot.setDrawExtent(layer.getExtent().clone())
-        plot.setExtent(layer.getExtent().clone())
+        plot.add_layer(layer)
+        plot.axes.setDrawExtent(layer.getExtent().clone())
+        plot.axes.setExtent(layer.getExtent().clone())
         
         if chartpanel is None:
             figure()
@@ -5145,9 +4990,9 @@ def __plot_uvdata_m(plot, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
         layer.setProjInfo(proj)
     
     shapetype = layer.getShapeType()
-    plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent().clone())
-    plot.setExtent(layer.getExtent().clone())
+    plot.add_layer(layer)
+    plot.axes.setDrawExtent(layer.getExtent().clone())
+    plot.axes.setExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -5174,9 +5019,9 @@ def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None, de
         layer.setProjInfo(proj)
     
     shapetype = layer.getShapeType()
-    plot.addLayer(layer)
-    plot.setDrawExtent(layer.getExtent().clone())
-    plot.setExtent(layer.getExtent().clone())
+    plot.add_layer(layer)
+    plot.axes.setDrawExtent(layer.getExtent().clone())
+    plot.axes.setExtent(layer.getExtent().clone())
     
     if chartpanel is None:
         figure()
@@ -5251,10 +5096,10 @@ def worldmap():
     mapview = MapView()
     mapview.setXYScaleFactor(1.0)
     #print 'Is GeoMap: ' + str(mapview.isGeoMap())
-    plot = MapPlot(mapview)
+    plot = MapAxes(mapview)
     chart = chartpanel.getChart()
     chart.clearPlots()
-    chart.setPlot(plot)
+    chart.setPlot(plot.axes)
     global gca
     gca = plot
     return plot
@@ -5271,7 +5116,7 @@ def webmap(provider='OpenStreetMap', order=0):
     layer = WebMapLayer()
     provider = WebMapProvider.valueOf(provider)
     layer.setWebMapProvider(provider)
-    gca.addLayer(order, layer)
+    gca.add_layer(layer, order)
     draw_if_interactive()
     return MILayer(layer)
         
@@ -5295,9 +5140,9 @@ def geoshow(*args, **kwargs):
         order = kwargs.pop('order', None)
         if layer.getLayerType() == LayerTypes.ImageLayer:
             if order is None:
-                plot.addLayer(layer)
+                plot.add_layer(layer)
             else:
-                plot.addLayer(order, layer)
+                plot.add_layer(layer, order)
         else:
             #LegendScheme
             ls = kwargs.pop('symbolspec', None)
@@ -5315,9 +5160,9 @@ def geoshow(*args, **kwargs):
             else:
                 layer.setLegendScheme(ls)
             if order is None:
-                plot.addLayer(layer)
+                plot.add_layer(layer)
             else:
-                plot.addLayer(order, layer)
+                plot.add_layer(layer, order)
             #Labels        
             labelfield = kwargs.pop('labelfield', None)
             if not labelfield is None:
@@ -5346,8 +5191,8 @@ def geoshow(*args, **kwargs):
                     labelset.setDecimalDigits(decimals)
                 labelset.setAvoidCollision(avoidcoll)
                 layer.addLabels()  
-        plot.setDrawExtent(layer.getExtent().clone())
-        plot.setExtent(layer.getExtent().clone())
+        plot.axes.setDrawExtent(layer.getExtent().clone())
+        plot.axes.setExtent(layer.getExtent().clone())
         draw_if_interactive()
     else:
         if isinstance(args[0], Graphic):
@@ -5360,7 +5205,7 @@ def geoshow(*args, **kwargs):
                 displaytype = 'polygon'
             lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
             graphic.setLegend(lbreak)
-            plot.addGraphic(graphic)            
+            plot.add_graphic(graphic)            
             draw_if_interactive()
         elif isinstance(args[0], Shape):
             shape = args[0]
@@ -5372,7 +5217,7 @@ def geoshow(*args, **kwargs):
                 displaytype = 'polygon'
             lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
             graphic = Graphic(shape, lbreak)
-            plot.addGraphic(graphic)            
+            plot.add_graphic(graphic)            
             draw_if_interactive()
         elif len(args) == 2:
             lat = args[0]
@@ -5391,11 +5236,11 @@ def geoshow(*args, **kwargs):
 
             lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
             if displaytype == 'point':
-                graphic = plot.addPoint(lat, lon, lbreak)
+                graphic = plot.axes.addPoint(lat, lon, lbreak)
             elif displaytype == 'polyline' or displaytype == 'line':
-                graphic = plot.addPolyline(lat, lon, lbreak)
+                graphic = plot.axes.addPolyline(lat, lon, lbreak)
             elif displaytype == 'polygon':
-                graphic = plot.addPolygon(lat, lon, lbreak)
+                graphic = plot.axes.addPolygon(lat, lon, lbreak)
             draw_if_interactive()
             return graphic
 
