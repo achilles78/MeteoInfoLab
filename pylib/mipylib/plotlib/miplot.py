@@ -1219,8 +1219,8 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     if gca is None:
         chart.setCurrentPlot(plot.axes)
     elif not isinstance(gca, Axes):
-        if isinstance(gca, Plot):
-            chart.removePlot(gca)
+        if isinstance(gca.axes, Plot):
+            chart.removePlot(gca.axes)
         chart.setCurrentPlot(plot.axes)
     
     chartpanel.setChart(chart)
