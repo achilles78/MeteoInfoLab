@@ -5518,7 +5518,7 @@ def masklayer(mobj, layers):
     :param layers: (*list*) The layers will be masked.       
     '''
     plot = gca
-    mapview = plot.getMapView()
+    mapview = plot.axes.getMapView()
     mapview.getMaskOut().setMask(True)
     mapview.getMaskOut().setMaskLayer(mobj.layer.getLayerName())
     for layer in layers:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\hdf">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\math">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
@@ -18,16 +18,8 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
   </Path>
   <File>
-    <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\satellite\TRMM_3B42_Daily.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\FY2C.py"/>
-    </OpenedFiles>
-    <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\satellite\TRMM_3B42_Daily.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\FY2C.py"/>
-    </RecentFiles>
+    <OpenedFiles/>
+    <RecentFiles/>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
