@@ -351,9 +351,9 @@ class MIArray(object):
         
     def sum(self, fill_value=None):
         if fill_value == None:
-            return ArrayMath.sumDouble(self.array)
+            return ArrayMath.sum(self.array)
         else:
-            return ArrayMath.sumDouble(self.array, fill_value)
+            return ArrayMath.sum(self.array, fill_value)
             
     def prod(self):
         '''

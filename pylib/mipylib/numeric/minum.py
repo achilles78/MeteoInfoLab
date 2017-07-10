@@ -55,7 +55,7 @@ __all__ = [
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
     'numasciicol','numasciirow','nonzero','ones','ones_like','pol2cart','polyval','power',
     'project','projectxy','projinfo','radians','readtable','reshape',
-    'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','tan','transpose','trapz','vdot',
+    'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','sum','tan','transpose','trapz','vdot',
     'where','zeros','zeros_like'
     ]
 
@@ -832,7 +832,41 @@ def log10(x):
             return cmath.log10(x)
         else:
             return math.log10(x)
-        
+
+def sum(x, axis=None):
+    """
+    Sum of array elements over a given axis.
+    
+    :param x: (*array_like or list*) Input values.
+    
+    returns: (*array_like*) Sum result
+    """
+    if isinstance(x, list):
+        if isinstance(x[0], (MIArray, DimArray)):
+            a = []
+            for xx in x:
+                a.append(xx.asarray())
+            r = ArrayMath.sum(a)
+            if isinstance(x[0], MIArray):            
+                return MIArray(r)
+            else:
+                return DimArray(MIArray(r), x[0].dims, x[0].fill_value, x[0].proj)
+        else:
+            x = array(x)
+    if axis is None:
+        r = ArrayMath.sum(x.asarray())
+        return r
+    else:
+        r = ArrayMath.sum(x.asarray(), axis)
+        if isinstance(x, MIArray):
+            return MIArray(r)
+        else:
+            dims = []
+            for i in range(0, x.ndim):
+                if i != axis:
+                    dims.append(x.dims[i])
+            return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+            
 def mean(x, axis=None):
     """
     Compute tha arithmetic mean along the specified axis.
@@ -859,22 +893,19 @@ def mean(x, axis=None):
             return PyStationData(r)
         else:
             x = array(x)
-            r = ArrayMath.mean(x.asarray())
-            return r
+    if axis is None:
+        r = ArrayMath.mean(x.asarray())
+        return r
     else:
-        if axis is None:
-            r = ArrayMath.mean(x.asarray())
-            return r
+        r = ArrayMath.mean(x.asarray(), axis)
+        if isinstance(x, MIArray):
+            return MIArray(r)
         else:
-            r = ArrayMath.mean(x.asarray(), axis)
-            if isinstance(x, MIArray):
-                return MIArray(r)
-            else:
-                dims = []
-                for i in range(0, x.ndim):
-                    if i != axis:
-                        dims.append(x.dims[i])
-                return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+            dims = []
+            for i in range(0, x.ndim):
+                if i != axis:
+                    dims.append(x.dims[i])
+            return DimArray(MIArray(r), dims, x.fill_value, x.proj)
                 
 def median(x, axis=None):
     """
