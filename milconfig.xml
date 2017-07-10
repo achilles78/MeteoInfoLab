@@ -20,15 +20,15 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\visad_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\ave_polygons_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\add_shapes.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\visad_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\ave_polygons_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\add_shapes.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="95,25" MainFormSize="1446,797"/>
+  <Startup MainFormLocation="97,25" MainFormSize="1446,797"/>
 </MeteoInfo>
