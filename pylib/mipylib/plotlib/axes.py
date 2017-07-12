@@ -6,7 +6,7 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot
+from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot, Plot3D
 
 from java.awt import Font
 
@@ -23,6 +23,14 @@ class Axes():
             self.axes = Plot2D()
         else:
             self.axes = axes
+            
+    def get_type(self):
+        '''
+        Get axes type
+        
+        :returns: Axes type
+        '''
+        return self.axes.getPlotType()
             
     def get_position(self):
         '''
@@ -256,3 +264,15 @@ class PolarAxes(Axes):
                 style = Font.PLAIN
         font = Font(name, style, size)
         self.axes.setXTickFont(font)
+        
+#########################################################
+class Axes3D(Axes):
+    '''
+    Axes with 3 dimensional.
+    '''
+    
+    def __init__(self, axes=None, panel=None):
+        if axes is None:        
+            self.axes = Plot3D(panel)
+        else:
+            self.axes = axes

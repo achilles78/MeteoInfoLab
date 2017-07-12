@@ -15,7 +15,8 @@ from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, 
 from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
-from org.meteoinfo.chart.plot import Plot, Plot2D, PiePlot, PolarPlot, MapPlot, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
+from org.meteoinfo.chart.plot import Plot, Plot2D, PiePlot, PolarPlot, MapPlot, Plot3D, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
+from org.meteoinfo.chart.plot3d.surface import ArraySurfaceModel
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
@@ -39,7 +40,7 @@ from mipylib.numeric.miarray import MIArray
 import mipylib.numeric.minum as minum
 from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
-from mipylib.plotlib.axes import Axes, MapAxes, PolarAxes, PieAxes
+from mipylib.plotlib.axes import Axes, MapAxes, PolarAxes, PieAxes, Axes3D
 
 ## Global ##
 milapp1 = None
@@ -51,7 +52,7 @@ isholdon = True
 gca = None
 
 __all__ = [
-    'gca','antialias','axes','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
+    'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
     'contourfm','contourm','display','draw_if_interactive','errorbar',
     'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
@@ -59,7 +60,7 @@ __all__ = [
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatterm',
     'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
-    'surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
+    'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','repaint',
     'isinteractive'
     ]
@@ -1889,6 +1890,54 @@ def __set_axesm(ax, **kwargs):
         ax.axes.setBackground(bgcolor)
  
     return ax
+
+def __create_axes3d(*args, **kwargs):
+    """
+    Create an axes.
+    
+    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param outerposition: (*list*) Optional, axes size and location, including labels and margin.
+    
+    :returns: The axes.
+    """        
+    if len(args) > 0:
+        position = args[0]
+    else:
+        position = kwargs.pop('position', None)    
+    outerposition = kwargs.pop('outerposition', None)
+    ax = Axes3D()
+    if position is None:
+        position = [0.13, 0.11, 0.775, 0.815]
+        ax.active_outerposition(True)
+    else:        
+        ax.active_outerposition(False)        
+    ax.set_position(position)   
+    if not outerposition is None:
+        ax.set_outerposition(outerposition)
+        ax.active_outerposition(True)
+    
+    return ax
+    
+def __set_axes3d(ax, **kwargs):
+    """
+    Set an axes.
+
+    :param aspect: (*string*) ['equal' | 'auto'] or a number. If a number the ratio of x-unit/y-unit in screen-space.
+        Default is 'auto'.
+    :param bgcolor: (*Color*) Optional, axes background color.
+    :param axis: (*boolean*) Optional, set all axis visible or not. Default is ``True`` .
+    :param bottomaxis: (*boolean*) Optional, set bottom axis visible or not. Default is ``True`` .
+    :param leftaxis: (*boolean*) Optional, set left axis visible or not. Default is ``True`` .
+    :param topaxis: (*boolean*) Optional, set top axis visible or not. Default is ``True`` .
+    :param rightaxis: (*boolean*) Optional, set right axis visible or not. Default is ``True`` .
+    :param xaxistype: (*string*) Optional, set x axis type as 'normal', 'lon', 'lat' or 'time'.
+    :param xreverse: (*boolean*) Optional, set x axis reverse or not. Default is ``False`` .
+    :param yreverse: (*boolean*) Optional, set yaxis reverse or not. Default is ``False`` .
+    
+    :returns: The axes.
+    """        
+    return None
     
 def __get_axes(chart, idx):
     ax = chart.getPlot(idx)
@@ -1898,6 +1947,8 @@ def __get_axes(chart, idx):
         ax = MapAxes(ax)
     elif isinstance(ax, PolarAxes):
         ax = PolarAxes(ax)
+    elif isinstance(ax, Plot3D):
+        ax = Plot3D(ax)
     return ax
     
 def axes(*args, **kwargs):
@@ -1991,6 +2042,38 @@ def axesm(*args, **kwargs):
         chart.setCurrentPlot(ax.axes)
     gca = ax
     return ax, ax.axes.getProjInfo()
+    
+def axes3d(*args, **kwargs):
+    """
+    Add an axes to the figure.
+    
+    :param position: (*list*) Optional, axes position specified by *position=* [left, bottom, width
+        height] in normalized (0, 1) units. Default is [0.13, 0.11, 0.775, 0.815].
+    :param outerposition: (*list*) Optional, axes size and location, including labels and margin.    
+    
+    :returns: The axes.
+    """
+    if chartpanel is None:
+        figure()
+    global gca
+    chart = chartpanel.getChart()
+    newaxes = kwargs.pop('newaxes', True)
+    if not newaxes and gca is None:
+        newaxes = True
+    ax = __create_axes3d(*args, **kwargs)
+    __set_axes3d(ax, **kwargs)
+    if newaxes:
+        chart.addPlot(ax.axes)
+    else:
+        chart.setCurrentPlot(chart.getPlotIndex(gca.axes))
+        if gca.axes.isSubPlot:
+            ax.axes.isSubPlot = True
+            position = kwargs.pop('position', None)
+            if position is None:
+                ax.set_position(gca.get_position())  
+        chart.setCurrentPlot(ax.axes)
+    gca = ax
+    return ax
     
 def twinx(ax):
     """
@@ -3541,8 +3624,8 @@ def imshow(*args, **kwargs):
         else:
             plot = Axes()
     if not xaxistype is None:
-        __setXAxisType(plot, xaxistype)
-        plot.updateDrawExtent()
+        __setXAxisType(plot.axes, xaxistype)
+        plot.axes.updateDrawExtent()
     plot.add_graphic(igraphic)
     plot.axes.setAutoExtent()
     
@@ -5242,6 +5325,24 @@ def geoshow(*args, **kwargs):
                 graphic = plot.axes.addPolygon(lat, lon, lbreak)
             draw_if_interactive()
             return graphic
+            
+def surf(*args, **kwargs):
+    '''
+    creates a three-dimensional surface plot
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    '''
+    global gca
+    z = args[0]
+    sm = ArraySurfaceModel()
+    sm.setValues(0, 20, 0, 20, z.asarray(), None)
+    sm.setDisplayXY(True)
+    sm.setDisplayZ(True)
+    sm.setDisplayGrids(True)
+    gca.axes.setModel(sm)
+    draw_if_interactive()
 
 def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     '''

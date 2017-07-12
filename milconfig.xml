@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
@@ -16,21 +15,18 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d\examples"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\visad_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\add_shapes.py"/>
-      <OpenedFile File=""/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\visad_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\add_shapes.py"/>
-      <RecentFile File=""/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_1.py"/>
     </RecentFiles>
   </File>
   <Font>
-    <TextFont FontName="宋体" FontSize="15"/>
+    <TextFont FontName="宋体" FontSize="14"/>
   </Font>
-  <Startup MainFormLocation="97,25" MainFormSize="1446,797"/>
+  <Startup MainFormLocation="36,11" MainFormSize="1215,661"/>
 </MeteoInfo>
