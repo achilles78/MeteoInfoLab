@@ -58,7 +58,7 @@ __all__ = [
     'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plotm','quiver',
-    'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatterm',
+    'quiverkey','quiverm','readlegend','repaint','savefig','savefig_jpeg','scatter','scatterm',
     'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
     'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','repaint',
@@ -85,10 +85,16 @@ def __getplotdata(data):
         return minum.array([data]).array
 
 def draw_if_interactive():
+    '''
+    Draw current figure if is interactive model.
+    '''
     if isinteractive:
 		chartpanel.paintGraphics()
         
 def repaint():
+    '''
+    Repaint the current figure.
+    '''
     chartpanel.repaint()
         
 def plot(*args, **kwargs):
@@ -1906,7 +1912,8 @@ def __create_axes3d(*args, **kwargs):
     else:
         position = kwargs.pop('position', None)    
     outerposition = kwargs.pop('outerposition', None)
-    ax = Axes3D()
+    panel = kwargs.pop('panel', None)
+    ax = Axes3D(panel=panel)
     if position is None:
         position = [0.13, 0.11, 0.775, 0.815]
         ax.active_outerposition(True)
@@ -5333,14 +5340,43 @@ def surf(*args, **kwargs):
     :param x: (*array_like*) Optional. X coordinate array.
     :param y: (*array_like*) Optional. Y coordinate array.
     :param z: (*array_like*) 2-D z value array.
+    :param xyaxis: (*boolean*) Draw x and y axis or not.
+    :param zaxis: (*boolean*) Draw z axis or not.
+    :param grid: (*boolean*) Draw grid or not.
+    :param boxed: (*boolean*) Draw boxed or not.
     '''
     global gca
-    z = args[0]
+    if chartpanel is None:
+        figure()
+    chart = chartpanel.getChart()
+    if gca is None:    
+        gca = Axes3D()
+        chart.addPlot(gca.axes)
+    else:
+        if not isinstance(gca, Axes3D):
+            ax = Axes3D()
+            gca = ax
+            chart.addPlot(gca.axes)
+    
     sm = ArraySurfaceModel()
-    sm.setValues(0, 20, 0, 20, z.asarray(), None)
-    sm.setDisplayXY(True)
-    sm.setDisplayZ(True)
-    sm.setDisplayGrids(True)
+    if len(args) == 1:
+        z = args[0]    
+        sm.setValues(0, z.shape[1], z.shape[0], 20, z.asarray(), None)
+    else:
+        x = args[0]
+        y = args[1]
+        z = args[2]
+        sm.setValues(x.asarray(), y.asarray(), z.asarray(), None)
+        
+    xyaxis = kwargs.pop('xyaxis', True)
+    sm.setDisplayXY(xyaxis)
+    zaxis = kwargs.pop('zaxis', True)
+    sm.setDisplayZ(zaxis)
+    grid = kwargs.pop('grid', True)
+    sm.setDisplayGrids(grid)
+    boxed = kwargs.pop('boxed', False)
+    sm.setBoxed(boxed)
+    
     gca.axes.setModel(sm)
     draw_if_interactive()
 

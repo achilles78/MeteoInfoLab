@@ -115,6 +115,20 @@ public class FigureDockable extends DefaultSingleCDockable {
             }
         });
         this.addAction(button);
+        //Rotate action
+        button = new CButton();
+        button.setText("Rotate");
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/rotate_16.png")));
+        button.setTooltip("Rotate");
+        button.addActionListener( new ActionListener(){
+            @Override
+            public void actionPerformed( ActionEvent e ){
+                ChartPanel cp = FigureDockable.this.getCurrentFigure();
+                if (cp != null)
+                    cp.setMouseMode(MouseMode.ROTATE);
+            }
+        });
+        this.addAction(button);
         //Full extent action
         button = new CButton();
         button.setText("Full Extent");
