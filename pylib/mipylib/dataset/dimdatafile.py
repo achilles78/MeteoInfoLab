@@ -50,6 +50,9 @@ class DimDataFile():
         return self.dataset.getInfoText()
             
     def close(self):
+        '''
+        Close the opended dataset
+        '''
         if not self.dataset is None:
             self.dataset.close()
         elif not self.ncfile is None:
@@ -60,18 +63,32 @@ class DimDataFile():
             self.bufrdata.closeDataFile()
     
     def dimensions(self):
+        '''
+        Get dimensions
+        '''
         return self.dataset.getDataInfo().getDimensions()
         
     def finddim(self, name):
+        '''
+        Find a dimension by name
+        
+        :name: (*string*) Dimension name
+        '''
         for dim in self.dataset.getDataInfo().getDimensions():
             if name == dim.getShortName():
                 return dim
         return None
         
     def attributes(self):
+        '''
+        Get global attributes.
+        '''
         return self.dataset.getDataInfo().getGlobalAttributes()
     
     def attrvalue(self, key):
+        '''
+        Get a global attribute value by key.
+        '''
         attr = self.dataset.getDataInfo().findGlobalAttribute(key)
         if attr is None:
             return None
@@ -79,18 +96,32 @@ class DimDataFile():
         return v
         
     def variables(self):
+        '''
+        Get all variables.
+        '''
         return self.dataset.getDataInfo().getVariables()
         
     def varnames(self):
+        '''
+        Get all variable names.
+        '''
         return self.dataset.getDataInfo().getVariableNames()
         
     def read(self, varname, origin=None, size=None, stride=None):
+        '''
+        Read data array from a variable.
+        
+        :varname: (*string*) Variable name
+        '''
         if origin is None:
             return self.dataset.read(varname)
         else:
             return self.dataset.read(varname, origin, size, stride)
         
     def dump(self):
+        '''
+        Print data file information
+        '''
         print self.dataset.getInfoText()
         
     def griddata(self, varname='var', timeindex=0, levelindex=0, yindex=None, xindex=None):
@@ -112,6 +143,9 @@ class DimDataFile():
             return None
             
     def stinfodata(self):
+        '''
+        Get station info data
+        '''
         if self.dataset.isStationData():
             sidata = self.dataset.getStationInfoData()
             return sidata
@@ -119,6 +153,9 @@ class DimDataFile():
             return None
             
     def smodeldata(self, timeindex=0, levelindex=0):
+        '''
+        Get station model data.
+        '''
         if self.dataset.isStationData():
             self.dataset.setTimeIndex(timeindex)
             self.dataset.setLevelIndex(levelindex)
@@ -128,24 +165,36 @@ class DimDataFile():
             return None
             
     def trajlayer(self):
+        '''
+        Create trajectory polyline layer.
+        '''
         if self.dataset.isTrajData():
             return MILayer(self.dataset.getDataInfo().createTrajLineLayer())
         else:
             return None
             
     def trajplayer(self):
+        '''
+        Create trajectory point layer.
+        '''
         if self.dataset.isTrajData():
             return MILayer(self.dataset.getDataInfo().createTrajPointLayer())
         else:
             return None
             
     def trajsplayer(self):
+        '''
+        Create trajectory start point layer.
+        '''
         if self.dataset.isTrajData():
             return MILayer(self.dataset.getDataInfo().createTrajStartPointLayer())
         else:
             return None
             
     def trajvardata(self, varidx, hourx=False):
+        '''
+        Get trajectory variable data.
+        '''
         if self.dataset.isTrajData():
             if hourx:
                 return MIXYListData(self.dataset.getDataInfo().getXYDataset_HourX(varidx))
@@ -185,11 +234,19 @@ class DimDataFile():
         return times
         
     def bigendian(self, big_endian):
+        '''
+        Set dataset as big_endian or little_endian. Only for GrADS binary data.
+        
+        :param big_endian: (*boolean*) Big endian or not.
+        '''
         datatype = self.dataset.getDataInfo().getDataType()
         if datatype.isGrADS() or datatype == MeteoDataType.HYSPLIT_Conc:
             self.dataset.getDataInfo().setBigEndian(big_endian)            
             
     def tostation(self, varname, x, y, z, t):
+        '''
+        Interpolate data to a point.
+        '''
         if isinstance(t, datetime.datetime):
             cal = Calendar.getInstance()
             cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
@@ -198,12 +255,28 @@ class DimDataFile():
             return self.dataset.toStation(varname, x, y, t)
         else:
             return self.dataset.toStation(varname, x, y, z, t)
-    
+
+####################################################################            
     #Write netCDF data    
     def adddim(self, dimname, dimsize, group=None):
+        '''
+        Add a dimension.
+        
+        :param dimname: (*string*) Dimension name.
+        :param dimsize: (*int*) Dimension size.
+        :param group: None means global dimension.
+        '''
         return self.ncfile.addDimension(group, dimname, dimsize)
         
     def addgroupattr(self, attrname, attrvalue, group=None, float=False):
+        '''
+        Add a global attribute.
+        
+        :param attrname: (*string*) Attribute name.
+        :param attrvalue: (*object*) Attribute value.
+        :param group: None means global attribute.
+        :param float: (*boolean*) Transfer data as float or not.
+        '''
         if float:
             if isinstance(attrvalue, (list, tuple)):
                 for i in range(len(attrvalue)):
@@ -233,13 +306,32 @@ class DimDataFile():
             return datatype
  
     def addvar(self, varname, datatype, dims, group=None):
+        '''
+        Add a variable.
+        
+        :param varname: (*string*) Variable name.
+        :param datatype: (*string*) Data type [string | int | long | float | double |
+            char].
+        :param dims: (*list*) Dimensions.        
+        '''
         dt = self.__getdatatype(datatype)        
         return DimVariable(ncvariable=self.ncfile.addVariable(group, varname, dt, dims))
         
     def create(self):
+        '''
+        Create a netCDF data file according the settings of dimensions, global attributes
+        and variables
+        '''
         self.ncfile.create()
         
     def write(self, variable, value, origin=None):
+        '''
+        Write variable value.
+        
+        :param variable: (*Variable*) Variable object.
+        :param value: (*array_like*) Data array to be write.
+        :param origin: (*list*) Dimensions origin indices. None means all from 0.
+        '''
         if isinstance(value, (DimArray, MIArray)):
             value = value.asarray()
         if origin is None:
@@ -248,19 +340,43 @@ class DimDataFile():
             origin = jarray.array(origin, 'i')
             self.ncfile.write(variable.ncvariable, origin, value)
     def flush(self):
+        '''
+        Flush the data.
+        '''
         self.ncfile.flush()        
         
     def largefile(self, islarge=True):
+        '''
+        Set the netCDF file is large file (more than 2G) nor not.
+        
+        :param islarge: (*boolean*) Is large file or not.
+        '''
         self.ncfile.setLargeFile(islarge)
         
+##################################################################
     # Write ARL data
     def setx(self, x):
+        '''
+        Set x (longitude) dimension value.
+        
+        :param x: (*array_like*) X dimension value.
+        '''
         self.arldata.setX(x.aslist())
         
     def sety(self, y):
+        '''
+        Set y (latitude) dimension value.
+        
+        :param y: (*array_like*) Y dimension value.
+        '''
         self.arldata.setY(y.aslist())
         
     def setlevels(self, levels):
+        '''
+        Set vertical levels.
+        
+        :param leveles: (*list*) Vertical levels.
+        '''
         if isinstance(levels, MIArray):
             levels = levels.aslist()
         if levels[0] != 1:
@@ -268,29 +384,77 @@ class DimDataFile():
         self.arldata.levels = levels
         
     def set2dvar(self, vnames):
+        '''
+        Set surface variables (2 dimensions ignore time dimension).
+        
+        :param vnames: (*list*) Variable names.
+        '''
         self.arldata.LevelVarList.add(vnames)
         
     def set3dvar(self, vnames):
+        '''
+        Set level variables (3 dimensions ignore time dimension).
+        
+        :param vnames: (*list*) Variable names.
+        '''
         self.arldata.LevelVarList.add(vnames)
     
     def getdatahead(self, proj, model, vertical, icx=0, mn=0):
+        '''
+        Get data head.
+        
+        :param proj: (*ProjectionInfo*) Projection information.
+        :param model: (*string*) Model name with 4 characters.
+        :param vertical: (*int*) Vertical coordinate system flag. 1-sigma (fraction);
+            2-pressure (mb); 3-terrain (fraction); 4-hybrid (mb: offset.fraction)
+        :param icx: (*int*) Forecast hour (>99 the header forecast hr = 99)
+        :param mn: (*int*) Minutes associated with data time.
+        '''
         return self.arldata.getDataHead(proj, model, vertical, icx, mn)
         
     def writeindexrec(self, t, datahead, ksums=None):
+        '''
+        Write index record.
+        
+        :param t: (*datatime*) The time of the data.
+        :param datahead: (*DataHeader') Data header of the record.
+        :param ksums: (*list*) Check sum list.
+        '''
         cal = Calendar.getInstance()
         cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
         t = cal.getTime()
         self.arldata.writeIndexRecord(t, datahead, ksums)
         
     def writedatarec(self, t, lidx, vname, fhour, grid, data):
+        '''
+        Write data record.
+        
+        :param t: (*datatime*) The time of the data.
+        :param lidx: (*int*) Level index.
+        :param vname: (*string*) Variable name.
+        :param fhour: (*int*) Forecasting hour.
+        :param grid: (*int*) Grid id to check if the data grid is bigger than 999. Header 
+            record does not support grids of more than 999, therefore in those situations 
+            the grid number is converted to character to represent the 1000s digit, 
+            e.g. @(64)=<1000, A(65)=1000, B(66)=2000, etc.
+        :param data: (*array_like*) Data array.
+        
+        :returns: (*int*) Check sum of the record data.
+        '''
         cal = Calendar.getInstance()
         cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
         t = cal.getTime()
         ksum = self.arldata.writeGridData(t, lidx, vname, fhour, grid, data.asarray())
         return ksum
-        
+
+########################################################################        
     # Write Bufr data
     def write_indicator(self, bufrlen, edition=3):
+        '''
+        Write indicator section.
+        
+        :param bufrlen: (*int*) 
+        '''
         return self.bufrdata.writeIndicatorSection(bufrlen, edition)
         
     def rewrite_indicator(self, bufrlen, edition=3):
@@ -331,6 +495,7 @@ class DimDataFile():
     def write_end(self):
         return self.bufrdata.writeEndSection()
 
+        
 #*********************************************
 # Created by addfiles function in midata module - multiple data files with difference only 
 # on time dimension.      
