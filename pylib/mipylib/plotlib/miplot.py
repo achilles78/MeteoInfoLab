@@ -95,7 +95,7 @@ def repaint():
     '''
     Repaint the current figure.
     '''
-    chartpanel.repaint()
+    chartpanel.paintGraphics()
         
 def plot(*args, **kwargs):
     """
@@ -1407,21 +1407,22 @@ def bgcolor(color):
         chart.setBackground(__getcolor(color))
     draw_if_interactive()    
     
-def caxes(ax):
+def caxes(ax=None):
     '''
-    Set current axes.
+    Set or get current axes.
     
-    :param ax: (*Axes or int*) The axes to be set as current axes.
+    :param ax: (*Axes or int*) The axes to be set as current axes. Is None, get current
+        axes.
     '''
     global gca
-    chart = chartpanel.getChart()
+    chart = chartpanel.getChart()    
     if isinstance(ax, int):
         if chartpanel is None:
             figure()
                         
         gca = __get_axes(chart, ax)
         chart.setCurrentPlot(ax - 1)
-    else:
+    elif not ax is None:
         gca = ax
         chart.setCurrentPlot(chart.getPlotIndex(ax.axes))
     return gca
@@ -5352,10 +5353,12 @@ def surf(*args, **kwargs):
     :param x: (*array_like*) Optional. X coordinate array.
     :param y: (*array_like*) Optional. Y coordinate array.
     :param z: (*array_like*) 2-D z value array.
+    :param cmap: (*string*) Color map string.
     :param xyaxis: (*boolean*) Draw x and y axis or not.
     :param zaxis: (*boolean*) Draw z axis or not.
     :param grid: (*boolean*) Draw grid or not.
     :param boxed: (*boolean*) Draw boxed or not.
+    :param mesh: (*boolean*) Draw mesh line or not.
     '''
     global gca
     if chartpanel is None:
@@ -5374,12 +5377,27 @@ def surf(*args, **kwargs):
     if len(args) == 1:
         z = args[0]    
         sm.setValues(0, z.shape[1], z.shape[0], 20, z.asarray(), None)
+        args = args[1:]
     else:
         x = args[0]
         y = args[1]
         z = args[2]
         sm.setValues(x.asarray(), y.asarray(), z.asarray(), None)
-        
+        args = args[3:]
+    cmap = __getcolormap(**kwargs)
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(z.min(), z.max(), cn, cmap)
+        else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
+            ls = LegendManage.createLegendScheme(z.min(), z.max(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(z.min(), z.max(), cmap)
+    ls = ls.convertTo(ShapeTypes.Polygon)
+    sm.setLegend(ls)
     xyaxis = kwargs.pop('xyaxis', True)
     sm.setDisplayXY(xyaxis)
     zaxis = kwargs.pop('zaxis', True)
@@ -5388,9 +5406,12 @@ def surf(*args, **kwargs):
     sm.setDisplayGrids(grid)
     boxed = kwargs.pop('boxed', False)
     sm.setBoxed(boxed)
+    mesh = kwargs.pop('mesh', True)
+    sm.setMesh(mesh)
     
     gca.axes.setModel(sm)
     draw_if_interactive()
+    return ls
 
 def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     '''
