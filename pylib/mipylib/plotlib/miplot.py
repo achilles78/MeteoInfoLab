@@ -5359,6 +5359,8 @@ def surf(*args, **kwargs):
     :param grid: (*boolean*) Draw grid or not.
     :param boxed: (*boolean*) Draw boxed or not.
     :param mesh: (*boolean*) Draw mesh line or not.
+    
+    :returns: Legend
     '''
     global gca
     if chartpanel is None:
