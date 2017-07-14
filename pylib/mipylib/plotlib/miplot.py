@@ -1519,7 +1519,7 @@ def subplot(nrows, ncols, plot_number, **kwargs):
     return gca
     
 def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
-    subplot_kw=None, wspace=None, hspace=None):
+    subplot_kw=None, wspace=None, hspace=None, axestype='Axes', **kwargs):
     '''
     Create a figure and a set of subplots.
     
@@ -1534,6 +1534,7 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
         expressed as a fraction of the average axis width.
     :param hspace: (*float*) The amount of height reserved for blank space between subplots,
         expressed as a fraction of the average axis height.
+    :param axestype: (*string*) Axes type [Axes | Axes3D | MapAxes | PolarAxes].
     '''
     if position is None:
         if wspace is None and hspace is None:
@@ -1564,6 +1565,7 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
     if not hspace is None and nrows > 1:
         h = (height - hspace * (nrows - 1)) / nrows
         ishspace = True
+    axestype = axestype.lower()
     y = bottom + height - h
     for i in range(nrows):
         if ax2d:
@@ -1572,8 +1574,18 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
         if ishspace:
             if i > 0:
                 y -= hspace
-        for j in range(ncols):                        
-            ax = Axes()
+        for j in range(ncols):   
+            if axestype == 'axes3d':
+                ax = Axes3D()
+                __set_axes3d(ax, **kwarg)
+            elif axestype == 'mapaxes':
+                ax = MapAxes()
+                __set_axesm(ax, **kwargs)
+            elif axestype == 'polaraxes':
+                ax = PolarAxes()
+            else:
+                ax = Axes()
+                __set_axes(ax, **kwargs)
             ax.axes.isSubPlot = True             
             if not iswspace and not ishspace:
                 x = left + w * j

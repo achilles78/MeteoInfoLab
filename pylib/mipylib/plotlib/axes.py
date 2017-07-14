@@ -7,6 +7,7 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot, Plot3D
+from org.meteoinfo.map import MapView
 
 from java.awt import Font
 
@@ -123,7 +124,8 @@ class MapAxes(Axes):
     def __init__(self, axes=None, mapview=None):
         if axes is None:        
             if mapview is None:
-                self.axes = MapPlot()
+                mapview = MapView()
+                self.axes = MapPlot(mapview)
             else:
                 self.axes = MapPlot(mapview)
         else:
