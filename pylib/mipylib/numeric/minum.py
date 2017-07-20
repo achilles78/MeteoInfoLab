@@ -46,7 +46,7 @@ inf = Double.POSITIVE_INFINITY
 nan = Double.NaN
 
 __all__ = [
-    'pi','e','inf','nan','arange','arange1',    
+    'pi','e','inf','nan','absolute','arange','arange1',    
     'array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
     'corrcoef','cos','degrees','diag','dim_array','datatable','series','dot','exp','eye','fmax','fmin',
@@ -55,7 +55,8 @@ __all__ = [
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
     'numasciicol','numasciirow','nonzero','ones','ones_like','pol2cart','polyval','power',
     'project','projectxy','projinfo','radians','readtable','reshape',
-    'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','sum','tan','transpose','trapz','vdot',
+    'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','std','sum','tan',
+    'transpose','trapz','vdot',
     'where','zeros','zeros_like'
     ]
 
@@ -511,6 +512,22 @@ def rand(*args):
         return MIArray(ArrayUtil.rand(args[0]))
     else:
         return MIArray(ArrayUtil.rand(args))
+        
+def absolute(x):
+    '''
+    Calculate the absolute value element-wise.
+    
+    :param x: (*array_like*) Input array.
+    
+    :returns: An array containing the absolute value of each element in x. 
+        For complex input, a + ib, the absolute value is \sqrt{ a^2 + b^2 }.
+    '''
+    if isinstance(x, list):
+        x = array(x)
+    if isinstance(x, (DimArray, MIArray)):
+        return x.abs()
+    else:
+        return math.abs(x)
     
 def sqrt(x):
     """
@@ -872,6 +889,8 @@ def mean(x, axis=None):
     Compute tha arithmetic mean along the specified axis.
     
     :param x: (*array_like or list*) Input values.
+    :param axis: (*int*) Axis along which the standard deviation is computed. 
+        The default is to compute the standard deviation of the flattened array.
     
     returns: (*array_like*) Mean result
     """
@@ -898,6 +917,30 @@ def mean(x, axis=None):
         return r
     else:
         r = ArrayMath.mean(x.asarray(), axis)
+        if isinstance(x, MIArray):
+            return MIArray(r)
+        else:
+            dims = []
+            for i in range(0, x.ndim):
+                if i != axis:
+                    dims.append(x.dims[i])
+            return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+            
+def std(x, axis=None):
+    '''
+    Compute the standard deviation along the specified axis.
+    
+    :param x: (*array_like or list*) Input values.
+    :param axis: (*int*) Axis along which the standard deviation is computed. 
+        The default is to compute the standard deviation of the flattened array.
+    
+    returns: (*array_like*) Standart deviation result.
+    '''
+    if axis is None:
+        r = sqrt(mean((x - mean(x))**2))
+        return r
+    else:
+        r = ArrayMath.std(x.asarray(), axis)
         if isinstance(x, MIArray):
             return MIArray(r)
         else:

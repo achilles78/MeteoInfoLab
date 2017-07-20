@@ -606,6 +606,15 @@ class DimArray():
         gdata = GridArray(self.array.array, xdata, ydata, self.fill_value, self.proj)
         return gdata
         
+    def abs(self):
+        '''
+        Calculate the absolute value element-wise.
+        
+        :returns: An array containing the absolute value of each element in x. 
+            For complex input, a + ib, the absolute value is \sqrt{ a^2 + b^2 }.
+        '''
+        return DimArray(self.array.abs(), self.dims, self.fill_value, self.proj)
+        
     def sqrt(self):
         r = DimArray(self.array.sqrt(), self.dims, self.fill_value, self.proj)
         return r
