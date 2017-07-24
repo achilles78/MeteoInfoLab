@@ -15,5 +15,3 @@ import plotlib as plt
 import meteolib
 import meteolib.meteo as meteo
 import imagelib
-import imagelib.filter as imfilter
-import imagelib.image as image

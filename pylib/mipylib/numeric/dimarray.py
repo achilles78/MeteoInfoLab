@@ -228,6 +228,8 @@ class DimArray():
     def __setitem__(self, indices, value):
         #print type(indices) 
         if isinstance(indices, (MIArray, DimArray)):
+            if isinstance(value, (MIArray, DimArray)):
+                value = value.asarray()
             ArrayMath.setValue(self.asarray(), indices.asarray(), value)
             return None
         

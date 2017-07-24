@@ -370,7 +370,7 @@ class MIArray(object):
         :returns: An array containing the absolute value of each element in x. 
             For complex input, a + ib, the absolute value is \sqrt{ a^2 + b^2 }.
         '''
-        return ArrayMath.abs(self.array)
+        return MIArray(ArrayMath.abs(self.array))
             
     def ave(self, fill_value=None):
         if fill_value == None:

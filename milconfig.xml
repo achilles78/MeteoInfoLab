@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\onedim"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+  <Path OpenPath="C:\TEMP\Data\dust\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
@@ -16,13 +12,19 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d\examples"/>
     <RecentFolder Folder="C:\TEMP\mingjing"/>
+    <RecentFolder Folder="C:\TEMP"/>
+    <RecentFolder Folder="C:\TEMP\Data"/>
+    <RecentFolder Folder="C:\TEMP\Data\dust"/>
+    <RecentFolder Folder="C:\TEMP\Data\dust\script"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_2.py"/>
+      <OpenedFile File="C:\TEMP\Data\dust\script\iddi_FY4A_dnoise.py"/>
+      <OpenedFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_2.py"/>
+      <RecentFile File="C:\TEMP\Data\dust\script\iddi_FY4A_dnoise.py"/>
+      <RecentFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
     </RecentFiles>
   </File>
   <Font>
