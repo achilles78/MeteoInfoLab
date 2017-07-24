@@ -72,7 +72,9 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         interp = new PythonInteractiveInterpreter(console);
         String path = this.startupPath + File.separator + "pylib";
         String toolboxPath = this.startupPath + "/toolbox";
-        String mapPath = this.startupPath + File.separator + "map";
+        String mapPath = this.startupPath + "/map";
+        if (mapPath.substring(0, 1).equals("/"))
+            mapPath = mapPath.substring(1);
         if (isDebug) {
             path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfoLab/pylib";
             toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
@@ -82,6 +84,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         //console.println(toolboxPath);
 
         //this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        new Thread(interp).start();
         try {
             interp.set("milapp", parent);
             interp.exec("import sys");
@@ -96,8 +99,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        new Thread(interp).start();
+        
         try {
             interp.exec("mipylib.plotlib.miplot.isinteractive = True");
             interp.exec("mipylib.plotlib.miplot.milapp1 = milapp");

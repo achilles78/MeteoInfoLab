@@ -7,7 +7,6 @@ package org.meteoinfo.laboratory.gui;
 import java.awt.Color;
 import org.meteoinfo.console.JavaCharStream;
 import org.meteoinfo.console.JConsole;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
@@ -16,7 +15,6 @@ import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 import org.meteoinfo.laboratory.event.ConsoleExecEvent;
 import org.meteoinfo.laboratory.event.IConsoleExecListener;
-import org.python.core.PySyntaxError;
 import org.python.util.InteractiveConsole;
 
 /**

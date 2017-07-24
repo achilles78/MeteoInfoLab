@@ -151,15 +151,20 @@ public class MeteoInfoLab {
 
         boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
                 getInputArguments().toString().contains("jdwp");
-        String path, toolboxPath;
+        String path, toolboxPath, mapPath;
         if (isDebug) {
             path = "D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/pylib";
             toolboxPath = "D:/MyProgram/java/MeteoInfoDev/MeteoInfoLab/toolbox";
+            mapPath = "D:/MyProgram/Distribution/Java/MeteoInfo/MeteoInfo/map";
         } else {
             //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
             //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
-            path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
-            toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + "/toolbox";
+            String basePath = GlobalUtil.getAppPath(FrmMain.class);
+            path = basePath + File.separator + "pylib";
+            toolboxPath = basePath + "/toolbox";
+            mapPath = basePath + "/map";
+            if (mapPath.substring(0, 1).equals("/"))
+                mapPath = mapPath.substring(1);
         }
 
         try {
@@ -174,6 +179,7 @@ public class MeteoInfoLab {
             }
             interp.exec("mipylib.plotlib.miplot.batchmode = True");
             interp.exec("mipylib.plotlib.miplot.isinteractive = False");
+            interp.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
             System.out.println("mipylib is loaded...");
 
             //String encoding = "utf-8";
@@ -197,8 +203,12 @@ public class MeteoInfoLab {
 //        plotForm.setSize(800, 600);
 //        plotForm.setVisible(true);
 //        MeteoInfoScript mis = new MeteoInfoScript(plotForm);
-        String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
-        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + "/toolbox";
+        String basePath = GlobalUtil.getAppPath(FrmMain.class);
+        String path = basePath + File.separator + "pylib";
+        String toolboxPath = basePath + "/toolbox";
+        String mapPath = basePath + "/map";
+        if (mapPath.substring(0, 1).equals("/"))
+            mapPath = mapPath.substring(1);
         //MeteoInfoScript mis = new MeteoInfoScript(path);
         InteractiveConsole console = new InteractiveConsole();
         try {
@@ -213,6 +223,7 @@ public class MeteoInfoLab {
             //console.exec("import mipylib");
             //console.exec("from mipylib.miscript import *");
             console.exec("mipylib.plotlib.miplot.isinteractive = True");
+            console.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
         } catch (Exception e) {
             e.printStackTrace();
         }
