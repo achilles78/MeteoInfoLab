@@ -38,6 +38,7 @@ from java.awt import Color, Font
 from mipylib.numeric.dimarray import DimArray, PyGridData, PyStationData
 from mipylib.numeric.miarray import MIArray
 import mipylib.numeric.minum as minum
+import mipylib.geolib.migeo as migeo
 from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
 from mipylib.plotlib.axes import Axes, MapAxes, PolarAxes, PieAxes, Axes3D
@@ -49,10 +50,11 @@ isinteractive = False
 maplayout = MapLayout()
 chartpanel = None
 isholdon = True
+mappath = None
 gca = None
 
 __all__ = [
-    'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
+    'gca','mappath','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
     'contourfm','contourm','display','draw_if_interactive','errorbar',
     'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
@@ -5234,8 +5236,23 @@ def geoshow(*args, **kwargs):
         geoshow(lat, lon) - Displays the latitude and longitude vectors.
     '''
     plot = gca
-    if isinstance(args[0], MILayer):
+    islayer = False
+    if isinstance(args[0], basestring):
+        fn = args[0]
+        if not fn.endswith('.shp'):
+            fn = fn + '.shp'
+        if not os.path.exists(fn):
+            fn = os.path.join(mappath, fn)
+        if os.path.exists(fn):
+            layer = migeo.shaperead(fn)
+            islayer = True
+        else:
+            raise IOError('File not exists: ' + fn)
+    elif isinstance(args[0], MILayer):
         layer = args[0]
+        islayer = True
+    
+    if islayer:    
         layer = layer.layer   
         visible = kwargs.pop('visible', True)
         layer.setVisible(visible)

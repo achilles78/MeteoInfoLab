@@ -72,9 +72,11 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         interp = new PythonInteractiveInterpreter(console);
         String path = this.startupPath + File.separator + "pylib";
         String toolboxPath = this.startupPath + "/toolbox";
+        String mapPath = this.startupPath + File.separator + "map";
         if (isDebug) {
             path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfoLab/pylib";
             toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
+            mapPath = "D:/MyProgram/Distribution/Java/MeteoInfo/MeteoInfo/map";
         }
         //console.println(path);
         //console.println(toolboxPath);
@@ -87,20 +89,10 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("import datetime");
             //interp.exec("sys.setdefaultencoding('utf-8')");
             interp.exec("sys.path.append('" + path + "')");
-            interp.exec("from milab import *");
+            interp.exec("from milab import *");            
             interp.exec("sys.path.append('" + toolboxPath + "')");
             interp.exec("import toolbox");
             interp.exec("from toolbox import *");
-            //interp.exec("import mipylib");
-            //interp.exec("from mipylib.miscript import *");
-            //interp.set("mipylib.miplot.milapp", parent);                        
-            //interp.exec("from meteoinfo.numeric.JNumeric import *");
-            //interp.exec("import mipylib.miscript as plt");
-            //interp.exec("import meteoinfo.numeric.JNumeric as np");
-            //interp.exec("import miscript");
-            //for (String jarfn : jarfns) {
-            //    interp.exec("sys.path.append('" + jarfn + "')");
-            //}
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,8 +101,9 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         try {
             interp.exec("mipylib.plotlib.miplot.isinteractive = True");
             interp.exec("mipylib.plotlib.miplot.milapp1 = milapp");
+            interp.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
             currentPath = currentPath.replace("\\", "/");
-            interp.exec("mipylib.dataset.midata.currentfolder = '" + currentPath + "'");
+            interp.exec("mipylib.dataset.midata.currentfolder = '" + currentPath + "'");            
         } catch (Exception e) {
             e.printStackTrace();
         }

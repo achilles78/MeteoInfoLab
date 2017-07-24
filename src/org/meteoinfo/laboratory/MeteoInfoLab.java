@@ -213,12 +213,6 @@ public class MeteoInfoLab {
             //console.exec("import mipylib");
             //console.exec("from mipylib.miscript import *");
             console.exec("mipylib.plotlib.miplot.isinteractive = True");
-            //console.exec("from meteoinfo.numeric.JNumeric import *");
-            //console.exec("import mipylib.miscript as plt");
-            //console.exec("import meteoinfo.numeric.JNumeric as np");
-            //console.exec("import miscript");
-            //console.exec("from miscript import MeteoInfoScript");
-            //console.exec("mis = MeteoInfoScript()");
         } catch (Exception e) {
             e.printStackTrace();
         }
