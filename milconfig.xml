@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\io\web">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
@@ -16,19 +14,19 @@
     <RecentFolder Folder="C:\TEMP\Data"/>
     <RecentFolder Folder="C:\TEMP\Data\dust"/>
     <RecentFolder Folder="C:\TEMP\Data\dust\script"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io\web"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="C:\TEMP\Data\dust\script\iddi_FY4A_dnoise.py"/>
       <OpenedFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\coastline.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\web\eosdap_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="C:\TEMP\Data\dust\script\iddi_FY4A_dnoise.py"/>
       <RecentFile File="C:\TEMP\Data\dust\script\iddi_FY4A.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\coastline.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\io\web\eosdap_1.py"/>
     </RecentFiles>
   </File>
   <Font>

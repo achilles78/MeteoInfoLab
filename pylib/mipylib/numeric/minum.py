@@ -527,7 +527,7 @@ def absolute(x):
     if isinstance(x, (DimArray, MIArray)):
         return x.abs()
     else:
-        return math.abs(x)
+        return abs(x)
     
 def sqrt(x):
     """
@@ -855,6 +855,8 @@ def sum(x, axis=None):
     Sum of array elements over a given axis.
     
     :param x: (*array_like or list*) Input values.
+    :param axis: (*int*) Axis along which the standard deviation is computed. 
+        The default is to compute the standard deviation of the flattened array.
     
     returns: (*array_like*) Sum result
     """
@@ -955,6 +957,8 @@ def median(x, axis=None):
     Compute tha median along the specified axis.
     
     :param x: (*array_like or list*) Input values.
+    :param axis: (*int*) Axis along which the standard deviation is computed. 
+        The default is to compute the standard deviation of the flattened array.
     
     returns: (*array_like*) Median result
     """

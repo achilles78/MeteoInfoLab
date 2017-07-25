@@ -154,6 +154,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
      * @param command Command line
      */
     public void run(String command) {
+        interp.console.println("evaluate selection...");
         interp.console.setStyle(Color.blue);
         this.interp.console.println(command);
         interp.console.setStyle(Color.black);

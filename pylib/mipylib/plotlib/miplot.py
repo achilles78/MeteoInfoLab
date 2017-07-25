@@ -5230,6 +5230,7 @@ def geoshow(*args, **kwargs):
     
     Syntax:
     --------    
+        geoshow(shapefilename) - Displays the map data from a shape file.
         geoshow(layer) - Displays the map data from a map layer which may created by ``shaperead`` function.
         geoshow(S) - Displays the vector geographic features stored in S as points, multipoints, lines, or 
           polygons.
@@ -5782,6 +5783,8 @@ def gifaddframe(animation):
 def giffinish(animation):
     """
     Finish a gif animation object and write gif animation image file
+    
+    :param animation: Gif animation object
     """
     animation.finish()
         
