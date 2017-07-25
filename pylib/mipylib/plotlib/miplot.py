@@ -55,7 +55,7 @@ gca = None
 
 __all__ = [
     'gca','mappath','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
-    'boxplot','windrose','cla','clabel','clc','clear','clf','cll','colorbar','contour','contourf',
+    'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','display','draw_if_interactive','errorbar',
     'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
@@ -782,34 +782,35 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     pstyle = __getpointstyle(marker)    
     pb.setStyle(pstyle)
     isvalue = False
-    ls = None
     if len(c) > 1:
         if isinstance(c, (MIArray, DimArray)):
             isvalue = True
         elif isinstance(c[0], (int, long, float)):
             isvalue = True            
     if isvalue:
-        if isinstance(c, (list, tuple)):
-            c = minum.array(c)
-        levels = kwargs.pop('levs', None)
-        if levels is None:
-            levels = kwargs.pop('levels', None)
-        if levels is None:
-            cnum = kwargs.pop('cnum', None)
-            if cnum is None:
-                ls = __getlegendscheme([], c.min(), c.max(), **kwargs)
+        ls = kwargs.pop('symbolspec', None)
+        if ls is None:        
+            if isinstance(c, (list, tuple)):
+                c = minum.array(c)
+            levels = kwargs.pop('levs', None)
+            if levels is None:
+                levels = kwargs.pop('levels', None)
+            if levels is None:
+                cnum = kwargs.pop('cnum', None)
+                if cnum is None:
+                    ls = __getlegendscheme([], c.min(), c.max(), **kwargs)
+                else:
+                    ls = __getlegendscheme([cnum], c.min(), c.max(), **kwargs)
             else:
-                ls = __getlegendscheme([cnum], c.min(), c.max(), **kwargs)
-        else:
-            ls = __getlegendscheme([levels], c.min(), c.max(), **kwargs)
-        ls = __setlegendscheme_point(ls, **kwargs)
-        if isinstance(s, int):
-            for lb in ls.getLegendBreaks():
-                lb.setSize(s)
-        else:
-            n = len(s)
-            for i in range(0, n):
-                ls.getLegendBreaks()[i].setSize(s[i])
+                ls = __getlegendscheme([levels], c.min(), c.max(), **kwargs)
+            ls = __setlegendscheme_point(ls, **kwargs)
+            if isinstance(s, int):
+                for lb in ls.getLegendBreaks():
+                    lb.setSize(s)
+            else:
+                n = len(s)
+                for i in range(0, n):
+                    ls.getLegendBreaks()[i].setSize(s[i])
         #Create graphics
         graphics = GraphicFactory.createPoints(xdata, ydata, c.asarray(), ls)
     else:
@@ -842,7 +843,6 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
                     pbs.append(npb)
         #Create graphics
         graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
-        ls = pbs
     
     if gca is None:
         plot = Axes()
@@ -5543,6 +5543,18 @@ def weatherspec(weather='all', size=20, color='b'):
         wlist = weather
     c = __getcolor(color)
     return DrawMeteoData.createWeatherLegendScheme(wlist, size, c)
+    
+def cloudspec(size=12, color='b'):
+    '''
+    Make a cloud amount symbol legend.
+
+    :param size: (*string*) The symbol size.
+    :param color: (*color*) The symbol color.
+    
+    :returns: Cloud amount symbol legend.
+    '''
+    c = __getcolor(color)
+    return DrawMeteoData.createCloudLegendScheme(size, c)
     
 def __getpointlegendbreak(**kwargs):
     lb = PointBreak()        
