@@ -2126,7 +2126,7 @@ def __create_axes3d(*args, **kwargs):
     else:
         position = kwargs.pop('position', None)    
     outerposition = kwargs.pop('outerposition', None)
-    ax = Axes3D()
+    ax = Axes3D(**kwargs)
     if position is None:
         position = [0.13, 0.11, 0.71, 0.815]
         ax.active_outerposition(True)

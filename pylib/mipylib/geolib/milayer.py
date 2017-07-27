@@ -43,6 +43,11 @@ class MILayer():
         return self.layer.getLayerInfo()            
     
     def isvectorlayer(self):
+        '''
+        Check this layer is VectorLayer or not.
+        
+        :returns: (*boolean*) Is VectorLayer or not.
+        '''
         return self.layer.getLayerType() == LayerTypes.VectorLayer
     
     def cellvalue(self, fieldname, shapeindex):

@@ -91,6 +91,18 @@ def getcolor(style, alpha=None):
     
     return c
     
+def getcolors(cs, alpha=None):
+    colors = []
+    if isinstance(cs, (tuple, list, MIArray)):
+        if isinstance(cs[0], int):
+            colors.append(getcolor(cs, alpha))
+        else:            
+            for c in cs:
+                colors.append(getcolor(c, alpha))
+    else:
+        colors.append(getcolor(cs, alpha))
+    return colors
+    
 def getcolormap(**kwargs):
     colors = kwargs.pop('colors', None)
     issingle = False
@@ -401,9 +413,14 @@ def setlegendscheme_polygon(ls, **kwargs):
     edgesize = kwargs.pop('edgesize', 1)
     fill = kwargs.pop('fill', True)
     edge = kwargs.pop('edge', True)
+    alpha = kwargs.pop('alpha', None)
     for lb in ls.getLegendBreaks():
         if not facecolor is None:
             lb.setColor(facecolor)
+        if not alpha is None:
+            c = lb.getColor()
+            c = getcolor(c, alpha)
+            lb.setColor(c)
         lb.setOutlineSize(edgesize)        
         lb.setOutlineColor(edgecolor)        
         lb.setDrawFill(fill)        

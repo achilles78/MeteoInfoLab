@@ -8,7 +8,7 @@
 
 from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot, Plot3D, GraphicFactory
 from org.meteoinfo.map import MapView
-from org.meteoinfo.legend import LegendManage
+from org.meteoinfo.legend import LegendManage, BreakTypes
 from org.meteoinfo.shape import ShapeTypes
 
 from java.awt import Font
@@ -17,7 +17,7 @@ from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
 import plotutil
 import miplot
-import mipylib.numeric.minum
+import mipylib.numeric.minum as minum
 
 class Axes():
     '''
@@ -278,15 +278,19 @@ class Axes3D(Axes):
     Axes with 3 dimensional.
     '''
     
-    def __init__(self, axes=None):
+    def __init__(self, axes=None, **kwargs):
         if axes is None:        
             self.axes = Plot3D()
         else:
             self.axes = axes
-        self.axes.setDisplayXY(True)
-        self.axes.setDisplayZ(True)
-        self.axes.setDisplayGrids(True)
-        self.axes.setMesh(True)
+        xyaxis = kwargs.pop('xyaxis', True)
+        self.axes.setDisplayXY(xyaxis)
+        zaxis = kwargs.pop('zaxis', True)
+        self.axes.setDisplayZ(zaxis)
+        grid = kwargs.pop('grid', True)
+        self.axes.setDisplayGrids(grid)
+        boxed = kwargs.pop('boxed', False)
+        self.axes.setBoxed(boxed)
         
     def plot(self, x, y, z, *args, **kwargs):
         """
@@ -355,18 +359,6 @@ class Axes3D(Axes):
         #Add graphics
         graphics = GraphicFactory.createLineString(xdata, ydata, zdata, line)
         self.add_graphic(graphics)
-        
-        xyaxis = kwargs.pop('xyaxis', True)
-        self.axes.setDisplayXY(xyaxis)
-        zaxis = kwargs.pop('zaxis', True)
-        self.axes.setDisplayZ(zaxis)
-        grid = kwargs.pop('grid', True)
-        self.axes.setDisplayGrids(grid)
-        boxed = kwargs.pop('boxed', False)
-        self.axes.setBoxed(boxed)
-        mesh = kwargs.pop('mesh', True)
-        self.axes.setMesh(mesh)
-
         miplot.draw_if_interactive()
         return graphics
         
@@ -463,18 +455,40 @@ class Axes3D(Axes):
             graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, pbs)
 
         self.add_graphic(graphics)
+        miplot.draw_if_interactive()
+        return graphics
         
-        xyaxis = kwargs.pop('xyaxis', True)
-        self.axes.setDisplayXY(xyaxis)
-        zaxis = kwargs.pop('zaxis', True)
-        self.axes.setDisplayZ(zaxis)
-        grid = kwargs.pop('grid', True)
-        self.axes.setDisplayGrids(grid)
-        boxed = kwargs.pop('boxed', False)
-        self.axes.setBoxed(boxed)
-        mesh = kwargs.pop('mesh', True)
-        self.axes.setMesh(mesh)
-
+    def plot_wireframe(self, *args, **kwargs):
+        '''
+        creates a three-dimensional wireframe plot
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param cmap: (*string*) Color map string.
+        :param xyaxis: (*boolean*) Draw x and y axis or not.
+        :param zaxis: (*boolean*) Draw z axis or not.
+        :param grid: (*boolean*) Draw grid or not.
+        :param boxed: (*boolean*) Draw boxed or not.
+        :param mesh: (*boolean*) Draw mesh line or not.
+        
+        :returns: Legend
+        '''        
+        if len(args) == 1:
+            x = args[0].dimvalue(1)
+            y = args[0].dimvalue(0)
+            x, y = minum.meshgrid(x, y)
+            z = args[0]    
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            z = args[2]
+            args = args[3:]
+ 
+        line = plotutil.getlegendbreak('line', **kwargs)[0]
+        graphics = GraphicFactory.createWireframe(x.asarray(), y.asarray(), z.asarray(), line)
+        self.add_graphic(graphics)
         miplot.draw_if_interactive()
         return graphics
         
@@ -518,19 +532,165 @@ class Axes3D(Axes):
         else:    
             ls = LegendManage.createLegendScheme(z.min(), z.max(), cmap)
         ls = ls.convertTo(ShapeTypes.Polygon)
+        plotutil.setlegendscheme(ls, **kwargs)
         graphics = GraphicFactory.createMeshPolygons(x.asarray(), y.asarray(), z.asarray(), ls)
         self.add_graphic(graphics)
-        
-        xyaxis = kwargs.pop('xyaxis', True)
-        self.axes.setDisplayXY(xyaxis)
-        zaxis = kwargs.pop('zaxis', True)
-        self.axes.setDisplayZ(zaxis)
-        grid = kwargs.pop('grid', True)
-        self.axes.setDisplayGrids(grid)
-        boxed = kwargs.pop('boxed', False)
-        self.axes.setBoxed(boxed)
-        mesh = kwargs.pop('mesh', True)
-        self.axes.setMesh(mesh)
-
         miplot.draw_if_interactive()
         return ls
+        
+    def contour(self, *args, **kwargs):
+        """
+        Plot contours.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param smooth: (*boolean*) Smooth countour lines or not.
+        
+        :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
+        """
+        n = len(args)
+        cmap = plotutil.getcolormap(**kwargs)
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        offset = kwargs.pop('offset', 0)
+        xaxistype = None
+        if n <= 2:
+            gdata = minum.asgriddata(args[0])
+            if isinstance(args[0], DimArray):
+                if args[0].islondim(1):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(1):
+                    xaxistype = 'lat'
+                elif args[0].istimedim(1):
+                    xaxistype = 'time'
+            args = args[1:]
+        elif n <=4:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            gdata = minum.asgriddata(a, x, y, fill_value)
+            args = args[3:]
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+        else:    
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+        ls = ls.convertTo(ShapeTypes.Polyline)
+        plotutil.setlegendscheme(ls, **kwargs)
+        
+        smooth = kwargs.pop('smooth', True)
+        igraphic = GraphicFactory.createContourLines(gdata.data, offset, ls, smooth)
+        self.add_graphic(igraphic)
+
+        miplot.draw_if_interactive()
+        return igraphic
+        
+    def contourf(self, *args, **kwargs):
+        """
+        Plot filled contours.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param smooth: (*boolean*) Smooth countour lines or not.
+        
+        :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
+        """
+        n = len(args)
+        cmap = plotutil.getcolormap(**kwargs)
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        offset = kwargs.pop('offset', 0)
+        xaxistype = None
+        if n <= 2:
+            gdata = minum.asgriddata(args[0])
+            if isinstance(args[0], DimArray):
+                if args[0].islondim(1):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(1):
+                    xaxistype = 'lat'
+                elif args[0].istimedim(1):
+                    xaxistype = 'time'
+            args = args[1:]
+        elif n <=4:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            gdata = minum.asgriddata(a, x, y, fill_value)
+            args = args[3:]
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+        else:    
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+        ls = ls.convertTo(ShapeTypes.Polygon)
+        edge = kwargs.pop('edge', None)
+        if edge is None:
+            kwargs['edge'] = False
+        else:
+            kwargs['edge'] = edge
+        plotutil.setlegendscheme(ls, **kwargs)
+        
+        smooth = kwargs.pop('smooth', True)
+        igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, ls, smooth)
+        self.add_graphic(igraphic)
+
+        miplot.draw_if_interactive()
+        return igraphic
+        
+    def plot_layer(self, layer, **kwargs):
+        '''
+        Plot a layer in 3D axes.
+        
+        :param layer: (*MILayer*) The layer to be plotted.
+        
+        :returns: Graphics.
+        '''
+        ls = kwargs.pop('symbolspec', None)
+        layer = layer.layer
+        if ls is None:
+            if len(kwargs) > 0 and layer.getLegendScheme().getBreakNum() == 1:
+                lb = layer.getLegendScheme().getLegendBreaks().get(0)
+                btype = lb.getBreakType()
+                geometry = 'point'
+                if btype == BreakTypes.PolylineBreak:
+                    geometry = 'line'
+                elif btype == BreakTypes.PolygonBreak:
+                    geometry = 'polygon'
+                lb, isunique = plotutil.getlegendbreak(geometry, **kwargs)
+                layer.getLegendScheme().getLegendBreaks().set(0, lb)
+        else:
+            layer.setLegendScheme(ls)
+            
+        offset = kwargs.pop('offset', 0)
+        graphics = GraphicFactory.createGraphicsFromLayer(layer, offset)
+        
+        self.add_graphic(graphics)
+
+        miplot.draw_if_interactive()
+        return graphics
