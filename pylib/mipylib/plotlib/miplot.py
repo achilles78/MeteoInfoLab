@@ -59,11 +59,11 @@ __all__ = [
     'contourfm','contourm','display','draw_if_interactive','errorbar',
     'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
-    'makelegend','makesymbolspec','map','masklayer','pie','plot','plotm','quiver',
-    'quiverkey','quiverm','readlegend','repaint','savefig','savefig_jpeg','scatter','scatterm',
+    'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
+    'quiverkey','quiverm','readlegend','repaint','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
     'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
-    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','repaint',
+    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlim','repaint',
     'isinteractive'
     ]
 
@@ -297,6 +297,87 @@ def plot(*args, **kwargs):
         return graphics
     else:
         return graphics[0]
+        
+def plot3(x, y, z, *args, **kwargs):
+    """
+    Plot 3D lines and/or markers to the axes. *args* is a variable length argument, allowing
+    for multiple *x, y* pairs with an optional format string.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param z: (*array_like*) Input z data.
+    :param style: (*string*) Line style for plot.
+    
+    :returns: Legend breaks of the lines.
+    
+    The following format string characters are accepted to control the line style or marker:
+    
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         solid line style
+      '--'        dashed line style
+      '-.'        dash-dot line style
+      ':'         dotted line style
+      '.'         point marker
+      ','         pixel marker
+      'o'         circle marker
+      'v'         triangle_down marker
+      '^'         triangle_up marker
+      '<'         triangle_left marker
+      '>'         triangle_right marker
+      's'         square marker
+      'p'         pentagon marker
+      '*'         star marker
+      'x'         x marker
+      'D'         diamond marker
+      =========  ===========
+      
+    The following color abbreviations are supported:
+      
+      =========  =====
+      Character  Color  
+      =========  =====
+      'b'        blue
+      'g'        green
+      'r'        red
+      'c'        cyan
+      'm'        magenta
+      'y'        yellow
+      'k'        black
+      =========  =====
+    """
+    global gca
+    if chartpanel is None:
+        figure()
+    chart = chartpanel.getChart()
+    if gca is None:    
+        gca = axes3d()
+    else:
+        if not isinstance(gca, Axes3D):
+            gca = axes3d()
+    
+    xdata = __getplotdata(x)
+    ydata = __getplotdata(y)
+    zdata = __getplotdata(z)    
+    style = None
+    if len(args) > 0:
+        style = args[0]
+    
+    #Set plot data styles
+    label = kwargs.pop('label', 'S_1')
+    if style is None:
+        line = __getlegendbreak('line', **kwargs)[0]
+        line.setCaption(label)
+    else:
+        line = __getplotstyle(style, label, **kwargs)   
+
+    #Add graphics
+    graphics = GraphicFactory.createLineString(xdata, ydata, zdata, line)
+    gca.add_graphic(graphics)
+
+    draw_if_interactive()
+    return graphics
         
 def semilogy(*args, **kwargs):
     """
@@ -863,6 +944,124 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
         chart.setCurrentPlot(plot.axes)
     chartpanel.setChart(chart)
     gca = plot
+    draw_if_interactive()
+    return graphics
+    
+def scatter3(x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None, 
+            verts=None, **kwargs):
+    """
+    Make a 3D scatter plot of x, y and z, where x, y and z are sequence like objects of the same lengths.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param z: (*array_like*) Input z data.
+    :param s: (*int*) Size of points.
+    :param c: (*Color*) Color of the points. Or z vlaues.
+    :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
+    :param marker: (*string*) Marker of the points.
+    :param label: (*string*) Label of the points series.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+        points to draw, in increasing order.
+    
+    :returns: Points legend break.
+    """
+    global gca
+    if chartpanel is None:
+        figure()
+    chart = chartpanel.getChart()
+    if gca is None:    
+        gca = axes3d()
+    else:
+        if not isinstance(gca, Axes3D):
+            gca = axes3d()   
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    xdata = __getplotdata(x)
+    ydata = __getplotdata(y)
+    zdata = __getplotdata(z)
+    
+    #Set plot data styles
+    pb, isunique = __getlegendbreak('point', **kwargs)
+    pb.setCaption(label)
+    pstyle = __getpointstyle(marker)    
+    pb.setStyle(pstyle)
+    isvalue = False
+    if len(c) > 1:
+        if isinstance(c, (MIArray, DimArray)):
+            isvalue = True
+        elif isinstance(c[0], (int, long, float)):
+            isvalue = True            
+    if isvalue:
+        ls = kwargs.pop('symbolspec', None)
+        if ls is None:        
+            if isinstance(c, (list, tuple)):
+                c = minum.array(c)
+            levels = kwargs.pop('levs', None)
+            if levels is None:
+                levels = kwargs.pop('levels', None)
+            if levels is None:
+                cnum = kwargs.pop('cnum', None)
+                if cnum is None:
+                    ls = __getlegendscheme([], c.min(), c.max(), **kwargs)
+                else:
+                    ls = __getlegendscheme([cnum], c.min(), c.max(), **kwargs)
+            else:
+                ls = __getlegendscheme([levels], c.min(), c.max(), **kwargs)
+            ls = __setlegendscheme_point(ls, **kwargs)
+            if isinstance(s, int):
+                for lb in ls.getLegendBreaks():
+                    lb.setSize(s)
+            else:
+                n = len(s)
+                for i in range(0, n):
+                    ls.getLegendBreaks()[i].setSize(s[i])
+        #Create graphics
+        graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, c.asarray(), ls)
+    else:
+        colors = __getcolors(c, alpha)   
+        pbs = []
+        if isinstance(s, int):   
+            pb.setSize(s)
+            if len(colors) == 1:
+                pb.setColor(colors[0])
+                pbs.append(pb)
+            else:
+                n = len(colors)
+                for i in range(0, n):
+                    npb = pb.clone()
+                    npb.setColor(colors[i])
+                    pbs.append(npb)
+        else:
+            n = len(s)
+            if len(colors) == 1:
+                pb.setColor(colors[0])
+                for i in range(0, n):
+                    npb = pb.clone()
+                    npb.setSize(s[i])
+                    pbs.append(npb)
+            else:
+                for i in range(0, n):
+                    npb = pb.clone()
+                    npb.setSize(s[i])
+                    npb.setColor(colors[i])
+                    pbs.append(npb)
+        #Create graphics
+        graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, pbs)
+
+    gca.add_graphic(graphics)
+    
+    xyaxis = kwargs.pop('xyaxis', True)
+    gca.axes.setDisplayXY(xyaxis)
+    zaxis = kwargs.pop('zaxis', True)
+    gca.axes.setDisplayZ(zaxis)
+    grid = kwargs.pop('grid', True)
+    gca.axes.setDisplayGrids(grid)
+    boxed = kwargs.pop('boxed', False)
+    gca.axes.setBoxed(boxed)
+    mesh = kwargs.pop('mesh', True)
+    gca.axes.setMesh(mesh)
+
     draw_if_interactive()
     return graphics
 
@@ -1927,10 +2126,9 @@ def __create_axes3d(*args, **kwargs):
     else:
         position = kwargs.pop('position', None)    
     outerposition = kwargs.pop('outerposition', None)
-    panel = kwargs.pop('panel', None)
-    ax = Axes3D(panel=panel)
+    ax = Axes3D()
     if position is None:
-        position = [0.13, 0.11, 0.775, 0.815]
+        position = [0.13, 0.11, 0.71, 0.815]
         ax.active_outerposition(True)
     else:        
         ax.active_outerposition(False)        
@@ -3101,36 +3299,65 @@ def xlim(xmin, xmax):
     :param xmin: (*float*) Minimum limit of the x axis.
     :param xmax: (*float*) Maximum limit of the x axis.
     """
-    plot = gca
+    global gca
+    
     if isinstance(xmin, datetime.datetime):
         xmin = miutil.date2num(xmin)
     if isinstance(xmax, datetime.datetime):
         xmax = miutil.date2num(xmax)    
-    extent = plot.axes.getDrawExtent()
-    extent.minX = xmin
-    extent.maxX = xmax
-    plot.axes.setDrawExtent(extent)
-    plot.axes.setExtent(extent.clone())
+        
+    if isinstance(gca, Axes3D):
+        gca.axes.setXMin(xmin)
+        gca.axes.setXMax(xmax)
+    else:
+        extent = gca.axes.getDrawExtent()
+        extent.minX = xmin
+        extent.maxX = xmax
+        gca.axes.setDrawExtent(extent)
+        gca.axes.setExtent(extent.clone())
     draw_if_interactive()
             
 def ylim(ymin, ymax):
     """
     Set the *y* limits of the current axes.
     
-    :param xmin: (*float*) Minimum limit of the y axis.
-    :param xmax: (*float*) Maximum limit of the yaxis.
+    :param ymin: (*float*) Minimum limit of the y axis.
+    :param ymax: (*float*) Maximum limit of the y axis.
     """
-    plot = gca
+    global gca
     if isinstance(ymin, datetime.datetime):
         ymin = miutil.date2num(ymin)
     if isinstance(ymax, datetime.datetime):
         ymax = miutil.date2num(ymax) 
-    extent = plot.axes.getDrawExtent()
-    extent.minY = ymin
-    extent.maxY = ymax
-    plot.axes.setDrawExtent(extent)
-    plot.axes.setExtent(extent.clone())
+    
+    if isinstance(gca, Axes3D):
+        gca.axes.setYMin(ymin)
+        gca.axes.setYMax(ymax)
+    else:
+        extent = plot.axes.getDrawExtent()
+        extent.minY = ymin
+        extent.maxY = ymax
+        plot.axes.setDrawExtent(extent)
+        plot.axes.setExtent(extent.clone())
     draw_if_interactive()   
+    
+def zlim(zmin, zmax):
+    """
+    Set the *z* limits of the current axes.
+    
+    :param zmin: (*float*) Minimum limit of the z axis.
+    :param zmax: (*float*) Maximum limit of the z axis.
+    """
+    global gca
+    if isinstance(zmin, datetime.datetime):
+        zmin = miutil.date2num(zmin)
+    if isinstance(zmax, datetime.datetime):
+        zmax = miutil.date2num(zmax) 
+    
+    if isinstance(gca, Axes3D):
+        gca.axes.setZMin(zmin)
+        gca.axes.setZMax(zmax)
+        draw_if_interactive()   
 
 def xreverse():
     '''
@@ -5064,7 +5291,10 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=T
         layer.setProjInfo(proj)
  
     if isplot:
-        plot.add_layer(layer)
+        if order is None:
+            plot.add_layer(layer)
+        else:
+            plot.add_layer(layer, order)
         plot.axes.setDrawExtent(layer.getExtent().clone())
         plot.axes.setExtent(layer.getExtent().clone())
         
@@ -5365,6 +5595,73 @@ def geoshow(*args, **kwargs):
             return graphic
             
 def surf(*args, **kwargs):
+    '''
+    creates a three-dimensional surface plot
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param cmap: (*string*) Color map string.
+    :param xyaxis: (*boolean*) Draw x and y axis or not.
+    :param zaxis: (*boolean*) Draw z axis or not.
+    :param grid: (*boolean*) Draw grid or not.
+    :param boxed: (*boolean*) Draw boxed or not.
+    :param mesh: (*boolean*) Draw mesh line or not.
+    
+    :returns: Legend
+    '''
+    global gca
+    if chartpanel is None:
+        figure()
+    chart = chartpanel.getChart()
+    if gca is None:    
+        gca = axes3d()
+    else:
+        if not isinstance(gca, Axes3D):
+            gca = axes3d()
+
+    if len(args) == 1:
+        x = args[0].dimvalue(1)
+        y = args[0].dimvalue(0)
+        x, y = minum.meshgrid(x, y)
+        z = args[0]    
+        args = args[1:]
+    else:
+        x = args[0]
+        y = args[1]
+        z = args[2]
+        args = args[3:]
+    cmap = __getcolormap(**kwargs)
+    if len(args) > 0:
+        level_arg = args[0]
+        if isinstance(level_arg, int):
+            cn = level_arg
+            ls = LegendManage.createLegendScheme(z.min(), z.max(), cn, cmap)
+        else:
+            if isinstance(level_arg, MIArray):
+                level_arg = level_arg.aslist()
+            ls = LegendManage.createLegendScheme(z.min(), z.max(), level_arg, cmap)
+    else:    
+        ls = LegendManage.createLegendScheme(z.min(), z.max(), cmap)
+    ls = ls.convertTo(ShapeTypes.Polygon)
+    graphics = GraphicFactory.createMeshPolygons(x.asarray(), y.asarray(), z.asarray(), ls)
+    gca.add_graphic(graphics)
+    
+    xyaxis = kwargs.pop('xyaxis', True)
+    gca.axes.setDisplayXY(xyaxis)
+    zaxis = kwargs.pop('zaxis', True)
+    gca.axes.setDisplayZ(zaxis)
+    grid = kwargs.pop('grid', True)
+    gca.axes.setDisplayGrids(grid)
+    boxed = kwargs.pop('boxed', False)
+    gca.axes.setBoxed(boxed)
+    mesh = kwargs.pop('mesh', True)
+    gca.axes.setMesh(mesh)
+
+    draw_if_interactive()
+    return ls
+    
+def surf_bak(*args, **kwargs):
     '''
     creates a three-dimensional surface plot
     
