@@ -283,14 +283,110 @@ class Axes3D(Axes):
             self.axes = Plot3D()
         else:
             self.axes = axes
+        self.projector = self.axes.getProjector()
+        #distance = kwargs.pop('distance', 10000)
+        #self.projector.setDistance(distance)
+        rotation_angle = kwargs.pop('rotation', 225)
+        self.projector.setRotationAngle(rotation_angle)
+        elevation_angle = kwargs.pop('elevation', 30)
+        self.projector.setElevationAngle(elevation_angle)
         xyaxis = kwargs.pop('xyaxis', True)
         self.axes.setDisplayXY(xyaxis)
         zaxis = kwargs.pop('zaxis', True)
         self.axes.setDisplayZ(zaxis)
         grid = kwargs.pop('grid', True)
         self.axes.setDisplayGrids(grid)
-        boxed = kwargs.pop('boxed', False)
+        boxed = kwargs.pop('boxed', True)
         self.axes.setBoxed(boxed)
+        bbox = kwargs.pop('bbox', False)
+        self.axes.setDrawBoundingBox(bbox)
+        
+    def get_distance(self):
+        '''
+        Get distance to object.
+        
+        :returns: Distance to object.
+        '''
+        return self.projector.getDistance()
+        
+    def set_distance(self, dis):
+        '''
+        Set distance to object.
+        
+        :param dis: (*float*) Distance to object.
+        '''
+        self.projector.setDistance(dis)
+        miplot.draw_if_interactive()
+        
+    def get_rotation(self):
+        '''
+        Get rotation angle.
+        
+        :returns: Rotation angle.
+        '''
+        return self.projector.getRotationAngle()
+        
+    def set_rotation(self, rotation):
+        '''
+        Set rotation angle.
+        
+        :param rotation: (*float*) Rotation angle.
+        '''
+        self.projector.setRotationAngle(rotation)
+        miplot.draw_if_interactive()
+        
+    def get_elevation(self):
+        '''
+        Get elevation angle.
+        
+        :returns: Elevation angle.
+        '''
+        return self.projector.getElevationAngle()
+        
+    def set_elevation(self, elevation):
+        '''
+        Set elevation angle.
+        
+        :param elevation: (*float*) Elevation angle.
+        '''
+        self.projector.setElevationAngle(elevation)
+        miplot.draw_if_interactive()
+        
+    def set_draw_xy(self, dxy):
+        '''
+        Set draw xy axis or not.
+        
+        :param dxy: (*boolean*) Draw xy axis or not.
+        '''
+        self.axes.setDisplayXY(dxy)
+        miplot.draw_if_interactive()
+        
+    def set_draw_z(self, dz):
+        '''
+        Set draw z axis or not.
+        
+        :param dz: (*boolean*) Draw z axis or not.
+        '''
+        self.axes.setDisplayZ(dz)
+        miplot.draw_if_interactive()
+        
+    def set_draw_box(self, db):
+        '''
+        Set draw 3D box or not.
+        
+        :param db: (*boolean*) Draw 3D box or not.
+        '''
+        self.axes.setBoxed(db)
+        miplot.draw_if_interactive()
+        
+    def set_draw_bbox(self, bbox):
+        '''
+        Set draw bounding box or not.
+        
+        :param db: (*boolean*) Draw bounding box or not.
+        '''
+        self.axes.setDrawBoundingBox(bbox)
+        miplot.draw_if_interactive()
         
     def plot(self, x, y, z, *args, **kwargs):
         """

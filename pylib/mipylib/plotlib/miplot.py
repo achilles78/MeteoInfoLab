@@ -3307,8 +3307,7 @@ def xlim(xmin, xmax):
         xmax = miutil.date2num(xmax)    
         
     if isinstance(gca, Axes3D):
-        gca.axes.setXMin(xmin)
-        gca.axes.setXMax(xmax)
+        gca.axes.setXMinMax(xmin, xmax)
     else:
         extent = gca.axes.getDrawExtent()
         extent.minX = xmin
@@ -3331,8 +3330,7 @@ def ylim(ymin, ymax):
         ymax = miutil.date2num(ymax) 
     
     if isinstance(gca, Axes3D):
-        gca.axes.setYMin(ymin)
-        gca.axes.setYMax(ymax)
+        gca.axes.setYMinMax(ymin, ymax)
     else:
         extent = plot.axes.getDrawExtent()
         extent.minY = ymin
@@ -3355,8 +3353,7 @@ def zlim(zmin, zmax):
         zmax = miutil.date2num(zmax) 
     
     if isinstance(gca, Axes3D):
-        gca.axes.setZMin(zmin)
-        gca.axes.setZMax(zmax)
+        gca.axes.setZMinMax(zmin, zmax)
         draw_if_interactive()   
 
 def xreverse():
