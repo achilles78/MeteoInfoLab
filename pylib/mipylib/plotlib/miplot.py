@@ -63,8 +63,8 @@ __all__ = [
     'quiverkey','quiverm','readlegend','repaint','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
     'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
-    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlim','repaint',
-    'isinteractive'
+    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlabel','zlim','zticks',
+    'repaint','isinteractive'
     ]
 
 def hold(ishold):
@@ -357,27 +357,7 @@ def plot3(x, y, z, *args, **kwargs):
         if not isinstance(gca, Axes3D):
             gca = axes3d()
     
-    xdata = __getplotdata(x)
-    ydata = __getplotdata(y)
-    zdata = __getplotdata(z)    
-    style = None
-    if len(args) > 0:
-        style = args[0]
-    
-    #Set plot data styles
-    label = kwargs.pop('label', 'S_1')
-    if style is None:
-        line = __getlegendbreak('line', **kwargs)[0]
-        line.setCaption(label)
-    else:
-        line = __getplotstyle(style, label, **kwargs)   
-
-    #Add graphics
-    graphics = GraphicFactory.createLineString(xdata, ydata, zdata, line)
-    gca.add_graphic(graphics)
-
-    draw_if_interactive()
-    return graphics
+    return gca.plot(x, y, z, *args, **kwargs)
         
 def semilogy(*args, **kwargs):
     """
@@ -975,95 +955,7 @@ def scatter3(x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None,
         if not isinstance(gca, Axes3D):
             gca = axes3d()   
     
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = __getplotdata(x)
-    ydata = __getplotdata(y)
-    zdata = __getplotdata(z)
-    
-    #Set plot data styles
-    pb, isunique = __getlegendbreak('point', **kwargs)
-    pb.setCaption(label)
-    pstyle = __getpointstyle(marker)    
-    pb.setStyle(pstyle)
-    isvalue = False
-    if len(c) > 1:
-        if isinstance(c, (MIArray, DimArray)):
-            isvalue = True
-        elif isinstance(c[0], (int, long, float)):
-            isvalue = True            
-    if isvalue:
-        ls = kwargs.pop('symbolspec', None)
-        if ls is None:        
-            if isinstance(c, (list, tuple)):
-                c = minum.array(c)
-            levels = kwargs.pop('levs', None)
-            if levels is None:
-                levels = kwargs.pop('levels', None)
-            if levels is None:
-                cnum = kwargs.pop('cnum', None)
-                if cnum is None:
-                    ls = __getlegendscheme([], c.min(), c.max(), **kwargs)
-                else:
-                    ls = __getlegendscheme([cnum], c.min(), c.max(), **kwargs)
-            else:
-                ls = __getlegendscheme([levels], c.min(), c.max(), **kwargs)
-            ls = __setlegendscheme_point(ls, **kwargs)
-            if isinstance(s, int):
-                for lb in ls.getLegendBreaks():
-                    lb.setSize(s)
-            else:
-                n = len(s)
-                for i in range(0, n):
-                    ls.getLegendBreaks()[i].setSize(s[i])
-        #Create graphics
-        graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, c.asarray(), ls)
-    else:
-        colors = __getcolors(c, alpha)   
-        pbs = []
-        if isinstance(s, int):   
-            pb.setSize(s)
-            if len(colors) == 1:
-                pb.setColor(colors[0])
-                pbs.append(pb)
-            else:
-                n = len(colors)
-                for i in range(0, n):
-                    npb = pb.clone()
-                    npb.setColor(colors[i])
-                    pbs.append(npb)
-        else:
-            n = len(s)
-            if len(colors) == 1:
-                pb.setColor(colors[0])
-                for i in range(0, n):
-                    npb = pb.clone()
-                    npb.setSize(s[i])
-                    pbs.append(npb)
-            else:
-                for i in range(0, n):
-                    npb = pb.clone()
-                    npb.setSize(s[i])
-                    npb.setColor(colors[i])
-                    pbs.append(npb)
-        #Create graphics
-        graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, pbs)
-
-    gca.add_graphic(graphics)
-    
-    xyaxis = kwargs.pop('xyaxis', True)
-    gca.axes.setDisplayXY(xyaxis)
-    zaxis = kwargs.pop('zaxis', True)
-    gca.axes.setDisplayZ(zaxis)
-    grid = kwargs.pop('grid', True)
-    gca.axes.setDisplayGrids(grid)
-    boxed = kwargs.pop('boxed', False)
-    gca.axes.setBoxed(boxed)
-    mesh = kwargs.pop('mesh', True)
-    gca.axes.setMesh(mesh)
-
-    draw_if_interactive()
-    return graphics
+    return gca.scatter(x, y, z, s, c, marker, alpha, linewidth, verts, **kwargs)
 
 def patch(x, y=None, **kwargs):
     '''
@@ -3037,10 +2929,37 @@ def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     axis.setDrawLabel(True)
     axis.setLabelFont(font)
     axis.setLabelColor(c)
-    axis_r = plot.axes.getAxis(Location.RIGHT)
-    axis_r.setLabel(label)
-    axis_r.setLabelFont(font)
-    axis_r.setLabelColor(c)
+    if not isinstance(plot, Axes3D):
+        axis_r = plot.axes.getAxis(Location.RIGHT)
+        axis_r.setLabel(label)
+        axis_r.setLabelFont(font)
+        axis_r.setLabelColor(c)
+    draw_if_interactive()
+    
+def zlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
+    """
+    Set the z axis label of the current axes.
+    
+    :param label: (*string*) Label string.
+    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
+    :param color: (*color*) Label string color. Default is ``black`` .
+    """
+    global gca
+    if not isinstance(gca, Axes3D):
+        return
+        
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    c = __getcolor(color)    
+    axis = gca.axes.getZAxis()
+    axis.setLabel(label)
+    axis.setDrawLabel(True)
+    axis.setLabelFont(font)
+    axis.setLabelColor(c)
     draw_if_interactive()
     
 def xticks(*args, **kwargs):
@@ -3056,7 +2975,10 @@ def xticks(*args, **kwargs):
     :param rotation: (*float*) Tick label rotation angle. Default is 0.
     """
     axis = gca.axes.getXAxis()
-    axis_t = gca.axes.getAxis(Location.TOP)
+    if isinstance(gca, Axes3D):
+        axis_t = None
+    else:
+        axis_t = gca.axes.getAxis(Location.TOP)
     if len(args) > 0:
         locs = args[0]
         if isinstance(locs, (MIArray, DimArray)):
@@ -3065,17 +2987,20 @@ def xticks(*args, **kwargs):
             for i in range(len(locs)):
                 locs[i] = miutil.date2num(locs[i])
         axis.setTickLocations(locs)
-        axis_t.setTickLocations(locs)
+        if not axis_t is None:
+            axis_t.setTickLocations(locs)
         args = args[1:]
     if len(args) > 0:
         labels = args[0]
         if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
             axis.setTickLabels_Number(labels)
-            axis_t.setTickLabels_Number(labels)
+            if not axis_t is None:
+                axis_t.setTickLabels_Number(labels)
         else:
             axis.setTickLabels(labels)
-            axis_t.setTickLabels(labels)
+            if not axis_t is None:
+                axis_t.setTickLabels(labels)
     fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
     fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
     bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
@@ -3091,9 +3016,10 @@ def xticks(*args, **kwargs):
     axis.setTickLabelFont(font)
     axis.setTickLabelColor(c)
     axis.setTickLabelAngle(angle)
-    axis_t.setTickLabelFont(font)
-    axis_t.setTickLabelColor(c)
-    axis_t.setTickLabelAngle(angle)
+    if not axis_t is None:
+        axis_t.setTickLabelFont(font)
+        axis_t.setTickLabelColor(c)
+        axis_t.setTickLabelAngle(angle)
     draw_if_interactive()
     
 def yticks(*args, **kwargs):
@@ -3109,7 +3035,10 @@ def yticks(*args, **kwargs):
     :param rotation: (*float*) Tick label rotation angle. Default is 0.
     """
     axis = gca.axes.getYAxis()
-    axis_r = gca.axes.getAxis(Location.RIGHT)
+    if isinstance(gca, Axes3D):
+        axis_r = None
+    else:
+        axis_r = gca.axes.getAxis(Location.RIGHT)
     if len(args) > 0:
         locs = args[0]
         if isinstance(locs, MIArray):
@@ -3118,17 +3047,20 @@ def yticks(*args, **kwargs):
             for i in range(len(locs)):
                 locs[i] = miutil.date2num(locs[i])
         axis.setTickLocations(locs)
-        axis_r.setTickLocations(locs)
+        if not axis_r is None:
+            axis_r.setTickLocations(locs)
         args = args[1:]
     if len(args) > 0:
         labels = args[0]
         if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
             axis.setTickLabels_Number(labels)
-            axis_r.setTickLabels_Number(labels)
+            if not axis_r is None:
+                axis_r.setTickLabels_Number(labels)
         else:
             axis.setTickLabels(labels)
-            axis_r.setTickLabels(labels)
+            if not axis_r is None:
+                axis_r.setTickLabels(labels)
     fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
     fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
     bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
@@ -3140,8 +3072,54 @@ def yticks(*args, **kwargs):
     c = __getcolor(color)
     axis.setTickLabelFont(font)
     axis.setTickLabelColor(c)
-    axis_r.setTickLabelFont(font)
-    axis_r.setTickLabelColor(c)
+    if not axis_r is None:
+        axis_r.setTickLabelFont(font)
+        axis_r.setTickLabelColor(c)
+    draw_if_interactive()
+    
+def zticks(*args, **kwargs):
+    """
+    Set the z-limits of the current tick locations and labels.
+    
+    :param locs: (*array_like*) Tick locations.
+    :param labels: (*string list*) Tick labels.
+    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
+    :param color: (*color*) Tick label string color. Default is ``black`` .
+    :param rotation: (*float*) Tick label rotation angle. Default is 0.
+    """
+    if not isinstance(gca, Axes3D):
+        return
+        
+    axis = gca.axes.getZAxis()
+    if len(args) > 0:
+        locs = args[0]
+        if isinstance(locs, MIArray):
+            locs = locs.aslist()
+        if isinstance(locs[0], datetime.datetime):
+            for i in range(len(locs)):
+                locs[i] = miutil.date2num(locs[i])
+        axis.setTickLocations(locs)
+        args = args[1:]
+    if len(args) > 0:
+        labels = args[0]
+        if isinstance(labels, (MIArray, DimArray)):
+            labels = labels.aslist()
+            axis.setTickLabels_Number(labels)
+        else:
+            axis.setTickLabels(labels)
+    fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
+    fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
+    bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    color = kwargs.pop('color', 'k')
+    c = __getcolor(color)
+    axis.setTickLabelFont(font)
+    axis.setTickLabelColor(c)
     draw_if_interactive()
     
 def text(x, y, s, **kwargs):
@@ -3332,11 +3310,11 @@ def ylim(ymin, ymax):
     if isinstance(gca, Axes3D):
         gca.axes.setYMinMax(ymin, ymax)
     else:
-        extent = plot.axes.getDrawExtent()
+        extent = gca.axes.getDrawExtent()
         extent.minY = ymin
         extent.maxY = ymax
-        plot.axes.setDrawExtent(extent)
-        plot.axes.setExtent(extent.clone())
+        gca.axes.setDrawExtent(extent)
+        gca.axes.setExtent(extent.clone())
     draw_if_interactive()   
     
 def zlim(zmin, zmax):
@@ -3391,18 +3369,13 @@ def legend(*args, **kwargs):
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
     :param labcolor: (*color*) Tick label string color. Default is ``black`` .
     """
-    plot = gca
-    #plot.setDrawLegend(True)   
+    global gca  
     newlegend = kwargs.pop('newlegend', True)
-    #plot.updateLegendScheme()
-    if isinstance(plot, Axes):        
-        ols = plot.axes.getLegendScheme()
-    else:
-        ols = None
+    ols = gca.axes.getLegendScheme()
     if newlegend:
         clegend = ChartLegend(ols)
     else:
-        clegend = plot.axes.getLegend()   
+        clegend = gca.axes.getLegend()   
     ls = kwargs.pop('legend', None)
     if len(args) > 0 and isinstance(args[0], MILayer):
         ls = args[0].legend()
@@ -3432,13 +3405,13 @@ def legend(*args, **kwargs):
                     ls.setLegendType(LegendType.GraduatedColor)
                 if clegend is None:
                     clegend = ChartLegend(ls)
-                    plot.axes.setLegend(clegend)
+                    gca.axes.setLegend(clegend)
                 else:
                     clegend.setLegendScheme(ls)
     else:
         if clegend is None:
             clegend = ChartLegend(ls)
-            plot.axes.setLegend(clegend)
+            gca.axes.setLegend(clegend)
         else:
             clegend.setLegendScheme(ls)
         
@@ -3498,7 +3471,7 @@ def legend(*args, **kwargs):
     if not yshift is None:
         clegend.setYShift(yshift)
     if newlegend:
-        plot.axes.addLegend(clegend)
+        gca.axes.addLegend(clegend)
     
     draw_if_interactive()
     
@@ -5617,116 +5590,8 @@ def surf(*args, **kwargs):
         if not isinstance(gca, Axes3D):
             gca = axes3d()
 
-    if len(args) == 1:
-        x = args[0].dimvalue(1)
-        y = args[0].dimvalue(0)
-        x, y = minum.meshgrid(x, y)
-        z = args[0]    
-        args = args[1:]
-    else:
-        x = args[0]
-        y = args[1]
-        z = args[2]
-        args = args[3:]
-    cmap = __getcolormap(**kwargs)
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(z.min(), z.max(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(z.min(), z.max(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(z.min(), z.max(), cmap)
-    ls = ls.convertTo(ShapeTypes.Polygon)
-    graphics = GraphicFactory.createMeshPolygons(x.asarray(), y.asarray(), z.asarray(), ls)
-    gca.add_graphic(graphics)
+    return gca.plot_surface(*args, **kwargs)
     
-    xyaxis = kwargs.pop('xyaxis', True)
-    gca.axes.setDisplayXY(xyaxis)
-    zaxis = kwargs.pop('zaxis', True)
-    gca.axes.setDisplayZ(zaxis)
-    grid = kwargs.pop('grid', True)
-    gca.axes.setDisplayGrids(grid)
-    boxed = kwargs.pop('boxed', False)
-    gca.axes.setBoxed(boxed)
-    mesh = kwargs.pop('mesh', True)
-    gca.axes.setMesh(mesh)
-
-    draw_if_interactive()
-    return ls
-    
-def surf_bak(*args, **kwargs):
-    '''
-    creates a three-dimensional surface plot
-    
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param z: (*array_like*) 2-D z value array.
-    :param cmap: (*string*) Color map string.
-    :param xyaxis: (*boolean*) Draw x and y axis or not.
-    :param zaxis: (*boolean*) Draw z axis or not.
-    :param grid: (*boolean*) Draw grid or not.
-    :param boxed: (*boolean*) Draw boxed or not.
-    :param mesh: (*boolean*) Draw mesh line or not.
-    
-    :returns: Legend
-    '''
-    global gca
-    if chartpanel is None:
-        figure()
-    chart = chartpanel.getChart()
-    if gca is None:    
-        gca = Axes3D()
-        chart.addPlot(gca.axes)
-    else:
-        if not isinstance(gca, Axes3D):
-            ax = Axes3D()
-            gca = ax
-            chart.addPlot(gca.axes)
-    
-    sm = ArraySurfaceModel()
-    if len(args) == 1:
-        z = args[0]    
-        sm.setValues(0, z.shape[1], z.shape[0], 20, z.asarray(), None)
-        args = args[1:]
-    else:
-        x = args[0]
-        y = args[1]
-        z = args[2]
-        sm.setValues(x.asarray(), y.asarray(), z.asarray(), None)
-        args = args[3:]
-    cmap = __getcolormap(**kwargs)
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(z.min(), z.max(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(z.min(), z.max(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(z.min(), z.max(), cmap)
-    ls = ls.convertTo(ShapeTypes.Polygon)
-    sm.setLegend(ls)
-    xyaxis = kwargs.pop('xyaxis', True)
-    sm.setDisplayXY(xyaxis)
-    zaxis = kwargs.pop('zaxis', True)
-    sm.setDisplayZ(zaxis)
-    grid = kwargs.pop('grid', True)
-    sm.setDisplayGrids(grid)
-    boxed = kwargs.pop('boxed', False)
-    sm.setBoxed(boxed)
-    mesh = kwargs.pop('mesh', True)
-    sm.setMesh(mesh)
-    
-    gca.axes.setModel(sm)
-    draw_if_interactive()
-    return ls
-
 def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     '''
     Make colors.

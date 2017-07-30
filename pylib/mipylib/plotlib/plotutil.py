@@ -408,11 +408,12 @@ def setlegendscheme_polygon(ls, **kwargs):
         facecolor = None
     else:
         facecolor = getcolor(fcobj)
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = getcolor(ecobj)
-    edgesize = kwargs.pop('edgesize', 1)
-    fill = kwargs.pop('fill', True)
-    edge = kwargs.pop('edge', True)
+    edgecolor = kwargs.pop('edgecolor', None)
+    if not edgecolor is None:
+        edgecolor = getcolor(edgecolor)
+    edgesize = kwargs.pop('edgesize', None)
+    fill = kwargs.pop('fill', None)
+    edge = kwargs.pop('edge', None)
     alpha = kwargs.pop('alpha', None)
     for lb in ls.getLegendBreaks():
         if not facecolor is None:
@@ -421,10 +422,14 @@ def setlegendscheme_polygon(ls, **kwargs):
             c = lb.getColor()
             c = getcolor(c, alpha)
             lb.setColor(c)
-        lb.setOutlineSize(edgesize)        
-        lb.setOutlineColor(edgecolor)        
-        lb.setDrawFill(fill)        
-        lb.setDrawOutline(edge)
+        if not edgesize is None:
+            lb.setOutlineSize(edgesize)   
+        if not edgecolor is None:
+            lb.setOutlineColor(edgecolor)   
+        if not fill is None:
+            lb.setDrawFill(fill)  
+        if not edge is None:
+            lb.setDrawOutline(edge)
     return ls
     
 def setpointlegendbreak(lb, **kwargs):       

@@ -454,8 +454,10 @@ class Axes3D(Axes):
 
         #Add graphics
         graphics = GraphicFactory.createLineString(xdata, ydata, zdata, line)
-        self.add_graphic(graphics)
-        miplot.draw_if_interactive()
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            miplot.draw_if_interactive()
         return graphics
         
     def scatter(self, x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None, 
@@ -549,9 +551,11 @@ class Axes3D(Axes):
                         pbs.append(npb)
             #Create graphics
             graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, pbs)
-
-        self.add_graphic(graphics)
-        miplot.draw_if_interactive()
+        
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            miplot.draw_if_interactive()
         return graphics
         
     def plot_wireframe(self, *args, **kwargs):
@@ -584,8 +588,10 @@ class Axes3D(Axes):
  
         line = plotutil.getlegendbreak('line', **kwargs)[0]
         graphics = GraphicFactory.createWireframe(x.asarray(), y.asarray(), z.asarray(), line)
-        self.add_graphic(graphics)
-        miplot.draw_if_interactive()
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            miplot.draw_if_interactive()
         return graphics
         
     def plot_surface(self, *args, **kwargs):
@@ -604,7 +610,7 @@ class Axes3D(Axes):
         
         :returns: Legend
         '''        
-        if len(args) == 1:
+        if len(args) <= 2:
             x = args[0].dimvalue(1)
             y = args[0].dimvalue(0)
             x, y = minum.meshgrid(x, y)
@@ -630,9 +636,11 @@ class Axes3D(Axes):
         ls = ls.convertTo(ShapeTypes.Polygon)
         plotutil.setlegendscheme(ls, **kwargs)
         graphics = GraphicFactory.createMeshPolygons(x.asarray(), y.asarray(), z.asarray(), ls)
-        self.add_graphic(graphics)
-        miplot.draw_if_interactive()
-        return ls
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            miplot.draw_if_interactive()
+        return graphics
         
     def contour(self, *args, **kwargs):
         """
@@ -689,9 +697,10 @@ class Axes3D(Axes):
         
         smooth = kwargs.pop('smooth', True)
         igraphic = GraphicFactory.createContourLines(gdata.data, offset, ls, smooth)
-        self.add_graphic(igraphic)
-
-        miplot.draw_if_interactive()
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(igraphic)
+            miplot.draw_if_interactive()
         return igraphic
         
     def contourf(self, *args, **kwargs):
@@ -754,9 +763,10 @@ class Axes3D(Axes):
         
         smooth = kwargs.pop('smooth', True)
         igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, ls, smooth)
-        self.add_graphic(igraphic)
-
-        miplot.draw_if_interactive()
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(igraphic)
+            miplot.draw_if_interactive()
         return igraphic
         
     def plot_layer(self, layer, **kwargs):
@@ -770,6 +780,7 @@ class Axes3D(Axes):
         ls = kwargs.pop('symbolspec', None)
         layer = layer.layer
         if ls is None:
+            ls = layer.getLegendScheme()
             if len(kwargs) > 0 and layer.getLegendScheme().getBreakNum() == 1:
                 lb = layer.getLegendScheme().getLegendBreaks().get(0)
                 btype = lb.getBreakType()
@@ -779,14 +790,16 @@ class Axes3D(Axes):
                 elif btype == BreakTypes.PolygonBreak:
                     geometry = 'polygon'
                 lb, isunique = plotutil.getlegendbreak(geometry, **kwargs)
-                layer.getLegendScheme().getLegendBreaks().set(0, lb)
-        else:
-            layer.setLegendScheme(ls)
+                ls.getLegendBreaks().set(0, lb)
+
+        plotutil.setlegendscheme(ls, **kwargs)
+        layer.setLegendScheme(ls)
             
         offset = kwargs.pop('offset', 0)
         graphics = GraphicFactory.createGraphicsFromLayer(layer, offset)
         
-        self.add_graphic(graphics)
-
-        miplot.draw_if_interactive()
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            miplot.draw_if_interactive()
         return graphics
