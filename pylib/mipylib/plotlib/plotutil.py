@@ -372,10 +372,16 @@ def setlegendscheme(ls, **kwargs):
 
 def setlegendscheme_image(ls, **kwargs):
     cobj = kwargs.pop('color', None)
-    if not cobj is None:
-        color = getcolor(cobj)    
-        for lb in ls.getLegendBreaks():
-            lb.setColor(color)
+    alpha = kwargs.pop('alpha', None)
+    for lb in ls.getLegendBreaks():
+        if not cobj is None:
+            color = getcolor(cobj)
+            lb.setColor(color)   
+        if not alpha is None:
+            c = lb.getColor()
+            c = getcolor(c, alpha)
+            lb.setColor(c)
+        
     return ls
         
 def setlegendscheme_point(ls, **kwargs):

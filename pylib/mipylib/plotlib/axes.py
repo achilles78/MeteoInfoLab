@@ -696,7 +696,8 @@ class Axes3D(Axes):
         plotutil.setlegendscheme(ls, **kwargs)
         
         smooth = kwargs.pop('smooth', True)
-        igraphic = GraphicFactory.createContourLines(gdata.data, offset, ls, smooth)
+        zdir = kwargs.pop('zdir', 'z')
+        igraphic = GraphicFactory.createContourLines(gdata.data, offset, zdir, ls, smooth)
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(igraphic)
@@ -762,12 +763,115 @@ class Axes3D(Axes):
         plotutil.setlegendscheme(ls, **kwargs)
         
         smooth = kwargs.pop('smooth', True)
-        igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, ls, smooth)
+        zdir = kwargs.pop('zdir', 'z')
+        igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, zdir, ls, smooth)
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(igraphic)
             miplot.draw_if_interactive()
         return igraphic
+        
+    def imshow(self, *args, **kwargs):
+        """
+        Display an image on the 3D axes.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D or 3-D (RGB) z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        
+        :returns: (*RasterLayer*) RasterLayer created from array data.
+        """
+        n = len(args)
+        cmap = plotutil.getcolormap(**kwargs)
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        xaxistype = None
+        isrgb = False
+        if n <= 2:
+            if isinstance(args[0], (list, tuple)):
+                isrgb = True
+                rgbdata = args[0]
+                if isinstance(rgbdata[0], MIArray):
+                    x = minum.arange(0, rgbdata[0].shape[1])
+                    y = minum.arange(0, rgbdata[0].shape[0])
+                else:
+                    x = rgbdata[0].dimvalue(1)
+                    y = rgbdata[0].dimvalue(0)
+            elif args[0].ndim > 2:
+                isrgb = True
+                rgbdata = args[0]
+                if isinstance(rgbdata, MIArray):
+                    x = minum.arange(0, rgbdata.shape[1])
+                    y = minum.arange(0, rgbdata.shape[0])
+                else:
+                    x = rgbdata.dimvalue(1)
+                    y = rgbdata.dimvalue(0)
+            else:
+                gdata = minum.asgridarray(args[0])
+                if isinstance(args[0], DimArray):
+                    if args[0].islondim(1):
+                        xaxistype = 'lon'
+                    elif args[0].islatdim(1):
+                        xaxistype = 'lat'
+                    elif args[0].istimedim(1):
+                        xaxistype = 'time'
+                args = args[1:]
+        elif n <=4:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            if isinstance(a, (list, tuple)):
+                isrgb = True
+                rgbdata = a
+            elif a.ndim > 2:
+                isrgb = True
+                rgbdata = a
+            else:
+                gdata = minum.asgridarray(a, x, y, fill_value)
+                args = args[3:]   
+        
+        offset = kwargs.pop('offset', 0)
+        zdir = kwargs.pop('zdir', 'z')
+        if isrgb:
+            if isinstance(rgbdata, (list, tuple)):
+                rgbd = []
+                for d in rgbdata:
+                    rgbd.append(d.asarray())
+                rgbdata = rgbd
+            else:
+                rgbdata = rgbdata.asarray()
+            x = plotutil.getplotdata(x)
+            y = plotutil.getplotdata(y)
+            graphics = GraphicFactory.createImage(x, y, rgbdata, offset, zdir)
+            ls = None
+        else:
+            if len(args) > 0:
+                level_arg = args[0]
+                if isinstance(level_arg, int):
+                    cn = level_arg
+                    ls = LegendManage.createImageLegend(gdata, cn, cmap)
+                else:
+                    if isinstance(level_arg, MIArray):
+                        level_arg = level_arg.aslist()
+                    ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
+            else:
+                ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+            ls = ls.convertTo(ShapeTypes.Image)
+            plotutil.setlegendscheme(ls, **kwargs)
+                
+            graphics = GraphicFactory.createImage(gdata, ls, offset, zdir)
+                
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            miplot.draw_if_interactive()
+        return graphics
         
     def plot_layer(self, layer, **kwargs):
         '''

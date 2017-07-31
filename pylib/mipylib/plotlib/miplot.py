@@ -16,7 +16,6 @@ from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import Plot, Plot2D, PiePlot, PolarPlot, MapPlot, Plot3D, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
-from org.meteoinfo.chart.plot3d.surface import ArraySurfaceModel
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
