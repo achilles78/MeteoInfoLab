@@ -634,6 +634,8 @@ class Axes3D(Axes):
         else:    
             ls = LegendManage.createLegendScheme(z.min(), z.max(), cmap)
         ls = ls.convertTo(ShapeTypes.Polygon)
+        edge = kwargs.pop('edge', True)
+        kwargs['edge'] = edge
         plotutil.setlegendscheme(ls, **kwargs)
         graphics = GraphicFactory.createMeshPolygons(x.asarray(), y.asarray(), z.asarray(), ls)
         visible = kwargs.pop('visible', True)
