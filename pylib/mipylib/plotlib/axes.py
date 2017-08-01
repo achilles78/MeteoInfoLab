@@ -108,6 +108,20 @@ class Axes():
         '''
         self.axes.addGraphic(graphic)
         
+    def data2screen(self, x, y, z=None):
+        '''
+        Transform data coordinate to screen coordinate
+        
+        :param x: (*float*) X coordinate.
+        :param y: (*float*) Y coordinate.
+        :param z: (*float*) Z coordinate - only used for 3-D axes.
+        '''
+        rect = self.axes.getPositionArea()
+        r = self.axes.projToScreen(x, y, rect)
+        sx = r[0] + rect.getX()
+        sy = rect.getHeight() - r[1] + rect.getY()
+        return sx, sy
+        
 ##############################################
 class PieAxes(Axes):
     '''
