@@ -1884,7 +1884,7 @@ def griddata(points, values, xi=None, **kwargs):
         radius = kwargs.pop('radius', inf)
         r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
     elif method == 'inside':
-        r = ArrayUtil.interpolation_Inside(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist())
+        r = ArrayUtil.interpolation_Inside(x_s.asarray(), y_s.asarray(), values, x_g.asarray(), y_g.asarray(), True)
     elif method == 'inside_max':
         r = ArrayUtil.interpolation_Inside_Max(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist())
     elif method == 'inside_min':

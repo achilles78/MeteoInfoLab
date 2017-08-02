@@ -41,6 +41,7 @@ import mipylib.geolib.migeo as migeo
 from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
 from mipylib.plotlib.axes import Axes, MapAxes, PolarAxes, PieAxes, Axes3D
+import plotutil
 
 ## Global ##
 milapp1 = None
@@ -4881,51 +4882,55 @@ def surfacem(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Polygon VectoryLayer created from array data.
     """    
-    plot = gca
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)    
     order = kwargs.pop('order', None)
     n = len(args) 
     if n <= 2:
         a = args[0]
-        y = minum.linspace(1, a.shape[1], 1)
-        x = minum.linspace(1, a.shape[0], 1)
+        y = a.dimvalue(0)
+        x = a.dimvalue(1)
         args = args[1:]
     elif n <=4:
         x = args[0]
         y = args[1]
         a = args[2]
-        if a.ndim == 2 and a.asarray().getSize() != x.asarray().getSize():            
-            x, y = minum.meshgrid(x, y)        
         args = args[3:]
+    if a.ndim == 2 and x.ndim == 1:            
+        x, y = minum.meshgrid(x, y)            
     ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)   
-    
-    if plot.axes.getProjInfo().isLonLat():
-        lonlim = 90
-    else:
-        lonlim = 0
-        x, y = minum.project(x, y, toproj=plot.axes.getProjInfo())
-    layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
-    layer.setProjInfo(plot.axes.getProjInfo())
-    shapetype = layer.getShapeType()
-    if order is None:
-        if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-            plot.add_layer(layer, 0)
+    ls = ls.convertTo(ShapeTypes.Polygon)
+    plotutil.setlegendscheme(ls, **kwargs)
+        
+    #if plot.axes.getProjInfo().isLonLat():
+    #    lonlim = 90
+    #else:
+    #    lonlim = 0
+        #x, y = minum.project(x, y, toproj=plot.axes.getProjInfo())
+    #layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
+    layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls)
+    if not proj is None:
+        layer.setProjInfo(proj)
+        
+    # Add layer
+    visible = kwargs.pop('visible', True)
+    if visible:
+        global gca
+        shapetype = layer.getShapeType()
+        if order is None:
+            if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
+                gca.add_layer(layer, 0)
+            else:
+                gca.add_layer(layer)
         else:
-            plot.add_layer(layer)
-    else:
-        plot.add_layer(layer, order)
-    plot.axes.setDrawExtent(layer.getExtent().clone())
-    plot.axes.setExtent(layer.getExtent().clone())
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    
-    if chartpanel is None:
-        figure()
-    
-    #chart = Chart(plot)
-    draw_if_interactive()
+            gca.add_layer(layer, order)
+        gca.axes.setDrawExtent(layer.getExtent().clone())
+        gca.axes.setExtent(layer.getExtent().clone())
+        select = kwargs.pop('select', True)
+        if select:
+            gca.axes.setSelectedLayer(layer)
+            
+        draw_if_interactive()
     return MILayer(layer)
     
 def quiverm(*args, **kwargs):

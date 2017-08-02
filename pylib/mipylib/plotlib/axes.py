@@ -15,6 +15,7 @@ from java.awt import Font
 
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
+from mipylib.geolib.milayer import MILayer
 import plotutil
 import miplot
 import mipylib.numeric.minum as minum
@@ -157,10 +158,20 @@ class MapAxes(Axes):
         :param layer: (*MapLayer*) The map layer.
         :param zorder: (*int*) Layer z order.
         '''
+        if isinstance(layer, MILayer):
+            layer = layer.layer
         if zorder is None:
             self.axes.addLayer(layer)
         else:
             self.axes.addLayer(zorder, layer)
+            
+    def set_active_layer(self, layer):
+        '''
+        Set active layer
+        
+        :param layer: (*MILayer*) The map layer.
+        '''
+        self.axes.setSelectedLayer(layer.layer)
             
 ###############################################
 class PolarAxes(Axes):
@@ -923,3 +934,8 @@ class Axes3D(Axes):
             self.add_graphic(graphics)
             miplot.draw_if_interactive()
         return graphics
+        
+########################################################3
+class Test():
+    def test():
+        print 'Test...'
