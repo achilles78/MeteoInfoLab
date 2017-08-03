@@ -56,11 +56,11 @@ gca = None
 __all__ = [
     'gca','mappath','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
-    'contourfm','contourm','display','draw_if_interactive','errorbar',
+    'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
     'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
-    'quiverkey','quiverm','readlegend','repaint','savefig','savefig_jpeg','scatter','scatter3','scatterm',
+    'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
     'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlabel','zlim','zticks',
@@ -93,9 +93,9 @@ def draw_if_interactive():
     if isinteractive:
 		chartpanel.paintGraphics()
         
-def repaint():
+def draw():
     '''
-    Repaint the current figure.
+    Draw the current figure.
     '''
     chartpanel.paintGraphics()
         
@@ -1129,10 +1129,7 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     :param fontsize: (*int*) Font size. Default is ``14`` .
     
     :returns: (*tuple*) Patches and texts.
-    """    
-    #Get current axes
-    global gca   
-    
+    """        
     n = len(x)
     x = __getplotdata(x)
     if colors is None:
@@ -1154,36 +1151,27 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     graphics = GraphicFactory.createPieArcs(x, colors, labels, startangle, explode, font, fontcolor, \
         autopct)
     
-    #Create PieAxes
+    #Get current axes
+    global gca
     if gca is None:
-        plot = PieAxes()
+        #plot = PieAxes()
+        gca = axes()
     else:
-        if isinstance(gca, PieAxes):
-            plot = gca
-        else:
-            plot = PieAxes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    plot.axes.setAutoAspect(False)
-    plot.axes.getAxis(Location.BOTTOM).setVisible(False)
-    plot.axes.getAxis(Location.LEFT).setVisible(False)
-    plot.axes.getAxis(Location.TOP).setVisible(False)
-    plot.axes.getAxis(Location.RIGHT).setVisible(False)
+        if gca.axestype != 'cartesian':
+            gca = axes()
+    gca.add_graphic(graphics)
+    gca.axes.setAutoExtent()
+    gca.axes.setAutoAspect(False)
+    gca.axes.getAxis(Location.BOTTOM).setVisible(False)
+    gca.axes.getAxis(Location.LEFT).setVisible(False)
+    gca.axes.getAxis(Location.TOP).setVisible(False)
+    gca.axes.getAxis(Location.RIGHT).setVisible(False)
     
     #Paint dataset
     if chartpanel is None:
         figure()
-        
-    chart = chartpanel.getChart()
-    if gca is None:
-        chart.setCurrentPlot(plot.axes)
-    elif not isinstance(gca, PieAxes):
-        if isinstance(gca, Axes):
-            chart.removePlot(gca.axes)
-        chart.setCurrentPlot(plot.axes)
-    
-    chartpanel.setChart(chart)
-    gca = plot
+        chartpanel.getChart().addPlot(gca.axes)
+
     draw_if_interactive()
     return graphics
     
@@ -1742,12 +1730,17 @@ def __create_axes(*args, **kwargs):
     else:
         position = kwargs.pop('position', None)    
     outerposition = kwargs.pop('outerposition', None)
+    axestype = kwargs.pop('axestype', 'cartesian')
     polar = kwargs.pop('polar', False)
     if polar:
-        #plot = PolarPlot()
+        axestype = 'polar'
+    if axestype == 'polar':
         ax = PolarAxes()
+    elif axestype == 'map':
+        ax = MapAxes()
+    elif axestype == '3d':
+        ax = Axes3D()
     else:
-        #ax = Plot2D()
         ax = Axes()
     if position is None:
         position = [0.13, 0.11, 0.775, 0.815]
@@ -1760,6 +1753,25 @@ def __create_axes(*args, **kwargs):
         ax.active_outerposition(True)
     
     return ax
+    
+def __set_axes_common(ax, *args, **kwargs):
+    if len(args) > 0:
+        position = args[0]
+    else:
+        position = kwargs.pop('position', None)    
+    outerposition = kwargs.pop('outerposition', None)
+    if position is None:
+        position = [0.13, 0.11, 0.775, 0.815]
+        ax.active_outerposition(True)
+    else:        
+        ax.active_outerposition(False)        
+    ax.set_position(position)   
+    if not outerposition is None:
+        ax.set_outerposition(outerposition)
+        ax.active_outerposition(True)
+    units = kwargs.pop('units', None)
+    if not units is None:
+        ax.axes.setUnits(units)
     
 def __set_axes(ax, **kwargs):
     """
@@ -1860,54 +1872,14 @@ def __create_axesm(*args, **kwargs):
     
     :returns: The map axes.
     """       
+    ax = MapAxes(**kwargs)
     if len(args) > 0:
         position = args[0]
     else:
-        position = kwargs.pop('position', None)    
-    projinfo = kwargs.pop('projinfo', None)
-    if projinfo == None:
-        proj = kwargs.pop('proj', 'longlat')
-        origin = kwargs.pop('origin', (0, 0, 0))    
-        lat_0 = origin[0]
-        lon_0 = origin[1]
-        lat_0 = kwargs.pop('lat_0', lat_0)
-        lon_0 = kwargs.pop('lon_0', lon_0)
-        lat_ts = kwargs.pop('truescalelat', 0)
-        lat_ts = kwargs.pop('lat_ts', lat_ts)
-        k = kwargs.pop('scalefactor', 1)
-        k = kwargs.pop('k', k)
-        paralles = kwargs.pop('paralles', (30, 60))
-        lat_1 = paralles[0]
-        if len(paralles) == 2:
-            lat_2 = paralles[1]
-        else:
-            lat_2 = lat_1
-        lat_1 = kwargs.pop('lat_1', lat_1)
-        lat_2 = kwargs.pop('lat_2', lat_2)
-        x_0 = kwargs.pop('falseeasting', 0)
-        y_0 = kwargs.pop('falsenorthing', 0)
-        x_0 = kwargs.pop('x_0', x_0)
-        y_0 = kwargs.pop('y_0', y_0)
-        h = kwargs.pop('h', 0)
-        projstr = '+proj=' + proj \
-            + ' +lat_0=' + str(lat_0) \
-            + ' +lon_0=' + str(lon_0) \
-            + ' +lat_1=' + str(lat_1) \
-            + ' +lat_2=' + str(lat_2) \
-            + ' +lat_ts=' + str(lat_ts) \
-            + ' +k=' + str(k) \
-            + ' +x_0=' + str(x_0) \
-            + ' +y_0=' + str(y_0) \
-            + ' +h=' + str(h)
-        projinfo = ProjectionInfo(projstr)   
-        
-    mapview = MapView(projinfo)    
-    #ax = MapPlot(mapview) 
-    ax = MapAxes(mapview=mapview)
+        position = kwargs.pop('position', None)        
     if position is None:
        position = [0.13, 0.11, 0.775, 0.815]
-    ax.set_position(position)   
-    #ax.getMapView().projectLayers(projinfo)  
+    ax.set_position(position)    
     return ax
     
 def __set_axesm(ax, **kwargs):  
@@ -2084,15 +2056,37 @@ def axes(*args, **kwargs):
     
     :returns: The axes.
     """
+    global gca    
+               
+    axestype = kwargs.pop('axestype', 'cartesian')
+    polar = kwargs.pop('polar', False)
+    if polar:
+        axestype = 'polar'
+    if axestype == 'polar':
+        ax = PolarAxes()
+        __set_axes(ax, **kwargs)
+    elif axestype == 'map':
+        ax = MapAxes(**kwargs)
+        __set_axesm(ax, **kwargs)
+    elif axestype == '3d':
+        ax = Axes3D(**kwargs)
+        position = kwargs.pop('position', None)
+        if position is None:
+            kwargs['position'] = [0.13, 0.11, 0.71, 0.815]
+        __set_axes3d(ax, **kwargs)
+    else:
+        ax = Axes()
+        __set_axes(ax, **kwargs)
+    __set_axes_common(ax, *args, **kwargs)
+        
+    #ax = __create_axes(*args, **kwargs)    
+    
     if chartpanel is None:
         figure()
-    global gca
     chart = chartpanel.getChart()
     newaxes = kwargs.pop('newaxes', True)
     if not newaxes and gca is None:
         newaxes = True
-    ax = __create_axes(*args, **kwargs)
-    __set_axes(ax, **kwargs)
     if newaxes:
         chart.addPlot(ax.axes)
     else:
@@ -2133,27 +2127,8 @@ def axesm(*args, **kwargs):
     
     :returns: The map axes.
     """
-    if chartpanel is None:
-        figure()    
-    global gca
-    ax = __create_axesm(*args, **kwargs)
-    __set_axesm(ax, **kwargs)
-    isnew = kwargs.pop('newaxes', True)    
-    if not isnew and gca is None:
-        isnew = True
-    chart = chartpanel.getChart()
-    if isnew:
-        chart.addPlot(ax.axes)
-    else:
-        chart.setCurrentPlot(chart.getPlotIndex(gca.axes))
-        if gca.axes.isSubPlot:
-            ax.axes.isSubPlot = True
-            position = kwargs.pop('position', None)
-            if position is None:
-                ax.set_position(gca.get_position())
-        chart.setCurrentPlot(ax.axes)
-    gca = ax
-    return ax, ax.axes.getProjInfo()
+    kwargs['axestype'] = 'map'
+    return axes(*args, **kwargs)
     
 def axes3d(*args, **kwargs):
     """
@@ -2165,27 +2140,8 @@ def axes3d(*args, **kwargs):
     
     :returns: The axes.
     """
-    if chartpanel is None:
-        figure()
-    global gca
-    chart = chartpanel.getChart()
-    newaxes = kwargs.pop('newaxes', True)
-    if not newaxes and gca is None:
-        newaxes = True
-    ax = __create_axes3d(*args, **kwargs)
-    __set_axes3d(ax, **kwargs)
-    if newaxes:
-        chart.addPlot(ax.axes)
-    else:
-        chart.setCurrentPlot(chart.getPlotIndex(gca.axes))
-        if gca.axes.isSubPlot:
-            ax.axes.isSubPlot = True
-            position = kwargs.pop('position', None)
-            if position is None:
-                ax.set_position(gca.get_position())  
-        chart.setCurrentPlot(ax.axes)
-    gca = ax
-    return ax
+    kwargs['axestype'] = '3d'
+    return axes(*args, **kwargs)
     
 def twinx(ax):
     """

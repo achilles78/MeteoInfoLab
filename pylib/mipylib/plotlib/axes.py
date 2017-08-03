@@ -10,6 +10,7 @@ from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot, Plot3D
 from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import LegendManage, BreakTypes
 from org.meteoinfo.shape import ShapeTypes
+from org.meteoinfo.projection import ProjectionInfo
 
 from java.awt import Font
 
@@ -30,6 +31,7 @@ class Axes():
             self.axes = Plot2D()
         else:
             self.axes = axes
+        self.axestype = 'cartesian'
             
     def get_type(self):
         '''
@@ -123,6 +125,24 @@ class Axes():
         sy = rect.getHeight() - r[1] + rect.getY()
         return sx, sy
         
+    def get_xlim(self):
+        '''
+        Get x axis limits
+        
+        :returns: X axis limits
+        '''
+        extent = self.axes.getDrawExtent()
+        return extent.minX, extent.maxX
+        
+    def get_ylim(self):
+        '''
+        Get y axis limits
+        
+        :returns: Y axis limits
+        '''
+        extent = self.axes.getDrawExtent()
+        return extent.minY, extent.maxY
+        
 ##############################################
 class PieAxes(Axes):
     '''
@@ -141,15 +161,50 @@ class MapAxes(Axes):
     Axes with geological map coordinate.
     '''
     
-    def __init__(self, axes=None, mapview=None):
-        if axes is None:        
-            if mapview is None:
-                mapview = MapView()
-                self.axes = MapPlot(mapview)
-            else:
-                self.axes = MapPlot(mapview)
+    def __init__(self, axes=None, **kwargs):
+        if axes is None:      
+            projinfo = kwargs.pop('projinfo', None)
+            if projinfo == None:
+                proj = kwargs.pop('proj', 'longlat')
+                origin = kwargs.pop('origin', (0, 0, 0))    
+                lat_0 = origin[0]
+                lon_0 = origin[1]
+                lat_0 = kwargs.pop('lat_0', lat_0)
+                lon_0 = kwargs.pop('lon_0', lon_0)
+                lat_ts = kwargs.pop('truescalelat', 0)
+                lat_ts = kwargs.pop('lat_ts', lat_ts)
+                k = kwargs.pop('scalefactor', 1)
+                k = kwargs.pop('k', k)
+                paralles = kwargs.pop('paralles', (30, 60))
+                lat_1 = paralles[0]
+                if len(paralles) == 2:
+                    lat_2 = paralles[1]
+                else:
+                    lat_2 = lat_1
+                lat_1 = kwargs.pop('lat_1', lat_1)
+                lat_2 = kwargs.pop('lat_2', lat_2)
+                x_0 = kwargs.pop('falseeasting', 0)
+                y_0 = kwargs.pop('falsenorthing', 0)
+                x_0 = kwargs.pop('x_0', x_0)
+                y_0 = kwargs.pop('y_0', y_0)
+                h = kwargs.pop('h', 0)
+                projstr = '+proj=' + proj \
+                    + ' +lat_0=' + str(lat_0) \
+                    + ' +lon_0=' + str(lon_0) \
+                    + ' +lat_1=' + str(lat_1) \
+                    + ' +lat_2=' + str(lat_2) \
+                    + ' +lat_ts=' + str(lat_ts) \
+                    + ' +k=' + str(k) \
+                    + ' +x_0=' + str(x_0) \
+                    + ' +y_0=' + str(y_0) \
+                    + ' +h=' + str(h)
+                projinfo = ProjectionInfo(projstr)   
+                
+            mapview = MapView(projinfo)     
+            self.axes = MapPlot(mapview)
         else:
             self.axes = axes
+        self.axestype = 'map'
             
     def add_layer(self, layer, zorder=None):
         '''
@@ -184,6 +239,7 @@ class PolarAxes(Axes):
             self.axes = PolarPlot()
         else:
             self.axes = axes
+        self.axestype = 'polar'
     
     def set_rmax(self, rmax):
         '''
@@ -308,6 +364,7 @@ class Axes3D(Axes):
             self.axes = Plot3D()
         else:
             self.axes = axes
+        self.axestype = '3d'
         self.projector = self.axes.getProjector()
         #distance = kwargs.pop('distance', 10000)
         #self.projector.setDistance(distance)
@@ -927,7 +984,8 @@ class Axes3D(Axes):
         layer.setLegendScheme(ls)
             
         offset = kwargs.pop('offset', 0)
-        graphics = GraphicFactory.createGraphicsFromLayer(layer, offset)
+        xshift = kwargs.pop('xshift', 0)
+        graphics = GraphicFactory.createGraphicsFromLayer(layer, offset, xshift)
         
         visible = kwargs.pop('visible', True)
         if visible:
