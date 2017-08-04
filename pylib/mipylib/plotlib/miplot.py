@@ -4727,6 +4727,8 @@ def contourfm(*args, **kwargs):
         gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
     ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    ls = ls.convertTo(ShapeTypes.Polygon)
+    plotutil.setlegendscheme(ls, **kwargs)
     if interpolate:
         gdata = gdata.interpolate()
     isplot = kwargs.pop('isplot', True)

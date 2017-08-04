@@ -64,7 +64,22 @@ def georead(fn):
     
     :returns: (*MILayer*) The created layer.
     '''
-    return shaperead(fn)
+    if not os.path.exists(fn):
+        fn = os.path.join(migl.mapfolder, fn)
+        
+    if os.path.exists(fn):        
+        try:
+            layer = MILayer(MapDataManage.loadLayer(fn))
+            if not layer.legend() is None:
+                lb = layer.legend().getLegendBreaks()[0]
+                if lb.getBreakType() == BreakTypes.PolygonBreak:
+                    lb.setDrawFill(False)
+            return layer
+        except:
+            raise
+    else:
+        print 'File not exists: ' + fn
+        raise IOError
     
 def geotiffread(filename):
     '''
