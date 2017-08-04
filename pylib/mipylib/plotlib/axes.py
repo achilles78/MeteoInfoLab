@@ -11,6 +11,7 @@ from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import LegendManage, BreakTypes
 from org.meteoinfo.shape import ShapeTypes
 from org.meteoinfo.projection import ProjectionInfo
+from org.meteoinfo.global import MIMath
 
 from java.awt import Font
 
@@ -122,7 +123,7 @@ class Axes():
         rect = self.axes.getPositionArea()
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
-        sy = rect.getHeight() - r[1] + rect.getY()
+        sy = r[1] + rect.getY()
         return sx, sy
         
     def get_xlim(self):
@@ -205,6 +206,7 @@ class MapAxes(Axes):
         else:
             self.axes = axes
         self.axestype = 'map'
+        self.proj = self.axes.getProjInfo()
             
     def add_layer(self, layer, zorder=None):
         '''
@@ -227,6 +229,23 @@ class MapAxes(Axes):
         :param layer: (*MILayer*) The map layer.
         '''
         self.axes.setSelectedLayer(layer.layer)
+        
+    def data2screen(self, x, y, z=None):
+        '''
+        Transform data coordinate to screen coordinate
+        
+        :param x: (*float*) X coordinate.
+        :param y: (*float*) Y coordinate.
+        :param z: (*float*) Z coordinate - only used for 3-D axes.
+        '''
+        if not self.axes.isLonLatMap():
+            x, y = minum.project(x, y, toproj=self.proj)  
+            
+        rect = self.axes.getPositionArea()
+        r = self.axes.projToScreen(x, y, rect)
+        sx = r[0] + rect.getX()
+        sy = r[1] + rect.getY()
+        return sx, sy
             
 ###############################################
 class PolarAxes(Axes):
@@ -352,6 +371,23 @@ class PolarAxes(Axes):
                 style = Font.PLAIN
         font = Font(name, style, size)
         self.axes.setXTickFont(font)
+        
+    def data2screen(self, x, y, z=None):
+        '''
+        Transform data coordinate to screen coordinate
+        
+        :param x: (*float*) X coordinate.
+        :param y: (*float*) Y coordinate.
+        :param z: (*float*) Z coordinate - only used for 3-D axes.
+        '''
+        r = MIMath.polarToCartesian(x, y) 
+        x = r[0]
+        y = r[1]
+        rect = self.axes.getPositionArea()
+        r = self.axes.projToScreen(x, y, rect)
+        sx = r[0] + rect.getX()
+        sy = r[1] + rect.getY()
+        return sx, sy
         
 #########################################################
 class Axes3D(Axes):
@@ -992,6 +1028,23 @@ class Axes3D(Axes):
             self.add_graphic(graphics)
             miplot.draw_if_interactive()
         return graphics
+        
+def data2screen(self, x, y, z=None):
+        '''
+        Transform data coordinate to screen coordinate
+        
+        :param x: (*float*) X coordinate.
+        :param y: (*float*) Y coordinate.
+        :param z: (*float*) Z coordinate - only used for 3-D axes.
+        '''
+        r = self.axes.project(x, y, z) 
+        x = r.x
+        y = r.y
+        rect = self.axes.getPositionArea()
+        r = self.axes.projToScreen(x, y, rect)
+        sx = r[0] + rect.getX()
+        sy = r[1] + rect.getY()
+        return sx, sy
         
 ########################################################3
 class Test():

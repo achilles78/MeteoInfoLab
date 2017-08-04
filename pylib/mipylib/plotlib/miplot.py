@@ -57,7 +57,7 @@ __all__ = [
     'gca','mappath','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
-    'figure','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
+    'figure','figsize','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatter3','scatterm',
@@ -85,6 +85,19 @@ def __getplotdata(data):
             return minum.array(data).array
     else:
         return minum.array([data]).array
+        
+def figsize():
+    '''
+    Get current figure size.
+    
+    :returns: Figure width and height.    
+    '''
+    if chartpanel is None:
+        return None
+    else:    
+        width = chartpanel.getFigureWidth()
+        height = chartpanel.getFigureHeight()
+        return width, height
 
 def draw_if_interactive():
     '''
