@@ -40,25 +40,23 @@ import mipylib.numeric.minum as minum
 import mipylib.geolib.migeo as migeo
 from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
-from mipylib.plotlib.axes import Axes, MapAxes, PolarAxes, PieAxes, Axes3D
+from mipylib.plotlib.axes import Axes, MapAxes, PolarAxes, Axes3D
 import plotutil
+import mipylib.migl as migl
 
 ## Global ##
-milapp1 = None
 batchmode = False
 isinteractive = False
 maplayout = MapLayout()
 chartpanel = None
-isholdon = True
-mappath = None
 gca = None
 
 __all__ = [
-    'gca','mappath','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
+    'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
     'figure','figsize','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
-    'grid','gridfm','hist','hold','imshow','imshowm','legend','loglog','makecolors',
+    'grid','gridfm','hist','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
@@ -66,10 +64,6 @@ __all__ = [
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlabel','zlim','zticks',
     'repaint','isinteractive'
     ]
-
-def hold(ishold):
-    global isholdon
-    isholdon = ishold
  
 def __getplotdata(data):
     if isinstance(data, (MIArray, DimArray)):
@@ -1468,7 +1462,7 @@ def figure(bgcolor=None, figsize=None, newfig=True):
     return chartpanel
         
 def show(newfig=True):
-    if milapp1 == None:
+    if migl.milapp == None:
         if not batchmode:            
             form = ChartForm(chartpanel)
             chartpanel.paintGraphics()
@@ -1477,7 +1471,7 @@ def show(newfig=True):
             form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
             form.setVisible(True)     
     else:
-        figureDock = milapp1.getFigureDock()
+        figureDock = migl.milapp.getFigureDock()
         if newfig:
             figureDock.addFigure(chartpanel)
         else:
@@ -2430,8 +2424,8 @@ def clc():
     '''
     Clear command window.
     '''
-    if not milapp1 is None:
-        console = milapp1.getConsoleDockable().getConsole()
+    if not migl.milapp is None:
+        console = migl.milapp.getConsoleDockable().getConsole()
         console.getTextPane().setText('')
 
 def __getplotstyle(style, caption, **kwargs):    
@@ -5422,7 +5416,7 @@ def geoshow(*args, **kwargs):
         if not fn.endswith('.shp'):
             fn = fn + '.shp'
         if not os.path.exists(fn):
-            fn = os.path.join(mappath, fn)
+            fn = os.path.join(migl.mapfolder, fn)
         if os.path.exists(fn):
             layer = migeo.shaperead(fn)
             islayer = True
@@ -5942,4 +5936,4 @@ def clear():
     """
     Clear all variables.
     """
-    milapp1.delVariables()
+    migl.milapp.delVariables()

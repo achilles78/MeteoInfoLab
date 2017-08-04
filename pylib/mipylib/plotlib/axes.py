@@ -112,7 +112,7 @@ class Axes():
         '''
         self.axes.addGraphic(graphic)
         
-    def data2screen(self, x, y, z=None):
+    def data2pixel(self, x, y, z=None):
         '''
         Transform data coordinate to screen coordinate
         
@@ -124,6 +124,7 @@ class Axes():
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
+        sy = miplot.figsize()[1] - sy
         return sx, sy
         
     def get_xlim(self):
@@ -144,17 +145,6 @@ class Axes():
         extent = self.axes.getDrawExtent()
         return extent.minY, extent.maxY
         
-##############################################
-class PieAxes(Axes):
-    '''
-    Axes for pie plot.       
-    '''
-    
-    def __init__(self, axes=None):
-        if axes is None:        
-            self.axes = PiePlot()
-        else:
-            self.axes = axes
 
 ##############################################        
 class MapAxes(Axes):
@@ -230,7 +220,7 @@ class MapAxes(Axes):
         '''
         self.axes.setSelectedLayer(layer.layer)
         
-    def data2screen(self, x, y, z=None):
+    def data2pixel(self, x, y, z=None):
         '''
         Transform data coordinate to screen coordinate
         
@@ -245,6 +235,7 @@ class MapAxes(Axes):
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
+        sy = miplot.figsize()[1] - sy
         return sx, sy
             
 ###############################################
@@ -372,7 +363,7 @@ class PolarAxes(Axes):
         font = Font(name, style, size)
         self.axes.setXTickFont(font)
         
-    def data2screen(self, x, y, z=None):
+    def data2pixel(self, x, y, z=None):
         '''
         Transform data coordinate to screen coordinate
         
@@ -387,6 +378,7 @@ class PolarAxes(Axes):
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
+        sy = miplot.figsize()[1] - sy
         return sx, sy
         
 #########################################################
@@ -1029,7 +1021,7 @@ class Axes3D(Axes):
             miplot.draw_if_interactive()
         return graphics
         
-def data2screen(self, x, y, z=None):
+    def data2pixel(self, x, y, z=None):
         '''
         Transform data coordinate to screen coordinate
         
@@ -1044,6 +1036,7 @@ def data2screen(self, x, y, z=None):
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
+        sy = miplot.figsize()[1] - sy
         return sx, sy
         
 ########################################################3

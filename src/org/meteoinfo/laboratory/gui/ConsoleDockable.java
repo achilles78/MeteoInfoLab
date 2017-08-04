@@ -102,10 +102,10 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         
         try {
             interp.exec("mipylib.plotlib.miplot.isinteractive = True");
-            interp.exec("mipylib.plotlib.miplot.milapp1 = milapp");
-            interp.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
-            currentPath = currentPath.replace("\\", "/");
-            interp.exec("mipylib.dataset.midata.currentfolder = '" + currentPath + "'");            
+            interp.exec("mipylib.migl.milapp = milapp");
+            interp.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
+            currentPath = currentPath.replace("\\", "/");  
+            interp.exec("mipylib.migl.currentfolder = '" + currentPath + "'");   
         } catch (Exception e) {
             e.printStackTrace();
         }

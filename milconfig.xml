@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
     <RecentFolder Folder="C:\TEMP\mingjing"/>
     <RecentFolder Folder="C:\TEMP"/>
     <RecentFolder Folder="C:\TEMP\Data"/>
@@ -22,11 +22,13 @@
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\bar_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\map_pie_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\image_ydir.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\bar_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\map_pie_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\image_ydir.py"/>
     </RecentFiles>
   </File>
   <Font>

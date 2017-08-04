@@ -21,8 +21,7 @@ from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import dimdatafile
 from dimdatafile import DimDataFile, DimDataFiles
-
-currentfolder = None
+import mipylib.migl as migl
 
 __all__ = [
     'addfile','addfiles','addfile_arl','addfile_ascii_grid','addfile_awx','addfile_geotiff',
@@ -48,10 +47,10 @@ def __getfilename(fname):
         if os.path.isabs(fname):
             return fname, isweb
         else:
-            return os.path.join(currentfolder, fname), isweb
+            return os.path.join(migl.currentfolder, fname), isweb
     else:
-        if currentfolder != None:
-            fname = os.path.join(currentfolder, fname)
+        if migl.currentfolder != None:
+            fname = os.path.join(migl.currentfolder, fname)
             if os.path.isfile(fname):
                 return fname, isweb
             else:

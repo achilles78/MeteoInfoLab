@@ -1,4 +1,5 @@
 import miutil
+import migl
 import numeric
 from .numeric import *
 import numeric as np

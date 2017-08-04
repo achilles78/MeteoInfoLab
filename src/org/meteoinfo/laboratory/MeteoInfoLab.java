@@ -84,55 +84,6 @@ public class MeteoInfoLab {
         }
     }
 
-    private static void runScript_back(String args[], String fn, int idx) {
-        String ext = GlobalUtil.getFileExtension(fn);
-        System.out.println("Running Jython script...");
-        PySystemState state = new PySystemState();
-        if (args.length > idx + 1) {
-            for (int i = idx + 1; i < args.length; i++) {
-                state.argv.append(new PyString(args[i]));
-            }
-        }
-        //state.setdefaultencoding("utf-8");
-        //PythonInterpreter interp = new PythonInterpreter(null, state);
-        MyPythonInterpreter interp = new MyPythonInterpreter(null, state);
-
-        //String pluginPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "plugins";
-        //List<String> jarfns = GlobalUtil.getFiles(pluginPath, ".jar");
-        String path = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "pylib";
-        String toolboxPath = GlobalUtil.getAppPath(FrmMain.class) + "/toolbox";
-        interp.exec("import sys");
-        interp.exec("import os");
-        interp.exec("import datetime");
-        interp.exec("sys.path.append('" + path + "')");
-        interp.exec("from milab import *");
-        interp.exec("sys.path.append('" + toolboxPath + "')");
-        interp.exec("from toolbox import *");
-        interp.exec("mipylib.plotlib.miplot.batchmode = True");
-        interp.exec("mipylib.plotlib.miplot.isinteractive = False");
-        System.out.println("mipylib is loaded...");
-        try {
-//            File file = new File(fn);    
-//            BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-//            StringBuilder sb = new StringBuilder();
-//            String line;
-//            while((line = r.readLine()) != null){
-//                sb.append(line);
-//                sb.append("\n");
-//            }
-//            String code = sb.toString();
-//            System.out.print(code);
-//            ByteArrayInputStream bis = new ByteArrayInputStream(code.getBytes("utf-8"));
-            interp.execfile(new FileInputStream(new File(fn)), "utf-8");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MeteoInfoLab.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (IOException ex) {
-//            Logger.getLogger(MeteoInfoLab.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            System.exit(0);
-        }
-    }
-
     private static void runScript(String args[], String fn, int idx) {
         //String ext = GlobalUtil.getFileExtension(fn);
         //registerFonts();
@@ -179,7 +130,8 @@ public class MeteoInfoLab {
             }
             interp.exec("mipylib.plotlib.miplot.batchmode = True");
             interp.exec("mipylib.plotlib.miplot.isinteractive = False");
-            interp.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
+            //interp.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
+            interp.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
             System.out.println("mipylib is loaded...");
 
             //String encoding = "utf-8";
@@ -203,6 +155,7 @@ public class MeteoInfoLab {
 //        plotForm.setSize(800, 600);
 //        plotForm.setVisible(true);
 //        MeteoInfoScript mis = new MeteoInfoScript(plotForm);
+        String startPath = System.getProperty("user.dir");
         String basePath = GlobalUtil.getAppPath(FrmMain.class);
         String path = basePath + File.separator + "pylib";
         String toolboxPath = basePath + "/toolbox";
@@ -223,7 +176,9 @@ public class MeteoInfoLab {
             //console.exec("import mipylib");
             //console.exec("from mipylib.miscript import *");
             console.exec("mipylib.plotlib.miplot.isinteractive = True");
-            console.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
+            //console.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
+            console.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
+            console.exec("mipylib.migl.currentfolder = '" + startPath + "'" );
         } catch (Exception e) {
             e.printStackTrace();
         }

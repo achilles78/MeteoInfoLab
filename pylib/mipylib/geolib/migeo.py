@@ -20,6 +20,7 @@ import milayer
 from milayer import MILayer
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
+import mipylib.migl as migl
 
 from java.util import ArrayList
 
@@ -36,6 +37,11 @@ def shaperead(fn):
     
     :returns: (*MILayer*) The created layer.
     '''
+    if not fn.endswith('.shp'):
+        fn = fn + '.shp'
+    if not os.path.exists(fn):
+        fn = os.path.join(migl.mapfolder, fn)
+        
     if os.path.exists(fn):        
         try:
             layer = MILayer(MapDataManage.loadLayer(fn))
