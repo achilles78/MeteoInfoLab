@@ -1768,7 +1768,10 @@ def __set_axes_common(ax, *args, **kwargs):
         position = kwargs.pop('position', None)    
     outerposition = kwargs.pop('outerposition', None)
     if position is None:
-        position = [0.13, 0.11, 0.775, 0.815]
+        if ax.axestype == '3d':
+            position = [0.13, 0.11, 0.71, 0.815]
+        else:
+            position = [0.13, 0.11, 0.775, 0.815]
         ax.active_outerposition(True)
     else:        
         ax.active_outerposition(False)        
@@ -2077,9 +2080,6 @@ def axes(*args, **kwargs):
         __set_axesm(ax, **kwargs)
     elif axestype == '3d':
         ax = Axes3D(**kwargs)
-        position = kwargs.pop('position', None)
-        if position is None:
-            kwargs['position'] = [0.13, 0.11, 0.71, 0.815]
         __set_axes3d(ax, **kwargs)
     else:
         ax = Axes()
