@@ -314,7 +314,39 @@ class MIArray(object):
         return r
         
     def __and__(self, other):
+        if isinstance(other, MIArray):
+            other = other.array
         r = MIArray(ArrayMath.bitAnd(self.array, other))
+        return r
+        
+    def __or__(self, other):
+        if isinstance(other, MIArray):
+            other = other.array
+        r = MIArray(ArrayMath.bitOr(self.array, other))
+        return r
+        
+    def __xor__(self, other):
+        if isinstance(other, MIArray):
+            other = other.array
+        r = MIArray(ArrayMath.bitXor(self.array, other))
+        return r
+        
+    def __invert__(self):
+        if isinstance(other, MIArray):
+            other = other.array
+        r = MIArray(ArrayMath.bitInvert(self.array))
+        return r
+        
+    def __lshift__(self, other):
+        if isinstance(other, MIArray):
+            other = other.array
+        r = MIArray(ArrayMath.leftShift(self.array, other))
+        return r
+        
+    def __rshift__(self, other):
+        if isinstance(other, MIArray):
+            other = other.array
+        r = MIArray(ArrayMath.rightShift(self.array, other))
         return r
     
     def getsize():

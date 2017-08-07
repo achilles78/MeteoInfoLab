@@ -2413,11 +2413,11 @@ def cll():
     Clear last added layer or plot object.
     '''
     if not gca is None:
-        if isinstance(gca, Axes):
+        if isinstance(gca, MapAxes):
+            gca.axes.removeLastLayer()
+        else:
             gca.axes.removeLastGraphic()
             gca.axes.setAutoExtent()
-        elif isinstance(gca, MapAxes):
-            gca.axes.removeLastLayer()
         draw_if_interactive()
         
 def clc():
@@ -3353,13 +3353,13 @@ def legend(*args, **kwargs):
         if len(args) > 0:
             lbs = []
             for lb in args[0]:
-                if isinstance(lb, (Graphic, GraphicCollection)):
-                    lbs.append(lb.getLegend())
+                if isinstance(lb, Graphic):
+                    lbs.append(lb.getLegend().clone())
                 else:
                     lbs.append(lb)
             if len(args) == 2:
+                labels = args[1]
                 for i in range(0, len(lbs)):
-                    labels = args[1]
                     lbs[i].setCaption(labels[i])
             if isinstance(lbs[0], basestring):
                 clegend.setTickLabels(lbs)

@@ -384,6 +384,27 @@ class DimArray():
         r = DimArray(self.array.__and__(other), self.dims, self.fill_value, self.proj)
         return r
         
+    def __or__(self, other):
+        r = DimArray(self.array.__or__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __xor__(self, other):
+        r = DimArray(self.array.__xor__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __invert__(self, other):
+        r = DimArray(self.array.__invert__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+    def __lshift__(self, other):
+        r = DimArray(self.array.__lshift__(other), self.dims, self.fill_value, self.proj)
+        return r        
+        
+    def __rshift__(self, other):
+        r = DimArray(self.array.__rshift__(other), self.dims, self.fill_value, self.proj)
+        return r
+        
+        
     def astype(self, dtype):
         r = DimArray(self.array.astype(dtype), self.dims, self.fill_value, self.proj)
         return r
