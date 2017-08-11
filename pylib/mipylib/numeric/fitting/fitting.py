@@ -61,6 +61,7 @@ def polyfit(x, y, degree, func=False):
     
     :param x: (*array_like*) x data array.
     :param y: (*array_like*) y data array.
+    :param degree: (*int*) Degree of the fitting polynomial.
     :param func: (*boolean*) Return fit function (for predict function) or not. Default is ``False``.
     
     :returns: Fitting parameters and function (optional).

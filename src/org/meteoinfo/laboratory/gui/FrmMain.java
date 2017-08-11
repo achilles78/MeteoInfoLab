@@ -409,7 +409,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         jMenuItem_SaveAs = new javax.swing.JMenuItem();
         jMenuItem_CloseAllFiles = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
-        jMenuItem_Exist = new javax.swing.JMenuItem();
+        jMenuItem_Exit = new javax.swing.JMenuItem();
         jMenu_Editor = new javax.swing.JMenu();
         jMenuItem_Cut = new javax.swing.JMenuItem();
         jMenuItem_Copy = new javax.swing.JMenuItem();
@@ -617,13 +617,13 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         jMenu_File.add(jMenuItem_CloseAllFiles);
         jMenu_File.add(jSeparator3);
 
-        jMenuItem_Exist.setText("Exist");
-        jMenuItem_Exist.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem_Exit.setText("Exit");
+        jMenuItem_Exit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem_ExistActionPerformed(evt);
+                jMenuItem_ExitActionPerformed(evt);
             }
         });
-        jMenu_File.add(jMenuItem_Exist);
+        jMenu_File.add(jMenuItem_Exit);
 
         jMenuBar1.add(jMenu_File);
 
@@ -912,10 +912,10 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 //        }
     }//GEN-LAST:event_jButton_CurrentFolderActionPerformed
 
-    private void jMenuItem_ExistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_ExistActionPerformed
+    private void jMenuItem_ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_ExitActionPerformed
         // TODO add your handling code here:
         this.dispose();
-    }//GEN-LAST:event_jMenuItem_ExistActionPerformed
+    }//GEN-LAST:event_jMenuItem_ExitActionPerformed
 
     private void jMenuItem_CloseAllFilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_CloseAllFilesActionPerformed
         // TODO add your handling code here:
@@ -1229,7 +1229,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     private javax.swing.JMenuItem jMenuItem_ColorMaps;
     private javax.swing.JMenuItem jMenuItem_Copy;
     private javax.swing.JMenuItem jMenuItem_Cut;
-    private javax.swing.JMenuItem jMenuItem_Exist;
+    private javax.swing.JMenuItem jMenuItem_Exit;
     private javax.swing.JMenuItem jMenuItem_NewFile;
     private javax.swing.JMenuItem jMenuItem_OpenFile;
     private javax.swing.JMenuItem jMenuItem_Paste;

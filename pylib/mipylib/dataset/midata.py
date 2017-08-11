@@ -27,7 +27,7 @@ __all__ = [
     'addfile','addfiles','addfile_arl','addfile_ascii_grid','addfile_awx','addfile_geotiff',
     'addfile_grads','addfile_hyconc','addfile_hytraj','addfile_lonlat','addfile_micaps',
     'addfile_mm5','addfile_nc','addfile_grib','addfile_surfer',
-    'addtimedim','joinncfile','asciiread','binread','binwrite',
+    'addtimedim','joinncfile','asciiread','asciiwrite','binread','binwrite',
     'convert2nc','dimension','grads2nc','ncwrite'
     ]
 
@@ -411,6 +411,18 @@ def asciiread(filename, **kwargs):
     rfirstcol = kwargs.pop('readfirstcol', True)
     a = ArrayUtil.readASCIIFile(filename, delimiter, headerlines, datatype, shape, rfirstcol)
     return MIArray(a)
+    
+def asciiwrite(fn, data, colnum=80, format=None, delimiter=None):
+    """
+    Write array data into a ASCII data file.
+    
+    :param fn: (*string*) Path needed to locate ASCII file.
+    :param data: (*array_like*) A numeric array variable of any dimensionality.
+    :param colnum: (*int*) Column number of each line.
+    :param format: (*string*) Number format.
+    :param delimiter: (*string*) Delimiter string.    
+    """
+    ArrayUtil.saveASCIIFile(fn, data.asarray(), colnum, format, delimiter)  
     
 def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     """

@@ -885,6 +885,23 @@ class DimArray():
         return DimArray(MIArray(r), rdims, self.fill_value, self.proj)
         
     def savegrid(self, fname, format='surfer', **kwargs):
+        '''
+        Save the array data to an ASCII or binary file. The array must be 2 dimension.
+        
+        :param fname: (*string*) File name.
+        :param format: (*string*) File format [surfer | bil | esri_ascii | micaps4].
+        :param description: (*string*) Data description - only used for ``micaps4`` file.
+        :param date: (*datetime*) Data datetime - only used for ``micaps4`` file.
+        :param hours: (*int*) Data forcasting hours - only used for ``micaps4`` file.
+        :param level: (*float*) Data vertical level - only used for ``micaps4`` file.
+        :param smooth: (*int*) 1 or 0 - only used for ``micaps4`` file.
+        :param boldvalue: (*int*) Bold contour value - only used for ``micaps4`` file.
+        :param proj: (*ProjectionInfo*) Data ProjectionInfo - only used for ``micaps4`` file.
+        '''
+        if self.ndim != 2:
+            print 'The array must be 2 dimensional!'
+            return
+            
         gdata = self.asgridarray()
         if format == 'surfer':
             gdata.saveAsSurferASCIIFile(fname)
