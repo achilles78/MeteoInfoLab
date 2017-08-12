@@ -1156,7 +1156,7 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     
     #Create graphics
     graphics = GraphicFactory.createPieArcs(x, colors, labels, startangle, explode, font, fontcolor, \
-        labeldistance, autopct)
+        labeldistance, autopct, pctdistance)
     
     #Get current axes
     global gca
@@ -1181,7 +1181,10 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
         chartpanel.getChart().addPlot(gca.axes)
 
     draw_if_interactive()
-    return graphics[0], graphics[1]
+    if len(graphics) == 2:
+        return graphics[0], graphics[1]
+    else:
+        return graphics[0], graphics[1], graphics[2]
     
 def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True, showfliers=True, showmeans=False, \
     meanline=False, boxprops=None, medianprops=None, meanprops=None, whiskerprops=None, capprops=None, flierprops=None):
