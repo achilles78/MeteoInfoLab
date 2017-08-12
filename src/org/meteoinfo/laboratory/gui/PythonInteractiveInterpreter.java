@@ -68,6 +68,7 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
         //out.print(ps1);
         this.console.print(ps1, Color.red);        
         String line;
+        boolean retVal = false;
         while (!eof) {
             // try to sync up the console
             System.out.flush();
@@ -85,7 +86,8 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
                         line = line + aChar;
                     }
                 }
-                line = line.trim();
+                if (!retVal)
+                    line = line.trim();
 
                 //hitting Enter at prompt returns a semicolon
                 //get rid of it since it returns an error when executed
@@ -93,7 +95,7 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
                     line = "";
                 }
 
-                boolean retVal = push(line);
+                retVal = push(line);
 
                 if (retVal) {
                     out.print(ps2);                    
