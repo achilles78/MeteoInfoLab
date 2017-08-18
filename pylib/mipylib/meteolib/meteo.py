@@ -20,12 +20,14 @@ Lv = 2.501e6        #Latent heat of vaporization for liquid water at 0C (J kg^-1
 Cp_d = 1005         #Specific heat at constant pressure for dry air (J kg^-1)
 epsilon = Mw / Md
 kappa = 0.286
-degCtoK=273.15        # Temperature offset between K and C (deg C)
+degCtoK=273.15      # Temperature offset between K and C (deg C)
+g = 9.8             # Gravitational acceleration (m / s^2)
 
 __all__ = [
     'dewpoint2rh','dry_lapse','ds2uv','dt','equivalent_potential_temperature','h2p',
     'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh',
-    'saturation_mixing_ratio','tc2tf','tf2tc','uv2ds'
+    'saturation_mixing_ratio','tc2tf','tf2tc','uv2ds','pressure_to_height_std',
+    'height_to_pressure_std'
     ]
 
 def uv2ds(u, v):
@@ -75,6 +77,20 @@ def p2h(press):
     else:
         return MeteoMath.press2Height(press)
         
+def pressure_to_height_std(press):
+    """
+    Convert pressure data to heights using the U.S. standard atmosphere.
+    
+    :param press: (*float*) Pressure - hPa.
+    
+    :returns: (*float*) Height - meter.
+    """
+    t0 = 288.
+    gamma = 6.5
+    p0 = 1013.25
+    h = (t0 / gamma) * (1 - (press / p0)**(Rd * gamma / g)) * 1000
+    return h
+        
 def h2p(height):
     """
     Height to pressure
@@ -89,6 +105,21 @@ def h2p(height):
         return DimArray(MIArray(ArrayMath.height2Press(height.asarray())), height.dims, height.fill_value, height.proj)
     else:
         return MeteoMath.height2Press(height)
+        
+def height_to_pressure_std(height):
+    """
+    Convert height data to pressures using the U.S. standard atmosphere.
+    
+    :param height: (*float*) Height - meter.
+    
+    :returns: (*float*) Height - meter.
+    """
+    t0 = 288.
+    gamma = 6.5
+    p0 = 1013.25
+    height = height * 0.001
+    p = p0 * (1 - (gamma / t0) * height) ** (g / (Rd * gamma))
+    return p
         
 def tf2tc(tf):
     """

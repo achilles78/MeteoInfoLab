@@ -6,10 +6,11 @@
 # Note: Jython
 #-----------------------------------------------------
 
+from org.meteoinfo.chart import ChartText3D
 from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot, Plot3D, GraphicFactory
 from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import LegendManage, BreakTypes
-from org.meteoinfo.shape import ShapeTypes
+from org.meteoinfo.shape import ShapeTypes, Graphic
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.global import MIMath
 
@@ -1021,6 +1022,78 @@ class Axes3D(Axes):
             miplot.draw_if_interactive()
         return graphics
         
+    def text(self, x, y, z, s, zdir=None, **kwargs):
+        '''
+        Add text to the plot. kwargs will be passed on to text, except for the zdir 
+        keyword, which sets the direction to be used as the z direction.
+        
+        :param x: (*float*) X coordinate.
+        :param y: (*float*) Y coordinate.
+        :param z: (*float*) Z coordinate.
+        :param s: (*string*) Text string.
+        :param zdir: Z direction.
+        '''
+        fontname = kwargs.pop('fontname', 'Arial')
+        fontsize = kwargs.pop('fontsize', 14)
+        bold = kwargs.pop('bold', False)
+        color = kwargs.pop('color', 'black')
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        c = plotutil.getcolor(color)
+        text = ChartText3D()
+        text.setText(s)
+        text.setFont(font)
+        text.setColor(c)
+        text.setPoint(x, y, z)
+        ha = kwargs.pop('horizontalalignment', None)
+        if ha is None:
+            ha = kwargs.pop('ha', None)
+        if not ha is None:
+            text.setXAlign(ha)
+        va = kwargs.pop('verticalalignment', None)
+        if va is None:
+            va = kwargs.pop('va', None)
+        if not va is None:
+            text.setYAlign(va)
+        bbox = kwargs.pop('bbox', None)
+        if not bbox is None:
+            fill = bbox.pop('fill', None)
+            if not fill is None:
+                text.setFill(fill)
+            facecolor = bbox.pop('facecolor', None)
+            if not facecolor is None:
+                facecolor = plotutil.getcolor(facecolor)
+                text.setFill(True)
+                text.setBackground(facecolor)
+            edge = bbox.pop('edge', None)
+            if not edge is None:
+                text.setDrawNeatline(edge)
+            edgecolor = bbox.pop('edgecolor', None)
+            if not edgecolor is None:
+                edgecolor = plotutil.getcolor(edgecolor)
+                text.setNeatlineColor(edgecolor)
+                text.setDrawNeatline(True)
+            linewidth = bbox.pop('linewidth', None)
+            if not linewidth is None:
+                text.setNeatlineSize(linewidth)
+                text.setDrawNeatline(True)
+            gap = bbox.pop('gap', None)
+            if not gap is None:
+                text.setGap(gap)
+        if not zdir is None:
+            if isinstance(zdir, (list, tuple)):
+                text.setZDir(zdir[0], zdir[1], zdir[2])
+            else:
+                text.setZDir(zdir)
+        graphic = Graphic(text, None)
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphic)
+            miplot.draw_if_interactive()
+        return graphic
+        
     def data2pixel(self, x, y, z=None):
         '''
         Transform data coordinate to screen coordinate
@@ -1038,6 +1111,7 @@ class Axes3D(Axes):
         sy = r[1] + rect.getY()
         sy = miplot.figsize()[1] - sy
         return sx, sy
+        
         
 ########################################################3
 class Test():

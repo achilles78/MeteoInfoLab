@@ -15,17 +15,16 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\onedim"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_labels.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\nc_test.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\radar_3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\text_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_labels.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\io\nc_test.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\radar_3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\text_1.py"/>
     </RecentFiles>
   </File>
   <Font>
