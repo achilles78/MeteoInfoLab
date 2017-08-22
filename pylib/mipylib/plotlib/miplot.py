@@ -59,7 +59,7 @@ __all__ = [
     'grid','gridfm','hist','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatter3','scatterm',
-    'semilogx','semilogy','set','show','stationmodel','streamplotm','subplot','subplots','suptitle',
+    'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
     'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlabel','zlim','zticks',
     'repaint','isinteractive'
@@ -304,6 +304,57 @@ def plot(*args, **kwargs):
         return graphics
     else:
         return graphics[0]
+        
+def step(x, y, *args, **kwargs):
+    '''
+    Make a step plot.
+    
+    :param x: (*array_like*) Input x data.
+    :param y: (*array_like*) Input y data.
+    :param style: (*string*) Line style for plot.
+    :param label: (*string*) Step line label.
+    :param where: (*string*) ['pre' | 'post' | 'mid']. If 'pre' (the default), the interval 
+        from x[i] to x[i+1] has level y[i+1]. If 'post', that interval has level y[i].
+        If ‘mid’, the jumps in y occur half-way between the x-values.
+    
+    :returns: Step lines
+    '''    
+    label = kwargs.pop('label', 'S_0')
+    xdata = plotutil.getplotdata(x)
+    ydata = plotutil.getplotdata(y)
+    if len(args) > 0:
+        fmt = args[0]
+        fmt = plotutil.getplotstyle(fmt, label, **kwargs)
+    else:
+        fmt = plotutil.getlegendbreak('line', **kwargs)[0]
+        fmt.setCaption(label)        
+    where = kwargs.pop('where', 'pre')
+    
+    #Create graphics
+    graphics = GraphicFactory.createStepLineString(xdata, ydata, fmt, where)
+    
+    #Create Axes
+    global gca
+    if gca is None:
+        plot = axes()
+    else:
+        if gca.axestype == 'cartesian':
+            plot = gca
+        else:
+            plot = axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
+    
+    #Chart panel
+    if chartpanel is None:
+        figure()
+            
+    chart = chartpanel.getChart()
+    if gca is None or (gca.axestype != 'cartesian'):
+        chart.addPlot(plot.axes)
+    gca = plot
+    draw_if_interactive()
+    return graphics 
         
 def plot3(x, y, z, *args, **kwargs):
     """
@@ -562,12 +613,12 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     
     #Create Axes
     if gca is None:
-        plot = Axes()
+        plot = axes()
     else:
-        if isinstance(gca, Axes):
+        if gca.axestype == 'cartesian':
             plot = gca
         else:
-            plot = Axes()
+            plot = axes()
     plot.add_graphic(graphics)
     plot.axes.setAutoExtent()
     
@@ -576,11 +627,8 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.clearPlots()
-        chart.setPlot(plot.axes)
-    #chart.setAntiAlias(True)
-    chartpanel.setChart(chart)
+    if gca is None or (gca.axestype == 'cartesian'):
+        chart.addPlot(plot.axes)
     gca = plot
     draw_if_interactive()
     return graphics 
