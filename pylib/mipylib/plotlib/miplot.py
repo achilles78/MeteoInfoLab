@@ -2886,7 +2886,7 @@ def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     gca.set_title(ctitile)
     draw_if_interactive()
     
-def suptitle(title, fontname='Arial', fontsize=14, bold=True, color='black'):
+def suptitle(title, fontname=None, fontsize=14, bold=True, color='black'):
     """
     Add a centered title to the figure.
     
@@ -2896,17 +2896,24 @@ def suptitle(title, fontname='Arial', fontsize=14, bold=True, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Title string color. Default is ``black`` .
     """
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+    
     if bold:
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
-    ctitile = ChartText(title, font)
-    ctitile.setColor(c)
-    chartpanel.getChart().setTitle(ctitile)
+    ctitle = ChartText(title, font)
+    ctitle.setUseExternalFont(exfont)
+    ctitle.setColor(c)
+    chartpanel.getChart().setTitle(ctitle)
     draw_if_interactive()
 
-def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
+def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     """
     Set the x axis label of the current axes.
     
@@ -2916,20 +2923,29 @@ def xlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Label string color. Default is ``black`` .
     """
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+        
     if bold:
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
-    plot = gca
-    axis = plot.axes.getXAxis()
-    axis.setLabel(label)
+    axis = gca.axes.getXAxis()
+    text = ChartText(label, font)
+    text.setUseExternalFont(exfont)
+    text.setColor(c)
+    axis.setLabel(text)
     axis.setDrawLabel(True)
-    axis.setLabelFont(font)
-    axis.setLabelColor(c)
+    if not isinstance(gca, Axes3D):
+        axis_t = gca.axes.getAxis(Location.TOP)
+        axis_t.setLabel(text)
     draw_if_interactive()
     
-def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
+def ylabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     """
     Set the y axis label of the current axes.
     
@@ -2939,25 +2955,29 @@ def ylabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Label string color. Default is ``black`` .
     """
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+    
     if bold:
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
-    plot = gca
-    axis = plot.axes.getYAxis()
-    axis.setLabel(label)
+    axis = gca.axes.getYAxis()
+    text = ChartText(label, font)
+    text.setUseExternalFont(exfont)
+    text.setColor(c)
+    axis.setLabel(text)
     axis.setDrawLabel(True)
-    axis.setLabelFont(font)
-    axis.setLabelColor(c)
-    if not isinstance(plot, Axes3D):
-        axis_r = plot.axes.getAxis(Location.RIGHT)
-        axis_r.setLabel(label)
-        axis_r.setLabelFont(font)
-        axis_r.setLabelColor(c)
+    if not isinstance(gca, Axes3D):
+        axis_r = gca.axes.getAxis(Location.RIGHT)
+        axis_r.setLabel(text)
     draw_if_interactive()
     
-def zlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
+def zlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     """
     Set the z axis label of the current axes.
     
@@ -2970,17 +2990,24 @@ def zlabel(label, fontname='Arial', fontsize=14, bold=False, color='black'):
     global gca
     if not isinstance(gca, Axes3D):
         return
-        
+    
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+    
     if bold:
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)    
     axis = gca.axes.getZAxis()
+    text = ChartText(label, font)
+    text.setUseExternalFont(exfont)
+    text.setColor(c)
     axis.setLabel(label)
-    axis.setDrawLabel(True)
-    axis.setLabelFont(font)
-    axis.setLabelColor(c)
+    axis.setDrawLabel(text)
     draw_if_interactive()
     
 def xticks(*args, **kwargs):
@@ -3160,7 +3187,12 @@ def text(x, y, s, **kwargs):
         1,1 in the upper right, 'data' are the axes data coordinates (Default value); 'inches' is 
         position in the figure in inches, with 0,0 at the lower left corner.
     """
-    fontname = kwargs.pop('fontname', 'Arial')
+    fontname = kwargs.pop('fontname', None)
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
     fontsize = kwargs.pop('fontsize', 14)
     bold = kwargs.pop('bold', False)
     color = kwargs.pop('color', 'black')
@@ -3170,6 +3202,7 @@ def text(x, y, s, **kwargs):
         font = Font(fontname, Font.PLAIN, fontsize)
     c = __getcolor(color)
     text = ChartText(s, font)
+    text.setUseExternalFont(exfont)
     text.setColor(c)
     text.setX(x)
     text.setY(y)
@@ -3461,7 +3494,12 @@ def legend(*args, **kwargs):
         clegend.setDrawBackground(True)
         background = __getcolor(bcobj)
         clegend.setBackground(background)
-    fontname = kwargs.pop('fontname', 'Arial')
+    fontname = kwargs.pop('fontname', None)
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
     fontsize = kwargs.pop('fontsize', 14)
     bold = kwargs.pop('bold', False)
     labcolor = kwargs.pop('labcolor', 'black')
@@ -3470,8 +3508,11 @@ def legend(*args, **kwargs):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    clegend.setLabelFont(font)
-    clegend.setLabelColor(labcolor)
+    title = kwargs.pop('title', '')
+    title = ChartText(title, font)
+    title.setColor(labcolor)
+    title.setUseExternalFont(exfont)
+    clegend.setLabel(title)
     markerscale = kwargs.pop('markerscale', None)
     if not markerscale is None:
         clegend.setSymbolScale(markerscale)
@@ -3549,9 +3590,14 @@ def colorbar(mappable, **kwargs):
         tickfont = __getfont_1(**kwargs)    
     else:
         tickfont = __getfont(tickfontdic)
+    exfont = False
     labelfontdic = kwargs.pop('labelfont', None)
     if labelfontdic is None:
         labfontname = kwargs.pop('labelfontname', tickfont.getName())
+        if labfontname is None:
+            labfontname = tickfont.getName()
+        else:
+            exfont = True
         labfontsize = kwargs.pop('labelfontsize', tickfont.getSize())
         labbold = kwargs.pop('labelbold', tickfont.isBold())
         if labbold:
@@ -3584,10 +3630,11 @@ def colorbar(mappable, **kwargs):
     legend.setShrink(shrink)
     legend.setAspect(aspect)
     legend.setTickFont(tickfont)
-    legend.setLabelFont(labelfont)
     label = kwargs.pop('label', None)
     if not label is None:
-        legend.setLabel(label)
+        label = ChartText(label, labelfont)
+        label.setUseExternalFont(exfont)
+        legend.setLabel(label)        
     labelloc = kwargs.pop('labelloc', None)
     if not labelloc is None:
         legend.setLabelLocation(labelloc)
