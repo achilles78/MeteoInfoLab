@@ -7,8 +7,6 @@ package org.meteoinfo.laboratory;
 
 import java.awt.GraphicsEnvironment;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -114,7 +112,7 @@ public class MeteoInfoLab {
             path = basePath + File.separator + "pylib";
             toolboxPath = basePath + "/toolbox";
             mapPath = basePath + "/map";
-            if (mapPath.substring(0, 1).equals("/"))
+            if (!new File(mapPath).isDirectory() && mapPath.substring(0, 1).equals("/"))
                 mapPath = mapPath.substring(1);
         }
 
@@ -160,7 +158,7 @@ public class MeteoInfoLab {
         String path = basePath + File.separator + "pylib";
         String toolboxPath = basePath + "/toolbox";
         String mapPath = basePath + "/map";
-        if (mapPath.substring(0, 1).equals("/"))
+        if (!new File(mapPath).isDirectory() && mapPath.substring(0, 1).equals("/"))
             mapPath = mapPath.substring(1);
         //MeteoInfoScript mis = new MeteoInfoScript(path);
         InteractiveConsole console = new InteractiveConsole();

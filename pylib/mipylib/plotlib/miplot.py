@@ -2011,6 +2011,7 @@ def __set_axesm(ax, **kwargs):
         
     mapview = ax.axes.getMapView()
     mapview.setXYScaleFactor(xyscale)
+    ax.axes.setAspect(xyscale)
     ax.axes.setAxisLabelFont(font)
     if not axison is None:
         ax.axes.setAxisOn(axison)
