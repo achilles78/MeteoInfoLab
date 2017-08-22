@@ -112,9 +112,10 @@ public class MeteoInfoLab {
             path = basePath + File.separator + "pylib";
             toolboxPath = basePath + "/toolbox";
             mapPath = basePath + "/map";
-            if (!new File(mapPath).isDirectory() && mapPath.substring(0, 1).equals("/"))
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("windows") && mapPath.substring(0, 1).equals("/"))
                 mapPath = mapPath.substring(1);
-        }
+            }
 
         try {
             interp.exec("import sys");
@@ -158,7 +159,8 @@ public class MeteoInfoLab {
         String path = basePath + File.separator + "pylib";
         String toolboxPath = basePath + "/toolbox";
         String mapPath = basePath + "/map";
-        if (!new File(mapPath).isDirectory() && mapPath.substring(0, 1).equals("/"))
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("windows") && mapPath.substring(0, 1).equals("/"))
             mapPath = mapPath.substring(1);
         //MeteoInfoScript mis = new MeteoInfoScript(path);
         InteractiveConsole console = new InteractiveConsole();

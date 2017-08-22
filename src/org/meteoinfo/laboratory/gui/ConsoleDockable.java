@@ -73,7 +73,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         String path = this.startupPath + File.separator + "pylib";
         String toolboxPath = this.startupPath + "/toolbox";
         String mapPath = this.startupPath + "/map";
-        if (!new File(mapPath).isDirectory() && mapPath.substring(0, 1).equals("/"))
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("windows") && mapPath.substring(0, 1).equals("/"))
             mapPath = mapPath.substring(1);
         if (isDebug) {
             path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfoLab/pylib";
