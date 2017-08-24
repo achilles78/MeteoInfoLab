@@ -2096,7 +2096,7 @@ def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     r = ArrayUtil.readBinFile(fn, dim, datatype, skip, byteorder);
     return MIArray(r)
         
-def binwrite(fn, data, byteorder='little_endian', append=False):
+def binwrite(fn, data, byteorder='little_endian', append=False, sequential=False):
     """
     Create a binary data file from an array variable.
     
@@ -2104,8 +2104,9 @@ def binwrite(fn, data, byteorder='little_endian', append=False):
     :param data: (*array_like*) A numeric array variable of any dimensionality.
     :param byteorder: (*string*) Byte order. ``little_endian`` or ``big_endian``.
     :param append: (*boolean*) Append to an existing file or not.
+    :param sequential: (*boolean*) If write binary data as sequential - Fortran
     """
-    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder, append)    
+    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder, append, sequential)    
     
 # Get month abstract English name
 def monthname(m):  
