@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\weather"/>
@@ -20,15 +20,15 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_labels.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\text_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\step_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\map_test.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\scatter_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\scatter_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\scatterm_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_labels.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\text_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\step_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\map_test.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\scatter_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\scatter_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\scatterm_1.py"/>
     </RecentFiles>
   </File>
   <Font>

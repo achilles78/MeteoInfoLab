@@ -12,13 +12,14 @@ from org.meteoinfo.data.meteodata import MeteoDataInfo, Dimension, DimensionType
 from org.meteoinfo.data.meteodata.arl import ARLDataInfo
 from org.meteoinfo.data.meteodata.bufr import BufrDataInfo
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
-from org.meteoinfo.data import ArrayUtil
+from org.meteoinfo.data import ArrayUtil, TableUtil
 from ucar.nc2 import NetcdfFileWriter
 
 import mipylib.numeric.minum as minum
 import mipylib.miutil as miutil
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
+from mipylib.numeric.mitable import PyTableData
 import dimdatafile
 from dimdatafile import DimDataFile, DimDataFiles
 import mipylib.migl as migl
@@ -28,7 +29,7 @@ __all__ = [
     'addfile_grads','addfile_hyconc','addfile_hytraj','addfile_lonlat','addfile_micaps',
     'addfile_mm5','addfile_nc','addfile_grib','addfile_surfer',
     'addtimedim','joinncfile','asciiread','asciiwrite','binread','binwrite',
-    'convert2nc','dimension','grads2nc','ncwrite'
+    'convert2nc','dimension','grads2nc','ncwrite','numasciicol','numasciirow','readtable'
     ]
 
 def isgriddata(gdata):
@@ -388,6 +389,66 @@ def joinncfile(infns, outfn, tdimname):
     '''
     NetCDFDataInfo.joinDataFiles(infns, outfn, tdimname)
     
+def numasciirow(filename):
+    '''
+    Returns the number of rows in an ASCII file.
+    
+    :param filename: (*string*) The ASCII file name.
+    
+    :returns: The number of rows in the file.
+    '''
+    nrow = ArrayUtil.numASCIIRow(filename)
+    return nrow
+    
+def numasciicol(filename, delimiter=None, headerlines=0):
+    '''
+    Returns the number of columns in an ASCII file.
+    
+    :param filename: (*string*) The ASCII file name.
+    :param delimiter: (*string*) Field delimiter character. Default is ``None``, means space or tab 
+        delimiter.
+    :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``.
+    
+    :returns: The number of columns in the file.
+    '''
+    ncol = ArrayUtil.numASCIICol(filename, delimiter, headerlines)
+    return ncol        
+        
+def readtable(filename, **kwargs):
+    '''
+    Create table by reading column oriented data from a file.
+    
+    :param filename: (*string*) File name for reading.
+    :param delimiter: (*string*) Variable delimiter character. Default is ``None``, means space or tab 
+        delimiter.
+    :param format: (*string*) Colomn format of the file. Default is ``None``, means all columns were
+        read as string variable. ``%s``: string; ``%i``: integer; ``%f``: float; ``%{yyyyMMdd...}D``: 
+        date time.
+    :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``. The line
+        after the skip lines will be read as variable names of the table. the ``headerlines`` should set
+        as ``-1`` if there is no field name line at beginning of the file.
+    :param encoding: (*string*) Character encoding scheme associated with the file. Default is ``UTF8``.
+    :param varnames: (*string*) Specified variable names for the readed table. Default is ``None``, means
+        the variable names should be read from the file.
+    :param readvarnames: (*boolean*) Read variable names or not. Default is ``True``.
+    :param readrownames: (*boolean*) Read row names or not. Default is ``False``.
+        
+    :returns: (*PyTableData*) The table.
+    '''
+    delimiter = kwargs.pop('delimiter', None)
+    format = kwargs.pop('format', None)
+    headerlines = kwargs.pop('headerlines', 0)
+    encoding = kwargs.pop('encoding', 'UTF8')
+    readvarnames = kwargs.pop('readvarnames', True)
+    readrownames = kwargs.pop('readrownames', False)
+    tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
+    r = PyTableData(tdata)
+    varnames = kwargs.pop('colnames', None)
+    varnames = kwargs.pop('varnames', varnames)
+    if not varnames is None:
+        r.setcolnames(varnames)
+    return r
+    
 def asciiread(filename, **kwargs):
     '''
     Read data from an ASCII file.
@@ -441,16 +502,17 @@ def binread(fn, dim, datatype=None, skip=0, byteorder='little_endian'):
     r = ArrayUtil.readBinFile(fn, dim, datatype, skip, byteorder);
     return MIArray(r)
         
-def binwrite(fn, data, byteorder='little_endian', append=False):
+def binwrite(fn, data, byteorder='little_endian', append=False, sequential=False):
     """
-    Write array data into a binary data file.
+    Create a binary data file from an array variable.
     
     :param fn: (*string*) Path needed to locate binary file.
     :param data: (*array_like*) A numeric array variable of any dimensionality.
     :param byteorder: (*string*) Byte order. ``little_endian`` or ``big_endian``.
     :param append: (*boolean*) Append to an existing file or not.
+    :param sequential: (*boolean*) If write binary data as sequential - Fortran
     """
-    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder, append)  
+    ArrayUtil.saveBinFile(fn, data.asarray(), byteorder, append, sequential)  
     
 def convert2nc(infn, outfn, version='netcdf3'):
     """

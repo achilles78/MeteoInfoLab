@@ -889,13 +889,13 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     
     #Add data series
     label = kwargs.pop('label', 'S_0')
-    xdata = __getplotdata(x)
-    ydata = __getplotdata(y)
+    xdata = plotutil.getplotdata(x)
+    ydata = plotutil.getplotdata(y)
     
     #Set plot data styles
-    pb, isunique = __getlegendbreak('point', **kwargs)
+    pb, isunique = plotutil.getlegendbreak('point', **kwargs)
     pb.setCaption(label)
-    pstyle = __getpointstyle(marker)    
+    pstyle = plotutil.getpointstyle(marker)    
     pb.setStyle(pstyle)
     isvalue = False
     if len(c) > 1:
@@ -914,12 +914,12 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
             if levels is None:
                 cnum = kwargs.pop('cnum', None)
                 if cnum is None:
-                    ls = __getlegendscheme([], c.min(), c.max(), **kwargs)
+                    ls = plotutil.getlegendscheme([], c.min(), c.max(), **kwargs)
                 else:
-                    ls = __getlegendscheme([cnum], c.min(), c.max(), **kwargs)
+                    ls = plotutil.getlegendscheme([cnum], c.min(), c.max(), **kwargs)
             else:
-                ls = __getlegendscheme([levels], c.min(), c.max(), **kwargs)
-            ls = __setlegendscheme_point(ls, **kwargs)
+                ls = plotutil.getlegendscheme([levels], c.min(), c.max(), **kwargs)
+            ls = plotutil.setlegendscheme_point(ls, **kwargs)
             if isinstance(s, int):
                 for lb in ls.getLegendBreaks():
                     lb.setSize(s)
@@ -930,7 +930,7 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
         #Create graphics
         graphics = GraphicFactory.createPoints(xdata, ydata, c.asarray(), ls)
     else:
-        colors = __getcolors(c, alpha)   
+        colors = plotutil.getcolors(c, alpha)   
         pbs = []
         if isinstance(s, int):   
             pb.setSize(s)
@@ -4470,8 +4470,8 @@ def scatterm(*args, **kwargs):
     ls = kwargs.pop('symbolspec', None)
     isplot = kwargs.pop('isplot', True)
     if ls is None:
-        ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-        ls = __setlegendscheme_point(ls, **kwargs)    
+        ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+        ls = plotutil.setlegendscheme_point(ls, **kwargs)    
     if isinstance(gdata, PyGridData):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
     else:

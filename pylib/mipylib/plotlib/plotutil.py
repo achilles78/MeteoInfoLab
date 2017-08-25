@@ -263,6 +263,8 @@ def getlegendbreak(geometry, **kwargs):
         ecobj = kwargs.pop('edgecolor', 'k')
         edgecolor = getcolor(ecobj)
         lb.setOutlineColor(edgecolor)
+        edgesize = kwargs.pop('edgesize', 1)
+        lb.setOutlineSize(edgesize)
         fill = kwargs.pop('fill', True)
         lb.setDrawFill(fill)
         edge = kwargs.pop('edge', True)
@@ -463,3 +465,6 @@ def setpointlegendbreak(lb, **kwargs):
     lb.setDrawFill(fill)
     edge = kwargs.pop('edge', True)
     lb.setDrawOutline(edge)
+    edgesize = kwargs.pop('edgesize', None)
+    if not edgesize is None:
+        lb.setOutlineSize(edgesize)
