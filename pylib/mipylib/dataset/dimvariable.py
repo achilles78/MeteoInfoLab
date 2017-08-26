@@ -47,6 +47,22 @@ class DimVariable():
                 len = len * dim.getLength()            
         return len
         
+    def __str__(self):
+        if self.variable is None:
+            return 'None'
+            
+        str = self.datatype.toString() + ' ' + self.name + '('
+        for dim in self.dims:
+            str = str + dim.getShortName() + ','
+        str = str[:-1] + '):'
+        attrs = self.variable.getAttributes()
+        for attr in attrs:
+            str = str + '\n\t' + self.name + ': ' + attr.toString()
+        return str
+        
+    def __repr__(self):
+        return self.__str__()
+        
     def __getitem__(self, indices):
         if indices is None:
             rr = self.dataset.read(self.name)

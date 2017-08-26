@@ -42,6 +42,8 @@ class DimDataFile():
         return None
         
     def __str__(self):
+        if self.dataset is None:
+            return 'None'
         return self.dataset.getInfoText()
         
     def __repr__(self):
