@@ -1123,9 +1123,12 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
         where = where.asarray()
     
     #Set plot data styles
-    pb, isunique = __getlegendbreak('polygon', **kwargs)
+    if not 'fill' in kwargs:
+        kwargs['fill'] = True
+    if not 'edge' in kwargs:
+        kwargs['edge'] = False
+    pb, isunique = plotutil.getlegendbreak('polygon', **kwargs)
     pb.setCaption(label)
-    pb.setDrawOutline(False)
     
     #Create graphics
     graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb)    
@@ -3008,7 +3011,7 @@ def zlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     text.setUseExternalFont(exfont)
     text.setColor(c)
     axis.setLabel(label)
-    axis.setDrawLabel(text)
+    axis.setDrawLabel(True)
     draw_if_interactive()
     
 def xticks(*args, **kwargs):

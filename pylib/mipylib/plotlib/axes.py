@@ -1022,6 +1022,62 @@ class Axes3D(Axes):
             miplot.draw_if_interactive()
         return graphics
         
+    def fill_between(self, x, y1, y2=0, where=None, **kwargs):
+        """
+        Make filled polygons between two curves (y1 and y2) where ``where==True``.
+        
+        :param x: (*array_like*) An N-length array of the x data.
+        :param y1: (*array_like*) An N-length array (or scalar) of the y data.
+        :param y2: (*array_like*) An N-length array (or scalar) of the y data.
+        :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
+            N-length boolean array and the fill will only happen over the regions where ``where==True``.
+        """
+        #Get dataset
+        global gca   
+        
+        #Add data series
+        label = kwargs.pop('label', 'S_0')
+        dn = len(x)
+        xdata = plotutil.getplotdata(x)
+        if isinstance(y1, (int, long, float)):
+            yy = []
+            for i in range(dn):
+                yy.append(y1)
+            y1 = minum.array(yy).array
+        else:
+            y1 = plotutil.getplotdata(y1)
+        if isinstance(y2, (int, long, float)):
+            yy = []
+            for i in range(dn):
+                yy.append(y2)
+            y2 = minum.array(yy).array
+        else:
+            y2 = plotutil.getplotdata(y2)
+        if not where is None:
+            if isinstance(where, (tuple, list)):
+                where = minum.array(where)
+            where = where.asarray()
+        
+        #Set plot data styles
+        if not 'fill' in kwargs:
+            kwargs['fill'] = True
+        if not 'edge' in kwargs:
+            kwargs['edge'] = False
+        pb, isunique = plotutil.getlegendbreak('polygon', **kwargs)
+        pb.setCaption(label)
+        
+        #Create graphics
+        offset = kwargs.pop('offset', 0)
+        zdir = kwargs.pop('zdir', 'z')
+        graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb, \
+            offset, zdir) 
+            
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            miplot.draw_if_interactive()
+        return graphics
+        
     def text(self, x, y, z, s, zdir=None, **kwargs):
         '''
         Add text to the plot. kwargs will be passed on to text, except for the zdir 
