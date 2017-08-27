@@ -2086,8 +2086,16 @@ def __set_axes3d(ax, **kwargs):
     :param yreverse: (*boolean*) Optional, set yaxis reverse or not. Default is ``False`` .
     
     :returns: The axes.
-    """        
-    return None
+    """     
+    tickfontname = kwargs.pop('tickfontname', 'Arial')
+    tickfontsize = kwargs.pop('tickfontsize', 14)
+    tickbold = kwargs.pop('tickbold', False)
+    if tickbold:
+        font = Font(tickfontname, Font.BOLD, tickfontsize)
+    else:
+        font = Font(tickfontname, Font.PLAIN, tickfontsize)
+    ax.axes.setAxisTickFont(font)
+    return ax
     
 def __get_axes(chart, idx):
     ax = chart.getPlot(idx)
@@ -3010,7 +3018,7 @@ def zlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     text = ChartText(label, font)
     text.setUseExternalFont(exfont)
     text.setColor(c)
-    axis.setLabel(label)
+    axis.setLabel(text)
     axis.setDrawLabel(True)
     draw_if_interactive()
     
