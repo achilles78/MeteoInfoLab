@@ -1679,6 +1679,8 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
     :param hspace: (*float*) The amount of height reserved for blank space between subplots,
         expressed as a fraction of the average axis height.
     :param axestype: (*string*) Axes type [Axes | Axes3D | MapAxes | PolarAxes].
+    
+    :returns: The figure and the axes tuple.
     '''
     if position is None:
         if wspace is None and hspace is None:

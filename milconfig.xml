@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\weather"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\wind"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\toolbox\qaqc">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
@@ -16,20 +13,13 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
   </Path>
   <File>
-    <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\grads\test.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\text_subplot.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_labels.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\layer_ydir.py"/>
-    </OpenedFiles>
-    <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\grads\test.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\text_subplot.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\pie_labels.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\layer_ydir.py"/>
-    </RecentFiles>
+    <OpenedFiles/>
+    <RecentFiles/>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
