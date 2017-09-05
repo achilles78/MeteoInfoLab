@@ -271,6 +271,7 @@ def plot(*args, **kwargs):
     #plot.setDataset(dataset)     
 
     #Add graphics
+    iscurve = kwargs.pop('iscurve', False)
     graphics = []
     if isxylistdata:
         graphic = GraphicFactory.createLineString(dataset, lines)
@@ -283,7 +284,7 @@ def plot(*args, **kwargs):
             label = kwargs.pop('label', 'S_' + str(i + 1))
             xdata = __getplotdata(xdatalist[i])
             ydata = __getplotdata(ydatalist[i])
-            graphic = GraphicFactory.createLineString(xdata, ydata, lines[i])
+            graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
             plot.add_graphic(graphic)
             graphics.append(graphic)
     plot.axes.setAutoExtent()
@@ -4519,7 +4520,7 @@ def plotm(*args, **kwargs):
             snum = args[0].size()
             isxylistdata = True
         else:
-            ydata = __getplotdata(args[0])
+            ydata = plotutil.getplotdata(args[0])
             if isinstance(args[0], DimArray):
                 xdata = args[0].dimvalue(0)
             else:
@@ -4530,7 +4531,7 @@ def plotm(*args, **kwargs):
             ydatalist.append(minum.asarray(ydata))
     elif n == 2:
         if isinstance(args[1], basestring):
-            ydata = __getplotdata(args[0])
+            ydata = plotutil.getplotdata(args[0])
             if isinstance(args[0], DimArray):
                 xdata = args[0].dimvalue(0)
             else:
@@ -4539,8 +4540,8 @@ def plotm(*args, **kwargs):
                     xdata.append(i)
             styles.append(args[1])
         else:
-            xdata = __getplotdata(args[0])
-            ydata = __getplotdata(args[1])
+            xdata = plotutil.getplotdata(args[0])
+            ydata = plotutil.getplotdata(args[1])
         xdatalist.append(minum.asarray(xdata))
         ydatalist.append(minum.asarray(ydata))
     else:
@@ -4576,11 +4577,13 @@ def plotm(*args, **kwargs):
     if ls is None:
         if styles != None:
             for i in range(0, len(styles)):
-                line = __getplotstyle(styles[i], str(i), **kwargs)
+                line = plotutil.getplotstyle(styles[i], str(i), **kwargs)
                 lines.append(line)
         else:
             for i in range(0, snum):
-                line = __getplotstyle(None, str(i), **kwargs)
+                label = kwargs.pop('label', 'S_' + str(i + 1))
+                line = plotutil.getlegendbreak('line', **kwargs)[0]
+                line.setCaption(label)
                 lines.append(line)
         ls = LegendScheme(lines)
     
@@ -5563,7 +5566,7 @@ def geoshow(*args, **kwargs):
                         geometry = 'line'
                     elif btype == BreakTypes.PolygonBreak:
                         geometry = 'polygon'
-                    lb, isunique = __getlegendbreak(geometry, **kwargs)
+                    lb, isunique = plotutil.getlegendbreak(geometry, **kwargs)
                     layer.getLegendScheme().getLegendBreaks().set(0, lb)
             else:
                 layer.setLegendScheme(ls)
@@ -5611,7 +5614,7 @@ def geoshow(*args, **kwargs):
                 displaytype = 'line'
             elif stype == ShapeTypes.Polygon:
                 displaytype = 'polygon'
-            lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
+            lbreak, isunique = plotutil.getlegendbreak(displaytype, **kwargs)
             graphic.setLegend(lbreak)
             plot.add_graphic(graphic)            
             draw_if_interactive()
@@ -5623,7 +5626,7 @@ def geoshow(*args, **kwargs):
                 displaytype = 'line'
             elif stype == ShapeTypes.Polygon:
                 displaytype = 'polygon'
-            lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
+            lbreak, isunique = plotutil.getlegendbreak(displaytype, **kwargs)
             graphic = Graphic(shape, lbreak)
             plot.add_graphic(graphic)            
             draw_if_interactive()
@@ -5642,11 +5645,12 @@ def geoshow(*args, **kwargs):
                     if isinstance(lat, (MIArray, DimArray)):
                         lat = lat.aslist()
 
-            lbreak, isunique = __getlegendbreak(displaytype, **kwargs)
+            lbreak, isunique = plotutil.getlegendbreak(displaytype, **kwargs)
+            iscurve = kwargs.pop('iscurve', False)
             if displaytype == 'point':
                 graphic = plot.axes.addPoint(lat, lon, lbreak)
             elif displaytype == 'polyline' or displaytype == 'line':
-                graphic = plot.axes.addPolyline(lat, lon, lbreak)
+                graphic = plot.axes.addPolyline(lat, lon, lbreak, iscurve)
             elif displaytype == 'polygon':
                 graphic = plot.axes.addPolygon(lat, lon, lbreak)
             draw_if_interactive()
