@@ -64,21 +64,6 @@ __all__ = [
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlabel','zlim','zticks',
     'repaint','isinteractive'
     ]
- 
-def __getplotdata(data):
-    if isinstance(data, (MIArray, DimArray)):
-        return data.asarray()
-    elif isinstance(data, (list, tuple)):
-        if isinstance(data[0], datetime.datetime):
-            dd = []
-            for d in data:
-                v = miutil.date2num(d)
-                dd.append(v)
-            return minum.array(dd).array
-        else:
-            return minum.array(data).array
-    else:
-        return minum.array([data]).array
         
 def figsize():
     '''
@@ -206,12 +191,10 @@ def plot(*args, **kwargs):
     else:
         c = 'x'
         for arg in args: 
-            if c == 'x':
-                #xdatalist.append(__getplotdata(arg))    
+            if c == 'x':   
                 xdatalist.append(arg)
                 c = 'y'
             elif c == 'y':
-                #ydatalist.append(__getplotdata(arg))
                 ydatalist.append(arg)
                 c = 's'
             elif c == 's':
@@ -220,7 +203,6 @@ def plot(*args, **kwargs):
                     c = 'x'
                 else:
                     styles.append('-')
-                    #xdatalist.append(__getplotdata(arg))
                     xdatalist.append(arg)
                     c = 'y'
     if len(styles) == 0:
@@ -282,8 +264,8 @@ def plot(*args, **kwargs):
         snum = len(xdatalist)
         for i in range(0, snum):
             label = kwargs.pop('label', 'S_' + str(i + 1))
-            xdata = __getplotdata(xdatalist[i])
-            ydata = __getplotdata(ydatalist[i])
+            xdata = plotutil.getplotdata(xdatalist[i])
+            ydata = plotutil.getplotdata(ydatalist[i])
             graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
             plot.add_graphic(graphic)
             graphics.append(graphic)
@@ -583,8 +565,8 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
     
     #Add data series
     label = kwargs.pop('label', 'S_0')
-    xdata = __getplotdata(x)
-    ydata = __getplotdata(y)
+    xdata = plotutil.getplotdata(x)
+    ydata = plotutil.getplotdata(y)
     if not yerr is None:
         if isinstance(yerr, (int, float)):
             ye = []
@@ -592,7 +574,7 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
                 ye.append(yerr)
             yerr = minum.array(ye).array
         else:
-            yerr = __getplotdata(yerr)
+            yerr = plotutil.getplotdata(yerr)
     if not xerr is None:
         if isinstance(xerr, (int, float)):
             ye = []
@@ -600,14 +582,14 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
                 ye.append(xerr)
             xerr = minum.array(ye).array
         else:
-            xerr = __getplotdata(xerr)
+            xerr = plotutil.getplotdata(xerr)
     
     #Get plot data style
     if fmt == '':
-        line = __getlegendbreak('line', **kwargs)[0]
+        line = plotutil.getlegendbreak('line', **kwargs)[0]
         line.setCaption(label)
     else:
-        line = __getplotstyle(fmt, label, **kwargs)
+        line = plotutil.getplotstyle(fmt, label, **kwargs)
     
     #Create graphics
     graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerr, yerr, line)
@@ -702,36 +684,36 @@ def bar(*args, **kwargs):
         xdata = []
         for i in range(1, len(args[0]) + 1):
             xdata.append(i)
-    xdata = __getplotdata(xdata)
-    ydata = __getplotdata(ydata)
-    width = __getplotdata(width)
+    xdata = plotutil.getplotdata(xdata)
+    ydata = plotutil.getplotdata(ydata)
+    width = plotutil.getplotdata(width)
     yerr = kwargs.pop('yerr', None)
     if not yerr is None:
         if not isinstance(yerr, (int, float)):
-            yerr = __getplotdata(yerr)
+            yerr = plotutil.getplotdata(yerr)
     bottom = kwargs.pop('bottom', None)   
     if not bottom is None:
-        bottom = __getplotdata(bottom)
+        bottom = plotutil.getplotdata(bottom)
     
     #Set plot data styles
     fcobj = kwargs.pop('color', None)
     if fcobj is None:
         fcobj = kwargs.pop('facecolor', 'b')
     if isinstance(fcobj, (tuple, list)):
-        colors = __getcolors(fcobj)
+        colors = plotutil.getcolors(fcobj)
     else:
-        color = __getcolor(fcobj)
+        color = plotutil.getcolor(fcobj)
         colors = [color]
     ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = __getcolor(ecobj)
+    edgecolor = plotutil.getcolor(ecobj)
     linewidth = kwargs.pop('linewidth', 1.0) 
     hatch = kwargs.pop('hatch', None)
     hatch = __gethatch(hatch) 
     hatchsize = kwargs.pop('hatchsize', None)
     bgcolor = kwargs.pop('bgcolor', None)
-    bgcolor = __getcolor(bgcolor)
+    bgcolor = plotutil.getcolor(bgcolor)
     ecolor = kwargs.pop('ecolor', 'k')
-    ecolor = __getcolor(ecolor)
+    ecolor = plotutil.getcolor(ecolor)
     morepoints = kwargs.pop('morepoints', False)
     barbreaks = []
     for color in colors:
@@ -808,20 +790,20 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
     if fcobj is None:
         fcobj = kwargs.pop('facecolor', 'b')
     if isinstance(fcobj, (tuple, list)):
-        colors = __getcolors(fcobj)
+        colors = plotutil.getcolors(fcobj)
     else:
-        color = __getcolor(fcobj)
+        color = plotutil.getcolor(fcobj)
         colors = [color]
     ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = __getcolor(ecobj)
+    edgecolor = plotutil.getcolor(ecobj)
     linewidth = kwargs.pop('linewidth', 1.0) 
     hatch = kwargs.pop('hatch', None)
     hatch = __gethatch(hatch) 
     hatchsize = kwargs.pop('hatchsize', None)
     bgcolor = kwargs.pop('bgcolor', None)
-    bgcolor = __getcolor(bgcolor)
+    bgcolor = plotutil.getcolor(bgcolor)
     ecolor = kwargs.pop('ecolor', 'k')
-    ecolor = __getcolor(ecolor)
+    ecolor = plotutil.getcolor(ecolor)
     barbreaks = []
     for color in colors:
         lb = BarBreak()
@@ -842,7 +824,7 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
         barbreaks.append(lb)
         
     #Create bar graphics
-    x = __getplotdata(x)
+    x = plotutil.getplotdata(x)
     graphics = GraphicFactory.createHistBars(x, bins, barbreaks)        
     
     #Create bar plot
@@ -1021,12 +1003,12 @@ def patch(x, y=None, **kwargs):
         is None.
     :param y: (*array_like*) Y coordinates for each vertex.
     '''
-    lbreak, isunique = __getlegendbreak('polygon', **kwargs)
+    lbreak, isunique = plotutil.getlegendbreak('polygon', **kwargs)
     if y is None:
         graphics = Graphic(x, lbreak)
     else:
-        x = __getplotdata(x)
-        y = __getplotdata(y)
+        x = plotutil.getplotdata(x)
+        y = plotutil.getplotdata(y)
         graphics = GraphicFactory.createPolygons(x, y, lbreak)
     
     global gca 
@@ -1059,7 +1041,7 @@ def rectangle(position, curvature=None, **kwargs):
     :param position: (*list*) Position of the rectangle [x, y, width, height].
     :param curvature: (*list*) Curvature of the rectangle [x, y]. Default is None.
     '''
-    lbreak, isunique = __getlegendbreak('polygon', **kwargs)
+    lbreak, isunique = plotutil.getlegendbreak('polygon', **kwargs)
     if isinstance(curvature, (int, float)):
         curvature = [curvature, curvature]
     graphic = GraphicFactory.createRectangle(position, curvature, lbreak)
@@ -1103,21 +1085,21 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     #Add data series
     label = kwargs.pop('label', 'S_0')
     dn = len(x)
-    xdata = __getplotdata(x)
+    xdata = plotutil.getplotdata(x)
     if isinstance(y1, (int, long, float)):
         yy = []
         for i in range(dn):
             yy.append(y1)
         y1 = minum.array(yy).array
     else:
-        y1 = __getplotdata(y1)
+        y1 = plotutil.getplotdata(y1)
     if isinstance(y2, (int, long, float)):
         yy = []
         for i in range(dn):
             yy.append(y2)
         y2 = minum.array(yy).array
     else:
-        y2 = __getplotdata(y2)
+        y2 = plotutil.getplotdata(y2)
     if not where is None:
         if isinstance(where, (tuple, list)):
             where = minum.array(where)
@@ -1190,11 +1172,11 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     :returns: (*tuple*) Patches and texts.
     """        
     n = len(x)
-    x = __getplotdata(x)
+    x = plotutil.getplotdata(x)
     if colors is None:
         colors = makecolors(n)
     else:
-        colors = __getcolors(colors)
+        colors = plotutil.getcolors(colors)
         
     fontname = kwargs.pop('fontname', 'Arial')
     fontsize = kwargs.pop('fontsize', 14)
@@ -1204,7 +1186,7 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    fontcolor = __getcolor(fontcolor)
+    fontcolor = plotutil.getcolor(fontcolor)
     
     #Create graphics
     graphics = GraphicFactory.createPieArcs(x, colors, labels, startangle, explode, font, fontcolor, \
@@ -1274,10 +1256,10 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     if isinstance(x, list):
         x1 = []
         for a in x:
-            x1.append(__getplotdata(a))
+            x1.append(plotutil.getplotdata(a))
         x = x1
     else:
-        x = __getplotdata(x)
+        x = plotutil.getplotdata(x)
         x = [x]
     
     if not positions is None:
@@ -1295,9 +1277,9 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
         
     #Get box plot properties
     if not color is None:
-        color = __getcolor(color)
+        color = plotutil.getcolor(color)
     if not sym is None:
-        sym = __getplotstyle(sym, '')
+        sym = plotutil.getplotstyle(sym, '')
         sym.setDrawFill(False)
         if not color is None:
             sym.setColor(color)
@@ -1307,26 +1289,26 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
         boxprops.setDrawFill(False)
         boxprops.setOutlineColor(color is None and Color.blue or color)
     else:
-        boxprops = __getlegendbreak('polygon', **boxprops)[0]
+        boxprops = plotutil.getlegendbreak('polygon', **boxprops)[0]
     if medianprops is None:
         medianprops = PolylineBreak()
         medianprops.setColor(color is None and Color.red or color)
     else:
-        medianprops = __getlegendbreak('line', **medianprops)[0]
+        medianprops = plotutil.getlegendbreak('line', **medianprops)[0]
     if whiskerprops is None:
         whiskerprops = PolylineBreak()
         whiskerprops.setColor(color is None and Color.black or color)
         whiskerprops.setStyle(LineStyles.Dash)
     else:
-        whiskerprops = __getlegendbreak('line', **whiskerprops)[0]
+        whiskerprops = plotutil.getlegendbreak('line', **whiskerprops)[0]
     if capprops is None:
         capprops = PolylineBreak()
         capprops.setColor(color is None and Color.black or color)
     else:
-        capprops = __getlegendbreak('line', **capprops)[0]
+        capprops = plotutil.getlegendbreak('line', **capprops)[0]
     if meanline:
         if not meanprops is None:
-            meanprops = __getlegendbreak('line', **meanprops)[0]
+            meanprops = plotutil.getlegendbreak('line', **meanprops)[0]
         else:
             meanprops = PolylineBreak()
             meanprops.setColor(color is None and Color.black or color)
@@ -1337,9 +1319,9 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
             meanprops.setColor(color is None and Color.red or color)
             meanprops.setOutlineColor(color is None and Color.black or color)
         else:
-            meanprops = __getlegendbreak('point', **meanprops)[0]
+            meanprops = plotutil.getlegendbreak('point', **meanprops)[0]
     if not flierprops is None:
-        flierprops = __getlegendbreak('point', **flierprops)[0]
+        flierprops = plotutil.getlegendbreak('point', **flierprops)[0]
     else:
         flierprops = sym
     if flierprops is None:
@@ -1507,7 +1489,7 @@ def figure(bgcolor=None, figsize=None, newfig=True):
     chart = Chart()
     if not bgcolor is None:
         chart.setDrawBackground(True)
-        chart.setBackground(__getcolor(bgcolor))
+        chart.setBackground(plotutil.getcolor(bgcolor))
     if figsize is None:
         chartpanel = ChartPanel(chart)
     else:
@@ -1548,7 +1530,7 @@ def bgcolor(color):
         chart.setDrawBackground(False)
     else:
         chart.setDrawBackground(True)
-        chart.setBackground(__getcolor(color))
+        chart.setBackground(plotutil.getcolor(color))
     draw_if_interactive()    
     
 def caxes(ax=None):
@@ -1913,7 +1895,7 @@ def __set_axes(ax, **kwargs):
     if not xaxistype is None:
         __setXAxisType(ax.axes, xaxistype)
     if not bgcobj is None:
-        bgcolor = __getcolor(bgcobj)
+        bgcolor = plotutil.getcolor(bgcobj)
         ax.axes.setDrawBackground(True)
         ax.axes.setBackground(bgcolor)
     tickline = kwargs.pop('tickline', True)
@@ -2038,7 +2020,7 @@ def __set_axesm(ax, **kwargs):
     mapframe.setGridYDelt(griddy)
     ax.axes.setDrawNeatLine(frameon)
     if not bgcobj is None:
-        bgcolor = __getcolor(bgcobj)
+        bgcolor = plotutil.getcolor(bgcobj)
         ax.axes.setDrawBackground(True)
         ax.axes.setBackground(bgcolor)
  
@@ -2255,7 +2237,7 @@ def xaxis(ax=None, **kwargs):
     visible = kwargs.pop('visible', True)
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     tickline = kwargs.pop('tickline', True)
     tickline = kwargs.pop('tickvisible', tickline)
     ticklabel = kwargs.pop('ticklabel', None)
@@ -2310,7 +2292,7 @@ def yaxis(ax=None, **kwargs):
     visible = kwargs.pop('visible', None)
     shift = kwargs.pop('shift', 0)
     color = kwargs.pop('color', 'black')
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     tickline = kwargs.pop('tickline', True)
     tickline = kwargs.pop('tickvisible', tickline)
     ticklabel = kwargs.pop('ticklabel', None)
@@ -2495,66 +2477,10 @@ def clc():
         console = migl.milapp.getConsoleDockable().getConsole()
         console.getTextPane().setText('')
 
-def __getplotstyle(style, caption, **kwargs):    
-    linewidth = kwargs.pop('linewidth', 1.0)
-    if style is None:
-        color = kwargs.pop('color', 'red')
-        c = __getcolor(color)
-    else:
-        c = __getcolor(style)
-    pointStyle = __getpointstyle(style)
-    lineStyle = __getlinestyle(style)
-    if not pointStyle is None:
-        fill = kwargs.pop('fill', True)        
-        if lineStyle is None:           
-            pb = PointBreak()
-            pb.setCaption(caption)
-            if '.' in style:
-                pb.setSize(4)
-                pb.setDrawOutline(False)
-            else:
-                pb.setSize(8)
-            pb.setStyle(pointStyle)
-            pb.setDrawFill(fill)
-            if not c is None:
-                pb.setColor(c)      
-            edgecolor = kwargs.pop('edgecolor', pb.getColor())
-            edgecolor = __getcolor(edgecolor)
-            pb.setOutlineColor(edgecolor)
-            return pb
-        else:
-            plb = PolylineBreak()
-            plb.setCaption(caption)
-            plb.setSize(linewidth)
-            plb.setStyle(lineStyle)
-            plb.setDrawSymbol(True)
-            plb.setSymbolStyle(pointStyle)
-            plb.setFillSymbol(fill)
-            interval = kwargs.pop('markerinterval', 1)
-            plb.setSymbolInterval(interval)
-            if not c is None:
-                plb.setColor(c)
-            makercolor = kwargs.pop('makercolor', plb.getColor())
-            makercolor = __getcolor(makercolor)
-            plb.setSymbolColor(c)
-            makerfillcolor = kwargs.pop('makerfillcolor', makercolor)
-            makerfillcolor = __getcolor(makerfillcolor)
-            plb.setSymbolFillColor(makerfillcolor)
-            return plb
-    else:
-        plb = PolylineBreak()
-        plb.setCaption(caption)
-        plb.setSize(linewidth)
-        if not c is None:
-            plb.setColor(c)
-        if not lineStyle is None:
-            plb.setStyle(lineStyle)
-        return plb
-        
 def __setplotstyle(plot, idx, style, n, **kwargs):    
     linewidth = kwargs.pop('linewidth', 1.0)
     color = kwargs.pop('color', 'red')
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     #print 'Line width: ' + str(linewidth)
     caption = plot.getLegendBreak(idx).getCaption()
     if style is None:
@@ -2567,9 +2493,9 @@ def __setplotstyle(plot, idx, style, n, **kwargs):
         plot.setLegendBreak(idx, plb)
         return
         
-    c = __getcolor(style)
-    pointStyle = __getpointstyle(style)
-    lineStyle = __getlinestyle(style)
+    c = plotutil.getcolor(style)
+    pointStyle = plotutil.getpointstyle(style)
+    lineStyle = plotutil.getlinestyle(style)
     if not pointStyle is None:
         if lineStyle is None:
             #plot.setChartPlotMethod(ChartPlotMethod.POINT)            
@@ -2612,126 +2538,12 @@ def __setplotstyle(plot, idx, style, n, **kwargs):
         if not lineStyle is None:
             plb.setStyle(lineStyle)
         plot.setLegendBreak(idx, plb)
-        return plb
-    
-def __getlinestyle(style):
-    if style is None:
-        return None
-        
-    lineStyle = None
-    if '--' in style:
-        lineStyle = LineStyles.Dash
-    elif ':' in style:
-        lineStyle = LineStyles.Dot
-    elif '-.' in style:
-        lineStyle = LineStyles.DashDot
-    elif '-' in style:
-        lineStyle = LineStyles.Solid
-    
-    return lineStyle
-    
-def __getpointstyle(style):
-    if style is None:
-        return None
-        
-    pointStyle = None
-    if 'o' in style:
-        pointStyle = PointStyle.Circle
-    elif '.' in style:
-        pointStyle = PointStyle.Circle
-    elif 'D' in style:
-        pointStyle = PointStyle.Diamond
-    elif '+' in style:
-        pointStyle = PointStyle.Plus
-    elif 'm' in style:
-        pointStyle = PointStyle.Minus
-    elif 's' in style:
-        pointStyle = PointStyle.Square
-    elif 'S' in style:
-        pointStyle = PointStyle.Star
-    elif '*' in style:
-        pointStyle = PointStyle.StarLines
-    elif '^' in style:
-        pointStyle = PointStyle.UpTriangle
-    elif 'x' in style:
-        pointStyle = PointStyle.XCross
-    
-    return pointStyle
-    
-def __getcolor(style, alpha=None):
-    if style is None:
-        return None
-        
-    if isinstance(style, Color):
-        c = style
-        if not alpha is None:
-            alpha = (int)(alpha * 255)
-            c = Color(c.getRed(), c.getGreen(), c.getBlue(), alpha)
-        return c
-        
-    c = Color.black
-    if isinstance(style, str):
-        if style == 'red':
-            c = Color.red
-        elif style == 'black':
-            c = Color.black
-        elif style == 'blue':
-            c = Color.blue
-        elif style == 'green':
-            c = Color.green
-        elif style == 'white':
-            c = Color.white
-        elif style == 'yellow':
-            c = Color.yellow
-        elif style == 'gray':
-            c = Color.gray
-        elif style == 'lightgray':
-            c = Color.lightGray
-        else:
-            if 'r' in style:
-                c = Color.red
-            elif 'k' in style:
-                c = Color.black
-            elif 'b' in style:
-                c = Color.blue
-            elif 'g' in style:
-                c = Color.green
-            elif 'w' in style:
-                c = Color.white
-            elif 'c' in style:
-                c = Color.cyan
-            elif 'm' in style:
-                c = Color.magenta
-            elif 'y' in style:
-                c = Color.yellow 
-    elif isinstance(style, (tuple, list)):
-        if len(style) == 3:
-            c = Color(style[0], style[1], style[2])
-        else:
-            c = Color(style[0], style[1], style[2], style[3])
-    
-    if not alpha is None:
-        alpha = (int)(alpha * 255)
-        c = Color(c.getRed(), c.getGreen(), c.getBlue(), alpha)
-    
-    return c
-
-def __getcolors(cs, alpha=None):
-    colors = []
-    if isinstance(cs, (tuple, list, MIArray)):
-        if isinstance(cs[0], int):
-            colors.append(__getcolor(cs, alpha))
-        else:            
-            for c in cs:
-                colors.append(__getcolor(c, alpha))
-    else:
-        colors.append(__getcolor(cs, alpha))
-    return colors
+        return plb    
     
 def __getcolors_value(v, n=None, cmap='matlab_jet'):
     min = v.min()
     max = v.max()
-    cmap = __getcolormap(cmap=cmap)
+    cmap = plotutil.getcolormap(cmap=cmap)
     if n is None:
         cs = ColorUtil.createColors(cmap, min, max)
     else:
@@ -2895,7 +2707,7 @@ def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     ctitile = ChartText(title, font)
     ctitile.setColor(c)
     gca.set_title(ctitile)
@@ -2921,7 +2733,7 @@ def suptitle(title, fontname=None, fontsize=14, bold=True, color='black'):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     ctitle = ChartText(title, font)
     ctitle.setUseExternalFont(exfont)
     ctitle.setColor(c)
@@ -2948,7 +2760,7 @@ def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     axis = gca.axes.getXAxis()
     text = ChartText(label, font)
     text.setUseExternalFont(exfont)
@@ -2980,7 +2792,7 @@ def ylabel(label, fontname=None, fontsize=14, bold=False, color='black'):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     axis = gca.axes.getYAxis()
     text = ChartText(label, font)
     text.setUseExternalFont(exfont)
@@ -3016,7 +2828,7 @@ def zlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    c = __getcolor(color)    
+    c = plotutil.getcolor(color)    
     axis = gca.axes.getZAxis()
     text = ChartText(label, font)
     text.setUseExternalFont(exfont)
@@ -3072,7 +2884,7 @@ def xticks(*args, **kwargs):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     color = kwargs.pop('color', 'k')
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     angle = kwargs.pop('rotation', 0)
     if angle == 'vertical':
         angle = 90
@@ -3132,7 +2944,7 @@ def yticks(*args, **kwargs):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     color = kwargs.pop('color', 'k')
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     axis.setTickLabelFont(font)
     axis.setTickLabelColor(c)
     if not axis_r is None:
@@ -3180,7 +2992,7 @@ def zticks(*args, **kwargs):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     color = kwargs.pop('color', 'k')
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     axis.setTickLabelFont(font)
     axis.setTickLabelColor(c)
     draw_if_interactive()
@@ -3215,7 +3027,7 @@ def text(x, y, s, **kwargs):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     text = ChartText(s, font)
     text.setUseExternalFont(exfont)
     text.setColor(c)
@@ -3228,7 +3040,7 @@ def text(x, y, s, **kwargs):
             text.setFill(fill)
         facecolor = bbox.pop('facecolor', None)
         if not facecolor is None:
-            facecolor = __getcolor(facecolor)
+            facecolor = plotutil.getcolor(facecolor)
             text.setFill(True)
             text.setBackground(facecolor)
         edge = bbox.pop('edge', None)
@@ -3236,7 +3048,7 @@ def text(x, y, s, **kwargs):
             text.setDrawNeatline(edge)
         edgecolor = bbox.pop('edgecolor', None)
         if not edgecolor is None:
-            edgecolor = __getcolor(edgecolor)
+            edgecolor = plotutil.getcolor(edgecolor)
             text.setNeatlineColor(edgecolor)
             text.setDrawNeatline(True)
         linewidth = bbox.pop('linewidth', None)
@@ -3325,14 +3137,14 @@ def grid(b=None, which='major', axis='both', **kwargs):
         gridline.setDrawYLine(isDraw)
     color = kwargs.pop('color', None)
     if not color is None:
-        c = __getcolor(color)
+        c = plotutil.getcolor(color)
         gridline.setColor(c)
     linewidth = kwargs.pop('linewidth', None)
     if not linewidth is None:
         gridline.setSize(linewidth)
     linestyle = kwargs.pop('linestyle', None)
     if not linestyle is None:
-        linestyle = __getlinestyle(linestyle)
+        linestyle = plotutil.getlinestyle(linestyle)
         gridline.setStyle(linestyle)
     top = kwargs.pop('top', None)
     if not top is None:
@@ -3507,7 +3319,7 @@ def legend(*args, **kwargs):
         clegend.setDrawBackground(False)
     else:
         clegend.setDrawBackground(True)
-        background = __getcolor(bcobj)
+        background = plotutil.getcolor(bcobj)
         clegend.setBackground(background)
     fontname = kwargs.pop('fontname', None)
     exfont = False
@@ -3518,7 +3330,7 @@ def legend(*args, **kwargs):
     fontsize = kwargs.pop('fontsize', 14)
     bold = kwargs.pop('bold', False)
     labcolor = kwargs.pop('labcolor', 'black')
-    labcolor = __getcolor(labcolor)
+    labcolor = plotutil.getcolor(labcolor)
     if bold:
         font = Font(fontname, Font.BOLD, fontsize)
     else:
@@ -3702,124 +3514,6 @@ def set(obj, **kwargs):
         if not tickin is None:
             obj.axes.setInsideTick(tickin)
     draw_if_interactive()
-    
-def __getcolormap(**kwargs):
-    colors = kwargs.pop('colors', None)
-    issingle = False
-    if colors is None:
-        colors = kwargs.pop('color', None)
-        issingle = True
-    if not colors is None:
-        if issingle or isinstance(colors, str):
-            c = __getcolor(colors)
-            cmap = ColorMap(c)
-        else:
-            cs = []
-            for cc in colors:
-                c = __getcolor(cc)
-                cs.append(c)
-            cmap = ColorMap(cs)
-    else:
-        cmapstr = kwargs.pop('cmap', 'matlab_jet')
-        if cmapstr is None:
-            cmapstr = 'matlab_jet'
-        alpha = kwargs.pop('alpha', None)
-        if alpha is None:
-            cmap = ColorUtil.getColorMap(cmapstr)
-        else:
-            alpha = (int)(alpha * 255)
-            cmap = ColorUtil.getColorMap(cmapstr, alpha)
-    reverse = kwargs.pop('cmapreverse', False)
-    if reverse:
-        cmap.reverse()
-    return cmap
-    
-def __getlegendscheme(args, min, max, **kwargs):
-    ls = kwargs.pop('symbolspec', None)
-    if ls is None:
-        cmap = __getcolormap(**kwargs)        
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(min, max, cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(min, max, level_arg, cmap)
-        else:    
-            ls = LegendManage.createLegendScheme(min, max, cmap)
-        ecobj = kwargs.pop('edgecolor', None)
-        if not ecobj is None:
-            edgecolor = __getcolor(ecobj)
-            ls = ls.convertTo(ShapeTypes.Polygon)
-            for lb in ls.getLegendBreaks():
-                lb.setDrawOutline(True)
-                lb.setOutlineColor(edgecolor)
-    return ls
-    
-def __setlegendscheme(ls, **kwargs):
-    st = ls.getShapeType()
-    if st == ShapeTypes.Point:
-        __setlegendscheme_point(ls, **kwargs)
-    elif st == ShapeTypes.Polyline:
-        __setlegendscheme_line(ls, **kwargs)
-    elif st == ShapeTypes.Polygon:
-        __setlegendscheme_polygon(ls, **kwargs)
-    else:
-        __setlegendscheme_image(ls, **kwargs)
-
-def __setlegendscheme_image(ls, **kwargs):
-    cobj = kwargs.pop('color', None)
-    if not cobj is None:
-        color = __getcolor(cobj)    
-        for lb in ls.getLegendBreaks():
-            lb.setColor(color)
-    return ls
-        
-def __setlegendscheme_point(ls, **kwargs):
-    ls = ls.convertTo(ShapeTypes.Point)    
-    for lb in ls.getLegendBreaks():
-        __setpointlegendbreak(lb, **kwargs)
-    return ls
-    
-def __setlegendscheme_line(ls, **kwargs):
-    ls = ls.convertTo(ShapeTypes.Polyline)
-    size = kwargs.pop('size', 1)
-    lsobj = kwargs.pop('linestyle', '-')
-    linestyle = __getlinestyle(lsobj)
-    cobj = kwargs.pop('color', None)
-    if cobj is None:
-        color = None
-    else:
-        color = __getcolor(cobj)    
-    for lb in ls.getLegendBreaks():
-        if not color is None:
-            lb.setColor(color)
-        lb.setStyle(linestyle)
-        lb.setSize(size)
-    return ls
-    
-def __setlegendscheme_polygon(ls, **kwargs):
-    ls = ls.convertTo(ShapeTypes.Polygon)
-    fcobj = kwargs.pop('facecolor', None)
-    if fcobj is None:
-        facecolor = None
-    else:
-        facecolor = __getcolor(fcobj)
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = __getcolor(ecobj)
-    edgesize = kwargs.pop('edgesize', 1)
-    fill = kwargs.pop('fill', True)
-    edge = kwargs.pop('edge', True)
-    for lb in ls.getLegendBreaks():
-        if not facecolor is None:
-            lb.setColor(facecolor)
-        lb.setOutlineSize(edgesize)        
-        lb.setOutlineColor(edgecolor)        
-        lb.setDrawFill(fill)        
-        lb.setDrawOutline(edge)
-    return ls
 
 def imshow(*args, **kwargs):
     """
@@ -3842,7 +3536,7 @@ def imshow(*args, **kwargs):
     global gca
     
     n = len(args)
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
     isrgb = False
@@ -3897,8 +3591,8 @@ def imshow(*args, **kwargs):
             rgbdata = rgbd
         else:
             rgbdata = rgbdata.asarray()
-        x = __getplotdata(x)
-        y = __getplotdata(y)
+        x = plotutil.getplotdata(x)
+        y = plotutil.getplotdata(y)
         igraphic = GraphicFactory.createImage(x, y, rgbdata)
         ls = None
     else:
@@ -3912,7 +3606,7 @@ def imshow(*args, **kwargs):
                     level_arg = level_arg.aslist()
                 ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
         else:
-            ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+            ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
         ls = ls.convertTo(ShapeTypes.Image)
             
         igraphic = GraphicFactory.createImage(gdata, ls)
@@ -3969,7 +3663,7 @@ def contour(*args, **kwargs):
     global gca
     
     n = len(args)
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
     if n <= 2:
@@ -4000,7 +3694,7 @@ def contour(*args, **kwargs):
     else:    
         ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     ls = ls.convertTo(ShapeTypes.Polyline)
-    __setlegendscheme(ls, **kwargs)
+    plotutil.setlegendscheme(ls, **kwargs)
     
     smooth = kwargs.pop('smooth', True)
     igraphic = GraphicFactory.createContourLines(gdata.data, ls, smooth)
@@ -4056,7 +3750,7 @@ def contourf(*args, **kwargs):
     global gca
     
     n = len(args)    
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
     if n <= 2:
@@ -4141,7 +3835,7 @@ def quiver(*args, **kwargs):
     """
     global gca
     
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     order = kwargs.pop('order', None)
     isuv = kwargs.pop('isuv', True)
@@ -4176,10 +3870,10 @@ def quiver(*args, **kwargs):
             cdata = args[0]
             iscolor = True
             args = args[1:]
-    x = __getplotdata(x)
-    y = __getplotdata(y)
-    u = __getplotdata(u)
-    v = __getplotdata(v)    
+    x = plotutil.getplotdata(x)
+    y = plotutil.getplotdata(y)
+    u = plotutil.getplotdata(u)
+    v = plotutil.getplotdata(v)    
     
     if iscolor:
         if len(args) > 0:
@@ -4199,10 +3893,10 @@ def quiver(*args, **kwargs):
         else:
             c = Color.black
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = __setlegendscheme_point(ls, **kwargs)
+    ls = plotutil.setlegendscheme_point(ls, **kwargs)
     
     if not cdata is None:
-        cdata = __getplotdata(cdata)
+        cdata = plotutil.getplotdata(cdata)
     igraphic = GraphicFactory.createArrows(x, y, u, v, cdata, ls, isuv)
     
     #Create plot
@@ -4255,7 +3949,7 @@ def barbs(*args, **kwargs):
     """
     global gca
     
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     order = kwargs.pop('order', None)
     isuv = kwargs.pop('isuv', True)
@@ -4290,10 +3984,10 @@ def barbs(*args, **kwargs):
             cdata = args[0]
             iscolor = True
             args = args[1:]
-    x = __getplotdata(x)
-    y = __getplotdata(y)
-    u = __getplotdata(u)
-    v = __getplotdata(v)    
+    x = plotutil.getplotdata(x)
+    y = plotutil.getplotdata(y)
+    u = plotutil.getplotdata(u)
+    v = plotutil.getplotdata(v)    
     
     if iscolor:
         if len(args) > 0:
@@ -4313,10 +4007,10 @@ def barbs(*args, **kwargs):
         else:
             c = Color.black
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = __setlegendscheme_point(ls, **kwargs)
+    ls = plotutil.setlegendscheme_point(ls, **kwargs)
     
     if not cdata is None:
-        cdata = __getplotdata(cdata)
+        cdata = plotutil.getplotdata(cdata)
     igraphic = GraphicFactory.createBarbs(x, y, u, v, cdata, ls, isuv)
     
     #Create plot
@@ -4656,7 +4350,7 @@ def imshowm(*args, **kwargs):
     :returns: (*RasterLayer*) RasterLayer created from array data.
     """
     plot = gca
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
     order = kwargs.pop('order', None)
@@ -4704,8 +4398,8 @@ def imshowm(*args, **kwargs):
             rgbdata = rgbd
         else:
             rgbdata = rgbdata.asarray()
-        x = __getplotdata(x)
-        y = __getplotdata(y)
+        x = plotutil.getplotdata(x)
+        y = plotutil.getplotdata(y)
         igraphic = GraphicFactory.createImage(x, y, rgbdata)
         layer = DrawMeteoData.createImageLayer(x, y, igraphic, 'layer_image')
         if (proj != None):
@@ -4743,10 +4437,10 @@ def imshowm(*args, **kwargs):
         if not fill_color is None:
             cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
             if cb.isNoData():
-                cb.setColor(__getcolor(fill_color))
+                cb.setColor(plotutil.getcolor(fill_color))
             # else:  
                 # cb = ColorBreak()
-                # cb.setColor(__getcolor(fill_color))
+                # cb.setColor(plotutil.getcolor(fill_color))
                 # cb.setNoData(True)
                 # ls.addLegendBreak(cb)
         layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
@@ -4789,9 +4483,9 @@ def contourm(*args, **kwargs):
         a = args[2]
         gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     ls = ls.convertTo(ShapeTypes.Polyline)
-    __setlegendscheme(ls, **kwargs)
+    plotutil.setlegendscheme(ls, **kwargs)
     isplot = kwargs.pop('isplot', True)
     if isplot:
         plot = gca
@@ -4842,7 +4536,7 @@ def contourfm(*args, **kwargs):
         a = args[2]
         gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     ls = ls.convertTo(ShapeTypes.Polygon)
     plotutil.setlegendscheme(ls, **kwargs)
     if interpolate:
@@ -4894,7 +4588,7 @@ def gridfm(*args, **kwargs):
         a = args[2]
         gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     if interpolate:
         gdata = gdata.interpolate()
     layer = __plot_griddata_m(plot, gdata, ls, 'gridf', proj=proj, order=order)
@@ -4929,10 +4623,10 @@ def surfacem_1(*args, **kwargs):
             gdata = minum.asgriddata(a, x_g, y_g, fill_value)
         
         args = args[3:]
-    ls = __getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
     symbolspec = kwargs.pop('symbolspec', None)
     if symbolspec is None:
-        ls = __setlegendscheme_point(ls, **kwargs)    
+        ls = plotutil.setlegendscheme_point(ls, **kwargs)    
           
     layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo(), order=order)
     select = kwargs.pop('select', True)
@@ -4979,7 +4673,7 @@ def surfacem(*args, **kwargs):
         args = args[3:]
     if a.ndim == 2 and x.ndim == 1:            
         x, y = minum.meshgrid(x, y)            
-    ls = __getlegendscheme(args, a.min(), a.max(), **kwargs)   
+    ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)   
     ls = ls.convertTo(ShapeTypes.Polygon)
     plotutil.setlegendscheme(ls, **kwargs)
         
@@ -5036,7 +4730,7 @@ def quiverm(*args, **kwargs):
     :returns: (*VectoryLayer*) Created quiver VectoryLayer.
     """
     plot = gca
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
     order = kwargs.pop('order', None)
@@ -5087,7 +4781,7 @@ def quiverm(*args, **kwargs):
         else:
             c = Color.black
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = __setlegendscheme_point(ls, **kwargs)
+    ls = plotutil.setlegendscheme_point(ls, **kwargs)
     layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'quiver', isuv, proj=proj)
     select = kwargs.pop('select', True)
     if select:
@@ -5135,10 +4829,10 @@ def quiverkey(*args, **kwargs):
         label = args[4]
         wa.setLabel(label)
     cobj = kwargs.pop('color', 'b')
-    color = __getcolor(cobj)
+    color = plotutil.getcolor(cobj)
     wa.setColor(color)
     lcobj = kwargs.pop('labelcolor', 'b')
-    lcolor = __getcolor(lcobj)
+    lcolor = plotutil.getcolor(lcobj)
     wa.setLabelColor(lcolor)
     bbox = kwargs.pop('bbox', None)
     if not bbox is None:
@@ -5147,7 +4841,7 @@ def quiverkey(*args, **kwargs):
             wa.setFill(fill)
         facecolor = bbox.pop('facecolor', None)
         if not facecolor is None:
-            facecolor = __getcolor(facecolor)
+            facecolor = plotutil.getcolor(facecolor)
             wa.setFill(True)
             wa.setBackground(facecolor)
         edge = bbox.pop('edge', None)
@@ -5155,7 +4849,7 @@ def quiverkey(*args, **kwargs):
             wa.setDrawNeatline(edge)
         edgecolor = bbox.pop('edgecolor', None)
         if not edgecolor is None:
-            edgecolor = __getcolor(edgecolor)
+            edgecolor = plotutil.getcolor(edgecolor)
             wa.setNeatlineColor(edgecolor)
             wa.setDrawNeatline(True)
         linewidth = bbox.pop('linewidth', None)
@@ -5187,7 +4881,7 @@ def barbsm(*args, **kwargs):
     :returns: (*VectoryLayer*) Created barbs VectoryLayer.
     """
     plot = gca
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
     order = kwargs.pop('order', None)
@@ -5237,7 +4931,7 @@ def barbsm(*args, **kwargs):
         else:
             c = Color.black
         ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = __setlegendscheme_point(ls, **kwargs)
+    ls = plotutil.setlegendscheme_point(ls, **kwargs)
     layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'barbs', isuv, proj=proj)
     select = kwargs.pop('select', True)
     if select:
@@ -5267,11 +4961,11 @@ def streamplotm(*args, **kwargs):
     :returns: (*VectoryLayer*) Created streamline VectoryLayer.
     """
     plot = gca
-    cmap = __getcolormap(**kwargs)
+    cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     proj = kwargs.pop('proj', None)
     cobj = kwargs.pop('color', 'b')
-    color = __getcolor(cobj)
+    color = plotutil.getcolor(cobj)
     isuv = kwargs.pop('isuv', True)
     density = kwargs.pop('density', 4)
     n = len(args)
@@ -5469,7 +5163,7 @@ def clabel(layer, **kwargs):
         labelset.setColorByLegend(True)
     else:
         labelset.setColorByLegend(False)
-        color = __getcolor(color)
+        color = plotutil.getcolor(color)
         labelset.setLabelColor(color)
     labelset.setDrawShadow(drawshadow)
     xoffset = kwargs.pop('xoffset', 0)
@@ -5696,7 +5390,7 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     :returns: (*list*) Created colors.
     '''
     if isinstance(n, list):
-        cols = __getcolors(n, alpha)
+        cols = plotutil.getcolors(n, alpha)
     else:
         ocmap = ColorUtil.getColorMap(cmap)
         if reverse:
@@ -5752,9 +5446,9 @@ def makesymbolspec(geometry, *args, **kwargs):
             levels = levels.aslist()
         colors = []
         for cobj in cols:
-            colors.append(__getcolor(cobj))
+            colors.append(plotutil.getcolor(cobj))
         ls = LegendManage.createLegendScheme(shapetype, levels, colors)
-        __setlegendscheme(ls, **kwargs)
+        plotutil.setlegendscheme(ls, **kwargs)
         field = kwargs.pop('field', '')    
         ls.setFieldName(field)
         return ls
@@ -5765,7 +5459,7 @@ def makesymbolspec(geometry, *args, **kwargs):
     n = len(args)
     isunique = True
     for arg in args:
-        lb, isu = __getlegendbreak(geometry, **arg)
+        lb, isu = plotutil.getlegendbreak(geometry, **arg)
         if isunique  and not isu:
             isunique = False
         ls.addLegendBreak(lb)
@@ -5792,7 +5486,7 @@ def weatherspec(weather='all', size=20, color='b'):
         wlist = DrawMeteoData.getWeatherTypes(weather)
     else:
         wlist = weather
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     return DrawMeteoData.createWeatherLegendScheme(wlist, size, c)
     
 def cloudspec(size=12, color='b'):
@@ -5804,7 +5498,7 @@ def cloudspec(size=12, color='b'):
     
     :returns: Cloud amount symbol legend.
     '''
-    c = __getcolor(color)
+    c = plotutil.getcolor(color)
     return DrawMeteoData.createCloudLegendScheme(size, c)
     
 def __getpointlegendbreak(**kwargs):
@@ -5822,145 +5516,18 @@ def __getpointlegendbreak(**kwargs):
         charindex = kwargs.pop('charindex', 0)
         lb.setCharIndex(charindex)
     else:
-        pstyle = __getpointstyle(marker)
+        pstyle = plotutil.getpointstyle(marker)
         lb.setStyle(pstyle)
     size = kwargs.pop('size', 6)
     lb.setSize(size)
     ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = __getcolor(ecobj)
+    edgecolor = plotutil.getcolor(ecobj)
     lb.setOutlineColor(edgecolor)
     fill = kwargs.pop('fill', True)
     lb.setDrawFill(fill)
     edge = kwargs.pop('edge', True)
     lb.setDrawOutline(edge)
     return lb
-    
-def __setpointlegendbreak(lb, **kwargs):       
-    marker = kwargs.pop('marker', 'o')
-    if marker == 'image':
-        imagepath = kwargs.pop('imagepath', None)
-        if not imagepath is None:
-            lb.setMarkerType(MarkerType.Image)
-            lb.setImagePath(imagepath)
-    elif marker == 'font':
-        fontname = kwargs.pop('fontname', 'Weather')
-        lb.setMarkerType(MarkerType.Character)
-        lb.setFontName(fontname)
-        charindex = kwargs.pop('charindex', 0)
-        lb.setCharIndex(charindex)
-    else:
-        pstyle = __getpointstyle(marker)
-        lb.setStyle(pstyle)
-    size = kwargs.pop('size', 6)
-    lb.setSize(size)
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = __getcolor(ecobj)
-    lb.setOutlineColor(edgecolor)
-    fill = kwargs.pop('fill', True)
-    lb.setDrawFill(fill)
-    edge = kwargs.pop('edge', True)
-    lb.setDrawOutline(edge)
-
-def __getlegendbreak(geometry, **kwargs): 
-    cobj = kwargs.pop('color', None)
-    if cobj is None:
-        cobj = kwargs.pop('facecolor', None)
-    color = None
-    if not cobj is None:
-        color = __getcolor(cobj)
-    if geometry == 'point':
-        lb = PointBreak()        
-        marker = kwargs.pop('marker', 'o')
-        if marker == 'image':
-            imagepath = kwargs.pop('imagepath', None)
-            if not imagepath is None:
-                lb.setMarkerType(MarkerType.Image)
-                lb.setImagePath(imagepath)
-        elif marker == 'font':
-            fontname = kwargs.pop('fontname', 'Weather')
-            lb.setMarkerType(MarkerType.Character)
-            lb.setFontName(fontname)
-            charindex = kwargs.pop('charindex', 0)
-            lb.setCharIndex(charindex)
-        else:
-            pstyle = __getpointstyle(marker)
-            lb.setStyle(pstyle)
-        size = kwargs.pop('size', 6)
-        lb.setSize(size)
-        ecobj = kwargs.pop('edgecolor', 'k')
-        edgecolor = __getcolor(ecobj)
-        lb.setOutlineColor(edgecolor)
-        fill = kwargs.pop('fill', True)
-        lb.setDrawFill(fill)
-        edge = kwargs.pop('edge', True)
-        lb.setDrawOutline(edge)
-    elif geometry == 'line':
-        lb = PolylineBreak()
-        size = kwargs.pop('size', 1.0)
-        size = kwargs.pop('linewidth', size)
-        lb.setSize(size)
-        lsobj = kwargs.pop('linestyle', '-')
-        linestyle = __getlinestyle(lsobj)
-        lb.setStyle(linestyle)
-        marker = kwargs.pop('marker', None)
-        if not marker is None:
-            pstyle = __getpointstyle(marker)
-            lb.setDrawSymbol(True)
-            lb.setSymbolStyle(pstyle)
-            markersize = kwargs.pop('markersize', 8)
-            lb.setSymbolSize(markersize)
-            markercolor = kwargs.pop('markercolor', None)
-            if markercolor is None:
-                makercolor = color
-            else:
-                makercolor = __getcolor(makercolor)
-            lb.setSymbolColor(makercolor)
-            fillcolor = kwargs.pop('makerfillcolor', None)
-            if not fillcolor is None:
-                lb.setFillSymbol(True)
-                lb.setSymbolFillColor(__getcolor(fillcolor))
-            else:
-                lb.setSymbolFillColor(markercolor)
-            interval = kwargs.pop('markerinterval', 1)
-            lb.setSymbolInterval(interval)
-    elif geometry == 'polygon':
-        lb = PolygonBreak()
-        ecobj = kwargs.pop('edgecolor', 'k')
-        edgecolor = __getcolor(ecobj)
-        lb.setOutlineColor(edgecolor)
-        fill = kwargs.pop('fill', None)
-        if fill is None:
-            if color is None:
-                lb.setDrawFill(False)
-            else:
-                lb.setDrawFill(True)
-        else:
-            lb.setDrawFill(fill)
-        edge = kwargs.pop('edge', True)
-        lb.setDrawOutline(edge)
-        size = kwargs.pop('size', 1)
-        lb.setOutlineSize(size)
-    else:
-        lb = ColorBreak()
-    caption = kwargs.pop('caption', None)
-    if not caption is None:
-        lb.setCaption(caption) 
-    if not color is None:
-        lb.setColor(color)
-    alpha = kwargs.pop('alpha', None)
-    if not alpha is None:
-        lb.setColor(__getcolor(lb.getColor(), alpha))
-    value = kwargs.pop('value', None)
-    isunique = True
-    if not value is None:
-        if isinstance(value, (tuple, list)):
-            lb.setStartValue(value[0])
-            lb.setEndValue(value[1])
-            isunique = False
-        else:
-            lb.setStartValue(value)
-            lb.setEndValue(value)
-    return lb, isunique
     
 def masklayer(mobj, layers):
     '''
