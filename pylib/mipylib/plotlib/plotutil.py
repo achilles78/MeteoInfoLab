@@ -167,14 +167,18 @@ def getlinestyle(style):
         return None
         
     lineStyle = None
-    if '--' in style:
-        lineStyle = LineStyles.Dash
-    elif ':' in style:
-        lineStyle = LineStyles.Dot
-    elif '-.' in style:
-        lineStyle = LineStyles.DashDot
-    elif '-' in style:
-        lineStyle = LineStyles.Solid
+    if style[0].isalpha():
+        style = style.upper()
+        lineStyle = LineStyles.valueOf(style)
+    else:
+        if '--' in style:
+            lineStyle = LineStyles.DASH
+        elif ':' in style:
+            lineStyle = LineStyles.DOT
+        elif '-.' in style:
+            lineStyle = LineStyles.DASHDOT
+        elif '-' in style:
+            lineStyle = LineStyles.SOLID
     
     return lineStyle
     

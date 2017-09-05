@@ -241,13 +241,13 @@ def plot(*args, **kwargs):
         if styles != None:
             for i in range(0, len(styles)):
                 label = kwargs.pop('label', 'S_' + str(i + 1))
-                line = __getplotstyle(styles[i], label, **kwargs)
+                line = plotutil.getplotstyle(styles[i], label, **kwargs)
                 lines.append(line)
         else:
             snum = len(xdatalist)
             for i in range(0, snum):
                 label = kwargs.pop('label', 'S_' + str(i + 1))
-                line = __getlegendbreak('line', **kwargs)[0]
+                line = plotutil.getlegendbreak('line', **kwargs)[0]
                 line.setCaption(label)
                 lines.append(line)
     
@@ -3103,7 +3103,7 @@ def yticks(*args, **kwargs):
         axis_r = gca.axes.getAxis(Location.RIGHT)
     if len(args) > 0:
         locs = args[0]
-        if isinstance(locs, MIArray):
+        if isinstance(locs, (MIArray, DimArray)):
             locs = locs.aslist()
         if isinstance(locs[0], datetime.datetime):
             for i in range(len(locs)):
