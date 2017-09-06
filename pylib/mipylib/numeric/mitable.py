@@ -190,6 +190,28 @@ class PyTableData():
         '''
         self.data.addRows(rows)
         
+    def delrow(self, row):
+        '''
+        Delete a row.
+        
+        :param row: (*int or DataRow*) Data row.
+        '''
+        self.data.dataTable.removeRow(row)
+        
+    def delrows(self, rows):
+        '''
+        Delete rows.
+        
+        :param rows: (*list*) Data rows.
+        '''
+        self.data.dataTable.removRows(rows)
+        
+    def clearrows(self):
+        '''
+        Clear all rows.               
+        '''
+        self.data.dataTable.getRows().clear()
+        
     def getrow(self, index):
         '''
         Return a row.
