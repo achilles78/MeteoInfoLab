@@ -47,7 +47,7 @@ nan = Double.NaN
 
 __all__ = [
     'pi','e','inf','nan','absolute','arange','arange1',    
-    'array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
+    'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
     'corrcoef','cos','degrees','diag','dim_array','datatable','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
@@ -56,7 +56,7 @@ __all__ = [
     'nonzero','ones','ones_like','pol2cart','polyval','power',
     'project','projectxy','projinfo','radians','reshape',
     'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','std','sum','tan',
-    'transpose','trapz','vdot',
+    'transpose','trapz','vdot','unravel_index',
     'where','zeros','zeros_like'
     ]
 
@@ -1007,6 +1007,68 @@ def fmin(x1, x2):
         return DimArray(r, x1.dims, x1.fill_value, x1.proj)
     else:
         return min(x1, x2)
+        
+def argmin(a, axis=None):
+    '''
+    Returns the indices of the minimum values along an axis.
+    
+    :param a: (*array_like*) Input array.
+    :param axis: (*int*) By default, the index is into the flattened array, otherwise 
+        along the specified axis.
+        
+    :returns: Array of indices into the array. It has the same shape as a.shape with the 
+        dimension along axis removed.
+    '''
+    if axis is None:
+        r = ArrayMath.argMin(a.asarray())
+        return r
+    else:
+        r = ArrayMath.argMin(a.asarray(), axis)
+        return MIArray(r)
+        
+def argmax(a, axis=None):
+    '''
+    Returns the indices of the minimum values along an axis.
+    
+    :param a: (*array_like*) Input array.
+    :param axis: (*int*) By default, the index is into the flattened array, otherwise 
+        along the specified axis.
+        
+    :returns: Array of indices into the array. It has the same shape as a.shape with the 
+        dimension along axis removed.
+    '''
+    if axis is None:
+        r = ArrayMath.argMax(a.asarray())
+        return r
+    else:
+        r = ArrayMath.argMax(a.asarray(), axis)
+        return MIArray(r)
+        
+def unravel_index(indices, dims):
+    '''
+    Converts a flat index or array of flat indices into a tuple of coordinate arrays.
+    
+    :param indices: (*array_like*) An integer array whose elements are indices into the 
+        flattened version of an array of dimensions ``dims``.
+    :param dims: (*tuple of ints*) The shape of the array to use for unraveling indices.
+    
+    :returns: tuple of ndarray. Each array in the tuple has the same shape as the indices 
+        array.
+    '''
+    if isinstance(indices, int):
+        idx = indices
+        coords = []
+        for i in range(len(dims)):
+            if i < len(dims) - 1:
+                n = 1
+                for j in range(i + 1, len(dims)):
+                    n = n * dims[j]
+                coord = idx / n
+                coords.append(coord)
+                idx = idx - coord * n
+            else:
+                coords.append(idx)
+        return tuple(coords)
 
 def ave_month(data, colnames, t):
     """

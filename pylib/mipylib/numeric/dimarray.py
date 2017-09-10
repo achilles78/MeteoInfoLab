@@ -687,6 +687,30 @@ class DimArray():
     def max(self):
         return self.array.max()
         
+    def argmin(self, axis=None):
+        '''
+        Returns the indices of the minimum values along an axis.
+        
+        :param axis: (*int*) By default, the index is into the flattened array, otherwise 
+            along the specified axis.
+            
+        :returns: Array of indices into the array. It has the same shape as a.shape with the 
+            dimension along axis removed.
+        '''
+        return self.array.argmin(axis)
+            
+    def argmax(self, axis=None):
+        '''
+        Returns the indices of the minimum values along an axis.
+        
+        :param axis: (*int*) By default, the index is into the flattened array, otherwise 
+            along the specified axis.
+            
+        :returns: Array of indices into the array. It has the same shape as a.shape with the 
+            dimension along axis removed.
+        '''
+        return self.array.argmax(axis)
+        
     def sum(self):
         return self.array.sum()
         

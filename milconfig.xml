@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\ascii">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\netcdf">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\onedim"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
@@ -19,16 +19,12 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\toolbox\emips\get_temporal_profile.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\plot_arrowline-1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\add_curveline.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_6.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\netcdf\wrfout_typhoon.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\toolbox\emips\get_temporal_profile.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\plot_arrowline-1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\add_curveline.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_6.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\netcdf\wrfout_typhoon.py"/>
     </RecentFiles>
   </File>
   <Font>

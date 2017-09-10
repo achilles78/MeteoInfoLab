@@ -367,12 +367,60 @@ class MIArray(object):
         return r
         
     def min(self, fill_value=None):
+        '''
+        Get minimum value.
+        
+        :param fill_value: (*float*) Fill value.
+        
+        :returns: Minimum value.
+        '''
         if fill_value == None:
             return ArrayMath.getMinimum(self.array)
         else:
             return ArrayMath.getMinimum(self.array, fill_value)
+            
+    def argmin(self, axis=None):
+        '''
+        Returns the indices of the minimum values along an axis.
+        
+        :param axis: (*int*) By default, the index is into the flattened array, otherwise 
+            along the specified axis.
+            
+        :returns: Array of indices into the array. It has the same shape as a.shape with the 
+            dimension along axis removed.
+        '''
+        if axis is None:
+            r = ArrayMath.argMin(self.array)
+            return r
+        else:
+            r = ArrayMath.argMin(self.array, axis)
+            return MIArray(r)
+            
+    def argmax(self, axis=None):
+        '''
+        Returns the indices of the minimum values along an axis.
+        
+        :param axis: (*int*) By default, the index is into the flattened array, otherwise 
+            along the specified axis.
+            
+        :returns: Array of indices into the array. It has the same shape as a.shape with the 
+            dimension along axis removed.
+        '''
+        if axis is None:
+            r = ArrayMath.argMax(self.array)
+            return r
+        else:
+            r = ArrayMath.argMax(self.array, axis)
+            return MIArray(r)
         
     def max(self, fill_value=None):
+        '''
+        Get maximum value.
+        
+        :param fill_value: (*float*) Fill value.
+        
+        :returns: Maximum value.
+        '''
         if fill_value == None:
             return ArrayMath.getMaximum(self.array)
         else:
@@ -382,6 +430,13 @@ class MIArray(object):
         return self.array.getShape()
         
     def sum(self, fill_value=None):
+        '''
+        Get summarize value.
+        
+        :param fill_value: (*float*) Fill value.
+        
+        :returns: Summarize value.
+        '''
         if fill_value == None:
             return ArrayMath.sum(self.array)
         else:
@@ -496,6 +551,8 @@ class MIArray(object):
         
         :returns: Transposed array.
         '''
+        if self.ndim == 1:
+            return self[:]
         dim1 = 0
         dim2 = 1
         r = ArrayMath.transpose(self.asarray(), dim1, dim2)
