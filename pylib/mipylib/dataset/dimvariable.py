@@ -100,28 +100,44 @@ class DimVariable():
                     k = indices[i]
                     if isinstance(k, basestring):
                         xlims = k.split(':')
-                        xlim = [float(xlims[0]), float(xlims[1])]
+                        if len(xlims) == 1:
+                            xlim = [float(xlims[0])]
+                        else:
+                            xlim = [float(xlims[0]), float(xlims[1])]
                         xidx = i
                 elif dim.getDimType() == DimensionType.Y:
                     k = indices[i]
                     if isinstance(k, basestring):
                         ylims = k.split(':')
-                        ylim = [float(ylims[0]), float(ylims[1])]
+                        if len(ylims) == 1:
+                            ylim = [float(ylims[0])]
+                        else:
+                            ylim = [float(ylims[0]), float(ylims[1])]
                         yidx = i
             if not xlim is None and not ylim is None:                
                 fromproj=KnownCoordinateSystems.geographic.world.WGS1984
                 inpt = PointD(xlim[0], ylim[0])
                 outpt1 = Reproject.reprojectPoint(inpt, fromproj, self.proj)
-                inpt = PointD(xlim[1], ylim[1])
-                outpt2 = Reproject.reprojectPoint(inpt, fromproj, self.proj)
-                xlim = [outpt1.X, outpt2.X]
-                ylim = [outpt1.Y, outpt2.Y]
+                if len(xlim) == 1:
+                    xlim = [outpt1.X]
+                    ylim = [outpt1.Y]
+                else:
+                    inpt = PointD(xlim[1], ylim[1])
+                    outpt2 = Reproject.reprojectPoint(inpt, fromproj, self.proj)
+                    xlim = [outpt1.X, outpt2.X]
+                    ylim = [outpt1.Y, outpt2.Y]
                 indices1 = []
                 for i in range(0, self.ndim):
                     if i == xidx:
-                        indices1.append(str(xlim[0]) + ':' + str(xlim[1]))
+                        if len(xlim) == 1:
+                            indices1.append(str(xlim[0]))
+                        else:
+                            indices1.append(str(xlim[0]) + ':' + str(xlim[1]))
                     elif i == yidx:
-                        indices1.append(str(ylim[0]) + ':' + str(ylim[1]))
+                        if len(ylim) == 1:
+                            indices1.append(str(ylim[0]))
+                        else:
+                            indices1.append(str(ylim[0]) + ':' + str(ylim[1]))
                     else:
                         indices1.append(indices[i])
                 indices = indices1
@@ -147,7 +163,7 @@ class DimVariable():
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.dimlen(i) + sidx
-                eidx = self.dimlen(i)-1 if k.stop is None else k.stop
+                eidx = self.dimlen(i)-1 if k.stop is None else k.stop-1
                 if eidx < 0:
                     eidx = self.dimlen(i) + eidx
                 step = 1 if k.step is None else k.step

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\netcdf">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\onedim"/>
+  <Path OpenPath="S:\haze_fog\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
@@ -16,15 +14,23 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="S:\haze_fog\script"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_6.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\netcdf\wrfout_typhoon.py"/>
+      <OpenedFile File="S:\haze_fog\script\cal_rh.py"/>
+      <OpenedFile File="S:\haze_fog\script\plot_haze_fog.py"/>
+      <OpenedFile File="S:\haze_fog\script\extract_micaps1.py"/>
+      <OpenedFile File="S:\haze_fog\script\extract_model.py"/>
+      <OpenedFile File="S:\haze_fog\script\cal_haze_fog_loop.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\surf_6.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\netcdf\wrfout_typhoon.py"/>
+      <RecentFile File="S:\haze_fog\script\cal_rh.py"/>
+      <RecentFile File="S:\haze_fog\script\plot_haze_fog.py"/>
+      <RecentFile File="S:\haze_fog\script\extract_micaps1.py"/>
+      <RecentFile File="S:\haze_fog\script\extract_model.py"/>
+      <RecentFile File="S:\haze_fog\script\cal_haze_fog_loop.py"/>
     </RecentFiles>
   </File>
   <Font>
