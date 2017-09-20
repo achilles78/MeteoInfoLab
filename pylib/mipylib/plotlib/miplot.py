@@ -5299,6 +5299,7 @@ def geoshow(*args, **kwargs):
         plot.axes.setDrawExtent(layer.getExtent().clone())
         plot.axes.setExtent(layer.getExtent().clone())
         draw_if_interactive()
+        return MILayer(layer)
     else:
         if isinstance(args[0], Graphic):
             graphic = args[0]
@@ -5348,7 +5349,7 @@ def geoshow(*args, **kwargs):
             elif displaytype == 'polygon':
                 graphic = plot.axes.addPolygon(lat, lon, lbreak)
             draw_if_interactive()
-            return graphic
+        return graphic
             
 def surf(*args, **kwargs):
     '''

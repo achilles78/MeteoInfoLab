@@ -98,6 +98,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("import toolbox");
             interp.exec("from toolbox import *");
         } catch (Exception e) {
+            System.out.println(e.toString());
             e.printStackTrace();
         }
         

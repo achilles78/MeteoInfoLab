@@ -7,7 +7,7 @@
 from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes, VectorLayer
 from org.meteoinfo.projection import ProjectionManage, KnownCoordinateSystems
-from org.meteoinfo.shape import PolygonShape, ShapeTypes, PointShape, ShapeUtil
+from org.meteoinfo.shape import PolygonShape, ShapeTypes, PointShape
 from java.util import Date, Calendar
 from java.awt import Font
 from datetime import datetime
@@ -186,7 +186,26 @@ class MILayer():
         r = self.layer.clip(clipobj)
         return MILayer(r)
         
+    def select(self, expression, seltype='new'):
+        '''
+        Select shapes by SQL expression.
+        
+        :param expression: (*string*) SQL expression.
+        :param seltype: (*string*) Selection type ['new' | 'add_to_current' |
+            'remove_from_current' | 'select_from_current']
+        '''
+        self.layer.sqlSelect(expression, seltype)
+        
+    def clear_selection(self):
+        '''
+        Clear shape selection.
+        '''
+        self.layer.clearSelectedShapes()
+        
     def clone(self):
+        '''
+        Clone self.
+        '''
         return MILayer(self.layer.clone())
     
     def save(self, fn=None):
@@ -211,49 +230,7 @@ class MILayer():
         """
         self.layer.saveAsKMLFile(fn)
 
-def makeshapes(x, y, type=None, z=None, m=None):
-    """
-    Make shapes by x and y coordinates.
-    
-    :param x: (*array_like*) X coordinates.
-    :param y: (*array_like*) Y coordinates.    
-    :param type: (*string*) Shape type [point | line | polygon].
-    :param z: (*array_like*) Z coordinates.
-    :param m: (*array_like*) M coordinates.
-    
-    :returns: Shapes
-    """
-    shapes = []   
-    if isinstance(x, (int, float)):
-        shape = PointShape()
-        shape.setPoint(PointD(x, y))
-        shapes.append(shape)    
-    else:
-        x = minum.asarray(x)
-        y = minum.asarray(y)
-        if not z is None:            
-            if m is None:
-                m = minum.zeros(len(z)).array
-            else:
-                m = minum.asarray(m)
-            z = minum.asarray(z)
-        if type == 'point':
-            if z is None:
-                shapes = ShapeUtil.createPointShapes(x, y)
-            else:
-                shapes = ShapeUtil.createPointShapes(x, y, z, m)
-        elif type == 'line':
-            if z is None:
-                shapes = ShapeUtil.createPolylineShapes(x, y)
-            else:
-                shapes = ShapeUtil.createPolylineShapes(x, y, z, m)
-        elif type == 'polygon':
-            if z is None:
-                shapes = ShapeUtil.createPolygonShapes(x, y)
-            else:
-                shapes = ShapeUtil.createPolygonShape(x, y, z, m)
-    return shapes   
-        
+
 class MIXYListData():
     def __init__(self, data=None):
         if data is None:

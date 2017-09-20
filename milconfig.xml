@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\hdf">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\micaps">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\emips"/>
@@ -13,18 +9,25 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
-    <RecentFolder Folder="S:\haze_fog\script"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\hammer_proj.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\FY3C_VIRRD.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_3.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\hammer_proj.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\FY3C_VIRRD.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_3.py"/>
     </RecentFiles>
   </File>
   <Font>
