@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\micaps">
+  <Path OpenPath="D:\KeyData\Visibility\Program">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\emips"/>
@@ -15,19 +15,22 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
+    <RecentFolder Folder="D:\KeyData\Visibility\Program"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_3.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_3.py"/>
+      <OpenedFile File="D:\KeyData\Visibility\Program\extract_stations.py"/>
+      <OpenedFile File="D:\KeyData\Visibility\Program\copy_data_stations.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_3.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_3.py"/>
+      <RecentFile File="D:\KeyData\Visibility\Program\extract_stations.py"/>
+      <RecentFile File="D:\KeyData\Visibility\Program\copy_data_stations.py"/>
     </RecentFiles>
   </File>
   <Font>

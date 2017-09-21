@@ -49,6 +49,15 @@ class MILayer():
         :returns: (*boolean*) Is VectorLayer or not.
         '''
         return self.layer.getLayerType() == LayerTypes.VectorLayer
+        
+    def gettable(self):
+        '''
+        Get attribute table.
+        
+        :returns: (*PyTableData') Attribute table.
+        '''
+        r = self.layer.getAttributeTable().getTable()
+        return minum.datatable(r)
     
     def cellvalue(self, fieldname, shapeindex):
         '''
@@ -193,8 +202,11 @@ class MILayer():
         :param expression: (*string*) SQL expression.
         :param seltype: (*string*) Selection type ['new' | 'add_to_current' |
             'remove_from_current' | 'select_from_current']
+            
+        :returns: (*list of Shape*) Selected shape list.
         '''
         self.layer.sqlSelect(expression, seltype)
+        return self.layer.getSelectedShapes()
         
     def clear_selection(self):
         '''

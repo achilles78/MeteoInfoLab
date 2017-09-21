@@ -26,7 +26,7 @@ from java.util import ArrayList
 
 __all__ = [
     'arrayinpolygon','distance','georead','geotiffread','maplayer','inpolygon','maskout',
-    'polyarea','polygon','rmaskout','shaperead'
+    'polyarea','polygon','makeshapes','rmaskout','shaperead'
     ]
 
 def shaperead(fn):   
