@@ -198,6 +198,14 @@ class MapAxes(Axes):
             self.axes = axes
         self.axestype = 'map'
         self.proj = self.axes.getProjInfo()
+        
+    def islonlat(self):
+        '''
+        Get if the map axes is lonlat projection or not.
+        
+        :returns: (*boolean*) Is lonlat projection or not.
+        '''
+        return self.proj.isLonLat()
             
     def add_layer(self, layer, zorder=None):
         '''

@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\KeyData\Visibility\Program">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\emips"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
+  <Path OpenPath="V:\data\dust\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
@@ -16,25 +12,29 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\KeyData\Visibility\Program"/>
+    <RecentFolder Folder="D:\KeyData\Visibility"/>
+    <RecentFolder Folder="D:\KeyData"/>
+    <RecentFolder Folder="E:\Temp\Data\dust\script"/>
+    <RecentFolder Folder="V:\data\dust\script"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_3.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_2.py"/>
-      <OpenedFile File="D:\KeyData\Visibility\Program\extract_stations.py"/>
-      <OpenedFile File="D:\KeyData\Visibility\Program\copy_data_stations.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test-1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test.py"/>
+      <OpenedFile File="V:\data\dust\script\iddi_FY4A.py"/>
+      <OpenedFile File="V:\data\dust\script\iddi_FY4A_to_model_grid.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_3.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig_2.py"/>
-      <RecentFile File="D:\KeyData\Visibility\Program\extract_stations.py"/>
-      <RecentFile File="D:\KeyData\Visibility\Program\copy_data_stations.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test-1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test.py"/>
+      <RecentFile File="V:\data\dust\script\iddi_FY4A.py"/>
+      <RecentFile File="V:\data\dust\script\iddi_FY4A_to_model_grid.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="75,17" MainFormSize="1478,790"/>
+  <Startup MainFormLocation="80,13" MainFormSize="1478,790"/>
 </MeteoInfo>

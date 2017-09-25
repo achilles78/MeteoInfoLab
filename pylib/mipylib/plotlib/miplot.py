@@ -2013,6 +2013,7 @@ def __set_axesm(ax, **kwargs):
         if rightaxis == False:
             ax.axes.getAxis(Location.RIGHT).setVisible(False)
     mapframe = ax.axes.getMapFrame()
+    mapframe.setGridFont(font)
     mapframe.setDrawGridLabel(gridlabel)
     mapframe.setDrawGridTickLine(gridlabel)
     mapframe.setDrawGridLine(gridline)
@@ -4982,6 +4983,7 @@ def streamplotm(*args, **kwargs):
         vdata = minum.asgriddata(v, x, y, fill_value)
         args = args[4:]  
     ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Polyline, color, 1)
+    plotutil.setlegendscheme(ls, **kwargs)
     layer = __plot_uvgriddata_m(plot, udata, vdata, None, ls, 'streamplot', isuv, proj=proj, density=density)
     select = kwargs.pop('select', True)
     if select:

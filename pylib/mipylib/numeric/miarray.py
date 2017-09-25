@@ -54,7 +54,7 @@ class MIArray(object):
             value = tuple(nvalue)
         self._shape = value
         nshape = jarray.array(value, 'i')
-        self.array = self.array.reshape(nshape)
+        self.__init__(self.array.reshape(nshape))
         
     shape = property(get_shape, set_shape)
         
