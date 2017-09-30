@@ -2884,7 +2884,7 @@ def xticks(*args, **kwargs):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    color = kwargs.pop('color', 'k')
+    color = kwargs.pop('color', axis.getTickLabelColor())
     c = plotutil.getcolor(color)
     angle = kwargs.pop('rotation', 0)
     if angle == 'vertical':
@@ -2944,7 +2944,7 @@ def yticks(*args, **kwargs):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    color = kwargs.pop('color', 'k')
+    color = kwargs.pop('color', axis.getTickLabelColor())
     c = plotutil.getcolor(color)
     axis.setTickLabelFont(font)
     axis.setTickLabelColor(c)
@@ -2992,7 +2992,7 @@ def zticks(*args, **kwargs):
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
-    color = kwargs.pop('color', 'k')
+    color = kwargs.pop('color', axis.getTickLabelColor())
     c = plotutil.getcolor(color)
     axis.setTickLabelFont(font)
     axis.setTickLabelColor(c)
