@@ -412,7 +412,6 @@ class TDimVariable():
                 var = ddf[self.name]
                 ii, ssi = self.dataset.dftindex(si)
                 ii, eei = self.dataset.dftindex(ei)
-                print si, ei, ssi, eei
                 eei += 1
                 nindices = list(indices)                
                 nindices[0] = slice(ssi, eei, step)
@@ -435,11 +434,9 @@ class TDimVariable():
             ii, ssi = self.dataset.dftindex(si)
             ii, eei = self.dataset.dftindex(ei)
             eei += 1
-            print si, ei, ssi, eei
             nindices = list(indices)
             nindices[0] = slice(ssi, eei, step)
             nindices = tuple(nindices)
-            print nindices
             aa = var.__getitem__(nindices)
             if si == ei and eidx != sidx:
                 aa.addtdim(self.dataset.gettime(si))

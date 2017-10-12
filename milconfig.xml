@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\meteo">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\linalg">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
@@ -22,15 +22,15 @@
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test-1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\addfiles_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\meteo\hdivg.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_timespace_transform.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test-1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_test.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\io\addfiles_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\meteo\hdivg.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_timespace_transform.py"/>
     </RecentFiles>
   </File>
   <Font>
