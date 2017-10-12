@@ -163,9 +163,10 @@ class DimVariable():
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.dimlen(i) + sidx
-                eidx = self.dimlen(i)-1 if k.stop is None else k.stop-1
+                eidx = self.dimlen(i) if k.stop is None else k.stop
                 if eidx < 0:
                     eidx = self.dimlen(i) + eidx
+                eidx -= 1
                 step = 1 if k.step is None else k.step
             elif isinstance(k, list):
                 if not isinstance(k[0], datetime.datetime):
@@ -375,7 +376,12 @@ class TDimVariable():
             step = 1
         elif isinstance(k, slice):
             sidx = 0 if k.start is None else k.start
-            eidx = self.tnum-1 if k.stop is None else k.stop
+            if sidx < 0:
+                sidx = self.tnum + sidx
+            eidx = self.tnum if k.stop is None else k.stop
+            if eidx < 0:
+                eidx = self.tnum + eidx
+            eidx -= 1
             step = 1 if k.step is None else k.step
         elif isinstance(k, list):
             sidx = self.dataset.timeindex(k[0])
@@ -406,7 +412,9 @@ class TDimVariable():
                 var = ddf[self.name]
                 ii, ssi = self.dataset.dftindex(si)
                 ii, eei = self.dataset.dftindex(ei)
-                nindices = list(indices)
+                print si, ei, ssi, eei
+                eei += 1
+                nindices = list(indices)                
                 nindices[0] = slice(ssi, eei, step)
                 nindices = tuple(nindices)
                 aa = var.__getitem__(nindices)
@@ -426,9 +434,12 @@ class TDimVariable():
             var = ddf[self.name]
             ii, ssi = self.dataset.dftindex(si)
             ii, eei = self.dataset.dftindex(ei)
+            eei += 1
+            print si, ei, ssi, eei
             nindices = list(indices)
             nindices[0] = slice(ssi, eei, step)
             nindices = tuple(nindices)
+            print nindices
             aa = var.__getitem__(nindices)
             if si == ei and eidx != sidx:
                 aa.addtdim(self.dataset.gettime(si))

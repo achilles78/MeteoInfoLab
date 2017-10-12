@@ -182,6 +182,22 @@ def getlinestyle(style):
     
     return lineStyle
     
+def getlinestyle_1(style):
+    if style is None:
+        return None
+        
+    lineStyle = None
+    if '--' in style:
+        lineStyle = LineStyles.DASH
+    elif ':' in style:
+        lineStyle = LineStyles.DOT
+    elif '-.' in style:
+        lineStyle = LineStyles.DASHDOT
+    elif '-' in style:
+        lineStyle = LineStyles.SOLID
+    
+    return lineStyle
+    
 def getplotstyle(style, caption, **kwargs):    
     linewidth = kwargs.pop('linewidth', 1.0)
     if style is None:
@@ -190,7 +206,7 @@ def getplotstyle(style, caption, **kwargs):
     else:
         c = getcolor(style)
     pointStyle = getpointstyle(style)
-    lineStyle = getlinestyle(style)
+    lineStyle = getlinestyle_1(style)
     if not pointStyle is None:
         fill = kwargs.pop('fill', True)        
         if lineStyle is None:           

@@ -106,6 +106,8 @@ def dim_array(a, dims):
     
     :returns: (*DimArray*) Dimension array.
     '''
+    if not isinstance(a, MIArray):
+        a = array(a)
     return DimArray(a, dims)
     
 def datatable(data=None):

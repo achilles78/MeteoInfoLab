@@ -9,7 +9,7 @@ from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
 from org.meteoinfo.math import Complex
-from ucar.ma2 import Array, Range, MAMath
+from ucar.ma2 import Array, Range, MAMath, DataType
 import jarray
 
 #import milayer
@@ -83,8 +83,9 @@ class MIArray(object):
 
         ranges = []
         flips = []
-        iszerodim = True
         onlyrange = True
+        isempty = False
+        nshape = []
         for i in range(0, self.ndim):  
             k = indices[i]
             if isinstance(k, int):
@@ -97,34 +98,45 @@ class MIArray(object):
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.getshape()[i] + sidx
-                eidx = self.getshape()[i]-1 if k.stop is None else k.stop-1
+                eidx = self.getshape()[i] if k.stop is None else k.stop
                 if eidx < 0:
                     eidx = self.getshape()[i] + eidx
+                eidx -= 1                    
                 step = 1 if k.step is None else k.step
             elif isinstance(k, (list, tuple, MIArray)):
                 if isinstance(k, MIArray):
                     k = k.aslist()
                 onlyrange = False
                 ranges.append(k)
-                iszerodim = False
                 continue
             else:
                 print k
                 return None
-            if sidx != eidx:
-                iszerodim = False
             if step < 0:
                 step = abs(step)
                 flips.append(i)
+                if eidx < sidx:
+                    tempidx = sidx
+                    sidx = eidx + 2
+                    eidx = tempidx
             if sidx >= self.shape[i]:
                 raise IndexError()
-            rr = Range(sidx, eidx, step)
-            ranges.append(rr)
+            if eidx < sidx:
+                isempty = True
+            else:
+                rr = Range(sidx, eidx, step)
+                ranges.append(rr)
+            nshape.append(eidx - sidx + 1 if eidx - sidx >= 0 else 0)
+
+        if isempty:
+            r = ArrayUtil.zeros(nshape, 'int')
+            return MIArray(r)
+            
         if onlyrange:
             r = ArrayMath.section(self.array, ranges)
         else:
             r = ArrayMath.take(self.array, ranges)
-        if iszerodim:
+        if r.getSize() == 1:
             r = r.getObject(0)
             if isinstance(r, Complex):
                 return complex(r.getReal(), r.getImaginary())

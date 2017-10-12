@@ -40,9 +40,12 @@ class DimArray():
                         self.sizestr = self.sizestr + '*%s' % self.shape[i]
             else:
                 self.sizestr = '1'
-        self.dims = dims
+        
+        self.dims = None
         if not dims is None:
-            self.ndim = len(dims)
+            #self.ndim = len(dims)
+            for dim in dims:
+                self.adddim(dim)
         self.fill_value = fill_value        
         if math.isnan(self.fill_value):
             self.fill_value = -9999.0
@@ -112,15 +115,14 @@ class DimArray():
                     else:
                         indices1.append(indices[i])
                 indices = indices1
-            
-        #origin = []
-        #size = []
-        #stride = []
+
         dims = []
         ranges = []
         flips = []
         iszerodim = True
         onlyrange = True
+        isempty = False
+        nshape = []
         for i in range(0, self.ndim):  
             isrange = True
             k = indices[i]
@@ -134,9 +136,10 @@ class DimArray():
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.dims[i].getLength() + sidx
-                eidx = self.dims[i].getLength()-1 if k.stop is None else k.stop-1
+                eidx = self.dims[i].getLength() if k.stop is None else k.stop
                 if eidx < 0:
                     eidx = self.dims[i].getLength() + eidx
+                eidx -= 1
                 step = 1 if k.step is None else k.step
             elif isinstance(k, list):
                 if not isinstance(k[0], datetime.datetime):
@@ -195,21 +198,29 @@ class DimArray():
                 if step < 0:
                     step = abs(step)
                     flips.append(i)
-                rr = Range(sidx, eidx, step)
-                ranges.append(rr)
-                #origin.append(sidx)
-                n = eidx - sidx + 1
-                #size.append(n)
-                #stride.append(step)
-                if n > 1:
-                    dim = self.dims[i]
-                    dims.append(dim.extract(sidx, eidx, step))
+                    if eidx < sidx:
+                        tempidx = sidx
+                        sidx = eidx + 2
+                        eidx = tempidx
+                if eidx < sidx:
+                    isempty = True
+                else:
+                    rr = Range(sidx, eidx, step)
+                    ranges.append(rr)
+                    n = eidx - sidx + 1
+                    if n > 1:
+                        dim = self.dims[i]
+                        dims.append(dim.extract(sidx, eidx, step))
+                nshape.append(eidx - sidx + 1 if eidx - sidx >= 0 else 0)
             else:
                 if len(k) > 1:
                     dim = self.dims[i]
                     dims.append(dim.extract(k))
-                    
-        #r = ArrayMath.section(self.array.array, origin, size, stride)
+        
+        if isempty:
+            r = ArrayUtil.zeros(nshape, 'int')
+            return MIArray(r)
+        
         if onlyrange:
             r = ArrayMath.section(self.array.array, ranges)
         else:
@@ -556,20 +567,23 @@ class DimArray():
         self.dims[idx].setDimType(dtype)
         
     def adddim(self, dimvalue, dimtype=None, index=None):
-        if isinstance(dimvalue, (MIArray, DimArray)):
-            dimvalue = dimvalue.aslist()
-        dtype = DimensionType.Other
-        if not dimtype is None:
-            if dimtype.upper() == 'X':
-                dtype = DimensionType.X
-            elif dimtype.upper() == 'Y':
-                dtype = DimensionType.Y
-            elif dimtype.upper() == 'Z':
-                dtype = DimensionType.Z
-            elif dimtype.upper() == 'T':
-                dtype = DimensionType.T
-        dim = Dimension(dtype)
-        dim.setDimValues(dimvalue)
+        if isinstance(dimvalue, Dimension):
+            dim = dimvalue
+        else:
+            if isinstance(dimvalue, (MIArray, DimArray)):
+                dimvalue = dimvalue.aslist()
+            dtype = DimensionType.Other
+            if not dimtype is None:
+                if dimtype.upper() == 'X':
+                    dtype = DimensionType.X
+                elif dimtype.upper() == 'Y':
+                    dtype = DimensionType.Y
+                elif dimtype.upper() == 'Z':
+                    dtype = DimensionType.Z
+                elif dimtype.upper() == 'T':
+                    dtype = DimensionType.T
+            dim = Dimension(dtype)
+            dim.setDimValues(dimvalue)
         if self.dims is None:
             self.dims = [dim]
         else:
