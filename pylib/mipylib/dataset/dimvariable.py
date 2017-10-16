@@ -232,8 +232,10 @@ class DimVariable():
                 if n > 1:
                     dim = self.variable.getDimension(i)
                     if dim.isReverse():
-                        step = -step                    
-                    dims.append(dim.extract(sidx, eidx, step))
+                        step = -step      
+                    dim = dim.extract(sidx, eidx, step)
+                    dim.setReverse(False)
+                    dims.append(dim)
                 stride.append(step) 
                 if step < 0:
                     step = abs(step)
@@ -243,7 +245,9 @@ class DimVariable():
             else:
                 if len(k) > 1:
                     dim = self.variable.getDimension(i)
-                    dims.append(dim.extract(k))
+                    dim = dim.extract(k)
+                    dim.setReverse(False)
+                    dims.append(dim)
         #rr = self.dataset.read(self.name, origin, size, stride).reduce()
         if onlyrange:
             rr = self.dataset.dataset.read(self.name, ranges)

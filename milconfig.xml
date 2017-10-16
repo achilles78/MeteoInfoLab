@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\math">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\linalg">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
@@ -16,19 +15,24 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_timespace_transform.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\lineregress_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\reof_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-2.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_timespace_transform.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\math\lineregress_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\reof_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-2.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="80,13" MainFormSize="1478,808"/>
+  <Startup MainFormLocation="40,27" MainFormSize="1478,808"/>
 </MeteoInfo>

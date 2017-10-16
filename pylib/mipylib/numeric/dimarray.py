@@ -847,6 +847,102 @@ class DimArray():
         r = self.array.reshape(int(self.array.array.getSize()))
         return r
         
+    def lonflip(self):
+        '''
+        Reorder global array from 0 - 360 longitude to -180 - 180 longitude or vice versa.
+        
+        :returns: Reordered array.
+        '''
+        lon = self.dimvalue(self.ndim - 1)
+        if lon.max() > 180:
+            return self.lonpivot(180)
+        else:
+            return self.lonpivot(0)
+        
+    def lonpivot(self, pivot):
+        '''
+        Pivots an array about a user-specified longitude. The rightmost dimension must be the
+        longitude dimension, which must be global and without a cyclic point.
+        
+        :param pivot: (*float*) The longitude value around which to pivot.
+        
+        :returns: Result array after longitude pivot.
+        '''
+        lon = self.dimvalue(self.ndim - 1)    
+        minlon = lon.min()
+        maxlon = lon.max()
+        dlon = lon[1] - lon[0]
+        if pivot < minlon:
+            pivot += 360
+        elif pivot > maxlon:
+            pivot -= 360
+            
+        keys1 = []
+        keys2 = []
+        for i in range(self.ndim - 1):
+            keys1.append(slice(None,None,None))
+            keys2.append(slice(None,None,None))
+        keys1.append('%f:%f' % (pivot, maxlon))  
+        keys2.append('%f:%f' % (minlon, pivot - dlon))
+        r1 = self.__getitem__(tuple(keys1))
+        r2 = self.__getitem__(tuple(keys2))
+            
+        lon1 = r1.dimvalue(r1.ndim - 1)
+        lon2 = r2.dimvalue(r2.ndim - 1)
+        if maxlon > 180:
+            lon1 = lon1 - 360
+        else:
+            lon2 = lon2 + 360
+        r = r1.join(r2, self.ndim - 1)
+        lon1 = lon1.aslist()
+        lon1.extend(lon2.aslist())
+        r.setdimvalue(self.ndim - 1, lon1)
+        return r
+        
+    def month_to_season(self, season):
+        '''
+        Computes a user-specified three-month seasonal mean
+        (DJF, JFM, FMA, MAM, AMJ, MJJ, JJA, JAS, ASO, SON, OND, NDJ).
+        The first average (DJF=JF) and the last average (NDJ=ND) are actually 
+        two-month averages.
+        
+        The time (leftmost) dimension must be divisible by 12. The data are assumed 
+        to be monthly mean data and the first record is assumed to be January.
+        
+        :param season: (*string*) A string representing the season to 
+            calculate: e.g., "JFM", "JJA".
+            
+        :returns: Season averaged data array.
+        '''
+        nmonth = self.dimlen(0)
+        nyear = nmonth / 12
+        seasons = ['DJF','JFM','FMA','MAM','AMJ','MJJ','JJA','JAS','ASO','SON','OND','NDJ']
+        season = season.upper()
+        if not season in seasons:
+            print 'Season string is not valid: "' + season + '"!'
+            raise KeyError()
+        idx = seasons.index(season) - 1
+        keys = []
+        keys.append(slice(0,nyear,1))
+        for i in range(1, self.ndim):
+            keys.append(slice(None,None,None))
+        r = self.__getitem__(tuple(keys))
+        si = idx
+        for i in range(nyear):
+            ei = si + 3
+            if si < 0:
+                si = 0
+            if ei > nmonth:
+                ei = nmonth
+            keys[0] = slice(si,ei,1)
+            sdata = self.__getitem__(tuple(keys))
+            sdata = ArrayMath.mean(sdata.asarray(), 0)
+            keys[0] = i
+            r.__setitem__(tuple(keys), sdata)
+            si += 12
+        
+        return r
+        
     def interpn(self, xi):
         """
         Multidimensional interpolation on regular grids.

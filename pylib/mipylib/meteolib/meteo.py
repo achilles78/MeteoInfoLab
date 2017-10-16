@@ -7,7 +7,7 @@
 
 from org.meteoinfo.data import ArrayMath
 from org.meteoinfo.data.analysis import MeteoMath
-import mipylib.numeric.minum as np
+import mipylib.numeric as np
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 
@@ -27,7 +27,7 @@ __all__ = [
     'dewpoint2rh','dry_lapse','ds2uv','dt','equivalent_potential_temperature','h2p',
     'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh',
     'saturation_mixing_ratio','tc2tf','tf2tc','uv2ds','pressure_to_height_std',
-    'height_to_pressure_std'
+    'height_to_pressure_std','eof','varimax'
     ]
 
 def uv2ds(u, v):
@@ -373,3 +373,67 @@ def equivalent_potential_temperature(pressure, temperature):
     pottemp = potential_temperature(pressure, temperature)
     smixr = saturation_mixing_ratio(pressure, temperature)
     return pottemp * np.exp(Lv * smixr / (Cp_d * temperature))
+    
+def eof(x, transform=False):
+    '''
+    Empirical Orthogonal Function (EOF) analysis to finds both time series and spatial patterns.
+    
+    :param x: (*array_like*) Input 2-D array with space-time field.
+    :param transform: (*boolean*) Do space-time transform or not. This transform will speed up
+        the computation if the space location number is much more than time stamps.
+        
+    :returns: (EOF, E, PC) EOF: eigen vector 2-D array; E: eigen values 1-D array;
+        PC: Principle component 2-D array.
+    '''
+    m, n = x.shape
+    if transform:        
+        C = np.dot(x.T, x)
+        E1, EOF1 = np.linalg.eig(C)
+        EOF1 = EOF1.T[:,::-1]
+        E = np.diag(E1[::-1])
+        EOFa = np.dot(x, EOF1)
+        EOF = np.zeros((m,n))
+        for i in range(n):
+            EOF[:,i] = EOFa[:,i]/np.sqrt(E[i,i])
+        PC = np.dot(EOF.T, x)
+        PC = PC[::-1,:]
+        E = np.diag(E)
+    else:
+        C = np.dot(x, x.T) / n
+        E, EOF = np.linalg.eig(C)
+        EOF = EOF.T
+        PC = np.dot(EOF.T, x)
+        EOF = EOF[:,::-1]
+        PC = PC[::-1,:]
+        E = E[::-1]
+    return EOF, E, PC
+    
+def varimax(x, normalize=False, tol=1e-10, it_max=1000):
+    '''
+    Rotate EOFs according to varimax algorithm
+    
+    :param x: (*array_like*) Input 2-D array.
+    :param normalize: (*boolean*) Determines whether or not to normalize the rows or columns
+        of the loadings before performing the rotation.
+    :param tol: (*float*) Tolerance.
+    :param it_max: (*int*) Specifies the maximum number of iterations to do.
+    
+    :returns: Rotated EOFs and rotate matrix.
+    '''
+    p, nc = x.shape
+    TT = np.eye(nc)
+    d = 0
+    for i in range(it_max):
+        z = np.dot(x, TT)
+        B = np.dot(x.T, (z**3 - np.dot(z, np.diag(np.squeeze(np.dot(np.ones((1,p)), (z**2))))) / p))
+        U, S, Vh = np.linalg.svd(B)
+        TT = np.dot(U, Vh)        
+        d2 = d;
+        d = np.sum(S)
+        # End if exceeded tolerance.
+        if d < d2 * (1 + tol):
+            break
+            
+    # Final matrix.
+    r = np.dot(x, TT)
+    return r, TT
