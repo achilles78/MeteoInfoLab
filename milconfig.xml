@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\math">
-    <RecentFolder Folder="D:\KeyData\Visibility"/>
-    <RecentFolder Folder="D:\KeyData"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\linalg">
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\MeteoInfoLab"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
@@ -16,21 +14,17 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\scatter"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\reof_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\scatterm_5.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\trend_test.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\reof_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\scatterm_5.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\math\trend_test.py"/>
     </RecentFiles>
   </File>
   <Font>

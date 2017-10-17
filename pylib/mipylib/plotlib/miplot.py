@@ -3664,6 +3664,7 @@ def contour(*args, **kwargs):
     global gca
     
     n = len(args)
+    ls = kwargs.pop('symbolspec', None)
     cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
@@ -3683,19 +3684,20 @@ def contour(*args, **kwargs):
         a = args[2]
         gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-    ls = ls.convertTo(ShapeTypes.Polyline)
-    plotutil.setlegendscheme(ls, **kwargs)
+    if ls is None:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+        else:    
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+        ls = ls.convertTo(ShapeTypes.Polyline)
+        plotutil.setlegendscheme(ls, **kwargs)
     
     smooth = kwargs.pop('smooth', True)
     igraphic = GraphicFactory.createContourLines(gdata.data, ls, smooth)
@@ -3751,6 +3753,7 @@ def contourf(*args, **kwargs):
     global gca
     
     n = len(args)    
+    ls = kwargs.pop('symbolspec', None)
     cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
@@ -3770,17 +3773,18 @@ def contourf(*args, **kwargs):
         a = args[2]
         gdata = minum.asgriddata(a, x, y, fill_value)
         args = args[3:]
-    if len(args) > 0:
-        level_arg = args[0]
-        if isinstance(level_arg, int):
-            cn = level_arg
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-        else:
-            if isinstance(level_arg, MIArray):
-                level_arg = level_arg.aslist()
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-    else:    
-        ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+    if ls is None:
+        if len(args) > 0:
+            level_arg = args[0]
+            if isinstance(level_arg, int):
+                cn = level_arg
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
+            else:
+                if isinstance(level_arg, MIArray):
+                    level_arg = level_arg.aslist()
+                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
+        else:    
+            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
     smooth = kwargs.pop('smooth', True)
     igraphic = GraphicFactory.createContourPolygons(gdata.data, ls, smooth)
     
@@ -3835,7 +3839,7 @@ def quiver(*args, **kwargs):
     :returns: (*VectoryLayer*) Created quiver VectoryLayer.
     """
     global gca
-    
+    ls = kwargs.pop('symbolspec', None)
     cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     order = kwargs.pop('order', None)
@@ -3876,25 +3880,26 @@ def quiver(*args, **kwargs):
     u = plotutil.getplotdata(u)
     v = plotutil.getplotdata(v)    
     
-    if iscolor:
-        if len(args) > 0:
-            cn = args[0]
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-        else:
-            levs = kwargs.pop('levs', None)
-            if levs is None:
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+    if ls is None:
+        if iscolor:
+            if len(args) > 0:
+                cn = args[0]
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
             else:
-                if isinstance(levs, MIArray):
-                    levs = levs.tolist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
-    else:    
-        if cmap.getColorCount() == 1:
-            c = cmap.getColor(0)
-        else:
-            c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = plotutil.setlegendscheme_point(ls, **kwargs)
+                levs = kwargs.pop('levs', None)
+                if levs is None:
+                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+                else:
+                    if isinstance(levs, MIArray):
+                        levs = levs.tolist()
+                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
+        else:    
+            if cmap.getColorCount() == 1:
+                c = cmap.getColor(0)
+            else:
+                c = Color.black
+            ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+        ls = plotutil.setlegendscheme_point(ls, **kwargs)
     
     if not cdata is None:
         cdata = plotutil.getplotdata(cdata)
@@ -3949,7 +3954,7 @@ def barbs(*args, **kwargs):
     :returns: (*VectoryLayer*) Created barbs VectoryLayer.
     """
     global gca
-    
+    ls = kwargs.pop('symbolspec', None)
     cmap = plotutil.getcolormap(**kwargs)
     fill_value = kwargs.pop('fill_value', -9999.0)
     order = kwargs.pop('order', None)
@@ -3990,25 +3995,26 @@ def barbs(*args, **kwargs):
     u = plotutil.getplotdata(u)
     v = plotutil.getplotdata(v)    
     
-    if iscolor:
-        if len(args) > 0:
-            cn = args[0]
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-        else:
-            levs = kwargs.pop('levs', None)
-            if levs is None:
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+    if ls is None:
+        if iscolor:
+            if len(args) > 0:
+                cn = args[0]
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
             else:
-                if isinstance(levs, MIArray):
-                    levs = levs.aslist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
-    else:    
-        if cmap.getColorCount() == 1:
-            c = cmap.getColor(0)
-        else:
-            c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = plotutil.setlegendscheme_point(ls, **kwargs)
+                levs = kwargs.pop('levs', None)
+                if levs is None:
+                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+                else:
+                    if isinstance(levs, MIArray):
+                        levs = levs.aslist()
+                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
+        else:    
+            if cmap.getColorCount() == 1:
+                c = cmap.getColor(0)
+            else:
+                c = Color.black
+            ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+        ls = plotutil.setlegendscheme_point(ls, **kwargs)
     
     if not cdata is None:
         cdata = plotutil.getplotdata(cdata)
@@ -5462,10 +5468,17 @@ def makesymbolspec(geometry, *args, **kwargs):
     n = len(args)
     isunique = True
     for arg in args:
-        lb, isu = plotutil.getlegendbreak(geometry, **arg)
-        if isunique  and not isu:
-            isunique = False
-        ls.addLegendBreak(lb)
+        if isinstance(arg, (list, tuple)):
+            for argi in arg:
+                lb, isu = plotutil.getlegendbreak(geometry, **argi)
+                if isunique and not isu:
+                    isunique = False
+                ls.addLegendBreak(lb)
+        else:
+            lb, isu = plotutil.getlegendbreak(geometry, **arg)
+            if isunique and not isu:
+                isunique = False
+            ls.addLegendBreak(lb)
         
     if ls.getBreakNum() > 1:
         if isunique:

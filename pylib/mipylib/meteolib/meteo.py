@@ -389,19 +389,18 @@ def eof(x, transform=False):
     if transform:        
         C = np.dot(x.T, x)
         E1, EOF1 = np.linalg.eig(C)
-        EOF1 = EOF1.T[:,::-1]
-        E = np.diag(E1[::-1])
+        EOF1 = EOF1[:,::-1]
+        E = E1[::-1]
         EOFa = np.dot(x, EOF1)
         EOF = np.zeros((m,n))
         for i in range(n):
-            EOF[:,i] = EOFa[:,i]/np.sqrt(E[i,i])
+            EOF[:,i] = EOFa[:,i]/np.sqrt(abs(E[i]))
         PC = np.dot(EOF.T, x)
         PC = PC[::-1,:]
         E = np.diag(E)
     else:
         C = np.dot(x, x.T) / n
         E, EOF = np.linalg.eig(C)
-        EOF = EOF.T
         PC = np.dot(EOF.T, x)
         EOF = EOF[:,::-1]
         PC = PC[::-1,:]
