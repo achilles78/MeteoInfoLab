@@ -610,7 +610,7 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
         figure()
         
     chart = chartpanel.getChart()
-    if gca is None or (gca.axestype == 'cartesian'):
+    if gca is None or (gca.axestype != 'cartesian'):
         chart.addPlot(plot.axes)
     gca = plot
     draw_if_interactive()

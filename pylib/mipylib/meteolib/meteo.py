@@ -397,7 +397,6 @@ def eof(x, transform=False):
             EOF[:,i] = EOFa[:,i]/np.sqrt(abs(E[i]))
         PC = np.dot(EOF.T, x)
         PC = PC[::-1,:]
-        E = np.diag(E)
     else:
         C = np.dot(x, x.T) / n
         E, EOF = np.linalg.eig(C)
