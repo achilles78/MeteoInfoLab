@@ -11,7 +11,7 @@ from org.meteoinfo.math.linalg import LinalgUtil
 from mipylib.numeric.miarray import MIArray
 
 __all__ = [
-    'solve','cholesky','lu','qr', 'svd','eig'
+    'solve','cholesky','lu','qr', 'svd','eig','inv'
     ]
 
 def solve(a, b):
@@ -186,3 +186,14 @@ def eig(a):
     w = MIArray(r[0])
     v = MIArray(r[1])
     return w, v
+    
+def inv(a):
+    '''
+    Compute the (multiplicative) inverse of a matrix.
+    
+    :param a: (*array_like*) Input array.
+    
+    :returns: Inverse matrix.
+    '''
+    r = LinalgUtil.inv(a.asarray())
+    return MIArray(r)

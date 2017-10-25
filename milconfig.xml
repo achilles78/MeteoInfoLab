@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\array">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
@@ -20,19 +20,21 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_hgt.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\difference_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\inverse.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\inverse_2.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp-1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eig.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_hgt.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\difference_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\inverse.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\inverse_2.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="27,24" MainFormSize="1478,808"/>
+  <Startup MainFormLocation="80,24" MainFormSize="1478,808"/>
 </MeteoInfo>

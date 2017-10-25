@@ -838,6 +838,40 @@ class DimArray():
     def reshape(self, *args):
         return self.array.reshape(*args)
         
+    def transpose(self):
+        '''
+        Transpose 2-D array.
+        
+        :returns: Transposed array.
+        '''
+        if self.ndim == 1:
+            return self[:]
+        dim1 = 0
+        dim2 = 1
+        r = ArrayMath.transpose(self.asarray(), dim1, dim2)
+        dims = []
+        for i in range(0, self.ndim):
+            if i == dim1:
+                dims.append(self.dims[dim2])
+            elif i == dim2:
+                dims.append(self.dims[dim1])
+            else:
+                dims.append(self.dims[i])
+        return DimArray(MIArray(r), dims, self.fill_value, self.proj) 
+        
+    T = property(transpose)
+    
+    def inv(self):
+        '''
+        Calculate inverse matrix array.
+        
+        :returns: Inverse matrix array.
+        '''
+        r = self.array.I
+        return DimArray(r, self.dims, self.fill_value, self.proj)
+        
+    I = property(inv)
+        
     def flatten(self):
         '''
         Return a copy of the array collapsed into one dimension.

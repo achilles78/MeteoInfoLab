@@ -2267,8 +2267,8 @@ def xaxis(ax=None, **kwargs):
         locs = [Location.BOTTOM]
     else:
         locs = [Location.BOTTOM, Location.TOP]
-    for loc in locs:    
-        axis = ax.axes.getAxis(loc)
+    if isinstance(ax, Axes3D):
+        axis = ax.axes.getXAxis()
         axis.setVisible(visible)
         axis.setShift(shift)
         axis.setColor_All(c)
@@ -2278,6 +2278,18 @@ def xaxis(ax=None, **kwargs):
         axis.setMinorTickVisible(minortick)
         axis.setInsideTick(tickin)
         axis.setTickLabelFont(font)
+    else:
+        for loc in locs:    
+            axis = ax.axes.getAxis(loc)
+            axis.setVisible(visible)
+            axis.setShift(shift)
+            axis.setColor_All(c)
+            axis.setDrawTickLine(tickline)
+            if not ticklabel is None:
+                axis.setDrawTickLabel(ticklabel)
+            axis.setMinorTickVisible(minortick)
+            axis.setInsideTick(tickin)
+            axis.setTickLabelFont(font)
     draw_if_interactive()
     
 def yaxis(ax=None, **kwargs):

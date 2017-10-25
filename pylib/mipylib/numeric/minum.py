@@ -97,7 +97,7 @@ def array(object):
         return object
     return MIArray(ArrayUtil.array(object))
     
-def dim_array(a, dims):
+def dim_array(a, dims=None):
     '''
     Create a dimension array (DimArray).
     
@@ -108,6 +108,11 @@ def dim_array(a, dims):
     '''
     if not isinstance(a, MIArray):
         a = array(a)
+    if dims is None:
+        dims = []
+        for i in range(a.ndim):
+            dim = Dimension()
+            dim.setDimValues(range(a.shape[i]))
     return DimArray(a, dims)
     
 def datatable(data=None):

@@ -9,6 +9,7 @@ from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
 from org.meteoinfo.math import Complex
+from org.meteoinfo.math.linalg import LinalgUtil
 from ucar.ma2 import Array, Range, MAMath, DataType
 import jarray
 
@@ -559,8 +560,6 @@ class MIArray(object):
         '''
         Transpose 2-D array.
         
-        :param a: (*array*) 2-D array to be transposed.
-        
         :returns: Transposed array.
         '''
         if self.ndim == 1:
@@ -571,6 +570,17 @@ class MIArray(object):
         return MIArray(r)
         
     T = property(transpose)
+    
+    def inv(self):
+        '''
+        Calculate inverse matrix array.
+        
+        :returns: Inverse matrix array.
+        '''
+        r = LinalgUtil.inv(self.array)
+        return MIArray(r)
+        
+    I = property(inv)
         
     def flatten(self):
         '''
