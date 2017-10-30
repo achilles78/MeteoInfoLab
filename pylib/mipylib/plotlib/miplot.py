@@ -2235,11 +2235,14 @@ def xaxis(ax=None, **kwargs):
     """
     if ax is None:
         ax = gca
-    visible = kwargs.pop('visible', True)
-    shift = kwargs.pop('shift', 0)
-    color = kwargs.pop('color', 'black')
-    c = plotutil.getcolor(color)
-    tickline = kwargs.pop('tickline', True)
+    visible = kwargs.pop('visible', None)
+    shift = kwargs.pop('shift', None)
+    color = kwargs.pop('color', None)
+    if not color is None:
+        color = plotutil.getcolor(color)
+    linewidth = kwargs.pop('linewidth', None)
+    linestyle = kwargs.pop('linestyle', None)
+    tickline = kwargs.pop('tickline', None)
     tickline = kwargs.pop('tickvisible', tickline)
     ticklabel = kwargs.pop('ticklabel', None)
     minortick = kwargs.pop('minortick', False)
@@ -2267,29 +2270,31 @@ def xaxis(ax=None, **kwargs):
         locs = [Location.BOTTOM]
     else:
         locs = [Location.BOTTOM, Location.TOP]
+    axislist = []
     if isinstance(ax, Axes3D):
-        axis = ax.axes.getXAxis()
-        axis.setVisible(visible)
-        axis.setShift(shift)
-        axis.setColor_All(c)
-        axis.setDrawTickLine(tickline)
+        axislist.append(ax.axes.getXAxis())
+    else:
+        for loc in locs:    
+            axislist.append(ax.axes.getAxis(loc))
+    for axis in axislist:
+        if not visible is None:
+            axis.setVisible(visible)
+        if not shift is None:
+            axis.setShift(shift)
+        if not color is None:
+            axis.setColor_All(color)
+        if not linewidth is None:
+            axis.setLineWidth(linewidth)
+        if not linestyle is None:
+            axis.setLineStyle(linestyle)
+        if not tickline is None:
+            axis.setDrawTickLine(tickline)
         if not ticklabel is None:
             axis.setDrawTickLabel(ticklabel)
         axis.setMinorTickVisible(minortick)
         axis.setInsideTick(tickin)
         axis.setTickLabelFont(font)
-    else:
-        for loc in locs:    
-            axis = ax.axes.getAxis(loc)
-            axis.setVisible(visible)
-            axis.setShift(shift)
-            axis.setColor_All(c)
-            axis.setDrawTickLine(tickline)
-            if not ticklabel is None:
-                axis.setDrawTickLabel(ticklabel)
-            axis.setMinorTickVisible(minortick)
-            axis.setInsideTick(tickin)
-            axis.setTickLabelFont(font)
+
     draw_if_interactive()
     
 def yaxis(ax=None, **kwargs):
@@ -2303,10 +2308,13 @@ def yaxis(ax=None, **kwargs):
     if ax is None:
         ax = gca
     visible = kwargs.pop('visible', None)
-    shift = kwargs.pop('shift', 0)
-    color = kwargs.pop('color', 'black')
-    c = plotutil.getcolor(color)
-    tickline = kwargs.pop('tickline', True)
+    shift = kwargs.pop('shift', None)
+    color = kwargs.pop('color', None)
+    if not color is None:
+        color = plotutil.getcolor(color)
+    linewidth = kwargs.pop('linewidth', None)
+    linestyle = kwargs.pop('linestyle', None)
+    tickline = kwargs.pop('tickline', None)
     tickline = kwargs.pop('tickvisible', tickline)
     ticklabel = kwargs.pop('ticklabel', None)
     minortick = kwargs.pop('minortick', False)
@@ -2333,19 +2341,30 @@ def yaxis(ax=None, **kwargs):
         locs = [Location.RIGHT]
     else:
         locs = [Location.LEFT, Location.RIGHT]
-    for loc in locs:
-        axis = ax.axes.getAxis(loc)
+    axislist = []
+    if isinstance(ax, Axes3D):
+        axislist.append(ax.axes.getXAxis())
+    else:
+        for loc in locs:    
+            axislist.append(ax.axes.getAxis(loc))
+    for axis in axislist:
         if not visible is None:
             axis.setVisible(visible)
-        if axis.isVisible():
+        if not shift is None:
             axis.setShift(shift)
-            axis.setColor_All(c)
+        if not color is None:
+            axis.setColor_All(color)
+        if not linewidth is None:
+            axis.setLineWidth(linewidth)
+        if not linestyle is None:
+            axis.setLineStyle(linestyle)
+        if not tickline is None:
             axis.setDrawTickLine(tickline)
-            if not ticklabel is None:
-                axis.setDrawTickLabel(ticklabel)
-            axis.setMinorTickVisible(minortick)
-            axis.setInsideTick(tickin)
-            axis.setTickLabelFont(font)
+        if not ticklabel is None:
+            axis.setDrawTickLabel(ticklabel)
+        axis.setMinorTickVisible(minortick)
+        axis.setInsideTick(tickin)
+        axis.setTickLabelFont(font)
     draw_if_interactive()
     
 def box(ax=None, on=None):
