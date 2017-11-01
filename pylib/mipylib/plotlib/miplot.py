@@ -3865,6 +3865,8 @@ def contourf(*args, **kwargs):
                 ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
         else:    
             ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
+    ls = ls.convertTo(ShapeTypes.Polygon)
+    plotutil.setlegendscheme(ls, **kwargs)
     smooth = kwargs.pop('smooth', True)
     igraphic = GraphicFactory.createContourPolygons(gdata.data, ls, smooth)
     
