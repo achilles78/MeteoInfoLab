@@ -560,7 +560,22 @@ def loglog(*args, **kwargs):
     gca.axes.setAutoExtent()
     return lines
         
-def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
+def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None, capsize=None,
+            **kwargs):
+    '''
+    Plot an errorbar graph.
+    
+    :param x: (*array_like*) X data.
+    :param y: (*array_like*) Y data.
+    :param yerr: (*scalar or array_like*) Y error values.
+    :param xerr: (*scalar or array_like*) X error values.
+    :param fmt: (*string*) Plot format string.
+    :param ecolor: (*color*) Error bar color.
+    :param elinewidth: (*float*) Error bar line width.
+    :param capsize: (*float*) The length of the error bar caps.
+
+    :returns: Error bar lines.
+    '''
     global gca  
     
     #Add data series
@@ -572,17 +587,42 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
             ye = []
             for i in range(xdata.getSize()):
                 ye.append(yerr)
-            yerr = minum.array(ye).array
+            yerrB = minum.array(ye).array
+            yerrU = yerrB
         else:
-            yerr = plotutil.getplotdata(yerr)
+            if isinstance(yerr, (list, tuple)):
+                yerrB = plotutil.getplotdata(yerr[0])
+                yerrU = plotutil.getplotdata(yerr[1])
+            elif yerr.ndim == 2:
+                yerrB = yerr[0,:].asarray()
+                yerrU = yerr[1,:].asarray()
+            else:
+                yerrB = plotutil.getplotdata(yerr)
+                yerrU = yerrB
+    else:
+        yerrB = None
+        yerrU = None
+        
     if not xerr is None:
         if isinstance(xerr, (int, float)):
             ye = []
             for i in range(xdata.getSize()):
                 ye.append(xerr)
-            xerr = minum.array(ye).array
+            xerrL = minum.array(ye).array
+            xerrR = xerrL         
         else:
-            xerr = plotutil.getplotdata(xerr)
+            if isinstance(xerr, (list, tuple)):
+                xerrL = plotutil.getplotdata(xerr[0])
+                xerrR = plotutil.getplotdata(xerr[1])
+            elif xerr.ndim == 2:
+                xerrL = xerr[0,:].asarray()
+                xerrR = xerr[1,:].asarray()
+            else:
+                xerrL = plotutil.getplotdata(xerr)
+                xerrR = xerrL
+    else:
+        xerrL = None
+        xerrR = None
     
     #Get plot data style
     if fmt == '':
@@ -590,9 +630,18 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', **kwargs):
         line.setCaption(label)
     else:
         line = plotutil.getplotstyle(fmt, label, **kwargs)
+    eline = line.clone()
+    eline.setDrawSymbol(False)
+    eline.setStyle(LineStyles.SOLID)
+    if not ecolor is None:
+        ecolor = plotutil.getcolor(ecolor)
+        eline.setColor(ecolor)
+    if not elinewidth is None:
+        eline.setSize(elinewidth)
     
     #Create graphics
-    graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerr, yerr, line)
+    graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerrL, xerrR, yerrB, \
+        yerrU, line, eline, capsize)
     
     #Create Axes
     if gca is None:
@@ -1298,7 +1347,7 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     if whiskerprops is None:
         whiskerprops = PolylineBreak()
         whiskerprops.setColor(color is None and Color.black or color)
-        whiskerprops.setStyle(LineStyles.Dash)
+        whiskerprops.setStyle(LineStyles.DASH)
     else:
         whiskerprops = plotutil.getlegendbreak('line', **whiskerprops)[0]
     if capprops is None:

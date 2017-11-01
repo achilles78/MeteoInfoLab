@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\math">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
@@ -15,20 +14,22 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
-    <RecentFolder Folder="E:\Temp\wangping"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\difference_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\errorbar_3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\lineregress_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\lineregress_test.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_slp.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\difference_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\errorbar_3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\math\lineregress_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\math\lineregress_test.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -237,12 +237,15 @@ def getplotstyle(style, caption, **kwargs):
             plb.setSymbolInterval(interval)
             if not c is None:
                 plb.setColor(c)
-            makercolor = kwargs.pop('makercolor', plb.getColor())
-            makercolor = getcolor(makercolor)
-            plb.setSymbolColor(c)
-            makerfillcolor = kwargs.pop('makerfillcolor', makercolor)
-            makerfillcolor = getcolor(makerfillcolor)
-            plb.setSymbolFillColor(makerfillcolor)
+            markersize = kwargs.pop('markersize', None)
+            if not markersize is None:
+                plb.setSymbolSize(markersize)
+            markercolor = kwargs.pop('markercolor', plb.getColor())
+            markercolor = getcolor(markercolor)
+            plb.setSymbolColor(markercolor)
+            markerfillcolor = kwargs.pop('markerfillcolor', markercolor)
+            markerfillcolor = getcolor(markerfillcolor)
+            plb.setSymbolFillColor(markerfillcolor)
             return plb
     else:
         plb = PolylineBreak()
@@ -302,7 +305,8 @@ def getlegendbreak(geometry, **kwargs):
             pstyle = getpointstyle(marker)
             lb.setDrawSymbol(True)
             lb.setSymbolStyle(pstyle)
-            markersize = kwargs.pop('markersize', 8)
+        markersize = kwargs.pop('markersize', None)
+        if not markersize is None:
             lb.setSymbolSize(markersize)
             markercolor = kwargs.pop('markercolor', None)
             if markercolor is None:

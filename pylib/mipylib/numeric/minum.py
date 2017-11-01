@@ -113,6 +113,7 @@ def dim_array(a, dims=None):
         for i in range(a.ndim):
             dim = Dimension()
             dim.setDimValues(range(a.shape[i]))
+            dims.append(dim)
     return DimArray(a, dims)
     
 def datatable(data=None):
@@ -1339,16 +1340,16 @@ def linregress(x, y):
     
     :param x, y: (*array_like*) Two sets of measurements. Both arrays should have the same length.
     
-    :returns slope, intercept, rvalue, pvalue, dnum: Result slope, intercept, relative coefficient,
-        two-sided p-value for a hypothesis test whose null hypothesis is that the slope is zero, validate
-        data number (remove NaN values).
+    :returns: Result slope, intercept, relative coefficient, two-sided p-value for a hypothesis test 
+        whose null hypothesis is that the slope is zero, standard error of the estimated gradient, 
+        validate data number (remove NaN values).
     '''
     if isinstance(x, list):
         x = array(x)
     if isinstance(y, list):
         y = array(y)
     r = ArrayMath.lineRegress(x.asarray(), y.asarray())
-    return r[0], r[1], r[2], r[3], r[4]
+    return r[0], r[1], r[2], r[3], r[4], r[5]
     
 def polyval(p, x):
     """
