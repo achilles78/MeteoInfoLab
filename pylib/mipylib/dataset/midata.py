@@ -132,6 +132,9 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
             else:
                 version = NetcdfFileWriter.Version.netcdf4
             ncfile = NetcdfFileWriter.createNew(version, fname)
+            largefile = kwargs.pop('largefile', None)
+            if not largefile is None:
+                ncfile.setLargeFile(largefile)
             datafile = DimDataFile(ncfile=ncfile)
         return datafile
     else:
@@ -222,7 +225,7 @@ def addfile_surfer(fname, getfn=True):
     datafile = DimDataFile(meteodata)
     return datafile
     
-def addfile_mm5(fname, getfn=True):
+def addfile_mm5(fname, getfn=True, reffile=None):
     '''
     Add a MM5 data file.
     
@@ -234,7 +237,10 @@ def addfile_mm5(fname, getfn=True):
     if getfn:
         fname, isweb = __getfilename(fname)
     meteodata = MeteoDataInfo()
-    meteodata.openMM5Data(fname)
+    if reffile is None:
+        meteodata.openMM5Data(fname)
+    else:
+        meteodata.openMM5Data(fname, reffile)
     datafile = DimDataFile(meteodata)
     return datafile
     
