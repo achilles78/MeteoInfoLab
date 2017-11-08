@@ -61,7 +61,7 @@ __all__ = [
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
     'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
-    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zlabel','zlim','zticks',
+    'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zaxis','zlabel','zlim','zticks',
     'repaint','isinteractive'
     ]
         
@@ -2260,9 +2260,11 @@ def twinx(ax):
     """
     ax.axes.getAxis(Location.RIGHT).setVisible(False)
     ax.axes.setSameShrink(True)
+    ax.active_outerposition(False) 
     plot = Axes()
     plot.axes.setSameShrink(True)
     plot.axes.setPosition(ax.get_position())
+    plot.active_outerposition(False) 
     plot.axes.getAxis(Location.BOTTOM).setVisible(False)
     plot.axes.getAxis(Location.LEFT).setVisible(False)
     plot.axes.getAxis(Location.TOP).setVisible(False)
@@ -2392,10 +2394,76 @@ def yaxis(ax=None, **kwargs):
         locs = [Location.LEFT, Location.RIGHT]
     axislist = []
     if isinstance(ax, Axes3D):
-        axislist.append(ax.axes.getXAxis())
+        axislist.append(ax.axes.getYAxis())
     else:
         for loc in locs:    
             axislist.append(ax.axes.getAxis(loc))
+    for axis in axislist:
+        if not visible is None:
+            axis.setVisible(visible)
+        if not shift is None:
+            axis.setShift(shift)
+        if not color is None:
+            axis.setColor_All(color)
+        if not linewidth is None:
+            axis.setLineWidth(linewidth)
+        if not linestyle is None:
+            axis.setLineStyle(linestyle)
+        if not tickline is None:
+            axis.setDrawTickLine(tickline)
+        if not ticklabel is None:
+            axis.setDrawTickLabel(ticklabel)
+        axis.setMinorTickVisible(minortick)
+        axis.setInsideTick(tickin)
+        axis.setTickLabelFont(font)
+    draw_if_interactive()
+    
+def zaxis(ax=None, **kwargs):
+    """
+    Set z axis of the axes.
+    
+    :param ax: The axes.
+    :param color: (*Color*) Color of the z axis. Default is 'black'.
+    :param shift: (*int) z axis shif along horizontal direction. Units is pixel. Default is 0.
+    """
+    if ax is None:
+        ax = gca
+    visible = kwargs.pop('visible', None)
+    shift = kwargs.pop('shift', None)
+    color = kwargs.pop('color', None)
+    if not color is None:
+        color = plotutil.getcolor(color)
+    linewidth = kwargs.pop('linewidth', None)
+    linestyle = kwargs.pop('linestyle', None)
+    tickline = kwargs.pop('tickline', None)
+    tickline = kwargs.pop('tickvisible', tickline)
+    ticklabel = kwargs.pop('ticklabel', None)
+    minortick = kwargs.pop('minortick', False)
+    tickin = kwargs.pop('tickin', True)
+    axistype = kwargs.pop('axistype', None)
+    timetickformat = kwargs.pop('timetickformat', None)
+    if not axistype is None:
+        if timetickformat is None:
+            __setYAxisType(ax.axes, axistype)
+        else:
+            __setYAxisType(ax.axes, axistype, timetickformat)
+        ax.axes.updateDrawExtent()
+    tickfontname = kwargs.pop('tickfontname', 'Arial')
+    tickfontsize = kwargs.pop('tickfontsize', 14)
+    tickbold = kwargs.pop('tickbold', False)
+    if tickbold:
+        font = Font(tickfontname, Font.BOLD, tickfontsize)
+    else:
+        font = Font(tickfontname, Font.PLAIN, tickfontsize)
+    location = kwargs.pop('location', 'both')
+    if location == 'left':
+        locs = [Location.LEFT]
+    elif location == 'right':
+        locs = [Location.RIGHT]
+    else:
+        locs = [Location.LEFT, Location.RIGHT]
+    axislist = []
+    axislist.append(ax.axes.getZAxis())
     for axis in axislist:
         if not visible is None:
             axis.setVisible(visible)
