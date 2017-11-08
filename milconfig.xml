@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="V:\data\cuace_haze\script">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
@@ -20,9 +20,13 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="V:\data\cuace_haze\script\plot_meteo.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\table.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\errorbar_log.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="V:\data\cuace_haze\script\plot_meteo.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\table.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\errorbar_log.py"/>
     </RecentFiles>
   </File>
   <Font>
