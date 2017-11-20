@@ -640,6 +640,8 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None, c
         eline.setSize(elinewidth)
     
     #Create graphics
+    if capsize is None:
+        capsize = 10
     graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerrL, xerrR, yerrB, \
         yerrU, line, eline, capsize)
     
