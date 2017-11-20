@@ -184,9 +184,10 @@ class MIArray(object):
                 sidx = 0 if indices[i].start is None else indices[i].start
                 if sidx < 0:
                     sidx = self.getshape()[i] + sidx
-                eidx = self.getshape()[i]-1 if indices[i].stop is None else indices[i].stop
+                eidx = self.getshape()[i] if indices[i].stop is None else indices[i].stop
                 if eidx < 0:
                     eidx = self.getshape()[i] + eidx
+                eidx -= 1
                 step = 1 if indices[i].step is None else indices[i].step
             if step < 0:
                 step = abs(step)
@@ -590,6 +591,25 @@ class MIArray(object):
         '''
         r = self.reshape(int(self.array.getSize()))
         return r
+        
+    def repeat(self, repeats, axis=None):
+        '''
+        Repeat elements of an array.
+        
+        :param repeats: (*int or list of ints*) The number of repetitions for each 
+            element. repeats is broadcasted to fit the shape of the given axis.
+        :param axis: (*int*) The axis along which to repeat values. By default, use 
+            the flattened input array, and return a flat output array.
+        
+        :returns: (*array_like*) Repeated array.
+        '''
+        if isinstance(repeats, int):
+            repeats = [repeats]
+        if axis is None:
+            r = ArrayUtil.repeat(self.array, repeats)
+        else:
+            r = ArrayUtil.repeat(self.array, repeats, axis)
+        return MIArray(r)
         
     def take(self, indices):
         '''

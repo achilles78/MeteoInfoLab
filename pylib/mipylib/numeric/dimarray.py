@@ -270,9 +270,10 @@ class DimArray():
                 sidx = 0 if indices[i].start is None else indices[i].start
                 if sidx < 0:
                     sidx = self.shape[i] + sidx
-                eidx = self.shape[i]-1 if indices[i].stop is None else indices[i].stop
+                eidx = self.shape[i] if indices[i].stop is None else indices[i].stop
                 if eidx < 0:
                     eidx = self.shape[i] + eidx
+                eidx -= 1
                 step = 1 if indices[i].step is None else indices[i].step
             if step < 0:
                 step = abs(step)
@@ -880,6 +881,19 @@ class DimArray():
         '''
         r = self.array.reshape(int(self.array.array.getSize()))
         return r
+        
+    def repeat(self, repeats, axis=None):
+        '''
+        Repeat elements of an array.
+        
+        :param repeats: (*int or list of ints*) The number of repetitions for each 
+            element. repeats is broadcasted to fit the shape of the given axis.
+        :param axis: (*int*) The axis along which to repeat values. By default, use 
+            the flattened input array, and return a flat output array.
+        
+        :returns: (*array_like*) Repeated array.
+        '''
+        return self.array.repeat(repeats, axis)
         
     def lonflip(self):
         '''

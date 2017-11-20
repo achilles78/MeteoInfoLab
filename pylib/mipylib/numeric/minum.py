@@ -54,9 +54,9 @@ __all__ = [
     'interpn','isgriddata','isstationdata','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
     'nonzero','ones','ones_like','pol2cart','polyval','power',
-    'project','projectxy','projinfo','radians','reshape',
+    'project','projectxy','projinfo','radians','reshape','repeat',
     'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','std','sum','tan',
-    'transpose','trapz','vdot','unravel_index',
+    'tile','transpose','trapz','vdot','unravel_index',
     'where','zeros','zeros_like'
     ]
 
@@ -406,6 +406,49 @@ def diag(v, k=0):
     if isinstance(v, (list, tuple)):
         v = array(v)
     return MIArray(ArrayUtil.diag(v.asarray(), k))
+    
+def repeat(a, repeats, axis=None):
+    '''
+    Repeat elements of an array.
+    
+    :param repeats: (*int or list of ints*) The number of repetitions for each 
+        element. repeats is broadcasted to fit the shape of the given axis.
+    :param axis: (*int*) The axis along which to repeat values. By default, use 
+        the flattened input array, and return a flat output array.
+    
+    :returns: (*array_like*) Repeated array.
+    '''
+    if isinstance(repeats, int):
+        repeats = [repeats]
+    if isinstance(a, (list, tuple)):
+        a = array(a)
+    if isinstance(a, (MIArray, DimArray)):
+        a = a.asarray()    
+    if axis is None:
+        r = ArrayUtil.repeat(a, repeats)
+    else:
+        r = ArrayUtil.repeat(a, repeats, axis)
+    return MIArray(r)
+    
+def tile(a, repeats):
+    '''
+    Construct an array by repeating ``a`` the number of times given by repeats.
+    
+    If repeats has length ``d``, the result will have dimension of ``max(d, a.ndim)``.
+    
+    :param repeats: (*int or list of ints*) The number of repetitions of ``a`` along each 
+        axis.
+    
+    :returns: (*array_like*) Tiled array.
+    '''
+    if isinstance(repeats, int):
+        repeats = [repeats]
+    if isinstance(a, (list, tuple)):
+        a = array(a)
+    if isinstance(a, (MIArray, DimArray)):
+        a = a.asarray()    
+    r = ArrayUtil.tile(a, repeats)
+    return MIArray(r)
     
 def rand(*args):
     """
