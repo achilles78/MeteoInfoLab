@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
@@ -19,21 +19,17 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\errorbar_log.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\repeat_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\tile.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\errorbar_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\error_fill.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\xydir_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\meteo\vertical_slash.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\errorbar_log.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\array\repeat_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\array\tile.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\errorbar_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\error_fill.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\xydir_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\meteo\vertical_slash.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="80,24" MainFormSize="1478,808"/>
+  <Startup MainFormLocation="10,8" MainFormSize="1256,661"/>
 </MeteoInfo>

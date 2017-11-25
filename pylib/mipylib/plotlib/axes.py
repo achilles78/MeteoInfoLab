@@ -818,7 +818,12 @@ class Axes3D(Axes):
         
         smooth = kwargs.pop('smooth', True)
         zdir = kwargs.pop('zdir', 'z')
-        igraphic = GraphicFactory.createContourLines(gdata.data, offset, zdir, ls, smooth)
+        if zdir == 'xy':
+            sepoint = kwargs.pop('sepoint', [0,0,1,1])
+            igraphic = GraphicFactory.createContourLines(gdata.data, offset, zdir, ls, smooth, \
+                sepoint)
+        else:
+            igraphic = GraphicFactory.createContourLines(gdata.data, offset, zdir, ls, smooth)
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(igraphic)
@@ -885,7 +890,12 @@ class Axes3D(Axes):
         
         smooth = kwargs.pop('smooth', True)
         zdir = kwargs.pop('zdir', 'z')
-        igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, zdir, ls, smooth)
+        if zdir == 'xy':
+            sepoint = kwargs.pop('sepoint', [0,0,1,1])
+            igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, zdir, ls, smooth, \
+                sepoint)
+        else:
+            igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, zdir, ls, smooth)
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(igraphic)
@@ -985,8 +995,11 @@ class Axes3D(Axes):
                 ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
             ls = ls.convertTo(ShapeTypes.Image)
             plotutil.setlegendscheme(ls, **kwargs)
-                
-            graphics = GraphicFactory.createImage(gdata, ls, offset, zdir)
+            if zdir == 'xy':
+                sepoint = kwargs.pop('sepoint', [0,0,1,1])
+            else:
+                sepoint = None
+            graphics = GraphicFactory.createImage(gdata, ls, offset, zdir, sepoint)
                 
         visible = kwargs.pop('visible', True)
         if visible:
@@ -1077,8 +1090,14 @@ class Axes3D(Axes):
         #Create graphics
         offset = kwargs.pop('offset', 0)
         zdir = kwargs.pop('zdir', 'z')
-        graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb, \
-            offset, zdir) 
+        if zdir == 'xy':
+            y = kwargs.pop('y', x)
+            ydata = plotutil.getplotdata(y)
+            graphics = GraphicFactory.createFillBetweenPolygons(xdata, ydata, y1, y2, where, pb, \
+                offset, zdir) 
+        else:
+            graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb, \
+                offset, zdir) 
             
         visible = kwargs.pop('visible', True)
         if visible:

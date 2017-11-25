@@ -365,8 +365,6 @@ class DimArray():
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __neg__(self):
-        if isinstance(other, DimArray):
-            other = other.array
         r = DimArray(self.array.__neg__(), self.dims, self.fill_value, self.proj)
         return r
         
