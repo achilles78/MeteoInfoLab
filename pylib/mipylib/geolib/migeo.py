@@ -8,14 +8,12 @@
 import os
 
 from org.meteoinfo.data.mapdata.geotiff import GeoTiff
-from org.meteoinfo.global import PointD
 from org.meteoinfo.shape import ShapeUtil
 from org.meteoinfo.legend import BreakTypes
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.data import ArrayMath
 from org.meteoinfo.data.mapdata import MapDataManage
 
-import mipylib.numeric.minum as minum
 import milayer
 from milayer import MILayer
 from mipylib.numeric.miarray import MIArray
@@ -26,7 +24,7 @@ from java.util import ArrayList
 
 __all__ = [
     'arrayinpolygon','distance','georead','geotiffread','maplayer','inpolygon','maskout',
-    'polyarea','polygon','makeshapes','rmaskout','shaperead'
+    'polyarea','polygon','rmaskout','shaperead'
     ]
 
 def shaperead(fn):   
@@ -122,49 +120,6 @@ def polygon(x, y = None):
             y = y.aslist()
         polygon = ShapeUtil.createPolygonShape(x, y)
     return polygon    
-    
-def makeshapes(x, y, type=None, z=None, m=None):
-    """
-    Make shapes by x and y coordinates.
-    
-    :param x: (*array_like*) X coordinates.
-    :param y: (*array_like*) Y coordinates.    
-    :param type: (*string*) Shape type [point | line | polygon].
-    :param z: (*array_like*) Z coordinates.
-    :param m: (*array_like*) M coordinates.
-    
-    :returns: Shapes
-    """
-    shapes = []   
-    if isinstance(x, (int, float)):
-        shape = PointShape()
-        shape.setPoint(PointD(x, y))
-        shapes.append(shape)    
-    else:
-        x = minum.asarray(x)
-        y = minum.asarray(y)
-        if not z is None:            
-            if m is None:
-                m = minum.zeros(len(z)).array
-            else:
-                m = minum.asarray(m)
-            z = minum.asarray(z)
-        if type == 'point':
-            if z is None:
-                shapes = ShapeUtil.createPointShapes(x, y)
-            else:
-                shapes = ShapeUtil.createPointShapes(x, y, z, m)
-        elif type == 'line':
-            if z is None:
-                shapes = ShapeUtil.createPolylineShapes(x, y)
-            else:
-                shapes = ShapeUtil.createPolylineShapes(x, y, z, m)
-        elif type == 'polygon':
-            if z is None:
-                shapes = ShapeUtil.createPolygonShapes(x, y)
-            else:
-                shapes = ShapeUtil.createPolygonShape(x, y, z, m)
-    return shapes   
     
 def inpolygon(x, y, polygon):
     '''

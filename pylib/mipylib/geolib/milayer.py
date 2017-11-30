@@ -13,6 +13,7 @@ from java.awt import Font
 from datetime import datetime
 import mipylib.miutil as miutil
 import mipylib.numeric.minum as minum
+import geoutil
 
 class MILayer():
     '''
@@ -126,7 +127,7 @@ class MILayer():
             type = 'line'
         elif self.shapetype == ShapeTypes.Polygon:
             type = 'polygon'
-        shapes = makeshapes(x, y, type, z, m)
+        shapes = geoutil.makeshapes(x, y, type, z, m)
         if len(shapes) == 1:
             self.layer.editAddShape(shapes[0], fields)
         else:

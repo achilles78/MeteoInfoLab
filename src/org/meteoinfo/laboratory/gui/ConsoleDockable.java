@@ -107,7 +107,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("mipylib.migl.milapp = milapp");
             interp.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
             currentPath = currentPath.replace("\\", "/");  
-            interp.exec("mipylib.migl.currentfolder = '" + currentPath + "'");   
+            interp.exec("mipylib.migl.currentfolder = u'" + currentPath + "'");   
         } catch (Exception e) {
             e.printStackTrace();
         }
