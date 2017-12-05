@@ -152,7 +152,8 @@ def svd(a):
         Unitary matrix having right singular vectors as rows.
         Of shape ``(K,N)``.
     '''
-    r = LinalgUtil.svd(a.asarray())
+    #r = LinalgUtil.svd(a.asarray())
+    r = LinalgUtil.svd_EJML(a.asarray())
     U = MIArray(r[0])
     s = MIArray(r[1])
     Vh = MIArray(r[2])
@@ -183,6 +184,7 @@ def eig(a):
         eigenvalue ``w[i]``.
     '''
     r = LinalgUtil.eigen(a.asarray())
+    #r = LinalgUtil.eigen_EJML(a.asarray())
     w = MIArray(r[0])
     v = MIArray(r[1])
     return w, v

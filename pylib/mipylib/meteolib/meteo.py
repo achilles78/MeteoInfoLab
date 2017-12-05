@@ -374,36 +374,47 @@ def equivalent_potential_temperature(pressure, temperature):
     smixr = saturation_mixing_ratio(pressure, temperature)
     return pottemp * np.exp(Lv * smixr / (Cp_d * temperature))
     
-def eof(x, transform=False):
+def eof(x, svd=False, transform=False):
     '''
     Empirical Orthogonal Function (EOF) analysis to finds both time series and spatial patterns.
     
     :param x: (*array_like*) Input 2-D array with space-time field.
+    :param svd: (*boolean*) Using SVD or eigen method.
     :param transform: (*boolean*) Do space-time transform or not. This transform will speed up
-        the computation if the space location number is much more than time stamps.
+        the computation if the space location number is much more than time stamps. Only valid
+        when ``svd=False``.
         
     :returns: (EOF, E, PC) EOF: eigen vector 2-D array; E: eigen values 1-D array;
         PC: Principle component 2-D array.
     '''
     m, n = x.shape
-    if transform:        
-        C = np.dot(x.T, x)
-        E1, EOF1 = np.linalg.eig(C)
-        EOF1 = EOF1[:,::-1]
-        E = E1[::-1]
-        EOFa = np.dot(x, EOF1)
-        EOF = np.zeros((m,n))
-        for i in range(n):
-            EOF[:,i] = EOFa[:,i]/np.sqrt(abs(E[i]))
-        PC = np.dot(EOF.T, x)
-        PC = PC[::-1,:]
+    if svd:
+        U, S, V = np.linalg.svd(x)
+        EOF = U
+        C = np.zeros((m, n))
+        for i in range(len(S)):
+            C[i,i] = S[i]
+        PC = np.dot(C, V.T)
+        E = S**2 / n
     else:
-        C = np.dot(x, x.T) / n
-        E, EOF = np.linalg.eig(C)
-        PC = np.dot(EOF.T, x)
-        EOF = EOF[:,::-1]
-        PC = PC[::-1,:]
-        E = E[::-1]
+        if transform:        
+            C = np.dot(x.T, x)
+            E1, EOF1 = np.linalg.eig(C)
+            EOF1 = EOF1[:,::-1]
+            E = E1[::-1]
+            EOFa = np.dot(x, EOF1)
+            EOF = np.zeros((m,n))
+            for i in range(n):
+                EOF[:,i] = EOFa[:,i]/np.sqrt(abs(E[i]))
+            PC = np.dot(EOF.T, x)
+            #PC = PC[::-1,:]
+        else:
+            C = np.dot(x, x.T) / n
+            E, EOF = np.linalg.eig(C)
+            PC = np.dot(EOF.T, x)
+            EOF = EOF[:,::-1]
+            PC = PC[::-1,:]
+            E = E[::-1]
     return EOF, E, PC
     
 def varimax(x, normalize=False, tol=1e-10, it_max=1000):
