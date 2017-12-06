@@ -33,6 +33,7 @@ from org.meteoinfo.shape import Shape, ShapeTypes, Graphic, GraphicCollection
 
 from javax.swing import WindowConstants
 from java.awt import Color, Font
+from java.awt.image import BufferedImage
 
 from mipylib.numeric.dimarray import DimArray, PyGridData, PyStationData
 from mipylib.numeric.miarray import MIArray
@@ -3692,6 +3693,7 @@ def imshow(*args, **kwargs):
     fill_value = kwargs.pop('fill_value', -9999.0)
     xaxistype = None
     isrgb = False
+    isimage = False
     if n <= 2:
         if isinstance(args[0], (list, tuple)):
             isrgb = True
@@ -3702,6 +3704,9 @@ def imshow(*args, **kwargs):
             else:
                 x = rgbdata[0].dimvalue(1)
                 y = rgbdata[0].dimvalue(0)
+        elif isinstance(args[0], BufferedImage):
+            isimage = True
+            image = args[0]
         elif args[0].ndim > 2:
             isrgb = True
             rgbdata = args[0]
@@ -3746,6 +3751,9 @@ def imshow(*args, **kwargs):
         x = plotutil.getplotdata(x)
         y = plotutil.getplotdata(y)
         igraphic = GraphicFactory.createImage(x, y, rgbdata)
+        ls = None
+    elif isimage:
+        igraphic = GraphicFactory.createImage(image)
         ls = None
     else:
         if len(args) > 0:

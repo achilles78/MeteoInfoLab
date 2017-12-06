@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\linalg">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\image">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
@@ -15,25 +15,24 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\svd_4.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\image\imread_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\image\gifread_2.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\svd_4.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\image\imread_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\image\gifread_2.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,10" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-5,1" MainFormSize="1287,685"/>
 </MeteoInfo>
