@@ -394,7 +394,7 @@ def eof(x, svd=False, transform=False):
         C = np.zeros((m, n))
         for i in range(len(S)):
             C[i,i] = S[i]
-        PC = np.dot(C, V.T)
+        PC = np.dot(C, V)
         E = S**2 / n
     else:
         if transform:        

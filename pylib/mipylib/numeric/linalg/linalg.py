@@ -150,7 +150,7 @@ def svd(a):
         Of shape (K,), with ``K = min(M, N)``.
     Vh : ndarray
         Unitary matrix having right singular vectors as rows.
-        Of shape ``(K,N)``.
+        Of shape ``(N,N)``.
     '''
     #r = LinalgUtil.svd(a.asarray())
     r = LinalgUtil.svd_EJML(a.asarray())

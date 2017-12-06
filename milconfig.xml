@@ -18,24 +18,22 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\svd.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_2.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_hgt.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\svd_4.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\svd.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_2.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_function_hgt.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\svd_4.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-6,10" MainFormSize="1293,693"/>
 </MeteoInfo>
