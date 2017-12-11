@@ -7,8 +7,7 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.shape import Graphic
-from org.meteoinfo.image import ImageUtil
-from org.meteoinfo.global.image import GifDecoder
+from org.meteoinfo.image import ImageUtil, GifDecoder, AnimatedGifEncoder
 from mipylib.geolib.milayer import MILayer
 from mipylib.numeric.miarray import MIArray
 from org.meteoinfo.image.filter import ContrastFilter, SharpenFilter, RGBAdjustFilter, ChannelMixFilter, \
@@ -20,7 +19,8 @@ import math
 import os
 
 __all__ = [
-    'imread','imload','imwrite','gifopen','gifread','gifload'
+    'imread','imload','imwrite','gifopen','gifread','gifload','gifanimation','gifaddframe',
+    'giffinish','gifwrite'
     ]
 
 def imread(fname):
@@ -100,3 +100,47 @@ def gifload(gif, frame=0):
         gif = gifopen(gif)
     im = gif.getFrame(frame)
     return im
+    
+def gifanimation(filename, repeat=0, delay=1000):
+    """
+    Create a gif animation file
+    
+    :param: repeat: (*int, Default 0*) Animation repeat time number. 0 means repeat forever.
+    :param: delay: (*int, Default 1000*) Animation frame delay time with units of millsecond.
+    
+    :returns: Gif animation object.
+    """
+    encoder = AnimatedGifEncoder()
+    encoder.setRepeat(repeat)
+    encoder.setDelay(delay)
+    encoder.start(filename)
+    return encoder
+
+def gifaddframe(animation):
+    """
+    Add a frame to an gif animation object
+    
+    :param animation: Gif animation object
+    """
+    #chartpanel.paintGraphics()
+    animation.addFrame(chartpanel.paintViewImage())
+    
+def giffinish(animation):
+    """
+    Finish a gif animation object and write gif animation image file
+    
+    :param animation: Gif animation object
+    """
+    animation.finish()
+    
+def gifwrite(imfns, giffn, repeat=0, delay=1000):
+    '''
+    Write a gif animation file.
+    
+    :param imfns: (*list*) Input image file names.
+    :param giffn: (*string*) Output gif file name.
+    :param: repeat: (*int, Default 0*) Animation repeat time number. 0 means repeat forever.
+    :param: delay: (*int, Default 1000*) Animation frame delay time with units of millsecond.
+    '''
+    ImageUtil.createGifAnimator(imfns, giffn, delay, repeat)
+    
