@@ -11,6 +11,7 @@ from org.meteoinfo.data import TableData, TimeTableData, ArrayMath, ArrayUtil, T
 
 import miarray
 from miarray import MIArray
+import mipylib.miutil as miutil
 
 from java.util import Calendar, Date
 

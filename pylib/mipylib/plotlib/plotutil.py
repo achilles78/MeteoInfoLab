@@ -411,9 +411,15 @@ def setlegendscheme_image(ls, **kwargs):
     return ls
         
 def setlegendscheme_point(ls, **kwargs):
-    ls = ls.convertTo(ShapeTypes.Point)    
-    for lb in ls.getLegendBreaks():
-        setpointlegendbreak(lb, **kwargs)
+    ls = ls.convertTo(ShapeTypes.Point)  
+    sizes = kwargs.get('size', None)
+    if isinstance(sizes, (list, tuple, MIArray)):        
+        for lb, s in zip(ls.getLegendBreaks(), sizes):
+            kwargs['size'] = s
+            setpointlegendbreak(lb, **kwargs)
+    else:
+        for lb in ls.getLegendBreaks():
+            setpointlegendbreak(lb, **kwargs)
     return ls
     
 def setlegendscheme_line(ls, **kwargs):

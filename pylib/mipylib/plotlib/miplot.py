@@ -2846,22 +2846,29 @@ def __setYAxisType(ax, axistype, timetickformat=None):
         r_axis.setMinorTickNum(10)
         ax.setAxis(r_axis, Location.RIGHT)
 
-def title(title, fontname='Arial', fontsize=14, bold=True, color='black'):
+def title(title, fontname=None, fontsize=14, bold=True, color='black'):
     """
     Set a title of the current axes.
     
     :param title: (*string*) Title string.
-    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Title string color. Default is ``black`` .    
     """
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+        
     if bold:
         font = Font(fontname, Font.BOLD, fontsize)
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     c = plotutil.getcolor(color)
     ctitile = ChartText(title, font)
+    ctitile.setUseExternalFont(exfont)
     ctitile.setColor(c)
     gca.set_title(ctitile)
     draw_if_interactive()
@@ -3389,7 +3396,7 @@ def legend(*args, **kwargs):
     :param breaks: (*ColorBreak*) Legend breaks (optional).
     :param labels: (*list of string*) Legend labels (optional).
     :param orientation: (*string*) Colorbar orientation: ``vertical`` or ``horizontal``.
-    :param loc: (*string*) The location of the legend, including: 'upper right', upper left',
+    :param loc: (*string*) The location of the legend, including: 'upper right', 'upper left',
         'lower left', 'lower right', 'right', 'ceter left', 'center right', lower center',
         'upper center', 'center' and 'custom'. Default is 'upper right'.
     :param x: (*float*) Location x in normalized (0, 1) units when ``loc=custom`` .
@@ -4294,10 +4301,9 @@ def scatterm(*args, **kwargs):
         to draw, in increasing order.
     :param cmap: (*string*) Color map string.
     :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-        the order specified.
-    :param size: (*int*) Marker size.
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple, different 
+        levels will be plotted in different colors in the order specified.
+    :param size: (*int of list*) Marker size.
     :param marker: (*string*) Marker of the points.
     :param fill: (*boolean*) Fill markers or not. Default is True.
     :param edge: (*boolean*) Draw edge of markers or not. Default is True.
@@ -4346,8 +4352,20 @@ def scatterm(*args, **kwargs):
     ls = kwargs.pop('symbolspec', None)
     isplot = kwargs.pop('isplot', True)
     if ls is None:
-        ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-        ls = plotutil.setlegendscheme_point(ls, **kwargs)    
+        isunique = False
+        colors = kwargs.get('colors', None) 
+        if not colors is None:
+            if isinstance(colors, (list, tuple)) and len(colors) == len(x):
+                isunique = True
+        size = kwargs.get('size', None)
+        if not size is None:
+            if isinstance(size, (list, tuple, MIArray)) and len(size) == len(x):
+                isunique = True
+        if isunique:
+            ls = LegendManage.createUniqValueLegendScheme(len(x), ShapeTypes.Point)
+        else:
+            ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+        ls = plotutil.setlegendscheme_point(ls, **kwargs)
     if isinstance(gdata, PyGridData):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
     else:
