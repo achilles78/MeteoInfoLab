@@ -5220,9 +5220,11 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True,
     return layer
     
 def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=True):
-    #print 'GridData...'
     if type == 'scatter':
-        layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
+        if stdata.data.getStNum() == ls.getBreakNum():
+            layer = DrawMeteoData.createSTPointLayer_Unique(stdata.data, ls, 'layer', 'data')
+        else:
+            layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
     elif type == 'surface':
         layer = DrawMeteoData
     else:
@@ -5242,12 +5244,7 @@ def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=T
         
         if chartpanel is None:
             figure()
-        
-        #chart = Chart(plot)
-        #chart.setAntiAlias(True)
-        #chartpanel.setChart(chart)
-        #global gca
-        #gca = plot
+
         draw_if_interactive()
     return layer
 
@@ -5646,18 +5643,21 @@ def makesymbolspec(geometry, *args, **kwargs):
     ls.setFieldName(field)
     n = len(args)
     isunique = True
-    for arg in args:
-        if isinstance(arg, (list, tuple)):
-            for argi in arg:
-                lb, isu = plotutil.getlegendbreak(geometry, **argi)
+    if n == 1 and isinstance(args[0], int):
+        ls = LegendManage.createUniqValueLegendScheme(args[0], shapetype)
+    else:
+        for arg in args:
+            if isinstance(arg, (list, tuple)):
+                for argi in arg:
+                    lb, isu = plotutil.getlegendbreak(geometry, **argi)
+                    if isunique and not isu:
+                        isunique = False
+                    ls.addLegendBreak(lb)
+            else:
+                lb, isu = plotutil.getlegendbreak(geometry, **arg)
                 if isunique and not isu:
                     isunique = False
                 ls.addLegendBreak(lb)
-        else:
-            lb, isu = plotutil.getlegendbreak(geometry, **arg)
-            if isunique and not isu:
-                isunique = False
-            ls.addLegendBreak(lb)
         
     if ls.getBreakNum() > 1:
         if isunique:
