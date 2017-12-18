@@ -56,7 +56,7 @@ __all__ = [
     'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
-    'figure','figsize','patch','rectangle','fill_between','webmap','geoshow','gifaddframe','gifanimation','giffinish',
+    'figure','figsize','patch','rectangle','fill_between','fill_betweenx','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','imshow','imshowm','legend','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatter3','scatterm',
@@ -1167,6 +1167,78 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     
     #Create graphics
     graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb)    
+    
+    #Create axes
+    if gca is None:
+        plot = Axes()
+    else:
+        if isinstance(gca, Axes):
+            plot = gca
+        else:
+            plot = Axes() 
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
+    
+    #Paint dataset
+    if chartpanel is None:
+        figure()
+        
+    chart = chartpanel.getChart()
+    if gca is None:
+        chart.clearPlots()
+        chart.setPlot(plot.axes)
+    #chart.setAntiAlias(True)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return pb 
+    
+def fill_betweenx(y, x1, x2=0, where=None, **kwargs):
+    """
+    Make filled polygons between two curves (x1 and x2) where ``where==True``.
+    
+    :param y: (*array_like*) An N-length array of the y data.
+    :param x1: (*array_like*) An N-length array (or scalar) of the x data.
+    :param x2: (*array_like*) An N-length array (or scalar) of the x data.
+    :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
+        N-length boolean array and the fill will only happen over the regions where ``where==True``.
+    """
+    #Get dataset
+    global gca   
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    dn = len(y)
+    ydata = plotutil.getplotdata(y)
+    if isinstance(x1, (int, long, float)):
+        xx = []
+        for i in range(dn):
+            xx.append(x1)
+        x1 = minum.array(xx).array
+    else:
+        x1 = plotutil.getplotdata(x1)
+    if isinstance(x2, (int, long, float)):
+        xx = []
+        for i in range(dn):
+            xx.append(x2)
+        x2 = minum.array(xx).array
+    else:
+        x2 = plotutil.getplotdata(x2)
+    if not where is None:
+        if isinstance(where, (tuple, list)):
+            where = minum.array(where)
+        where = where.asarray()
+    
+    #Set plot data styles
+    if not 'fill' in kwargs:
+        kwargs['fill'] = True
+    if not 'edge' in kwargs:
+        kwargs['edge'] = False
+    pb, isunique = plotutil.getlegendbreak('polygon', **kwargs)
+    pb.setCaption(label)
+    
+    #Create graphics
+    graphics = GraphicFactory.createFillBetweenPolygonsX(ydata, x1, x2, where, pb)    
     
     #Create axes
     if gca is None:
