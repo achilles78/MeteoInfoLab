@@ -3490,9 +3490,13 @@ def legend(*args, **kwargs):
     else:
         clegend = gca.axes.getLegend()   
     ls = kwargs.pop('legend', None)
-    if len(args) > 0 and isinstance(args[0], MILayer):
-        ls = args[0].legend()
-        args = args[1:]
+    if len(args) > 0:
+        if isinstance(args[0], MILayer):
+            ls = args[0].legend()
+            args = args[1:]
+        elif isinstance(args[0], LegendScheme):
+            ls = args[0]
+            args = args[1:]
     if ls is None:
         if len(args) > 0:
             lbs = []

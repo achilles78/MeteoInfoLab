@@ -1153,6 +1153,8 @@ def histogram(a, bins=10):
     '''
     if isinstance(a, list):
         a = array(a)
+    elif isinstance(a, (int, long, float)):
+        a = array([a])
     if isinstance(bins, list):
         bins = array(bins)
     r = ArrayUtil.histogram(a.asarray(), bins.asarray())

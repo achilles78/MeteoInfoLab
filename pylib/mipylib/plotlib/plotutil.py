@@ -413,13 +413,16 @@ def setlegendscheme_image(ls, **kwargs):
 def setlegendscheme_point(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Point)  
     sizes = kwargs.get('size', None)
-    if isinstance(sizes, (list, tuple, MIArray)):        
-        for lb, s in zip(ls.getLegendBreaks(), sizes):
-            kwargs['size'] = s
-            setpointlegendbreak(lb, **kwargs)
-    else:
-        for lb in ls.getLegendBreaks():
-            setpointlegendbreak(lb, **kwargs)
+    colors = kwargs.get('colors', None)
+    i = 0
+    for lb in ls.getLegendBreaks():
+        if isinstance(sizes, (list, tuple, MIArray)): 
+            kwargs['size'] = sizes[i]
+        if isinstance(colors, (list, tuple, MIArray)):
+            kwargs['color'] = colors[i]
+        setpointlegendbreak(lb, **kwargs)
+        i += 1
+
     return ls
     
 def setlegendscheme_line(ls, **kwargs):
@@ -486,6 +489,10 @@ def setpointlegendbreak(lb, **kwargs):
     else:
         pstyle = getpointstyle(marker)
         lb.setStyle(pstyle)
+    color = kwargs.pop('color', None)
+    if not color is None:
+        color = getcolor(color)
+        lb.setColor(color)
     size = kwargs.pop('size', 6)
     lb.setSize(size)
     ecobj = kwargs.pop('edgecolor', 'k')
