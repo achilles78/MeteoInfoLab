@@ -5297,7 +5297,7 @@ def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True,
     
 def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=True):
     if type == 'scatter':
-        if stdata.data.getStNum() == ls.getBreakNum():
+        if stdata.data.getStNum() == ls.getBreakNum() and ls.getLegendType() == LegendType.UniqueValue:
             layer = DrawMeteoData.createSTPointLayer_Unique(stdata.data, ls, 'layer', 'data')
         else:
             layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
