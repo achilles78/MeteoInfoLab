@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\ascii">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
@@ -16,21 +12,21 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\data_process"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\makesymbolspec_map.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\scatterm_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\test_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\test_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\table.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\makesymbolspec_map.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\scatterm_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\test_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\test_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\table.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -281,6 +281,18 @@ class PyTableData():
         dtable = self.data.average(cols)
         return PyTableData(TableData(dtable))
         
+    def sum(self, colnames):
+        '''
+        Summary some columns data.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains one row of summary data of the columns.
+        '''
+        cols = self.data.findColumns(colnames)
+        dtable = self.data.sum(cols)
+        return PyTableData(TableData(dtable))
+        
     def ave_year(self, colnames, year=None):
         '''
         Yearly average function. Time column is needed.
@@ -301,6 +313,26 @@ class PyTableData():
                 dtable = self.data.ave_Year(cols, year)
             return PyTableData(TableData(dtable))
             
+    def sum_year(self, colnames, year=None):
+        '''
+        Yearly summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        :param year: (*int*) Specific year. Default is ``None``.
+        
+        :returns: (*PyTableData*) Result table contains some rows of yearly summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            if year is None:
+                dtable = self.data.sum_Year(cols)
+            else:
+                dtable = self.data.sum_Year(cols, year)
+            return PyTableData(TableData(dtable))
+            
     def ave_yearmonth(self, colnames, month):
         '''
         Average the table data by year and month. Time column is needed.
@@ -316,6 +348,23 @@ class PyTableData():
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_YearMonth(cols, month)
+            return PyTableData(TableData(dtable))
+            
+    def sum_yearmonth(self, colnames, month):
+        '''
+        summary the table data by year and month. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        :param month: (*int*) Specific month.
+        
+        :returns: (*PyTableData*) Result table contains some rows of year-month summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.sum_YearMonth(cols, month)
             return PyTableData(TableData(dtable))
                   
     def ave_monthofyear(self, colnames):
@@ -334,6 +383,22 @@ class PyTableData():
             dtable = self.data.ave_MonthOfYear(cols)
             return PyTableData(TableData(dtable))
             
+    def sum_monthofyear(self, colnames):
+        '''
+        Month of year summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of month of year summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.sum_MonthOfYear(cols)
+            return PyTableData(TableData(dtable))
+            
     def ave_seasonofyear(self, colnames):
         '''
         Season of year average function. Time column is needed.
@@ -348,6 +413,22 @@ class PyTableData():
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_SeasonOfYear(cols)
+            return PyTableData(TableData(dtable))
+            
+    def sum_seasonofyear(self, colnames):
+        '''
+        Season of year summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of season of year summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.sum_SeasonOfYear(cols)
             return PyTableData(TableData(dtable))
             
     def ave_hourofday(self, colnames):
@@ -365,6 +446,22 @@ class PyTableData():
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_HourOfDay(cols)
             return PyTableData(TableData(dtable))
+            
+    def sum_hourofday(self, colnames):
+        '''
+        Hour of day summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of hour of day summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.sum_HourOfDay(cols)
+            return PyTableData(TableData(dtable))
     
     def ave_month(self, colnames):
         '''
@@ -373,6 +470,22 @@ class PyTableData():
         :param colnames: (*list*) Column names.
         
         :returns: (*PyTableData*) Result table contains some rows of monthly average data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_Month(cols)
+            return PyTableData(TableData(dtable))
+            
+    def sum_month(self, colnames):
+        '''
+        Monthly summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of monthly summary data of the columns.
         '''
         if not self.timedata:
             print 'There is no time column!'
@@ -400,6 +513,60 @@ class PyTableData():
             ttd.setTimeColName('Date')
             return PyTableData(ttd)
             
+    def sum_day(self, colnames, day=None):
+        '''
+        Daily summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of daily summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.sum_Day(cols)
+            ttd = TimeTableData(dtable)
+            ttd.setTimeColName('Date')
+            return PyTableData(ttd)
+            
+    def ave_dayofweek(self, colnames, day=None):
+        '''
+        Day of week average function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of dya of week average data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.ave_DayOfWeek(cols)
+            ttd = TimeTableData(dtable)
+            ttd.setTimeColName('Date')
+            return PyTableData(ttd)
+            
+    def sum_dayofweek(self, colnames, day=None):
+        '''
+        Day of week summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of day of week summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.sum_DayOfWeek(cols)
+            ttd = TimeTableData(dtable)
+            ttd.setTimeColName('Date')
+            return PyTableData(ttd)
+            
     def ave_hour(self, colnames):
         '''
         Hourly average function. Time column is needed.
@@ -414,6 +581,24 @@ class PyTableData():
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_Hour(cols)
+            ttd = TimeTableData(dtable)
+            ttd.setTimeColName('Date')
+            return PyTableData(ttd)
+            
+    def sum_hour(self, colnames):
+        '''
+        Hourly summary function. Time column is needed.
+        
+        :param colnames: (*list*) Column names.
+        
+        :returns: (*PyTableData*) Result table contains some rows of hourly summary data of the columns.
+        '''
+        if not self.timedata:
+            print 'There is no time column!'
+            return None
+        else:
+            cols = self.data.findColumns(colnames)
+            dtable = self.data.sum_Hour(cols)
             ttd = TimeTableData(dtable)
             ttd.setTimeColName('Date')
             return PyTableData(ttd)
