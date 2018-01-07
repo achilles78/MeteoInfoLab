@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\ascii">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
@@ -16,17 +15,20 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\table.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\windrose_contourf.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\two_yaxis.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino-1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\table.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\windrose_contourf.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\two_yaxis.py"/>
     </RecentFiles>
   </File>
   <Font>

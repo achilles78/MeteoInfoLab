@@ -97,6 +97,12 @@ class Axes():
         '''
         return self.axes.getAxis(loc)
         
+    def get_title(self):
+        '''
+        Get title               
+        '''
+        return self.axes.getTitle()
+        
     def set_title(self, title):
         '''
         Set title
@@ -104,6 +110,43 @@ class Axes():
         :param title: (*string*) Title
         '''
         self.axes.setTitle(title)
+        
+    def get_yticks(self):
+        '''
+        Get y axis tick locations.
+        '''
+        axis = self.axes.getYAxis()
+        axis.updateTickLabels()
+        return axis.getTickLocations()
+        
+    def set_yticks(self, locs):
+        '''
+        Set y axis tick locations.
+        '''
+        axis = self.axes.getYAxis()
+        if isinstance(locs, (MIArray, DimArray)):
+            locs = labels.aslist()
+        axis.setTickLocations(locs)
+            
+    def get_yticklabels(self):
+        '''
+        Get y axis tick labels.
+        '''
+        axis = self.axes.getYAxis()
+        axis.updateTickLabels()
+        return axis.getTickLabelText()
+        
+    def set_yticklabels(self, labels):
+        '''
+        Set y axis tick labels.
+        '''
+        axis = self.axes.getYAxis()
+        if isinstance(labels, (MIArray, DimArray)):
+            labels = labels.aslist()
+        if isinstance(labels[0], (int, long, float)):
+            axis.setTickLabels_Number(labels)
+        else:
+            axis.setTickLabelText(labels)
     
     def add_graphic(self, graphic):
         '''

@@ -492,7 +492,7 @@ class PyTableData():
             return None
         else:
             cols = self.data.findColumns(colnames)
-            dtable = self.data.ave_Month(cols)
+            dtable = self.data.sum_Month(cols)
             return PyTableData(TableData(dtable))
             
     def ave_day(self, colnames, day=None):

@@ -3105,9 +3105,9 @@ def xticks(*args, **kwargs):
             if not axis_t is None:
                 axis_t.setTickLabels_Number(labels)
         else:
-            axis.setTickLabels(labels)
+            axis.setTickLabelText(labels)
             if not axis_t is None:
-                axis_t.setTickLabels(labels)
+                axis_t.setTickLabelText(labels)
     fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
     fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
     bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
@@ -3161,13 +3161,14 @@ def yticks(*args, **kwargs):
         labels = args[0]
         if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
+        if isinstance(labels[0], (int, long, float)):
             axis.setTickLabels_Number(labels)
             if not axis_r is None:
                 axis_r.setTickLabels_Number(labels)
         else:
-            axis.setTickLabels(labels)
+            axis.setTickLabelText(labels)
             if not axis_r is None:
-                axis_r.setTickLabels(labels)
+                axis_r.setTickLabelText(labels)
     fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
     fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
     bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
@@ -3215,7 +3216,7 @@ def zticks(*args, **kwargs):
             labels = labels.aslist()
             axis.setTickLabels_Number(labels)
         else:
-            axis.setTickLabels(labels)
+            axis.setTickLabelText(labels)
     fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
     fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
     bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
