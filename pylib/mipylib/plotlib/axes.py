@@ -111,6 +111,23 @@ class Axes():
         '''
         self.axes.setTitle(title)
         
+    def get_xticks(self):
+        '''
+        Get x axis tick locations.
+        '''
+        axis = self.axes.getXAxis()
+        axis.updateTickLabels()
+        return axis.getTickLocations()
+        
+    def set_xticks(self, locs):
+        '''
+        Set x axis tick locations.
+        '''
+        axis = self.axes.getXAxis()
+        if isinstance(locs, (MIArray, DimArray)):
+            locs = labels.aslist()
+        axis.setTickLocations(locs)
+        
     def get_yticks(self):
         '''
         Get y axis tick locations.
@@ -127,6 +144,26 @@ class Axes():
         if isinstance(locs, (MIArray, DimArray)):
             locs = labels.aslist()
         axis.setTickLocations(locs)
+        
+    def get_xticklabels(self):
+        '''
+        Get x axis tick labels.
+        '''
+        axis = self.axes.getXAxis()
+        axis.updateTickLabels()
+        return axis.getTickLabelText()
+        
+    def set_xticklabels(self, labels):
+        '''
+        Set x axis tick labels.
+        '''
+        axis = self.axes.getXAxis()
+        if isinstance(labels, (MIArray, DimArray)):
+            labels = labels.aslist()
+        if isinstance(labels[0], (int, long, float)):
+            axis.setTickLabels_Number(labels)
+        else:
+            axis.setTickLabelText(labels)
             
     def get_yticklabels(self):
         '''
