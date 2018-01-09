@@ -13,7 +13,7 @@ from ucar.ma2 import Array
 from mipylib.numeric.miarray import MIArray
 
 __all__ = [
-    'cov','pearsonr','spearmanr','kendalltau'
+    'cov','pearsonr','spearmanr','kendalltau','linregress','mlinregress'
     ]
 
 def cov(m, y=None, rowvar=True, bias=False):
@@ -156,3 +156,37 @@ def spearmanr(m, y=None, axis=0):
             y = y.T
         r = StatsUtil.spearmanr(m.asarray(), y.asarray())
         return MIArray(r)
+        
+def linregress(x, y):
+    '''
+    Calculate a linear least-squares regression for two sets of measurements.
+    
+    :param x, y: (*array_like*) Two sets of measurements. Both arrays should have the same length.
+    
+    :returns: Result slope, intercept, relative coefficient, two-sided p-value for a hypothesis test 
+        whose null hypothesis is that the slope is zero, standard error of the estimated gradient, 
+        validate data number (remove NaN values).
+    '''
+    if isinstance(x, list):
+        x = MIArray(ArrayUtil.array(x))
+    if isinstance(y, list):
+        y = MIArray(ArrayUtil.array(y))
+    r = ArrayMath.lineRegress(x.asarray(), y.asarray())
+    return r[0], r[1], r[2], r[3], r[4], r[5]
+    
+def mlinregress(y, x):
+    '''
+    Implements ordinary least squares (OLS) to estimate the parameters of a multiple linear 
+    regression model.
+    
+    :param y: (*array_like*) Y sample data - one dimension array.
+    :param x: (*array_like*) X sample data - two dimension array.
+    
+    :returns: Estimated regression parameters and residuals.
+    '''
+    if isinstance(x, list):
+        x = MIArray(ArrayUtil.array(x))
+    if isinstance(y, list):
+        y = MIArray(ArrayUtil.array(y))
+    r = StatsUtil.mutipleLineRegress_OLS(y.asarray(), x.asarray())
+    return MIArray(r[0]), MIArray(r[1])

@@ -16,7 +16,7 @@ from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 from org.meteoinfo.data.meteodata import MeteoDataInfo, DrawMeteoData
 from org.meteoinfo.chart.plot import Plot, Plot2D, PiePlot, PolarPlot, MapPlot, Plot3D, SeriesLegend, ChartPlotMethod, PlotOrientation, GraphicFactory
-from org.meteoinfo.chart import Chart, ChartText, ChartLegend, LegendPosition, ChartWindArrow
+from org.meteoinfo.chart import Chart, ChartText, ChartLegend, ChartColorBar, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
 from org.meteoinfo.legend import MapFrame, LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
@@ -3641,6 +3641,7 @@ def colorbar(mappable, **kwargs):
         . If a scalar, indicates the length of both the minimum and maximum triangle colorbar extensions
         as a fraction of the interior colorbar length.
     :param ticks: [None | list of ticks] If None, ticks are determined automatically from the input.
+    :param ticklabels: [None | list of ticklabels] Tick labels.
     """
     cax = kwargs.pop('cax', None)
     if cax is None:
@@ -3681,12 +3682,12 @@ def colorbar(mappable, **kwargs):
     
     newlegend = kwargs.pop('newlegend', True)
     if newlegend:
-        legend = ChartLegend(ls)
+        legend = ChartColorBar(ls)
         cax.axes.addLegend(legend)
     else:
         legend = cax.axes.getLegend()   
         if legend is None:
-            legend = ChartLegend(ls)
+            legend = ChartColorBar(ls)
             cax.axes.setLegend(legend)
         else:
             legend.setLegendScheme(ls)
@@ -3716,7 +3717,20 @@ def colorbar(mappable, **kwargs):
         legend.setAutoExtendFrac(True)
     ticks = kwargs.pop('ticks', None)
     if not ticks is None:
-        legend.setTickLabels(ticks)
+        if isinstance(ticks, MIArray):
+            ticks = ticks.aslist()
+        legend.setTickLocations(ticks)
+    ticklabels = kwargs.pop('ticklabels', None)
+    if not ticklabels is None:
+        if isinstance(ticklabels, (MIArray, DimArray)):
+            ticklabels = ticklabels.aslist()
+        if ls.getLegendType() == LegendType.UniqueValue:
+            legend.setTickCaptions(ticklabels)
+        else:
+            if isinstance(ticklabels[0], (int, long, float)):
+                legend.setTickLabels_Number(ticklabels)
+            else:
+                legend.setTickLabelText(ticklabels)
     xshift = kwargs.pop('xshift', None)
     if not xshift is None:
         legend.setXShift(xshift)
@@ -5673,8 +5687,12 @@ def makelegend(source):
     :returns: Created legend.
     '''
     if isinstance(source, basestring):
-        ls = LegendScheme()
-        ls.importFromXMLFile(source, False)
+        if os.path.exists(source):
+            ls = LegendScheme()
+            ls.importFromXMLFile(source, False)
+            return ls
+        else:
+            source = plotutil.getcolormap(source)
     else:
         ls = LegendScheme(source)
     return ls
