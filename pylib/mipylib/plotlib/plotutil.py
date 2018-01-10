@@ -198,6 +198,12 @@ def getlinestyle_1(style):
     
     return lineStyle
     
+def gethatch(h):
+    if h is None:
+        return h
+    else:
+        return HatchStyle.getStyle(h)
+    
 def getplotstyle(style, caption, **kwargs):    
     linewidth = kwargs.pop('linewidth', 1.0)
     if style is None:
@@ -339,6 +345,17 @@ def getlegendbreak(geometry, **kwargs):
         lb.setDrawOutline(edge)
         size = kwargs.pop('size', 1)
         lb.setOutlineSize(size)
+        hatch = kwargs.pop('hatch', None)
+        hatch = gethatch(hatch) 
+        hatchsize = kwargs.pop('hatchsize', None)
+        bgcolor = kwargs.pop('bgcolor', None)
+        bgcolor = getcolor(bgcolor)
+        if not hatch is None:
+            lb.setStyle(hatch)
+            if not bgcolor is None:
+                lb.setBackColor(bgcolor)
+            if not hatchsize is None:
+                lb.setStyleSize(hatchsize)
     else:
         lb = ColorBreak()
     caption = kwargs.pop('caption', None)
@@ -456,6 +473,11 @@ def setlegendscheme_polygon(ls, **kwargs):
     fill = kwargs.pop('fill', None)
     edge = kwargs.pop('edge', None)
     alpha = kwargs.pop('alpha', None)
+    hatch = kwargs.pop('hatch', None)
+    hatch = gethatch(hatch) 
+    hatchsize = kwargs.pop('hatchsize', None)
+    bgcolor = kwargs.pop('bgcolor', None)
+    bgcolor = getcolor(bgcolor)
     for lb in ls.getLegendBreaks():
         if not facecolor is None:
             lb.setColor(facecolor)
@@ -471,6 +493,12 @@ def setlegendscheme_polygon(ls, **kwargs):
             lb.setDrawFill(fill)  
         if not edge is None:
             lb.setDrawOutline(edge)
+        if not hatch is None:
+            lb.setStyle(hatch)
+            if not bgcolor is None:
+                lb.setBackColor(bgcolor)
+            if not hatchsize is None:
+                lb.setStyleSize(hatchsize)
     return ls
     
 def setpointlegendbreak(lb, **kwargs):       

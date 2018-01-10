@@ -19,7 +19,7 @@ from org.meteoinfo.chart.plot import Plot, Plot2D, PiePlot, PolarPlot, MapPlot, 
 from org.meteoinfo.chart import Chart, ChartText, ChartLegend, ChartColorBar, LegendPosition, ChartWindArrow
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.script import ChartForm, MapForm
-from org.meteoinfo.legend import MapFrame, LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
+from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.drawing import PointStyle, MarkerType
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
@@ -760,7 +760,7 @@ def bar(*args, **kwargs):
     edgecolor = plotutil.getcolor(ecobj)
     linewidth = kwargs.pop('linewidth', 1.0) 
     hatch = kwargs.pop('hatch', None)
-    hatch = __gethatch(hatch) 
+    hatch = plotutil.gethatch(hatch) 
     hatchsize = kwargs.pop('hatchsize', None)
     bgcolor = kwargs.pop('bgcolor', None)
     bgcolor = plotutil.getcolor(bgcolor)
@@ -850,7 +850,7 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
     edgecolor = plotutil.getcolor(ecobj)
     linewidth = kwargs.pop('linewidth', 1.0) 
     hatch = kwargs.pop('hatch', None)
-    hatch = __gethatch(hatch) 
+    hatch = plotutil.gethatch(hatch) 
     hatchsize = kwargs.pop('hatchsize', None)
     bgcolor = kwargs.pop('bgcolor', None)
     bgcolor = plotutil.getcolor(bgcolor)
@@ -2825,24 +2825,6 @@ def __getfont_1(**kwargs):
     else:
         font = Font(fontname, Font.PLAIN, fontsize)
     return font
-    
-def __gethatch(h):
-    hatch = HatchStyle.NONE
-    if h == '-' or h == 'horizontal':
-        hatch = HatchStyle.HORIZONTAL
-    elif h == '|' or h == 'vertical':
-        hatch = HatchStyle.VERTICAL
-    elif h == '\\' or h == 'forward_diagonal':
-        hatch = HatchStyle.FORWARD_DIAGONAL
-    elif h == '/' or h == 'backward_diagonal':
-        hatch = HatchStyle.BACKWARD_DIAGONAL
-    elif h == '+' or h == 'cross':
-        hatch = HatchStyle.CROSS
-    elif h == 'x' or h == 'diagonal_cross':
-        hatch = HatchStyle.DIAGONAL_CROSS
-    elif h == '.' or h == 'dot':
-        hatch = HatchStyle.DOT    
-    return hatch
     
 def __setXAxisType(ax, axistype, timetickformat=None):
     if axistype == 'lon':

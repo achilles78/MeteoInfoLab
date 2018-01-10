@@ -13,7 +13,7 @@ from ucar.ma2 import Array
 from mipylib.numeric.miarray import MIArray
 
 __all__ = [
-    'cov','pearsonr','spearmanr','kendalltau','linregress','mlinregress'
+    'cov','pearsonr','spearmanr','kendalltau','linregress','mlinregress','percentile'
     ]
 
 def cov(m, y=None, rowvar=True, bias=False):
@@ -190,3 +190,18 @@ def mlinregress(y, x):
         y = MIArray(ArrayUtil.array(y))
     r = StatsUtil.mutipleLineRegress_OLS(y.asarray(), x.asarray())
     return MIArray(r[0]), MIArray(r[1])
+    
+def percentile(a, q):
+    '''
+    Compute the qth percentile of the data along the specified axis.
+    
+    :param a: (*array_like*) Input array.
+    :param q: (*float*) float in range of [0,100].
+        Percentile to compute, which must be between 0 and 100 inclusive.
+    
+    :returns: (*float*) qth percentile value.
+    '''
+    if isinstance(a, list):
+        a = MIArray(ArrayUtil.array(x))
+    r = StatsUtil.percentile(a.asarray(), q)
+    return r
