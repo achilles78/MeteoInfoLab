@@ -3715,6 +3715,12 @@ def colorbar(mappable, **kwargs):
     extendfrac = kwargs.pop('extendfrac', None)
     if extendfrac == 'auto':
         legend.setAutoExtendFrac(True)
+    tickin = kwargs.pop('tickin', None)
+    if not tickin is None:
+        legend.setInsideTick(tickin)
+    ticklen = kwargs.pop('ticklen', None)
+    if not ticklen is None:
+        legend.setTickLength(ticklen)
     ticks = kwargs.pop('ticks', None)
     if not ticks is None:
         if isinstance(ticks, MIArray):
