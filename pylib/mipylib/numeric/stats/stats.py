@@ -191,17 +191,23 @@ def mlinregress(y, x):
     r = StatsUtil.mutipleLineRegress_OLS(y.asarray(), x.asarray())
     return MIArray(r[0]), MIArray(r[1])
     
-def percentile(a, q):
+def percentile(a, q, axis=None):
     '''
     Compute the qth percentile of the data along the specified axis.
     
     :param a: (*array_like*) Input array.
     :param q: (*float*) float in range of [0,100].
         Percentile to compute, which must be between 0 and 100 inclusive.
+    :param axis: (*int*) Axis or axes along which the percentiles are computed. The default is 
+        to compute the percentile along a flattened version of the array.
     
     :returns: (*float*) qth percentile value.
     '''
     if isinstance(a, list):
         a = MIArray(ArrayUtil.array(x))
-    r = StatsUtil.percentile(a.asarray(), q)
+    if axis is None:
+        r = StatsUtil.percentile(a.asarray(), q)
+    else:
+        r = StatsUtil.percentile(a.asarray(), q, axis)
+        r = MIArray(r)
     return r
