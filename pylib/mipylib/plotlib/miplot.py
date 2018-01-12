@@ -911,7 +911,7 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     :param x: (*array_like*) Input x data.
     :param y: (*array_like*) Input y data.
     :param s: (*int*) Size of points.
-    :param c: (*Color*) Color of the points. Or z vlaues.
+    :param c: (*Color or array*) Color of the points. Or z vlaues.
     :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
     :param marker: (*string*) Marker of the points.
     :param label: (*string*) Label of the points series.
@@ -3480,6 +3480,10 @@ def legend(*args, **kwargs):
         elif isinstance(args[0], LegendScheme):
             ls = args[0]
             args = args[1:]
+        elif isinstance(args[0], GraphicCollection):
+            if not args[0].isSingleLegend():
+                ls = args[0].getLegendScheme()
+                args = args[1:]
     if ls is None:
         if len(args) > 0:
             lbs = []

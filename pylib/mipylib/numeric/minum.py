@@ -381,12 +381,7 @@ def eye(n, m=None, k=0, dtype='float'):
 def diag(v, k=0):
     '''
     Extract a diagonal or construct a diagonal array.
-    
-    See the more detailed documentation for ``numpy.diagonal`` if you use this
-    function to extract a diagonal and wish to write to the resulting array;
-    whether it returns a copy or a view depends on what version of numpy you
-    are using.
-    
+        
     Parameters
     ----------
     v : array_like
