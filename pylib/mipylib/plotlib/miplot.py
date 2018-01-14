@@ -3680,7 +3680,7 @@ def colorbar(mappable, **kwargs):
     legend.setColorbar(True)   
     legend.setShrink(shrink)
     legend.setAspect(aspect)
-    legend.setTickFont(tickfont)
+    legend.setTickLabelFont(tickfont)
     label = kwargs.pop('label', None)
     if not label is None:
         label = ChartText(label, labelfont)
@@ -3723,6 +3723,9 @@ def colorbar(mappable, **kwargs):
                 legend.setTickLabels_Number(ticklabels)
             else:
                 legend.setTickLabelText(ticklabels)
+    tickrotation = kwargs.pop('tickrotation', None)
+    if not tickrotation is None:
+        legend.setTickLabelAngle(tickrotation)
     xshift = kwargs.pop('xshift', None)
     if not xshift is None:
         legend.setXShift(xshift)
