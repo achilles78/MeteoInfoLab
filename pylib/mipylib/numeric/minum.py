@@ -1962,7 +1962,7 @@ def projinfo(proj='longlat', **kwargs):
     y_0 = kwargs.pop('falsenorthing', 0)
     x_0 = kwargs.pop('x_0', x_0)
     y_0 = kwargs.pop('y_0', y_0)
-    h = kwargs.pop('h', 0)
+    h = kwargs.pop('h', None)
     projstr = '+proj=' + proj \
         + ' +lat_0=' + str(lat_0) \
         + ' +lon_0=' + str(lon_0) \
@@ -1971,8 +1971,9 @@ def projinfo(proj='longlat', **kwargs):
         + ' +lat_ts=' + str(lat_ts) \
         + ' +k=' + str(k) \
         + ' +x_0=' + str(x_0) \
-        + ' +y_0=' + str(y_0) \
-        + ' +h=' + str(h)
+        + ' +y_0=' + str(y_0)
+    if not h is None:
+        projstr = projstr + ' +h=' + str(h)
         
     return ProjectionInfo(projstr)     
     

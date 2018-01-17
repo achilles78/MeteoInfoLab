@@ -4949,13 +4949,13 @@ def surfacem(*args, **kwargs):
     ls = ls.convertTo(ShapeTypes.Polygon)
     plotutil.setlegendscheme(ls, **kwargs)
         
-    #if plot.axes.getProjInfo().isLonLat():
-    #    lonlim = 90
-    #else:
-    #    lonlim = 0
-        #x, y = minum.project(x, y, toproj=plot.axes.getProjInfo())
-    #layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
-    layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls)
+    if proj is None or proj.isLonLat():
+        lonlim = 90
+    else:
+        lonlim = 0
+        x, y = minum.project(x, y, toproj=proj)
+    layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
+    #layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls)
     if not proj is None:
         layer.setProjInfo(proj)
         
