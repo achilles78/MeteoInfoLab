@@ -139,7 +139,11 @@ def getpointstyle(style):
         return None
         
     pointStyle = None
-    if 'o' in style:
+    if 'do' in style:
+        pointStyle = PointStyle.DOUBLE_CIRCLE
+    elif 'os' in style:
+        pointStyle = PointStyle.CIRCLE_STAR
+    elif 'o' in style:
         pointStyle = PointStyle.Circle
     elif '.' in style:
         pointStyle = PointStyle.Circle

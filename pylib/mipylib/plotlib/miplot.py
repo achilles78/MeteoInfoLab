@@ -3273,6 +3273,9 @@ def text(x, y, s, **kwargs):
         gap = bbox.pop('gap', None)
         if not gap is None:
             text.setGap(gap)
+    rotation = kwargs.pop('rotation', None)
+    if not rotation is None:
+        text.setAngle(rotation)
     coordinates = kwargs.pop('coordinates', 'data')
     text.setCoordinates(coordinates)
     if coordinates == 'figure':

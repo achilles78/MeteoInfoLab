@@ -85,6 +85,7 @@ class MIArray(object):
         ranges = []
         flips = []
         onlyrange = True
+        alllist = True
         isempty = False
         nshape = []
         for i in range(0, self.ndim):  
@@ -95,6 +96,7 @@ class MIArray(object):
                 sidx = k
                 eidx = k
                 step = 1
+                alllist = False
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
@@ -104,6 +106,7 @@ class MIArray(object):
                     eidx = self.getshape()[i] + eidx
                 eidx -= 1                    
                 step = 1 if k.step is None else k.step
+                alllist = False
             elif isinstance(k, (list, tuple, MIArray)):
                 if isinstance(k, MIArray):
                     k = k.aslist()
@@ -136,7 +139,10 @@ class MIArray(object):
         if onlyrange:
             r = ArrayMath.section(self.array, ranges)
         else:
-            r = ArrayMath.take(self.array, ranges)
+            if alllist:
+                r = ArrayMath.take(self.array, ranges)
+            else:
+                r = ArrayMath.take(self.array, ranges)
         if r.getSize() == 1:
             r = r.getObject(0)
             if isinstance(r, Complex):
