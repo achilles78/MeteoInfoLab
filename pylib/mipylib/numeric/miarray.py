@@ -140,7 +140,7 @@ class MIArray(object):
             r = ArrayMath.section(self.array, ranges)
         else:
             if alllist:
-                r = ArrayMath.take(self.array, ranges)
+                r = ArrayMath.takeValues(self.array, ranges)
             else:
                 r = ArrayMath.take(self.array, ranges)
         if r.getSize() == 1:

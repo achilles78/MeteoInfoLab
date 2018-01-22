@@ -347,8 +347,10 @@ def getlegendbreak(geometry, **kwargs):
             lb.setDrawFill(fill)
         edge = kwargs.pop('edge', True)
         lb.setDrawOutline(edge)
-        size = kwargs.pop('size', 1)
-        lb.setOutlineSize(size)
+        size = kwargs.pop('size', None)
+        size = kwargs.pop('edgesize', size)
+        if not size is None:
+            lb.setOutlineSize(size)
         hatch = kwargs.pop('hatch', None)
         hatch = gethatch(hatch) 
         hatchsize = kwargs.pop('hatchsize', None)

@@ -121,6 +121,7 @@ class DimArray():
         flips = []
         iszerodim = True
         onlyrange = True
+        alllist = True
         isempty = False
         nshape = []
         for i in range(0, self.ndim):  
@@ -131,7 +132,8 @@ class DimArray():
                     k = self.dims[i].getLength() + k
                 sidx = k
                 eidx = k
-                step = 1                
+                step = 1       
+                alllist = False
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
@@ -141,6 +143,7 @@ class DimArray():
                     eidx = self.dims[i].getLength() + eidx
                 eidx -= 1
                 step = 1 if k.step is None else k.step
+                alllist = False
             elif isinstance(k, list):
                 if not isinstance(k[0], datetime.datetime):
                     onlyrange = False
@@ -185,6 +188,7 @@ class DimArray():
                         iidx = eidx
                         eidx = sidx
                         sidx = iidx
+                alllist = False
             else:                
                 print k
                 raise IndexError()
@@ -224,7 +228,11 @@ class DimArray():
         if onlyrange:
             r = ArrayMath.section(self.array.array, ranges)
         else:
-            r = ArrayMath.take(self.array.array, ranges)
+            if alllist:
+                r = ArrayMath.takeValues(self.array.array, ranges)
+                return MIArray(r)
+            else:
+                r = ArrayMath.take(self.array.array, ranges)
         if r.getSize() == 1:
             return r.getObject(0)
         else:
