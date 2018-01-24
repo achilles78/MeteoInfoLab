@@ -46,39 +46,28 @@ def getcolor(style, alpha=None):
         
     c = Color.black
     if isinstance(style, str):
-        if style == 'red':
+        if style == 'red' or style == 'r':
             c = Color.red
-        elif style == 'black':
+        elif style == 'black' or style == 'k':
             c = Color.black
-        elif style == 'blue':
+        elif style == 'blue' or style == 'b':
             c = Color.blue
-        elif style == 'green':
+        elif style == 'green' or style == 'g':
             c = Color.green
-        elif style == 'white':
+        elif style == 'white' or style == 'w':
             c = Color.white
-        elif style == 'yellow':
+        elif style == 'yellow' or style == 'y':
             c = Color.yellow
         elif style == 'gray':
             c = Color.gray
         elif style == 'lightgray':
             c = Color.lightGray
+        elif style == 'cyan' or style == 'c':
+            c = Color.cyan
+        elif style == 'magenta' or style == 'm':
+            c = Color.magenta
         else:
-            if 'r' in style:
-                c = Color.red
-            elif 'k' in style:
-                c = Color.black
-            elif 'b' in style:
-                c = Color.blue
-            elif 'g' in style:
-                c = Color.green
-            elif 'w' in style:
-                c = Color.white
-            elif 'c' in style:
-                c = Color.cyan
-            elif 'm' in style:
-                c = Color.magenta
-            elif 'y' in style:
-                c = Color.yellow 
+            c = Color.decode(style)
     elif isinstance(style, (tuple, list)):
         if len(style) == 3:
             c = Color(style[0], style[1], style[2])
@@ -89,6 +78,26 @@ def getcolor(style, alpha=None):
         alpha = (int)(alpha * 255)
         c = Color(c.getRed(), c.getGreen(), c.getBlue(), alpha)
     
+    return c
+    
+def getcolor_style(style):
+    c = Color.black
+    if 'r' in style:
+        c = Color.red
+    elif 'k' in style:
+        c = Color.black
+    elif 'b' in style:
+        c = Color.blue
+    elif 'g' in style:
+        c = Color.green
+    elif 'w' in style:
+        c = Color.white
+    elif 'c' in style:
+        c = Color.cyan
+    elif 'm' in style:
+        c = Color.magenta
+    elif 'y' in style:
+        c = Color.yellow     
     return c
     
 def getcolors(cs, alpha=None):
@@ -214,7 +223,7 @@ def getplotstyle(style, caption, **kwargs):
         color = kwargs.pop('color', 'red')
         c = getcolor(color)
     else:
-        c = getcolor(style)
+        c = getcolor_style(style)
     pointStyle = getpointstyle(style)
     lineStyle = getlinestyle_1(style)
     if not pointStyle is None:
@@ -315,19 +324,17 @@ def getlegendbreak(geometry, **kwargs):
             pstyle = getpointstyle(marker)
             lb.setDrawSymbol(True)
             lb.setSymbolStyle(pstyle)
-        markersize = kwargs.pop('markersize', None)
-        if not markersize is None:
-            lb.setSymbolSize(markersize)
+            markersize = kwargs.pop('markersize', None)
+            if not markersize is None:
+                lb.setSymbolSize(markersize)
             markercolor = kwargs.pop('markercolor', None)
-            if markercolor is None:
-                makercolor = color
-            else:
-                makercolor = __getcolor(makercolor)
-            lb.setSymbolColor(makercolor)
+            if not markercolor is None:
+                markercolor = getcolor(markercolor)
+                lb.setSymbolColor(markercolor)
             fillcolor = kwargs.pop('makerfillcolor', None)
             if not fillcolor is None:
                 lb.setFillSymbol(True)
-                lb.setSymbolFillColor(__getcolor(fillcolor))
+                lb.setSymbolFillColor(getcolor(fillcolor))
             else:
                 lb.setSymbolFillColor(markercolor)
             interval = kwargs.pop('markerinterval', 1)

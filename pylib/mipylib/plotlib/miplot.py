@@ -3500,7 +3500,7 @@ def legend(*args, **kwargs):
                 for i in range(0, len(lbs)):
                     lbs[i].setCaption(labels[i])
             if isinstance(lbs[0], basestring):
-                clegend.setTickLabels(lbs)
+                clegend.setTickCaptions(lbs)
             else:
                 ls = LegendScheme()
                 for lb in lbs:
@@ -3516,6 +3516,11 @@ def legend(*args, **kwargs):
                 else:
                     clegend.setLegendScheme(ls)
     else:
+        if len(args) > 0:
+            labels = args[0]
+            for i in range(len(labels)):
+                if i < ls.getBreakNum():
+                    ls.getLegendBreak(i).setCaption(labels[i])
         if clegend is None:
             clegend = ChartLegend(ls)
             gca.axes.setLegend(clegend)
