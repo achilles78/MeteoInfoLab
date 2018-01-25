@@ -23,7 +23,7 @@ import plotutil
 import miplot
 import mipylib.numeric.minum as minum
 
-class Axes():
+class Axes(object):
     '''
     Axes with Cartesian coordinate.
     '''

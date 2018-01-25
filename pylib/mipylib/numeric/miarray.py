@@ -12,6 +12,7 @@ from org.meteoinfo.math import Complex
 from org.meteoinfo.math.linalg import LinalgUtil
 from ucar.ma2 import Array, Range, MAMath, DataType
 import jarray
+import numbers
 
 #import milayer
 #from milayer import MILayer
@@ -206,14 +207,17 @@ class MIArray(object):
         r = ArrayMath.setSection(self.array, ranges, value)
         self.array = r
     
+    def __value_other(self, other):
+        if not isinstance(other, numbers.Number):
+            other = other.asarray()
+        return other
+    
     def __abs__(self):
         return MIArray(ArrayMath.abs(self.array))
     
     def __add__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.add(self.array, other.array)
-        else:
-            r = ArrayMath.add(self.array, other)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.add(self.array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
@@ -222,28 +226,22 @@ class MIArray(object):
         return MIArray.__add__(self, other)
         
     def __sub__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.sub(self.array, other.array)
-        else:
-            r = ArrayMath.sub(self.array, other)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.sub(self.array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
         
     def __rsub__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.sub(other.array, self.array)
-        else:
-            r = ArrayMath.sub(other, self.array)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.sub(other, self.array)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
     
     def __mul__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.mul(self.array, other.array)
-        else:
-            r = ArrayMath.mul(self.array, other)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.mul(self.array, other)
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
@@ -252,37 +250,29 @@ class MIArray(object):
         return MIArray.__mul__(self, other)
         
     def __div__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.div(self.array, other.array)
-        else:
-            r = ArrayMath.div(self.array, other)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.div(self.array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
         
     def __rdiv__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.div(other.array, self.array)
-        else:
-            r = ArrayMath.div(other, self.array)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.div(other, self.array)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
         
     def __pow__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.pow(self.array, other.array)
-        else:
-            r = ArrayMath.pow(self.array, other)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.pow(self.array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
         
     def __rpow__(self, other):
-        if isinstance(other, MIArray):      
-            r = ArrayMath.pow(other.array, self.array)
-        else:
-            r = ArrayMath.pow(other, self.array)
+        other = MIArray.__value_other(self, other)
+        r = ArrayMath.pow(other, self.array)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return MIArray(r)
@@ -292,82 +282,64 @@ class MIArray(object):
         return r
         
     def __lt__(self, other):
-        if isinstance(other, MIArray):
-            r = MIArray(ArrayMath.lessThan(self.array, other.array))
-        else:
-            r = MIArray(ArrayMath.lessThan(self.array, other))
+        other = MIArray.__value_other(self, other)
+        r = MIArray(ArrayMath.lessThan(self.array, other))
         return r
         
     def __le__(self, other):
-        if isinstance(other, MIArray):
-            r = MIArray(ArrayMath.lessThanOrEqual(self.array, other.array))
-        else:
-            r = MIArray(ArrayMath.lessThanOrEqual(self.array, other))
+        other = MIArray.__value_other(self, other)
+        r = MIArray(ArrayMath.lessThanOrEqual(self.array, other))        
         return r
         
     def __eq__(self, other):
-        if isinstance(other, MIArray):
-            r = MIArray(ArrayMath.equal(self.array, other.array))
-        else:
-            r = MIArray(ArrayMath.equal(self.array, other))
+        other = MIArray.__value_other(self, other)
+        r = MIArray(ArrayMath.equal(self.array, other))
         return r
         
     def __ne__(self, other):
-        if isinstance(other, MIArray):
-            r = MIArray(ArrayMath.notEqual(self.array, other.array))
-        else:
-            r = MIArray(ArrayMath.notEqual(self.array, other))
+        other = MIArray.__value_other(self, other)
+        r = MIArray(ArrayMath.notEqual(self.array, other))
         return r
         
     def __gt__(self, other):
-        if isinstance(other, MIArray):
-            r = MIArray(ArrayMath.greaterThan(self.array, other.array))
-        else:
-            r = MIArray(ArrayMath.greaterThan(self.array, other))
+        other = MIArray.__value_other(self, other)
+        r = MIArray(ArrayMath.greaterThan(self.array, other))
         return r
         
     def __ge__(self, other):
-        if isinstance(other, MIArray):
-            r = MIArray(ArrayMath.greaterThanOrEqual(self.array, other.array))
-        else:
-            r = MIArray(ArrayMath.greaterThanOrEqual(self.array, other))
+        other = MIArray.__value_other(self, other)
+        r = MIArray(ArrayMath.greaterThanOrEqual(self.array, other))
         return r
         
     def __and__(self, other):
-        if isinstance(other, MIArray):
-            other = other.array
+        other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.bitAnd(self.array, other))
         return r
         
     def __or__(self, other):
-        if isinstance(other, MIArray):
-            other = other.array
+        other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.bitOr(self.array, other))
         return r
         
     def __xor__(self, other):
-        if isinstance(other, MIArray):
-            other = other.array
+        other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.bitXor(self.array, other))
         return r
         
     def __invert__(self):
-        if isinstance(other, MIArray):
-            other = other.array
+        other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.bitInvert(self.array))
         return r
         
     def __lshift__(self, other):
-        if isinstance(other, MIArray):
-            other = other.array
+        other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.leftShift(self.array, other))
         return r
         
     def __rshift__(self, other):
-        if isinstance(other, MIArray):
-            other = other.array
+        other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.rightShift(self.array, other))
-        return r
+        return r           
     
     def getsize():
         if name == 'size':

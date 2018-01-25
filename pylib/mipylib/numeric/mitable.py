@@ -17,7 +17,7 @@ from java.util import Calendar, Date
 
 ###############################################################        
 #  The encapsulate class of TableData
-class PyTableData():
+class PyTableData(object):
     # Must be a TableData object
     def __init__(self, data=None):
         self.data = data

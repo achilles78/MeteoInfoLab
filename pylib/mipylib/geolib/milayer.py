@@ -15,7 +15,7 @@ import mipylib.miutil as miutil
 import mipylib.numeric.minum as minum
 import geoutil
 
-class MILayer():
+class MILayer(object):
     '''
     Map layer
     

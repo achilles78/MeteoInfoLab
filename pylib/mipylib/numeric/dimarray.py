@@ -24,7 +24,7 @@ from java.util import ArrayList
 nan = Double.NaN
 
 # Dimension array
-class DimArray():
+class DimArray(object):
     
     # array must be MIArray
     def __init__(self, array=None, dims=None, fill_value=-9999.0, proj=None):
