@@ -326,6 +326,15 @@ class MapAxes(Axes):
         sy = r[1] + rect.getY()
         sy = miplot.figsize()[1] - sy
         return sx, sy
+        
+    def loadmip(self, mipfn, mfidx=0):
+        '''
+        Load one map frame from a MeteoInfo project file.
+        
+        :param mipfn: (*string*) MeteoInfo project file name.
+        :param mfidx: (*int*) Map frame index.
+        '''
+        self.axes.loadMIProjectFile(mipfn, mfidx)
             
 ###############################################
 class PolarAxes(Axes):
