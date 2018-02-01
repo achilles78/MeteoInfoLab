@@ -522,7 +522,7 @@ def binwrite(fn, data, byteorder='little_endian', append=False, sequential=False
     """
     ArrayUtil.saveBinFile(fn, data.asarray(), byteorder, append, sequential)  
     
-def convert2nc(infn, outfn, version='netcdf3'):
+def convert2nc(infn, outfn, version='netcdf3', largefile=False):
     """
     Convert data file (Grib, HDF...) to netCDF data file.
     
@@ -532,7 +532,7 @@ def convert2nc(infn, outfn, version='netcdf3'):
     #Open input data file
     f = addfile(infn)
     #New netCDF file
-    ncfile = addfile(outfn, 'c', version=version)
+    ncfile = addfile(outfn, 'c', version=version, largefile=largefile)
     #Add dimensions
     dims = []
     for dim in f.dimensions():
@@ -575,7 +575,7 @@ def convert2nc(infn, outfn, version='netcdf3'):
     ncfile.close()
     print 'Convert finished!'
     
-def grads2nc(infn, outfn, big_endian=None):
+def grads2nc(infn, outfn, big_endian=None, largefile=False):
     """
     Convert GrADS data file to netCDF data file.
     
@@ -589,7 +589,7 @@ def grads2nc(infn, outfn, big_endian=None):
         f.bigendian(big_endian)
 
     #New netCDF file
-    ncfile = addfile(outfn, 'c')
+    ncfile = addfile(outfn, 'c', largefile=largefile)
 
     #Add dimensions
     dims = []
@@ -708,7 +708,7 @@ def dimension(dimvalue, dimname='null', dimtype=None):
     dim.setShortName(dimname)
     return dim
     
-def ncwrite(fn, data, varname, dims=None, attrs=None):
+def ncwrite(fn, data, varname, dims=None, attrs=None, largefile=False):
     """
     Write a netCDF data file from an array.
     
@@ -728,7 +728,7 @@ def ncwrite(fn, data, varname, dims=None, attrs=None):
         else:
             dims = data.dims
     #New netCDF file
-    ncfile = addfile(fn, 'c')
+    ncfile = addfile(fn, 'c', largefile=largefile)
     #Add dimensions
     ncdims = []
     for dim in dims:    
