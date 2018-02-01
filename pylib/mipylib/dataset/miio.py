@@ -18,13 +18,14 @@ __all__ = [
     'convert2nc','dimension','grads2nc','ncwrite'
     ]
 
-def convert2nc(infn, outfn, version='netcdf3', writedimvar=False):
+def convert2nc(infn, outfn, version='netcdf3', writedimvar=False, largefile=False):
     """
     Convert data file (Grib, HDF...) to netCDF data file.
     
     :param infn: (*string or DimDataFile*) Input data file (or file name).
     :param outfn: (*string*) Output netCDF data file name.
     :param writedimvar: (*boolean*) Write dimension variables or not.
+    :param largefile: (*boolean*) Create netCDF as large file or not.
     """
     if isinstance(infn, DimDataFile):
         f = infn
@@ -33,7 +34,7 @@ def convert2nc(infn, outfn, version='netcdf3', writedimvar=False):
         f = midata.addfile(infn)
         
     #New netCDF file
-    ncfile = midata.addfile(outfn, 'c', version=version)
+    ncfile = midata.addfile(outfn, 'c', version=version, largefile=largefile)
     
     #Add dimensions
     dims = []
@@ -131,13 +132,14 @@ def convert2nc(infn, outfn, version='netcdf3', writedimvar=False):
     ncfile.close()
     print 'Convert finished!'
     
-def grads2nc(infn, outfn, big_endian=None):
+def grads2nc(infn, outfn, big_endian=None, largefile=False):
     """
     Convert GrADS data file to netCDF data file.
     
     :param infn: (*string*) Input GrADS data file name.
     :param outfn: (*string*) Output netCDF data file name.
     :param big_endian: (*boolean*) Is GrADS data big_endian or not.
+    :param largefile: (*boolean*) Create netCDF as large file or not.
     """
     #Open GrADS file
     f = midata.addfile_grads(infn)
@@ -264,7 +266,7 @@ def dimension(dimvalue, dimname='null', dimtype=None):
     dim.setShortName(dimname)
     return dim
     
-def ncwrite(fn, data, varname, dims=None, attrs=None):
+def ncwrite(fn, data, varname, dims=None, attrs=None, largefile=False):
     """
     Write a netCDF data file.
     
@@ -272,6 +274,8 @@ def ncwrite(fn, data, varname, dims=None, attrs=None):
     :param data: (*array_like*) A numeric array variable of any dimensionality.
     :param varname: (*string*) Variable name.
     :param dims: (*list of dimensions*) Dimension list.
+    :param attrs: (*list of attributes*) Attribute list.
+    :param largefile: (*boolean*) Create netCDF as large file or not.
     """
     if dims is None:
         if isinstance(data, MIArray):

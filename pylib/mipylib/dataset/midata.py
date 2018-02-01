@@ -29,7 +29,7 @@ __all__ = [
     'addfile_grads','addfile_hyconc','addfile_hytraj','addfile_lonlat','addfile_micaps',
     'addfile_mm5','addfile_nc','addfile_grib','addfile_surfer',
     'addtimedim','joinncfile','asciiread','asciiwrite','binread','binwrite',
-    'convert2nc','dimension','grads2nc','ncwrite','numasciicol','numasciirow','readtable'
+    'numasciicol','numasciirow','readtable'
     ]
 
 def isgriddata(gdata):
