@@ -3871,6 +3871,9 @@ def imshow(*args, **kwargs):
         ls = ls.convertTo(ShapeTypes.Image)
             
         igraphic = GraphicFactory.createImage(gdata, ls)
+    interpolation = kwargs.pop('interpolation', None)
+    if not interpolation is None:
+        igraphic.getShape().setInterpolation(interpolation)
     
     #Create plot
     if gca is None:
@@ -4673,6 +4676,7 @@ def imshowm(*args, **kwargs):
             args = args[3:]
     
     isplot = True
+    interpolation = kwargs.pop('interpolation', None)
     if isrgb:
         if isinstance(rgbdata, (list, tuple)):
             rgbd = []
@@ -4685,9 +4689,10 @@ def imshowm(*args, **kwargs):
         y = plotutil.getplotdata(y)
         igraphic = GraphicFactory.createImage(x, y, rgbdata)
         layer = DrawMeteoData.createImageLayer(x, y, igraphic, 'layer_image')
-        if (proj != None):
+        if not proj is None:
             layer.setProjInfo(proj)
-            
+        if not interpolation is None:
+            layer.setInterpolation(interpolation)
         if isplot:
             shapetype = layer.getShapeType()
             if order is None:
@@ -4727,6 +4732,8 @@ def imshowm(*args, **kwargs):
                 # cb.setNoData(True)
                 # ls.addLegendBreak(cb)
         layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
+        if not interpolation is None:
+            layer.setInterpolation(interpolation)
         gdata = None
     return MILayer(layer)
     

@@ -1058,6 +1058,7 @@ class Axes3D(Axes):
         
         offset = kwargs.pop('offset', 0)
         zdir = kwargs.pop('zdir', 'z')
+        interpolation = kwargs.pop('interpolation', None)
         if isrgb:
             if isinstance(rgbdata, (list, tuple)):
                 rgbd = []
@@ -1068,7 +1069,7 @@ class Axes3D(Axes):
                 rgbdata = rgbdata.asarray()
             x = plotutil.getplotdata(x)
             y = plotutil.getplotdata(y)
-            graphics = GraphicFactory.createImage(x, y, rgbdata, offset, zdir)
+            graphics = GraphicFactory.createImage(x, y, rgbdata, offset, zdir, interpolation)
             ls = None
         else:
             if len(args) > 0:
@@ -1088,7 +1089,7 @@ class Axes3D(Axes):
                 sepoint = kwargs.pop('sepoint', [0,0,1,1])
             else:
                 sepoint = None
-            graphics = GraphicFactory.createImage(gdata, ls, offset, zdir, sepoint)
+            graphics = GraphicFactory.createImage(gdata, ls, offset, zdir, sepoint, interpolation)
                 
         visible = kwargs.pop('visible', True)
         if visible:
