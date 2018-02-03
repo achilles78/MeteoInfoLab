@@ -180,6 +180,14 @@ class MILayer(object):
     def movelabel(self, label, x=0, y=0):
         self.layer.moveLabel(label, x, y)
         
+    def set_avoidcoll(self, avoidcoll):
+        '''
+        Set if avoid collision or not. Only valid for VectorLayer with Point shapes.
+        
+        :param avoidcoll: (*boolean*) Avoid collision or not.
+        '''
+        self.layer.setAvoidCollision(avoidcoll)
+        
     def project(self, toproj):
         r = ProjectionManage.projectLayer(self.layer, toproj)
         return MILayer(r)

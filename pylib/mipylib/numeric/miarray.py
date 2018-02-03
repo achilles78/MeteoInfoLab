@@ -341,6 +341,12 @@ class MIArray(object):
         r = MIArray(ArrayMath.rightShift(self.array, other))
         return r           
     
+    def in_values(self, other):
+        if not isinstance(other, (list, tuple)):
+            other = other.aslist()
+        r = MIArray(ArrayMath.inValues(self.array, other))
+        return r
+    
     def getsize():
         if name == 'size':
             sizestr = str(self.shape[0])

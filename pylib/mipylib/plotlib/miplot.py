@@ -4464,6 +4464,9 @@ def scatterm(*args, **kwargs):
         layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
     else:
         layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
+    avoidcoll = kwargs.pop('avoidcoll', None)
+    if not avoidcoll is None:
+        layer.setAvoidCollision(avoidcoll)
     gdata = None
     return MILayer(layer)
     

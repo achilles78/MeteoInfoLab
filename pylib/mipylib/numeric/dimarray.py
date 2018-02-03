@@ -447,7 +447,20 @@ class DimArray(object):
             other = other.array
         r = DimArray(self.array.__rshift__(other), self.dims, self.fill_value, self.proj)
         return r
+    
+    def in_values(self, other):
+        '''
+        The returned array element set 1 when the input array element is in other, otherwise the
+        element set 0.
         
+        :param other: (*array_like*) The array or list value.
+        
+        :returns: (*array*) The array with element value of 1 or 0.
+        '''
+        if not isinstance(other, (list, tuple)):
+            other = other.aslist()
+        r = DimArray(MIArray(ArrayMath.inValues(self.asarray(), other)), self.dims, self.fill_value, self.proj)
+        return r
         
     def astype(self, dtype):
         r = DimArray(self.array.astype(dtype), self.dims, self.fill_value, self.proj)
