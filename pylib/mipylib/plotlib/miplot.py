@@ -3552,14 +3552,20 @@ def legend(*args, **kwargs):
         clegend.setDrawBackground(True)
         background = plotutil.getcolor(bcobj)
         clegend.setBackground(background)
-    fontname = kwargs.pop('fontname', None)
+    tickfontdic = kwargs.pop('tickfont', None)
+    if tickfontdic is None:
+        tickfont = __getfont_1(**kwargs)    
+    else:
+        tickfont = __getfont(tickfontdic)
+    clegend.setTickLabelFont(tickfont)
+    fontname = kwargs.pop('labelfontname', None)
     exfont = False
     if fontname is None:
         fontname = 'Arial'
     else:
         exfont = True
-    fontsize = kwargs.pop('fontsize', 14)
-    bold = kwargs.pop('bold', False)
+    fontsize = kwargs.pop('labelfontsize', 14)
+    bold = kwargs.pop('labelbold', False)
     labcolor = kwargs.pop('labcolor', 'black')
     labcolor = plotutil.getcolor(labcolor)
     if bold:
