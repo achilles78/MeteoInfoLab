@@ -54,13 +54,6 @@ public class FileExplorer extends JPanel implements MouseListener{
         
         this.path = path;
         this.setForeground(Color.white);
-        //JPanel jp = new JPanel(new BorderLayout());
-        //jbUp = new JButton("Up");
-        //jbUp.addActionListener(this);
-        //jcbPath = new JComboBox();
-        //jcbPath.addActionListener(this);
-        //jp.add(jbUp, "West");
-        //jp.add(jcbPath, "Center");
         dtmFile = new LocalTableModel();
         dtmFile.addColumn("Name");
         dtmFile.addColumn("Size");
@@ -70,11 +63,8 @@ public class FileExplorer extends JPanel implements MouseListener{
         jtFile.getColumnModel().getColumn(0).setCellRenderer(new IconRenderer());
         jtFile.setShowGrid(false);
         jtFile.addMouseListener(this);
-        //jlLocal = new JLabel("本地状态", JLabel.CENTER);
 
-        //add(jp, "North");
         add(new JScrollPane(jtFile), "Center");
-        //add(jlLocal, "South");
 
         //Show current path files
         //path = new File(System.getProperty("user.dir"));
@@ -136,23 +126,24 @@ public class FileExplorer extends JPanel implements MouseListener{
     public void mouseClicked(MouseEvent e) {
         if(e.getClickCount()==2) {
             int row = ((JTable)e.getSource()).getSelectedRow();
+            File newPath;
             if (((JTable)e.getSource()).getValueAt(row, 2).toString().equals("Folder"))
             {
-                this.path = new File(currentPath + "/" + ((JTable)e.getSource()).getValueAt(row, 0).toString());
-                if (!this.path.exists()) {
+                newPath = new File(currentPath + "/" + ((JTable)e.getSource()).getValueAt(row, 0).toString());
+                if (!newPath.exists()) {
                     //Root path
-                    this.path = new File(currentPath + ((JTable)e.getSource()).getValueAt(row, 0).toString());
+                    newPath = new File(currentPath + ((JTable)e.getSource()).getValueAt(row, 0).toString());
                 }
-                if (this.path.isDirectory()){
-                    listFiles(this.path);
+                if (newPath.isDirectory()){
+                    listFiles(newPath);
                     this.fireCurrentPathChangedEvent();
                 }
             }
             else if (((JTable)e.getSource()).getValueAt(row, 0).toString().equals("")
                     && ((JTable)e.getSource()).getValueAt(row, 2).toString().equals(""))
             {
-                this.path = new File(currentPath).getParentFile();
-                listFiles(path);
+                newPath = new File(currentPath).getParentFile();
+                listFiles(newPath);
                 this.fireCurrentPathChangedEvent();
             }
         }
@@ -166,16 +157,28 @@ public class FileExplorer extends JPanel implements MouseListener{
     public void mousePressed(MouseEvent e) {}
     @Override
     public void mouseReleased(MouseEvent e) {}
+    
+    /**
+     * List files
+     * @return 
+     */
+    public boolean listFiles() {   
+        return this.listFiles(path);
+    }
 
-    //Show files
-    private boolean listFiles(File path) {        
-        String strPath = path.getAbsolutePath();
-        if (path.isDirectory() == false)
+    /**
+     * List files
+     * @param path File path
+     * @return 
+     */
+    public boolean listFiles(File path) {        
+        if (!path.isDirectory())
         {
             JOptionPane.showMessageDialog(this, "The file not exists!");
             return false;
         }
         
+        this.path = path;
         currentPath = path.getAbsolutePath();
         init = false;
 
@@ -213,8 +216,6 @@ public class FileExplorer extends JPanel implements MouseListener{
                 }
             }
         }
-        
-        //jlLocal.setText(currentPath);
 
         return true;
     }

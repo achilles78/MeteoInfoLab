@@ -2582,12 +2582,13 @@ def box(ax=None, on=None):
             axis.setVisible(on)
     draw_if_interactive()
     
-def antialias(b=None):
+def antialias(b=None, symbol=None):
     """
     Set figure antialias or not.
     
     :param b: (*boolean*) Set figure antialias or not. Default is ``None``, means the opposite with 
         current status.
+    :param symbol: (*boolean*) Set symbol antialias or not.
     """
     if chartpanel is None:
         figure()
@@ -2595,6 +2596,8 @@ def antialias(b=None):
     if b is None:
         b = not chartpanel.getChart().isAntiAlias()
     chartpanel.getChart().setAntiAlias(b)
+    if not symbol is None:
+        chartpanel.getChart().setSymbolAntialias(symbol)
     draw_if_interactive()
     
 def savefig(fname, width=None, height=None, dpi=None, sleep=None):
@@ -3779,9 +3782,7 @@ def imshow(*args, **kwargs):
     """
     Display an image on the axes.
     
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param z: (*array_like*) 2-D or 3-D (RGB) z value array.
+    :param X: (*array_like*) 2-D or 3-D (RGB or RGBA) image value array or BufferedImage.
     :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
         to draw, in increasing order.
     :param cmap: (*string*) Color map string.
@@ -3801,63 +3802,34 @@ def imshow(*args, **kwargs):
     xaxistype = None
     isrgb = False
     isimage = False
-    if n <= 2:
-        if isinstance(args[0], (list, tuple)):
-            isrgb = True
-            rgbdata = args[0]
-            if isinstance(rgbdata[0], MIArray):
-                x = minum.arange(0, rgbdata[0].shape[1])
-                y = minum.arange(0, rgbdata[0].shape[0])
-            else:
-                x = rgbdata[0].dimvalue(1)
-                y = rgbdata[0].dimvalue(0)
-        elif isinstance(args[0], BufferedImage):
-            isimage = True
-            image = args[0]
-        elif args[0].ndim > 2:
-            isrgb = True
-            rgbdata = args[0]
-            if isinstance(rgbdata, MIArray):
-                x = minum.arange(0, rgbdata.shape[1])
-                y = minum.arange(0, rgbdata.shape[0])
-            else:
-                x = rgbdata.dimvalue(1)
-                y = rgbdata.dimvalue(0)
-        else:
-            gdata = minum.asgridarray(args[0])
-            if isinstance(args[0], DimArray):
-                if args[0].islondim(1):
-                    xaxistype = 'lon'
-                elif args[0].islatdim(1):
-                    xaxistype = 'lat'
-                elif args[0].istimedim(1):
-                    xaxistype = 'time'
-            args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        if isinstance(a, (list, tuple)):
-            isrgb = True
-            rgbdata = a
-        elif a.ndim > 2:
-            isrgb = True
-            rgbdata = a
-        else:
-            gdata = minum.asgridarray(a, x, y, fill_value)
-            args = args[3:]   
+    X = args[0]
+    if isinstance(X, (list, tuple)):
+        isrgb = True
+    elif isinstance(X, BufferedImage):
+        isimage = True
+    elif X.ndim > 2:
+        isrgb = True
+    else:
+        gdata = minum.asgridarray(X)
+        if isinstance(X, DimArray):
+            if X.islondim(1):
+                xaxistype = 'lon'
+            elif X.islatdim(1):
+                xaxistype = 'lat'
+            elif X.istimedim(1):
+                xaxistype = 'time'
+    args = args[1:]   
     
+    extent = kwargs.pop('extent', None)
     if isrgb:
-        if isinstance(rgbdata, (list, tuple)):
+        if isinstance(X, (list, tuple)):
             rgbd = []
             for d in rgbdata:
                 rgbd.append(d.asarray())
             rgbdata = rgbd
         else:
-            rgbdata = rgbdata.asarray()
-        x = plotutil.getplotdata(x)
-        y = plotutil.getplotdata(y)
-        igraphic = GraphicFactory.createImage(x, y, rgbdata)
+            rgbdata = X.asarray()
+        igraphic = GraphicFactory.createImage(rgbdata, extent)
         ls = None
     elif isimage:
         igraphic = GraphicFactory.createImage(image)
@@ -3894,6 +3866,8 @@ def imshow(*args, **kwargs):
         plot.axes.updateDrawExtent()
     plot.add_graphic(igraphic)
     plot.axes.setAutoExtent()
+    gridline = plot.axes.getGridLine()
+    gridline.setTop(True)
     
     #Create figure
     if chartpanel is None:

@@ -108,11 +108,6 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         this.loadConfigureFile();
         this.setLocation(this.options.getMainFormLocation());
         this.setSize(this.options.getMainFormSize());
-//        if (isDebug) {
-//            this.setSize(1000, 650);
-//        } else {
-//            this.setSize(this.options.getMainFormSize());
-//        }
 
         //Current folder
         this.jComboBox_CurrentFolder.removeAllItems();
@@ -756,7 +751,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
     private void jButton_RunScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RunScriptActionPerformed
         TextEditor te = this.editorDock.getActiveTextEditor();
-        if (!te.getFileName().isEmpty()) {
+        if (!te.getFileName().isEmpty() && te.getTextArea().isDirty()) {
             te.saveFile(te.getFile());
         }
 

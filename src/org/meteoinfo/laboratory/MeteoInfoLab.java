@@ -129,18 +129,8 @@ public class MeteoInfoLab {
             }
             interp.exec("mipylib.plotlib.miplot.batchmode = True");
             interp.exec("mipylib.plotlib.miplot.isinteractive = False");
-            //interp.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
             interp.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
             System.out.println("mipylib is loaded...");
-
-            //String encoding = "utf-8";
-            //File file = new File(fn);            
-            //byte[] bytes = Files.readAllBytes(file.toPath());
-            //String code = new String(bytes, encoding);
-            //ByteArrayInputStream bis = new ByteArrayInputStream(code.getBytes(encoding));
-            //ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            //interp.execfile(bis);
-            //interp.exec(code);
             interp.execfile(fn);
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,10 +140,6 @@ public class MeteoInfoLab {
     }
 
     private static void runInteractive() {
-//        PlotForm plotForm = new PlotForm();
-//        plotForm.setSize(800, 600);
-//        plotForm.setVisible(true);
-//        MeteoInfoScript mis = new MeteoInfoScript(plotForm);
         String startPath = System.getProperty("user.dir");
         String basePath = GlobalUtil.getAppPath(FrmMain.class);
         String path = basePath + File.separator + "pylib";
@@ -162,10 +148,8 @@ public class MeteoInfoLab {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("windows") && mapPath.substring(0, 1).equals("/"))
             mapPath = mapPath.substring(1);
-        //MeteoInfoScript mis = new MeteoInfoScript(path);
         InteractiveConsole console = new InteractiveConsole();
         try {
-            //console.set("mis", mis);
             console.exec("import sys");
             console.exec("import os");
             console.exec("import datetime");
@@ -173,10 +157,7 @@ public class MeteoInfoLab {
             console.exec("from milab import *");
             console.exec("sys.path.append('" + toolboxPath + "')");
             console.exec("from toolbox import *");
-            //console.exec("import mipylib");
-            //console.exec("from mipylib.miscript import *");
             console.exec("mipylib.plotlib.miplot.isinteractive = True");
-            //console.exec("mipylib.plotlib.miplot.mappath = '" + mapPath + "'");
             console.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
             console.exec("mipylib.migl.currentfolder = '" + startPath + "'" );
         } catch (Exception e) {
@@ -210,29 +191,6 @@ public class MeteoInfoLab {
         //java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-//                new Thread() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            final SplashScreen splash = SplashScreen.getSplashScreen();
-//                            if (splash == null){
-//                                System.out.println("SplashScreen.getSplashScreen() returned null");
-//                                return;
-//                            }
-//                            Graphics2D g = splash.createGraphics();
-//                            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//                            g.setFont(new Font("Arial", Font.BOLD, 60));
-//                            g.setColor(Color.red);
-//                            g.drawString("MeteoInfo", 100, 200);
-//                            splash.update();
-//                            Thread.sleep(1000);
-//                            //splash.setImageURL(Program.class.getResource("/meteoinfo/resources/logo.png"));
-//                            //splash.update();
-//                        } catch (Exception e) {
-//                        }
-//                    }
-//                }.start();
-
                 boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
                         getInputArguments().toString().contains("jdwp");
 //                if (isDebug) {
