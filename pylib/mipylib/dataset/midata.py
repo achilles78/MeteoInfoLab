@@ -48,8 +48,7 @@ def __getfilename(fname):
         if os.path.isabs(fname):
             return fname, isweb
         else:
-            fname = os.path.join(migl.currentfolder, fname)
-            print fname
+            fname = os.path.abspath(fname)
             return fname, isweb
     else:
         if migl.currentfolder != None:
