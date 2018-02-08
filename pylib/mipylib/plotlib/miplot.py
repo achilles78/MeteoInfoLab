@@ -53,7 +53,7 @@ chartpanel = None
 gca = None
 
 __all__ = [
-    'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barbs','barbsm','bgcolor','box',
+    'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barh','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
     'figure','figsize','patch','rectangle','fill_between','fill_betweenx','webmap','geoshow','gifaddframe','gifanimation','giffinish',
@@ -807,6 +807,154 @@ def bar(*args, **kwargs):
     if autowidth:
         barswidth = kwargs.pop('barswidth', 0.8)
         plot.axes.setBarsWidth(barswidth)
+    
+    #Create figure
+    if chartpanel is None:
+        figure()
+    
+    #Set chart
+    chart = chartpanel.getChart()
+    if gca is None or (not isinstance(gca, Axes)):
+        chart.setCurrentPlot(plot.axes)
+    chartpanel.setChart(chart)
+    gca = plot
+    draw_if_interactive()
+    return barbreaks
+    
+def barh(*args, **kwargs):
+    """
+    Make a horizontal bar plot.
+    
+    Make a bar plot with rectangles bounded by:
+        left, left + width, y, y + height
+    
+    :param y: (*array_like*) The y coordinates of the bars.
+    :param width: (*array_like*) The widths of the bars.
+    :param height: (*array_like*) Optional, the height of the bars default: 0.8.
+    :param left: (*array_like*) Optional, the x coordinates of the bars default: None
+    :param color: (*Color*) Optional, the color of the bar faces.
+    :param edgecolor: (*Color*) Optional, the color of the bar edge. Default is black color.
+        Edge line will not be plotted if ``edgecolor`` is ``None``.
+    :param linewidth: (*int*) Optional, width of bar edge.
+    :param label: (*string*) Label of the bar series.
+    :param hatch: (*string*) Hatch string.
+    :param hatchsize: (*int*) Hatch size. Default is None (8).
+    :param bgcolor: (*Color*) Background color, only valid with hatch.
+    :param barswidth: (*float*) Bars width (0 - 1), only used for automatic bar with plot
+        (only one argument widthout ``width`` augument). Defaul is 0.8.
+    :param morepoints: (*boolean*) More points in bar rectangle. Defaul is False.
+    
+    :returns: Bar legend break.
+    
+    
+    The following format string characters are accepted to control the hatch style:
+      =========  ===========
+      Character  Description
+      =========  ===========
+      '-'         horizontal hatch style
+      '|'         vertical hatch style
+      '\\'        forward_diagonal hatch style
+      '/'         backward_diagonal hatch style
+      '+'         cross hatch style
+      'x'         diagonal_cross hatch style
+      '.'         dot hatch style
+      =========  ===========
+      
+    """
+    #Get dataset
+    global gca
+    
+    #Add data series
+    label = kwargs.pop('label', 'S_0')
+    xdata = None
+    autoheight = True
+    height = 0.8
+    if len(args) == 1:
+        xdata = args[0]
+    elif len(args) == 2:
+        if isinstance(args[1], (int, float)):
+            xdata = args[0]
+            height = args[1]
+            autoheight = False
+        else:
+            ydata = args[0]
+            xdata = args[1]
+    else:
+        ydata = args[0]
+        xdata = args[1]
+        height = args[2]
+        autoheight = False        
+    
+    if ydata is None:
+        ydata = []
+        for i in range(1, len(args[0]) + 1):
+            ydata.append(i)
+    ydata = plotutil.getplotdata(ydata)
+    xdata = plotutil.getplotdata(xdata)
+    height = plotutil.getplotdata(height)
+    xerr = kwargs.pop('xerr', None)
+    if not xerr is None:
+        if not isinstance(xerr, (int, float)):
+            xerr = plotutil.getplotdata(xerr)
+    left = kwargs.pop('left', None)   
+    if not left is None:
+        left = plotutil.getplotdata(left)
+    
+    #Set plot data styles
+    fcobj = kwargs.pop('color', None)
+    if fcobj is None:
+        fcobj = kwargs.pop('facecolor', 'b')
+    if isinstance(fcobj, (tuple, list)):
+        colors = plotutil.getcolors(fcobj)
+    else:
+        color = plotutil.getcolor(fcobj)
+        colors = [color]
+    ecobj = kwargs.pop('edgecolor', 'k')
+    edgecolor = plotutil.getcolor(ecobj)
+    linewidth = kwargs.pop('linewidth', 1.0) 
+    hatch = kwargs.pop('hatch', None)
+    hatch = plotutil.gethatch(hatch) 
+    hatchsize = kwargs.pop('hatchsize', None)
+    bgcolor = kwargs.pop('bgcolor', None)
+    bgcolor = plotutil.getcolor(bgcolor)
+    ecolor = kwargs.pop('ecolor', 'k')
+    ecolor = plotutil.getcolor(ecolor)
+    barbreaks = []
+    for color in colors:
+        lb = BarBreak()
+        lb.setCaption(label)
+        lb.setColor(color)    
+        if edgecolor is None:
+            lb.setDrawOutline(False)
+        else:
+            lb.setOutlineColor(edgecolor)  
+        lb.setOutlineSize(linewidth)   
+        if not hatch is None:
+            lb.setStyle(hatch)
+            if not bgcolor is None:
+                lb.setBackColor(bgcolor)
+            if not hatchsize is None:
+                lb.setStyleSize(hatchsize)
+        lb.setErrorColor(ecolor)
+        barbreaks.append(lb)
+        
+    #Create bar graphics
+    graphics = GraphicFactory.createHBars(ydata, xdata, autoheight, height, not xerr is None, xerr, \
+        not left is None, left, barbreaks)  
+                  
+    #Create bar plot
+    if gca is None:
+        plot = Axes()
+    else:
+        if isinstance(gca, Axes):
+            plot = gca
+        else:
+            plot = Axes()
+    plot.add_graphic(graphics)
+    plot.axes.setAutoExtent()
+    if autoheight:
+        barsheight = kwargs.pop('barsheight', 0.8)
+        plot.axes.setBarsWidth(barsheight)
     
     #Create figure
     if chartpanel is None:

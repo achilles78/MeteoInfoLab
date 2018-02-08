@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\image">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\mywork\haze_fog\new"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
@@ -21,10 +21,12 @@
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\load_mip_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\image\imshow_interpolation.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\barh_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\load_mip_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\image\imshow_interpolation.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\barh_1.py"/>
     </RecentFiles>
   </File>
   <Font>
