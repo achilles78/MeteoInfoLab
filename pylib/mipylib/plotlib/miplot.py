@@ -3939,7 +3939,7 @@ def imshow(*args, **kwargs):
         color args (string, float, rgb, etc), different levels will be plotted in different colors in 
         the order specified.
     
-    :returns: (*RasterLayer*) RasterLayer created from array data.
+    :returns: (*Image graphic*) Image graphic created from array data.
     """
     #Get dataset
     global gca
@@ -3996,7 +3996,7 @@ def imshow(*args, **kwargs):
             ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
         ls = ls.convertTo(ShapeTypes.Image)
             
-        igraphic = GraphicFactory.createImage(gdata, ls)
+        igraphic = GraphicFactory.createImage(gdata, ls, extent)
     interpolation = kwargs.pop('interpolation', None)
     if not interpolation is None:
         igraphic.getShape().setInterpolation(interpolation)
