@@ -3488,36 +3488,7 @@ def grid(b=None, which='major', axis='both', **kwargs):
         gridlines are drawn.
     :param kwargs: *kwargs* are used to set the grid line properties.
     """
-    plot = gca
-    gridline = plot.axes.getGridLine()
-    isDraw = gridline.isDrawXLine()
-    if b is None:
-        isDraw = not gridline.isDrawXLine()
-    elif b == True or b == 'on':
-        isDraw = True
-    elif b == False or b == 'on':
-        isDraw = False
-    if axis == 'both':
-        gridline.setDrawXLine(isDraw)
-        gridline.setDrawYLine(isDraw)
-    elif axis == 'x':
-        gridline.setDrawXLine(isDraw)
-    elif axis == 'y':
-        gridline.setDrawYLine(isDraw)
-    color = kwargs.pop('color', None)
-    if not color is None:
-        c = plotutil.getcolor(color)
-        gridline.setColor(c)
-    linewidth = kwargs.pop('linewidth', None)
-    if not linewidth is None:
-        gridline.setSize(linewidth)
-    linestyle = kwargs.pop('linestyle', None)
-    if not linestyle is None:
-        linestyle = plotutil.getlinestyle(linestyle)
-        gridline.setStyle(linestyle)
-    top = kwargs.pop('top', None)
-    if not top is None:
-        gridline.setTop(top)
+    gca.grid(b, which, axis, **kwargs)
     draw_if_interactive()
     
 def xlim(xmin, xmax):

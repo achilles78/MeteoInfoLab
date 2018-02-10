@@ -226,6 +226,48 @@ class Axes(object):
         extent = self.axes.getDrawExtent()
         return extent.minY, extent.maxY
         
+    def grid(self, b=None, which='major', axis='both', **kwargs):
+        """
+        Turn the aexs grids on or off.
+        
+        :param b: If b is *None* and *len(kwargs)==0* , toggle the grid state. If *kwargs*
+            are supplied, it is assumed that you want a grid and *b* is thus set to *True* .
+        :param which: *which* can be 'major' (default), 'minor', or 'both' to control
+            whether major tick grids, minor tick grids, or both are affected.
+        :param axis: *axis* can be 'both' (default), 'x', or 'y' to control which set of
+            gridlines are drawn.
+        :param kwargs: *kwargs* are used to set the grid line properties.
+        """
+        gridline = self.axes.getGridLine()
+        isDraw = gridline.isDrawXLine()
+        if b is None:
+            isDraw = not gridline.isDrawXLine()
+        elif b == True or b == 'on':
+            isDraw = True
+        elif b == False or b == 'on':
+            isDraw = False
+        if axis == 'both':
+            gridline.setDrawXLine(isDraw)
+            gridline.setDrawYLine(isDraw)
+        elif axis == 'x':
+            gridline.setDrawXLine(isDraw)
+        elif axis == 'y':
+            gridline.setDrawYLine(isDraw)
+        color = kwargs.pop('color', None)
+        if not color is None:
+            c = plotutil.getcolor(color)
+            gridline.setColor(c)
+        linewidth = kwargs.pop('linewidth', None)
+        if not linewidth is None:
+            gridline.setSize(linewidth)
+        linestyle = kwargs.pop('linestyle', None)
+        if not linestyle is None:
+            linestyle = plotutil.getlinestyle(linestyle)
+            gridline.setStyle(linestyle)
+        top = kwargs.pop('top', None)
+        if not top is None:
+            gridline.setTop(top)
+        
 
 ##############################################        
 class MapAxes(Axes):
@@ -308,6 +350,47 @@ class MapAxes(Axes):
         :param layer: (*MILayer*) The map layer.
         '''
         self.axes.setSelectedLayer(layer.layer)
+        
+    def grid(self, b=None, which='major', axis='both', **kwargs):
+        """
+        Turn the aexs grids on or off.
+        
+        :param b: If b is *None* and *len(kwargs)==0* , toggle the grid state. If *kwargs*
+            are supplied, it is assumed that you want a grid and *b* is thus set to *True* .
+        :param which: *which* can be 'major' (default), 'minor', or 'both' to control
+            whether major tick grids, minor tick grids, or both are affected.
+        :param axis: *axis* can be 'both' (default), 'x', or 'y' to control which set of
+            gridlines are drawn.
+        :param kwargs: *kwargs* are used to set the grid line properties.
+        """
+        if self.islonlat():
+            super(MapAxes, self).grid(b, which, axis, **kwargs)
+        else:
+            mapframe = self.axes.getMapFrame()
+            gridline = mapframe.isDrawGridLine()
+            if b is None:
+                gridline = not gridline
+            else:
+                gridline = b
+            griddx = kwargs.pop('griddx', None)
+            griddy = kwargs.pop('griddy', None)            
+            if not gridline is None:
+                mapframe.setDrawGridLine(gridline)
+            if not griddx is None:
+                mapframe.setGridXDelt(griddx)
+            if not griddy is None:
+                mapframe.setGridYDelt(griddy)
+            color = kwargs.pop('color', None)
+            if not color is None:
+                c = plotutil.getcolor(color)
+                mapframe.setGridLineColor(c)
+            linewidth = kwargs.pop('linewidth', None)
+            if not linewidth is None:
+                mapframe.setGridLineSize(linewidth)
+            linestyle = kwargs.pop('linestyle', None)
+            if not linestyle is None:
+                linestyle = plotutil.getlinestyle(linestyle)
+                mapframe.setGridLineStyle(linestyle)
         
     def data2pixel(self, x, y, z=None):
         '''
