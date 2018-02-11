@@ -3073,6 +3073,8 @@ def title(title, fontname=None, fontsize=14, bold=True, color='black'):
         font = Font(fontname, Font.PLAIN, fontsize)
     c = plotutil.getcolor(color)
     ctitile = ChartText(title, font)
+    ctitile.setXAlign('center')
+    ctitile.setYAlign('top')
     ctitile.setUseExternalFont(exfont)
     ctitile.setColor(c)
     gca.set_title(ctitile)
