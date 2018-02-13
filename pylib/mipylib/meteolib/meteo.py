@@ -388,7 +388,7 @@ def eof(x, svd=False, transform=False):
         PC: Principle component 2-D array.
     '''
     has_nan = False
-    if (x==np.nan).sum() > 0:       #Has NaN value
+    if x.contains_nan():       #Has NaN value
         valid_idx = np.where(x[:,0]!=np.nan)[0]
         xx = x[valid_idx,:]
         has_nan = True
