@@ -461,6 +461,19 @@ class DimArray(object):
             other = other.array
         r = DimArray(self.array.__rshift__(other), self.dims, self.fill_value, self.proj)
         return r
+        
+    def __iter__(self):
+        """
+        provide iteration over the values of the array
+        """
+        self.array.idx = -1
+        return self
+        
+    def next(self):
+        self.array.idx += 1
+        if self.array.idx >= self.size:
+            raise StopIteration()        
+        return self.array.array.getObject(self.array.idx)
     
     def in_values(self, other):
         '''
@@ -475,6 +488,14 @@ class DimArray(object):
             other = other.aslist()
         r = DimArray(MIArray(ArrayMath.inValues(self.asarray(), other)), self.dims, self.fill_value, self.proj)
         return r
+        
+    def contains_nan(self):
+        '''
+        Check if the array contains nan value.
+        
+        :returns: (*boolean*) True if contains nan, otherwise return False.
+        '''
+        return ArrayMath.containsNaN(self.array.array)
         
     def astype(self, dtype):
         r = DimArray(self.array.astype(dtype), self.dims, self.fill_value, self.proj)

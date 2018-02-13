@@ -35,6 +35,7 @@ class MIArray(object):
         self._shape = tuple(s1)
         self.dtype = array.getDataType()
         self.size = int(self.array.getSize())
+        self.idx = -1
         if self.ndim > 0:
             self.sizestr = str(self.shape[0])
             if self.ndim > 1:
@@ -357,13 +358,42 @@ class MIArray(object):
     def __rshift__(self, other):
         other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.rightShift(self.array, other))
-        return r           
+        return r     
+
+    def __iter__(self):
+        """
+        provide iteration over the values of the array
+        """
+        self.idx = -1
+        return self
+        
+    def next(self):
+        self.idx += 1
+        if self.idx >= self.size:
+            raise StopIteration()        
+        return self.array.getObject(self.idx)
     
     def in_values(self, other):
+        '''
+        Return the array with the value of 1 when the element value
+        in the list other, otherwise set value as 0.
+        
+        :param other: (*list or array*) List value.
+        
+        :returns: (*array*) Result array.
+        '''
         if not isinstance(other, (list, tuple)):
             other = other.aslist()
         r = MIArray(ArrayMath.inValues(self.array, other))
         return r
+        
+    def contains_nan(self):
+        '''
+        Check if the array contains nan value.
+        
+        :returns: (*boolean*) True if contains nan, otherwise return False.
+        '''
+        return ArrayMath.containsNaN(self.array)
     
     def getsize():
         if name == 'size':
@@ -374,10 +404,19 @@ class MIArray(object):
             return sizestr
     
     def astype(self, dtype):
+        '''
+        Convert to another data type.
+        
+        :param dtype: (*string*) Data type.
+        
+        :returns: (*array*) Converted array.
+        '''
         if dtype == 'int' or dtype is int:
             r = MIArray(ArrayUtil.toInteger(self.array))
         elif dtype == 'float' or dtype is float:
             r = MIArray(ArrayUtil.toFloat(self.array))
+        elif dtype == 'boolean' or dtype is boolean:
+            r = MIArray(ArrayUtil.toBoolean(self.array))
         else:
             r = self
         return r

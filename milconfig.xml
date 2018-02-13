@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
-    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\hdf">
     <RecentFolder Folder="D:\Working"/>
     <RecentFolder Folder="D:\MyProgram"/>
     <RecentFolder Folder="D:\"/>
@@ -16,21 +15,22 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\load_mip_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_nao.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\cov.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_6.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\boolean_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_aerosol_type.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\load_mip_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_nao.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\cov.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_6.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\boolean_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_aerosol_type.py"/>
     </RecentFiles>
   </File>
   <Font>
