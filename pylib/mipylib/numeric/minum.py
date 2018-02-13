@@ -51,7 +51,7 @@ __all__ = [
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
     'corrcoef','cos','degrees','diag','dim_array','datatable','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
-    'interpn','isgriddata','isstationdata','linregress','linspace','log','log10',
+    'interpn','isarray','isnan','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
     'nonzero','ones','ones_like','pol2cart','polyval','power',
     'project','projectxy','projinfo','radians','reshape','repeat',
@@ -115,6 +115,16 @@ def dim_array(a, dims=None):
             dim.setDimValues(range(a.shape[i]))
             dims.append(dim)
     return DimArray(a, dims)
+    
+def isarray(a):
+    '''
+    Check if input object is an array or not.
+    
+    :param a: (*object*) Input object.
+    
+    :returns: (*boolean*) True if the input object is an array.
+    '''
+    return isinstance(a, (MIArray, DimArray))
     
 def datatable(data=None):
     '''
@@ -1185,6 +1195,24 @@ def argsort(a, axis=-1):
         a = array(a)
     r = ArrayUtil.argSort(a.asarray(), axis)
     return MIArray(r)
+    
+def isnan(a):
+    '''
+    Test element-wise for NaN and return result as a boolean array.
+    
+    :param a: (*array_like*) Input array.
+    
+    :returns: (*array*) For scalar input, the result is a new boolean with value True if the input is NaN; 
+        otherwise the value is False. For array input, the result is a boolean array of the same dimensions 
+        as the input and the values are True if the corresponding element of the input is NaN; otherwise the 
+        values are False.
+    '''
+    if isinstance(a, (list, tuple)):
+        a = array(a)
+    if isarray(a):
+        return a == nan
+    else:
+        return a is nan
     
 def nonzero(a):
     '''

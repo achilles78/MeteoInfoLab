@@ -387,9 +387,17 @@ def eof(x, svd=False, transform=False):
     :returns: (EOF, E, PC) EOF: eigen vector 2-D array; E: eigen values 1-D array;
         PC: Principle component 2-D array.
     '''
-    m, n = x.shape
+    has_nan = False
+    if (x==np.nan).sum() > 0:       #Has NaN value
+        valid_idx = np.where(x[:,0]!=np.nan)[0]
+        xx = x[valid_idx,:]
+        has_nan = True
+    else:
+        xx = x
+        
+    m, n = xx.shape    
     if svd:
-        U, S, V = np.linalg.svd(x)
+        U, S, V = np.linalg.svd(xx)
         EOF = U
         C = np.zeros((m, n))
         for i in range(len(S)):
@@ -398,24 +406,31 @@ def eof(x, svd=False, transform=False):
         E = S**2 / n
     else:
         if transform:        
-            C = np.dot(x.T, x)
+            C = np.dot(xx.T, xx)
             E1, EOF1 = np.linalg.eig(C)
             EOF1 = EOF1[:,::-1]
             E = E1[::-1]
-            EOFa = np.dot(x, EOF1)
+            EOFa = np.dot(xx, EOF1)
             EOF = np.zeros((m,n))
             for i in range(n):
                 EOF[:,i] = EOFa[:,i]/np.sqrt(abs(E[i]))
-            PC = np.dot(EOF.T, x)
-            #PC = PC[::-1,:]
+            PC = np.dot(EOF.T, xx)
         else:
-            C = np.dot(x, x.T) / n
+            C = np.dot(xx, xx.T) / n
             E, EOF = np.linalg.eig(C)
-            PC = np.dot(EOF.T, x)
+            PC = np.dot(EOF.T, xx)
             EOF = EOF[:,::-1]
             PC = PC[::-1,:]
             E = E[::-1]
-    return EOF, E, PC
+    
+    if has_nan:
+        _EOF = np.ones(x.shape) * np.nan
+        _PC = np.ones(x.shape) * np.nan
+        _EOF[valid_idx,:] = -EOF
+        _PC[valid_idx,:] = -PC
+        return _EOF, E, _PC
+    else:
+        return EOF, E, PC
     
 def varimax(x, normalize=False, tol=1e-10, it_max=1000):
     '''

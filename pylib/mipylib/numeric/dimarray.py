@@ -33,6 +33,7 @@ class DimArray(object):
             self.ndim = array.ndim
             self.shape = array.shape
             self.dtype = array.dtype
+            self.size = array.size
             if self.ndim > 0:
                 self.sizestr = str(self.shape[0])
                 if self.ndim > 1:
@@ -52,11 +53,7 @@ class DimArray(object):
         self.proj = proj
         
     def __len__(self):
-        shape = self.array.getshape()
-        len = 1
-        for l in shape:
-            len = len * l
-        return len
+        return self.array.__len__()
 
     def __str__(self):
         return self.array.__repr__()
@@ -267,22 +264,33 @@ class DimArray(object):
 
         ranges = []
         flips = []        
+        onlyrange = True
+        alllist = True
         for i in range(0, self.ndim):   
-            if isinstance(indices[i], int):
-                if indices[i] < 0:
-                    indices[i] = self.shape[i] + indices[i]
-                sidx = indices[i]
-                eidx = indices[i]
+            k = indices[i]
+            if isinstance(k, int):
+                if k < 0:
+                    k = self.shape[i] + k
+                sidx = k
+                eidx = k
                 step = 1
+                alllist = False
+            elif isinstance(k, (list, tuple, MIArray)):
+                if isinstance(k, MIArray):
+                    k = k.aslist()
+                onlyrange = False
+                ranges.append(k)
+                continue
             else:
-                sidx = 0 if indices[i].start is None else indices[i].start
+                sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.shape[i] + sidx
-                eidx = self.shape[i] if indices[i].stop is None else indices[i].stop
+                eidx = self.shape[i] if k.stop is None else k.stop
                 if eidx < 0:
                     eidx = self.shape[i] + eidx
                 eidx -= 1
-                step = 1 if indices[i].step is None else indices[i].step
+                step = 1 if k.step is None else k.step
+                alllist = False
             if step < 0:
                 step = abs(step)
                 flips.append(i)
@@ -291,7 +299,13 @@ class DimArray(object):
     
         if isinstance(value, (MIArray, DimArray)):
             value = value.asarray()
-        r = ArrayMath.setSection(self.array.array, ranges, value)
+        if onlyrange:
+            r = ArrayMath.setSection(self.array.array, ranges, value)
+        else:
+            if alllist:
+                r = ArrayMath.setSection_List(self.array.array, ranges, value)
+            else:
+                r = ArrayMath.setSection_Mix(self.array.array, ranges, value)
         self.array.array = r
         
     def __add__(self, other):

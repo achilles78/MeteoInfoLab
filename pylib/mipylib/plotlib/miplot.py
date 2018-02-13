@@ -3968,6 +3968,7 @@ def imshow(*args, **kwargs):
         else:
             ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
         ls = ls.convertTo(ShapeTypes.Image)
+        plotutil.setlegendscheme(ls, **kwargs)
             
         igraphic = GraphicFactory.createImage(gdata, ls, extent)
     interpolation = kwargs.pop('interpolation', None)
@@ -4822,16 +4823,13 @@ def imshowm(*args, **kwargs):
             if ls is None:
                 #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
                 ls = LegendManage.createImageLegend(gdata, cmap)
+        plotutil.setlegendscheme(ls, **kwargs)
         fill_color = kwargs.pop('fill_color', None)
         if not fill_color is None:
             cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
             if cb.isNoData():
                 cb.setColor(plotutil.getcolor(fill_color))
-            # else:  
-                # cb = ColorBreak()
-                # cb.setColor(plotutil.getcolor(fill_color))
-                # cb.setNoData(True)
-                # ls.addLegendBreak(cb)
+
         layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
         if not interpolation is None:
             layer.setInterpolation(interpolation)

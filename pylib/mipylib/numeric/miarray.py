@@ -34,6 +34,7 @@ class MIArray(object):
             s1.append(s[i])
         self._shape = tuple(s1)
         self.dtype = array.getDataType()
+        self.size = int(self.array.getSize())
         if self.ndim > 0:
             self.sizestr = str(self.shape[0])
             if self.ndim > 1:
@@ -61,7 +62,7 @@ class MIArray(object):
     shape = property(get_shape, set_shape)
         
     def __len__(self):
-        return int(self.array.getSize())         
+        return self._shape[0]         
         
     def __str__(self):
         return ArrayUtil.convertToString(self.array)
@@ -180,22 +181,33 @@ class MIArray(object):
 
         ranges = []
         flips = []
+        onlyrange = True
+        alllist = True
         for i in range(0, self.ndim):   
-            if isinstance(indices[i], int):
-                sidx = indices[i]                
+            k = indices[i]
+            if isinstance(k, int):
+                sidx = k                
                 if sidx < 0:
                     sidx = self.getshape()[i] + sidx                
                 eidx = sidx
                 step = 1
+                alllist = False
+            elif isinstance(k, (list, tuple, MIArray)):
+                if isinstance(k, MIArray):
+                    k = k.aslist()
+                onlyrange = False
+                ranges.append(k)
+                continue
             else:
-                sidx = 0 if indices[i].start is None else indices[i].start
+                sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.getshape()[i] + sidx
-                eidx = self.getshape()[i] if indices[i].stop is None else indices[i].stop
+                eidx = self.getshape()[i] if k.stop is None else k.stop
                 if eidx < 0:
                     eidx = self.getshape()[i] + eidx
                 eidx -= 1
-                step = 1 if indices[i].step is None else indices[i].step
+                step = 1 if k.step is None else k.step
+                alllist = False
             if step < 0:
                 step = abs(step)
                 flips.append(i)
@@ -204,7 +216,13 @@ class MIArray(object):
 
         if isinstance(value, MIArray):
             value = value.asarray()
-        r = ArrayMath.setSection(self.array, ranges, value)
+        if onlyrange:
+            r = ArrayMath.setSection(self.array, ranges, value)
+        else:
+            if alllist:
+                r = ArrayMath.setSection_List(self.array, ranges, value)
+            else:
+                r = ArrayMath.setSection_Mix(self.array, ranges, value)
         self.array = r
     
     def __value_other(self, other):

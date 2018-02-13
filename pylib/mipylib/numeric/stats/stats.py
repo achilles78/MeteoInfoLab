@@ -13,9 +13,26 @@ from ucar.ma2 import Array
 from mipylib.numeric.miarray import MIArray
 
 __all__ = [
-    'cov','pearsonr','spearmanr','kendalltau','linregress','mlinregress','percentile'
+    'covariance','cov','pearsonr','spearmanr','kendalltau','linregress','mlinregress','percentile'
     ]
 
+def covariance(x, y, bias=False):
+    '''
+    Calculate covariance of two array.
+    
+    :param x: (*array_like*) A 1-D array containing multiple variables and observations.
+    :param y: (*array_like*) An additional set of variables and observations. y has the same form as 
+        that of x.
+    :param bias: (*boolean*) Default normalization (False) is by (N - 1), where N is the number of observations 
+        given (unbiased estimate). If bias is True, then normalization is by N.
+    '''
+    if isinstance(x, (list, tuple)):
+        x = MIArray(ArrayUtil.array(x))
+    if isinstance(y, (list, tuple)):
+        y = MIArray(ArrayUtil.array(y))
+    r = StatsUtil.covariance(x.asarray(), y.asarray(), bias)
+    return r
+    
 def cov(m, y=None, rowvar=True, bias=False):
     '''
     Estimate a covariance matrix.
