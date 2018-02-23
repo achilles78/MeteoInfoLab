@@ -3923,6 +3923,12 @@ def imshow(*args, **kwargs):
     xaxistype = None
     isrgb = False
     isimage = False
+    extent = None
+    if n >= 3:
+        xdata = args[0]
+        ydata = args[1]
+        extent = [xdata[0],xdata[-1],ydata[0],ydata[-1]]
+        args = args[2:]
     X = args[0]
     if isinstance(X, (list, tuple)):
         isrgb = True
@@ -3941,7 +3947,7 @@ def imshow(*args, **kwargs):
                 xaxistype = 'time'
     args = args[1:]   
     
-    extent = kwargs.pop('extent', None)
+    extent = kwargs.pop('extent', extent)
     if isrgb:
         if isinstance(X, (list, tuple)):
             rgbd = []
@@ -5833,6 +5839,7 @@ def makesymbolspec(geometry, *args, **kwargs):
         
     levels = kwargs.pop('levels', None)
     cols = kwargs.pop('colors', None)
+    field = kwargs.pop('field', '')
     if not levels is None and not cols is None:
         if isinstance(levels, MIArray):
             levels = levels.aslist()
@@ -5840,19 +5847,20 @@ def makesymbolspec(geometry, *args, **kwargs):
         for cobj in cols:
             colors.append(plotutil.getcolor(cobj))
         ls = LegendManage.createLegendScheme(shapetype, levels, colors)
-        plotutil.setlegendscheme(ls, **kwargs)
-        field = kwargs.pop('field', '')    
+        plotutil.setlegendscheme(ls, **kwargs)         
         ls.setFieldName(field)
         return ls
-    
-    ls = LegendScheme(shapetype)
-    field = kwargs.pop('field', '')    
-    ls.setFieldName(field)
+           
     n = len(args)
     isunique = True
-    if n == 1 and isinstance(args[0], int):
+    if n == 0:
+        ls = LegendManage.createSingleSymbolLegendScheme(shapetype)
+        plotutil.setlegendscheme(ls, **kwargs)
+    elif n == 1 and isinstance(args[0], int):
         ls = LegendManage.createUniqValueLegendScheme(args[0], shapetype)
+        plotutil.setlegendscheme(ls, **kwargs)
     else:
+        ls = LegendScheme(shapetype)
         for arg in args:
             if isinstance(arg, (list, tuple)):
                 for argi in arg:
@@ -5865,7 +5873,8 @@ def makesymbolspec(geometry, *args, **kwargs):
                 if isunique and not isu:
                     isunique = False
                 ls.addLegendBreak(lb)
-        
+       
+    ls.setFieldName(field)
     if ls.getBreakNum() > 1:
         if isunique:
             ls.setLegendType(LegendType.UniqueValue)
