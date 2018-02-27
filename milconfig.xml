@@ -23,18 +23,16 @@
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_6.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\array\boolean_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_aerosol_type.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\load_mip_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_6.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\array\boolean_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_aerosol_type.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-6,-6" MainFormSize="1287,693"/>
 </MeteoInfo>
