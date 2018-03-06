@@ -29,7 +29,7 @@ __all__ = [
     'addfile_grads','addfile_hyconc','addfile_hytraj','addfile_lonlat','addfile_micaps',
     'addfile_mm5','addfile_nc','addfile_grib','addfile_surfer',
     'addtimedim','joinncfile','asciiread','asciiwrite','binread','binwrite',
-    'numasciicol','numasciirow','readtable'
+    'numasciicol','numasciirow','readtable','convert2nc','dimension','grads2nc','ncwrite'
     ]
 
 def isgriddata(gdata):
@@ -521,24 +521,65 @@ def binwrite(fn, data, byteorder='little_endian', append=False, sequential=False
     """
     ArrayUtil.saveBinFile(fn, data.asarray(), byteorder, append, sequential)  
     
-def convert2nc(infn, outfn, version='netcdf3', largefile=False):
+def convert2nc(infn, outfn, version='netcdf3', writedimvar=False, largefile=False):
     """
     Convert data file (Grib, HDF...) to netCDF data file.
     
-    :param infn: (*string*) Input data file name.
+    :param infn: (*string or DimDataFile*) Input data file (or file name).
     :param outfn: (*string*) Output netCDF data file name.
+    :param writedimvar: (*boolean*) Write dimension variables or not.
+    :param largefile: (*boolean*) Create netCDF as large file or not.
     """
-    #Open input data file
-    f = addfile(infn)
+    if isinstance(infn, DimDataFile):
+        f = infn
+    else:
+        #Open input data file
+        f = addfile(infn)
+        
     #New netCDF file
     ncfile = addfile(outfn, 'c', version=version, largefile=largefile)
+    
     #Add dimensions
     dims = []
     for dim in f.dimensions():
         dims.append(ncfile.adddim(dim.getShortName(), dim.getLength()))
+        
     #Add global attributes
     for attr in f.attributes():
         ncfile.addgroupattr(attr.getName(), attr.getValues())
+        
+    #Add dimension variables
+    tvar = None
+    if writedimvar:
+        dimvars = []
+        for i in range(len(f.dimensions())):
+            dim = f.dimensions()[i]
+            dname = dim.getShortName()
+            if dim.getDimType() == DimensionType.T:
+                var = ncfile.addvar(dname, 'int', [dims[i]])
+                var.addattr('units', 'hours since 1900-01-01 00:00:0.0')
+                var.addattr('long_name', 'Time')
+                var.addattr('standard_name', 'time')
+                var.addattr('axis', 'T')
+                tvar = var
+            elif dim.getDimType() == DimensionType.Z:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', 'Level')
+                var.addattr('axis', 'Z')
+            elif dim.getDimType() == DimensionType.Y:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', dname)
+                var.addattr('axis', 'Y')
+            elif dim.getDimType() == DimensionType.X:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', dname)
+                var.addattr('axis', 'X')
+            else:
+                var = ncfile.addvar(dname, 'float', [dims[i]])
+                var.addattr('long_name', dname)
+                var.addattr('axis', dname)
+            dimvars.append(var)
+        
     #Add variables
     variables = []
     for var in f.variables():    
@@ -563,13 +604,33 @@ def convert2nc(infn, outfn, version='netcdf3', largefile=False):
         for attr in var.getAttributes():
             nvar.addattr(attr.getName(), attr.getValues())
         variables.append(nvar)
+        
     #Create netCDF file
     ncfile.create()
-    #Write data
+    
+    #Write dimension variable data
+    if writedimvar:
+        for dimvar, dim in zip(dimvars, f.dimensions()):
+            if dim.getDimType() != DimensionType.T:
+                ncfile.write(dimvar, minum.array(dim.getDimValue()))
+    
+    #Write time dimension variable data
+    if writedimvar and not tvar is None:
+        sst = datetime.datetime(1900,1,1)
+        tnum = f.timenum()
+        hours = []
+        for t in range(0, tnum):
+            st = f.gettime(t)
+            hs = (st - sst).total_seconds() // 3600
+            hours.append(hs)
+        ncfile.write(tvar, minum.array(hours))
+    
+    #Write variable data
     for var in variables:
         print 'Variable: ' + var.name
         data = f[str(var.name)].read()
-        ncfile.write(var, data)
+        ncfile.write(var, data)    
+        
     #Close netCDF file
     ncfile.close()
     print 'Convert finished!'
@@ -581,6 +642,7 @@ def grads2nc(infn, outfn, big_endian=None, largefile=False):
     :param infn: (*string*) Input GrADS data file name.
     :param outfn: (*string*) Output netCDF data file name.
     :param big_endian: (*boolean*) Is GrADS data big_endian or not.
+    :param largefile: (*boolean*) Create netCDF as large file or not.
     """
     #Open GrADS file
     f = addfile_grads(infn)
@@ -716,6 +778,7 @@ def ncwrite(fn, data, varname, dims=None, attrs=None, largefile=False):
     :param varname: (*string*) Variable name.
     :param dims: (*list of dimensions*) Dimension list.
     :param attrs: (*list of attributes*) Attributes list.
+    :param largefile: (*boolean*) Create netCDF as large file or not.
     """
     if dims is None:
         if isinstance(data, MIArray):

@@ -2759,11 +2759,9 @@ def savefig(fname, width=None, height=None, dpi=None, sleep=None):
         is None, the output figure size is same as *figures* window.
     :param height: (*int*) Optional, height of the output figure with pixel units. Default
         is None, the output figure size is same as *figures* window.
+    :param dpi: (*int*) Optional, figure resolution.
     :param sleep: (*int*) Sleep seconds. For web map tiles loading.
     """
-    #if (not width is None) and (not height is None):
-    #    chartpanel.setSize(width, height)
-    #chartpanel.paintGraphics()
     if dpi != None:
         if (not width is None) and (not height is None):
             chartpanel.saveImage(fname, dpi, width, height, sleep)
