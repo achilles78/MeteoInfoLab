@@ -57,9 +57,9 @@ __all__ = [
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
     'figure','figsize','patch','rectangle','fill_between','fill_betweenx','webmap','geoshow','gifaddframe','gifanimation','giffinish',
-    'grid','gridfm','hist','imshow','imshowm','legend','loglog','makecolors',
+    'grid','gridfm','hist','imshow','imshowm','legend','left_title','loglog','makecolors',
     'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
-    'quiverkey','quiverm','readlegend','savefig','savefig_jpeg','scatter','scatter3','scatterm',
+    'quiverkey','quiverm','readlegend','right_title','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
     'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zaxis','zlabel','zlim','zticks',
@@ -2760,7 +2760,7 @@ def savefig(fname, width=None, height=None, dpi=None, sleep=None):
     :param height: (*int*) Optional, height of the output figure with pixel units. Default
         is None, the output figure size is same as *figures* window.
     :param dpi: (*int*) Optional, figure resolution.
-    :param sleep: (*int*) Sleep seconds. For web map tiles loading.
+    :param sleep: (*int*) Optional, sleep seconds. For web map tiles loading.
     """
     if dpi != None:
         if (not width is None) and (not height is None):
@@ -3072,7 +3072,6 @@ def title(title, fontname=None, fontsize=14, bold=True, color='black'):
     c = plotutil.getcolor(color)
     ctitile = ChartText(title, font)
     ctitile.setXAlign('center')
-    ctitile.setYAlign('top')
     ctitile.setUseExternalFont(exfont)
     ctitile.setColor(c)
     gca.set_title(ctitile)
@@ -3103,6 +3102,62 @@ def suptitle(title, fontname=None, fontsize=14, bold=True, color='black'):
     ctitle.setUseExternalFont(exfont)
     ctitle.setColor(c)
     chartpanel.getChart().setTitle(ctitle)
+    draw_if_interactive()
+    
+def left_title(title, fontname=None, fontsize=14, bold=False, color='black'):
+    """
+    Set a left sub title of the current axes.
+    
+    :param title: (*string*) Title string.
+    :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+    :param color: (*color*) Title string color. Default is ``black`` .    
+    """
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+        
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    c = plotutil.getcolor(color)
+    ctitile = ChartText(title, font)
+    ctitile.setXAlign('left')
+    ctitile.setUseExternalFont(exfont)
+    ctitile.setColor(c)
+    gca.set_left_title(ctitile)
+    draw_if_interactive()
+    
+def right_title(title, fontname=None, fontsize=14, bold=False, color='black'):
+    """
+    Set a right sub title of the current axes.
+    
+    :param title: (*string*) Title string.
+    :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+    :param color: (*color*) Title string color. Default is ``black`` .    
+    """
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+        
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    c = plotutil.getcolor(color)
+    ctitile = ChartText(title, font)
+    ctitile.setXAlign('right')
+    ctitile.setUseExternalFont(exfont)
+    ctitile.setColor(c)
+    gca.set_right_title(ctitile)
     draw_if_interactive()
 
 def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):

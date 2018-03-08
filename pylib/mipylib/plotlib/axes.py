@@ -111,6 +111,22 @@ class Axes(object):
         '''
         self.axes.setTitle(title)
         
+    def set_left_title(self, title):
+        '''
+        Set left sub title
+        
+        :param title: (*string*) Title
+        '''
+        self.axes.setLeftTitle(title)
+        
+    def set_right_title(self, title):
+        '''
+        Set right sub title
+        
+        :param title: (*string*) Title
+        '''
+        self.axes.setRightTitle(title)
+        
     def get_xticks(self):
         '''
         Get x axis tick locations.
