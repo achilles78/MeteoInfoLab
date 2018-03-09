@@ -5876,7 +5876,7 @@ def makesymbolspec(geometry, *args, **kwargs):
     :param levels: (*array_like*) Value levels. Default is ``None``, not used.
     :param colors: (*list*) Colors. Defaul is ``None``, not used.
     :param legend break parameter maps: (*map*) Legend breaks.
-    :param field: (*string*) The field of to be used in the legend.
+    :param field: (*string*) The field to be used in the legend.
     
     :returns: Created legend.
     '''

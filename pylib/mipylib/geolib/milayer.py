@@ -95,18 +95,39 @@ class MILayer(object):
         self.layer.editCellValue(fieldname, shapeindex, value)
             
     def shapes(self):
+        '''
+        Get shapes.
+        '''
         return self.layer.getShapes()
         
     def shapenum(self):
+        '''
+        Get shape number
+        '''
         return self.layer.getShapeNum()
         
     def legend(self):
+        '''
+        Get legend scheme.
+        '''
         return self.layer.getLegendScheme()
         
     def setlegend(self, legend):
+        '''
+        Set legend scheme.
+        
+        :param legend: (*LegendScheme*) Legend scheme.
+        '''
         self.layer.setLegendScheme(legend)
     
     def addfield(self, fieldname, dtype, values=None):
+        '''
+        Add a field into the attribute table.
+        
+        :param fieldname: (*string*) Field name.
+        :param dtype: (*string*) Field data type [string | int | float | double].
+        :param values: (*array_like*) Field values.
+        '''
         dt = TableUtil.toDataTypes(dtype)
         self.layer.editAddField(fieldname, dt)
         if not values is None:
@@ -116,12 +137,32 @@ class MILayer(object):
                     self.layer.editCellValue(fieldname, i, values[i])
                     
     def delfield(self, fieldname):
+        '''
+        Delete a field from the attribute table.
+        
+        :param fieldname: (*string*) Filed name.
+        '''
         self.layer.editRemoveField(fieldname)
         
     def renamefield(self, fieldname, newfieldname):
+        '''
+        Rename the field.
+        
+        :param fieldname: (*string*) The old field name.
+        :param newfieldname: (*string*) The new field name.
+        '''
         self.layer.editRenameField(fieldname, newfieldname)
         
     def addshape(self, x, y, fields=None, z=None, m=None):
+        '''
+        Add a shape.
+        
+        :param x: (*array_like*) X coordinates of the shape points.
+        :param y: (*array_like*) Y coordinates of the shape points.
+        :param fields: (*array_like*) Field values of the shape.
+        :param z: (*array_like*) Optional, Z coordinates of the shape points.
+        :param m: (*array_like*) Optional, M coordinates of the shape points.
+        '''
         type = 'point'
         if self.shapetype == ShapeTypes.Polyline:
             type = 'line'
@@ -175,9 +216,21 @@ class MILayer(object):
         self.layer.addLabels()
         
     def getlabel(self, text):
+        '''
+        Get a label.
+        
+        :param text: (*string*) The label text.
+        '''
         return self.layer.getLabel(text)
         
     def movelabel(self, label, x=0, y=0):
+        '''
+        Move a label.
+        
+        :param label: (*string*) The label text.
+        :param x: (*float*) X shift for moving in pixel unit.
+        :param y: (*float*) Y shift for moving in pixel unit.
+        '''
         self.layer.moveLabel(label, x, y)
         
     def set_avoidcoll(self, avoidcoll):
@@ -189,14 +242,34 @@ class MILayer(object):
         self.layer.setAvoidCollision(avoidcoll)
         
     def project(self, toproj):
+        '''
+        Project to another projection.
+        
+        :param toproj: (*ProjectionInfo*) The projection to be projected.
+        '''
         r = ProjectionManage.projectLayer(self.layer, toproj)
         return MILayer(r)
         
     def buffer(self, dist=0, merge=False):
+        '''
+        Get the buffer layer.
+        
+        :param dist: (*float*) Buffer value.
+        :param merge: (*boolean*) Merge the buffered shapes or not.
+        
+        :returns: (*MILayer*) Buffered layer.
+        '''
         r = self.layer.buffer(dist, False, merge)
         return MILayer(r)
         
     def clip(self, clipobj):
+        '''
+        Clip this layer by polygon or another polygon layer.
+        
+        :param clipobj: (*PolygonShape or MILayer*) Clip object.
+        
+        :returns: (*MILayer*) Clipped layer.
+        '''
         if isinstance(clipobj, PolygonShape):
             clipobj = [clipobj]
         elif isinstance(clipobj, MILayer):
