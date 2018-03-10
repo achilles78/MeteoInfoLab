@@ -1748,20 +1748,18 @@ def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='ma
     draw_if_interactive()
     return gca, bars
  
-def figure(bgcolor=None, figsize=None, newfig=True):
+def figure(bgcolor='w', figsize=None, newfig=True):
     """
     Creates a figure.
     
-    :param bgcolor: (*Color*) Optional, background color of the figure. Default is ``None`` .
+    :param bgcolor: (*Color*) Optional, background color of the figure. Default is ``w`` (white) .
     :param figsize: (*list*) Optional, width and height of the figure such as ``[600, 400]`` .
         Default is ``None`` with changable size same as *Figures* window.
     :param newfig: (*boolean*) Optional, if creates a new figure. Default is ``True`` .
     """
     global chartpanel
     chart = Chart()
-    if not bgcolor is None:
-        chart.setDrawBackground(True)
-        chart.setBackground(plotutil.getcolor(bgcolor))
+    chart.setBackground(plotutil.getcolor(bgcolor))
     if figsize is None:
         chartpanel = ChartPanel(chart)
     else:
@@ -1798,11 +1796,7 @@ def bgcolor(color):
     :param color: (*Color*) Background color    
     '''
     chart = chartpanel.getChart()
-    if color is None:
-        chart.setDrawBackground(False)
-    else:
-        chart.setDrawBackground(True)
-        chart.setBackground(plotutil.getcolor(color))
+    chart.setBackground(plotutil.getcolor(color))
     draw_if_interactive()    
     
 def caxes(ax=None):
@@ -2166,10 +2160,8 @@ def __set_axes(ax, **kwargs):
         r_axis.setInverse(True)        
     if not xaxistype is None:
         __setXAxisType(ax.axes, xaxistype)
-    if not bgcobj is None:
-        bgcolor = plotutil.getcolor(bgcobj)
-        ax.axes.setDrawBackground(True)
-        ax.axes.setBackground(bgcolor)
+    bgcolor = plotutil.getcolor(bgcobj)
+    ax.axes.setBackground(bgcolor)
     tickline = kwargs.pop('tickline', True)
     b_axis.setDrawTickLine(tickline)
     t_axis.setDrawTickLine(tickline)
@@ -2292,10 +2284,8 @@ def __set_axesm(ax, **kwargs):
     mapframe.setGridXDelt(griddx)
     mapframe.setGridYDelt(griddy)
     ax.axes.setDrawNeatLine(frameon)
-    if not bgcobj is None:
-        bgcolor = plotutil.getcolor(bgcobj)
-        ax.axes.setDrawBackground(True)
-        ax.axes.setBackground(bgcolor)
+    bgcolor = plotutil.getcolor(bgcobj)
+    ax.axes.setBackground(bgcolor)
  
     return ax
 

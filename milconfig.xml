@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
@@ -16,25 +15,26 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\Temp\test"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\wind"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\load_mip_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
-      <OpenedFile File="D:\Temp\test\wrfout2arl_jie.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\wrfout2arl.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\image_xdir.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\load_mip_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
-      <RecentFile File="D:\Temp\test\wrfout2arl_jie.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\wrfout2arl.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\image_xdir.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-4,2" MainFormSize="1372,753"/>
+  <Startup MainFormLocation="-6,-6" MainFormSize="1287,693"/>
 </MeteoInfo>
