@@ -117,7 +117,8 @@ public class TextEditor extends JPanel {
      * @param value Title text
      */
     public void setTitle(String value) {
-        int idx = _parent.indexOfTab(_title);
+        //int idx = _parent.indexOfTab(_title);
+        int idx = _parent.indexOfComponent(this);
         _title = value;        
         _parent.setTitleAt(idx, _title);
     }
@@ -229,7 +230,8 @@ public class TextEditor extends JPanel {
         }
 
         if (!title.equals(_title)) {
-            int idx = _parent.indexOfTab(title);
+            //int idx = _parent.indexOfTab(title);
+            int idx = _parent.indexOfComponent(this);
             _parent.setTitleAt(idx, _title);
         }
     }
