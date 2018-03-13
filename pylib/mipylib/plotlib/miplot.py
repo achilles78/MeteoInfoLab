@@ -3630,10 +3630,21 @@ def legend(*args, **kwargs):
         is True.
     :param background: (*None or color*) Set draw background or not and/or background color.
         Default is None which set not draw background.
-    :param fontname: (*string*) Font name. Default is ``Arial`` .
-    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param fontname: (*string*) Tick font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Tick font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
-    :param labcolor: (*color*) Tick label string color. Default is ``black`` .
+    :param title: (*string*) Label string.
+    :param labelfontname: (*string*) Title font name.
+    :param labelfontsize: (*int*) Label font size.
+    :param labcolor: (*color*) Label color. Default is ``black`` .
+    :param markerscale: (*float*) Marker symbol scale.
+    :param markerwidth: (*float*) Marker symbol width.
+    :param markerheight: (*float*) Marker symbol height.
+    :param ncol: (*float*) Column number of the legend.
+    :param xshift: (*float*) X shift.
+    :param yshift: (*float*) Y shift.
+    
+    :returns: (*ChartLegend*) The chart legend.
     """
     global gca  
     newlegend = kwargs.pop('newlegend', True)
@@ -3672,7 +3683,6 @@ def legend(*args, **kwargs):
                 ls = LegendScheme()
                 for lb in lbs:
                     ls.addLegendBreak(lb)
-                #ls.setLegendBreaks(lbs)
                 if lbs[0].getStartValue() == lbs[1].getEndValue():
                     ls.setLegendType(LegendType.UniqueValue)
                 else:
@@ -3767,6 +3777,7 @@ def legend(*args, **kwargs):
         gca.axes.addLegend(clegend)
     
     draw_if_interactive()
+    return clegend
     
 def readlegend(fn):
     """
