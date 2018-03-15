@@ -10,7 +10,7 @@ from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
 from org.meteoinfo.math import Complex
 from org.meteoinfo.math.linalg import LinalgUtil
-from ucar.ma2 import Array, Range, MAMath, DataType
+from ucar.ma2 import Array, Range, MAMath, DataType, Index
 import jarray
 import numbers
 
@@ -35,7 +35,8 @@ class MIArray(object):
         self._shape = tuple(s1)
         self.dtype = array.getDataType()
         self.size = int(self.array.getSize())
-        self.idx = -1
+        #self.idx = -1
+        self.iterator = array.getIndexIterator()
         if self.ndim > 0:
             self.sizestr = str(self.shape[0])
             if self.ndim > 1:
@@ -77,6 +78,19 @@ class MIArray(object):
             inds = []
             inds.append(indices)
             indices = inds
+            
+        allint = True
+        aindex = self.array.getIndex()
+        i = 0
+        for ii in indices:
+            if isinstance(ii, int):
+                aindex.setDim(i, ii)
+            else:
+                allint = False
+                break;
+            i += 1
+        if allint:
+            return self.array.getObject(aindex)
             
         if self.ndim == 0:
             return self
@@ -215,6 +229,8 @@ class MIArray(object):
             rr = Range(sidx, eidx, step)
             ranges.append(rr)
 
+        if isinstance(value, (list,tuple)):
+            value = ArrayUtil.array(value)
         if isinstance(value, MIArray):
             value = value.asarray()
         if onlyrange:
@@ -364,14 +380,19 @@ class MIArray(object):
         """
         provide iteration over the values of the array
         """
-        self.idx = -1
+        #self.idx = -1
+        self.iterator = self.array.getIndexIterator()
         return self
         
     def next(self):
-        self.idx += 1
-        if self.idx >= self.size:
-            raise StopIteration()        
-        return self.array.getObject(self.idx)
+        if self.iterator.hasNext():
+            return self.iterator.getObjectNext()
+        else:
+            raise StopIteration()
+        # self.idx += 1
+        # if self.idx >= self.size:
+            # raise StopIteration()        
+        # return self.array.getObject(self.idx)
     
     def in_values(self, other):
         '''
