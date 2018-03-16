@@ -27,11 +27,12 @@ __all__ = [
     'polyarea','polygon','rmaskout','shaperead'
     ]
 
-def shaperead(fn):   
+def shaperead(fn, encoding=None):   
     '''
     Returns a layer readed from a shape file.
     
     :param fn: (*string*) The shape file name (.shp).
+    :param encoding: (*string*) Encoding
     
     :returns: (*MILayer*) The created layer.
     '''
@@ -42,7 +43,10 @@ def shaperead(fn):
         
     if os.path.exists(fn):        
         try:
-            layer = MILayer(MapDataManage.loadLayer(fn))
+            if encoding is None:
+                layer = MILayer(MapDataManage.readMapFile_ShapeFile(fn))
+            else:
+                layer = MILayer(MapDataManage.readMapFile_ShapeFile(fn, encoding))
             if not layer.legend() is None:
                 lb = layer.legend().getLegendBreaks()[0]
                 if lb.getBreakType() == BreakTypes.PolygonBreak:

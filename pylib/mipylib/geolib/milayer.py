@@ -51,6 +51,14 @@ class MILayer(object):
         '''
         return self.layer.getLayerType() == LayerTypes.VectorLayer
         
+    def get_encoding(self):
+        '''
+        Get encoding.
+        
+        :returns: (*string*) Encoding
+        '''
+        return self.layer.getAttributeTable().getEncoding()
+        
     def gettable(self):
         '''
         Get attribute table.
@@ -302,19 +310,24 @@ class MILayer(object):
         '''
         return MILayer(self.layer.clone())
     
-    def save(self, fn=None):
+    def save(self, fn=None, encoding=None):
         """
         Save layer as shape file.
         
         :param fn: (*string*) Shape file name (.shp).
+        :param encoding: (*string*) Encoding.
         """
         if fn is None:
-            if self.layer.getFileName().strip() == '':
-                print 'File name is needed to save the layer!'
-            else:
-                self.layer.saveFile()    
+            fn = self.layer.getFileName()
+            
+        if self.layer.getFileName().strip() == '':
+            print 'File name is needed to save the layer!'
+            raise IOError
         else:
-            self.layer.saveFile(fn)
+            if encoding is None:
+                self.layer.saveFile(fn)
+            else:
+                self.layer.saveFile(fn, encoding)
     
     def savekml(self, fn):
         """

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\grads">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\test"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
@@ -16,23 +15,26 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
-      <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\read_aqi_test.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\grads\read_datetime.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\shape_encoding_convert_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\read_shape_encoding_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <RecentFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
-      <RecentFile File="D:\Working\MIScript\mywork\aqi_data\read_aqi_test.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\grads\read_datetime.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\shape_encoding_convert_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\read_shape_encoding_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,0" MainFormSize="1381,808"/>
+  <Startup MainFormLocation="-6,-6" MainFormSize="1287,693"/>
 </MeteoInfo>
