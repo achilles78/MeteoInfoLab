@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\meteo">
-    <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\grads">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\test"/>
@@ -16,17 +15,20 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
       <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\read_aqi_test.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\grads\read_datetime.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <RecentFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
       <RecentFile File="D:\Working\MIScript\mywork\aqi_data\read_aqi_test.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\grads\read_datetime.py"/>
     </RecentFiles>
   </File>
   <Font>

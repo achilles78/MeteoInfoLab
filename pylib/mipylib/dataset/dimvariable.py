@@ -160,56 +160,66 @@ class DimVariable():
                 eidx = k
                 step = 1
             elif isinstance(k, slice):
-                sidx = 0 if k.start is None else k.start
+                if isinstance(k.start, basestring):
+                    sv = float(k.start)
+                    sidx = self.dims[i].getValueIndex(sv)
+                elif isinstance(k.start, datetime.datetime):
+                    sv = miutil.date2num(k.start)
+                    sidx = self.dims[i].getValueIndex(sv)
+                else:
+                    sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.dimlen(i) + sidx
-                eidx = self.dimlen(i) if k.stop is None else k.stop
-                if eidx < 0:
-                    eidx = self.dimlen(i) + eidx
-                eidx -= 1
-                step = 1 if k.step is None else k.step
+                    
+                if isinstance(k.stop, basestring):
+                    ev = float(k.stop)
+                    eidx = self.dims[i].getValueIndex(ev)
+                elif isinstance(k.stop, datetime.datetime):
+                    ev = miutil.date2num(k.stop)
+                    eidx = self.dims[i].getValueIndex(ev)
+                else:
+                    eidx = self.dimlen(i) if k.stop is None else k.stop
+                    if eidx < 0:
+                        eidx = self.dimlen(i) + eidx
+                    eidx -= 1
+                    
+                if isinstance(k.step, basestring):
+                    nv = float(k.step) + self.dims[i].getDimValue()[0]
+                    nidx = self.dims[i].getValueIndex(nv)
+                    step = nidx - sidx
+                elif isinstance(k.step, datetime.timedelta):
+                    nv = miutil.date2num(k.start + k.step)
+                    nidx = self.dims[i].getValueIndex(nv)
+                    step = nidx - sidx
+                else:
+                    step = 1 if k.step is None else k.step
+                if sidx > eidx:
+                    iidx = eidx
+                    eidx = sidx
+                    sidx = iidx
             elif isinstance(k, list):
+                onlyrange = False
+                isrange = False
                 if not isinstance(k[0], datetime.datetime):
-                    onlyrange = False
-                    isrange = False
                     ranges.append(k)
                 else:
-                    dim = self.variable.getDimension(i)
-                    sv = k[0]
-                    sv = miutil.date2num(sv)
-                    dim = self.variable.getDimension(i)
-                    sidx = dim.getValueIndex(sv)
-                    if len(k) == 1:
-                        eidx = sidx
-                        step = 1
-                    else:
-                        ev = k[1]
-                        ev = miutil.date2num(ev)
-                        eidx = dim.getValueIndex(ev)
-                        if len(k) == 2:
-                            step = 1
-                        else:
-                            nv = k[2]
-                            nv = miutil.date2num(k[0] + k[2]) - sv
-                            step = int(nv / dim.getDeltaValue())
-                        if sidx > eidx:
-                            iidx = eidx
-                            eidx = sidx
-                            sidx = iidx
+                    tlist = []
+                    for tt in k:
+                        sv = miutil.date2num(tt)
+                        idx = self.dims[i].getValueIndex(sv)
+                        tlist.append(idx)
+                    ranges.append(tlist)
+                    k = tlist
             elif isinstance(k, basestring):
                 dim = self.variable.getDimension(i)
                 kvalues = k.split(':')
                 sv = float(kvalues[0])
-                if isinstance(sv, datetime.datetime):
-                    sv = miutil.date2num(sv)
                 sidx = dim.getValueIndex(sv)
                 if len(kvalues) == 1:
                     eidx = sidx
                     step = 1
                 else:                    
                     ev = float(kvalues[1])
-                    if isinstance(ev, datetime.datetime):
-                        ev = miutil.date2num(ev)
                     eidx = dim.getValueIndex(ev)
                     if len(kvalues) == 2:
                         step = 1
