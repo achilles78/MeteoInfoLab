@@ -91,9 +91,7 @@ def array(object):
         array([[1.0, 2.0]
               [3.0, 4.0]])
     """
-    if isinstance(object, DimArray):
-        return object.array
-    elif isinstance(object, MIArray):
+    if isinstance(object, MIArray):
         return object
     return MIArray(ArrayUtil.array(object))
     
@@ -124,7 +122,7 @@ def isarray(a):
     
     :returns: (*boolean*) True if the input object is an array.
     '''
-    return isinstance(a, (MIArray, DimArray))
+    return isinstance(a, MIArray)
     
 def datatable(data=None):
     '''
@@ -427,7 +425,7 @@ def repeat(a, repeats, axis=None):
         repeats = [repeats]
     if isinstance(a, (list, tuple)):
         a = array(a)
-    if isinstance(a, (MIArray, DimArray)):
+    if isinstance(a, MIArray):
         a = a.asarray()    
     if axis is None:
         r = ArrayUtil.repeat(a, repeats)
@@ -450,7 +448,7 @@ def tile(a, repeats):
         repeats = [repeats]
     if isinstance(a, (list, tuple)):
         a = array(a)
-    if isinstance(a, (MIArray, DimArray)):
+    if isinstance(a, MIArray):
         a = a.asarray()    
     r = ArrayUtil.tile(a, repeats)
     return MIArray(r)
@@ -822,12 +820,12 @@ def sum(x, axis=None):
     returns: (*array_like*) Sum result
     """
     if isinstance(x, list):
-        if isinstance(x[0], (MIArray, DimArray)):
+        if isinstance(x[0], MIArray):
             a = []
             for xx in x:
                 a.append(xx.asarray())
             r = ArrayMath.sum(a)
-            if isinstance(x[0], MIArray):            
+            if type(x[0]) is MIArray:            
                 return MIArray(r)
             else:
                 return DimArray(MIArray(r), x[0].dims, x[0].fill_value, x[0].proj)
@@ -838,7 +836,7 @@ def sum(x, axis=None):
         return r
     else:
         r = ArrayMath.sum(x.asarray(), axis)
-        if isinstance(x, MIArray):
+        if type(x) is MIArray:
             return MIArray(r)
         else:
             dims = []
@@ -858,12 +856,12 @@ def mean(x, axis=None):
     returns: (*array_like*) Mean result
     """
     if isinstance(x, list):
-        if isinstance(x[0], (MIArray, DimArray)):
+        if isinstance(x[0], MIArray):
             a = []
             for xx in x:
                 a.append(xx.asarray())
             r = ArrayMath.mean(a)
-            if isinstance(x[0], MIArray):            
+            if type(x[0]) is MIArray:            
                 return MIArray(r)
             else:
                 return DimArray(MIArray(r), x[0].dims, x[0].fill_value, x[0].proj)
@@ -880,7 +878,7 @@ def mean(x, axis=None):
         return r
     else:
         r = ArrayMath.mean(x.asarray(), axis)
-        if isinstance(x, MIArray):
+        if type(x) is MIArray:
             return MIArray(r)
         else:
             dims = []
@@ -904,7 +902,7 @@ def std(x, axis=None):
         return r
     else:
         r = ArrayMath.std(x.asarray(), axis)
-        if isinstance(x, MIArray):
+        if type(x) is MIArray:
             return MIArray(r)
         else:
             dims = []
@@ -924,12 +922,12 @@ def median(x, axis=None):
     returns: (*array_like*) Median result
     """
     if isinstance(x, list):
-        if isinstance(x[0], (MIArray, DimArray)):
+        if isinstance(x[0], MIArray):
             a = []
             for xx in x:
                 a.append(xx.asarray())
             r = ArrayMath.median(a)
-            if isinstance(x[0], MIArray):            
+            if type(x[0]) is MIArray:            
                 return MIArray(r)
             else:
                 return DimArray(MIArray(r), x[0].dims, x[0].fill_value, x[0].proj)
@@ -949,7 +947,7 @@ def median(x, axis=None):
             return r
         else:
             r = ArrayMath.median(x.asarray(), axis)
-            if isinstance(x, MIArray):
+            if type(x) is MIArray:
                 return MIArray(r)
             else:
                 dims = []
@@ -976,7 +974,7 @@ def maximum(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, MIArray):
+    if type(x1) is MIArray:
         return MIArray(ArrayMath.maximum(x1.asarray(), x2.asarray()))
     elif isinstance(x1, DimArray):
         r = MIArray(ArrayMath.maximum(x1.asarray(), x2.asarray()))
@@ -1003,7 +1001,7 @@ def fmax(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, MIArray):
+    if type(x1) is MIArray:
         return MIArray(ArrayMath.fmax(x1.asarray(), x2.asarray()))
     elif isinstance(x1, DimArray):
         r = MIArray(ArrayMath.fmax(x1.asarray(), x2.asarray()))
@@ -1029,7 +1027,7 @@ def minimum(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, MIArray):
+    if type(x1) is MIArray:
         return MIArray(ArrayMath.minimum(x1.asarray(), x2.asarray()))
     elif isinstance(x1, DimArray):
         r = MIArray(ArrayMath.minimum(x1.asarray(), x2.asarray()))
@@ -1056,7 +1054,7 @@ def fmin(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, MIArray):
+    if type(x1) is MIArray:
         return MIArray(ArrayMath.fmin(x1.asarray(), x2.asarray()))
     elif isinstance(x1, DimArray):
         r = MIArray(ArrayMath.fmin(x1.asarray(), x2.asarray()))
@@ -1331,7 +1329,7 @@ def squeeze(a):
     '''
     da = a.asarray()
     da = da.reduce()
-    if isinstance(a, MIArray):
+    if type(a) is MIArray:
         return MIArray(da)
     else:
         dims = []
@@ -1448,7 +1446,7 @@ def transpose(a, dim1=0, dim2=1):
     :returns: Transposed array.
     '''
     r = ArrayMath.transpose(a.asarray(), dim1, dim2)
-    if isinstance(a, MIArray):
+    if type(a) is MIArray:
         return MIArray(r)
     else:
         dims = []
@@ -1472,7 +1470,7 @@ def rot90(a, k=1):
     :returns: (*array_like*) Rotated array.
     """
     r = ArrayMath.rot90(a.asarray(), k)
-    if isinstance(a, MIArray):
+    if type(a) is MIArray:
         return MIArray(r)
     else:
         dims = []
@@ -1521,7 +1519,7 @@ def trapz(y, x=None, dx=1.0, axis=-1):
             if isinstance(x, list):
                 x = array(x)
             r = ArrayMath.trapz(y.asarray(), x.asarray(), axis)
-        if isinstance(y, MIArray):
+        if type(y) is MIArray:
             return MIArray(r)
         else:
             dims = []
@@ -1646,8 +1644,6 @@ def asmiarray(data):
     '''
     if isinstance(data, Array):
         return MIArray(data)
-    elif isinstance(data, DimArray):
-        return data.array
     elif isinstance(data, MIArray):
         return data
     else:
@@ -1736,9 +1732,9 @@ def distance(x, y, islonlat=False):
     
     :returns: Distance, meters for lon/lat.
     """
-    if isinstance(x, (MIArray, DimArray)):
+    if isinstance(x, MIArray):
         x = x.aslist()
-    if isinstance(y, (MIArray, DimArray)):
+    if isinstance(y, MIArray):
         y = y.aslist()
     r = GeoComputation.getDistance(x, y, islonlat)
     return r
@@ -1780,7 +1776,7 @@ def maskout(data, mask, x=None, y=None):
     """
     if mask is None:
         return data
-    elif isinstance(mask, (MIArray, DimArray)):
+    elif isinstance(mask, MIArray):
         r = ArrayMath.maskout(data.asarray(), mask.asarray())
         return MIArray(r)
     if x is None or y is None:
@@ -1862,11 +1858,11 @@ def interpn(points, values, xi):
     """
     npoints = []
     for p in points:
-        if isinstance(p, (MIArray, DimArray)):
+        if isinstance(p, MIArray):
             p = p.aslist()
         npoints.append(p)
         
-    if isinstance(xi, (MIArray, DimArray)):
+    if isinstance(xi, MIArray):
         xi = xi.aslist()
     nxi = []
     for x in xi:
@@ -1909,7 +1905,7 @@ def griddata(points, values, xi=None, **kwargs):
     else:
         x_g = xi[0]
         y_g = xi[1]
-    if isinstance(values, MIArray) or isinstance(values, DimArray):
+    if isinstance(values, MIArray):
         values = values.asarray()    
     if method == 'idw':
         pnum = kwargs.pop('pointnum', 2)
@@ -2024,7 +2020,7 @@ def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, topr
         x = array(x)
     if isinstance(y, (tuple, list)):
         y = array(y)
-    if isinstance(x, (MIArray, DimArray)):
+    if isinstance(x, MIArray):
         outxy = ArrayUtil.reproject(x.asarray(), y.asarray(), fromproj, toproj)
         return MIArray(outxy[0]), MIArray(outxy[1])
     else:

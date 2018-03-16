@@ -84,6 +84,8 @@ class MIArray(object):
         i = 0
         for ii in indices:
             if isinstance(ii, int):
+                if ii < 0:
+                    ii = self.shape[i] + ii
                 aindex.setDim(i, ii)
             else:
                 allint = False

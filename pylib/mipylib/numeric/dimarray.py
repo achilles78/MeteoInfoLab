@@ -24,42 +24,21 @@ from java.util import ArrayList
 nan = Double.NaN
 
 # Dimension array
-class DimArray(object):
+class DimArray(MIArray):
     
-    # array must be MIArray
-    def __init__(self, array=None, dims=None, fill_value=-9999.0, proj=None):
-        self.array = array
-        if not array is None:
-            self.ndim = array.ndim
-            self.shape = array.shape
-            self.dtype = array.dtype
-            self.size = array.size
-            if self.ndim > 0:
-                self.sizestr = str(self.shape[0])
-                if self.ndim > 1:
-                    for i in range(1, self.ndim):
-                        self.sizestr = self.sizestr + '*%s' % self.shape[i]
-            else:
-                self.sizestr = '1'
-        
+    # array must be a ucar.ma2.Array object
+    def __init__(self, array, dims=None, fill_value=-9999.0, proj=None):
+        if isinstance(array, MIArray):
+            array = array.array
+        super(DimArray, self).__init__(array)
         self.dims = None
         if not dims is None:
-            #self.ndim = len(dims)
             for dim in dims:
                 self.adddim(dim)
         self.fill_value = fill_value        
         if math.isnan(self.fill_value):
             self.fill_value = -9999.0
         self.proj = proj
-        
-    def __len__(self):
-        return self.array.__len__()
-
-    def __str__(self):
-        return self.array.__repr__()
-        
-    def __repr__(self):
-        return self.array.__repr__()
         
     def __getitem__(self, indices):
         #print type(indices)
@@ -69,17 +48,19 @@ class DimArray(object):
             indices = inds
             
         allint = True
-        aindex = self.array.array.getIndex()
+        aindex = self.array.getIndex()
         i = 0
         for ii in indices:
             if isinstance(ii, int):
+                if ii < 0:
+                    ii = self.shape[i] + ii
                 aindex.setDim(i, ii)
             else:
                 allint = False
                 break;
             i += 1
         if allint:
-            return self.array.array.getObject(aindex)
+            return self.array.getObject(aindex)
         
         if len(indices) != self.ndim:
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
@@ -126,7 +107,7 @@ class DimArray(object):
                         indices1.append(indices[i])
                 indices = indices1
 
-        dims = []
+        ndims = []
         ranges = []
         flips = []
         iszerodim = True
@@ -224,25 +205,25 @@ class DimArray(object):
                     n = eidx - sidx + 1
                     if n > 1:
                         dim = self.dims[i]
-                        dims.append(dim.extract(sidx, eidx, step))
+                        ndims.append(dim.extract(sidx, eidx, step))
                 nshape.append(eidx - sidx + 1 if eidx - sidx >= 0 else 0)
             else:
                 if len(k) > 1:
                     dim = self.dims[i]
-                    dims.append(dim.extract(k))
+                    ndims.append(dim.extract(k))
         
         if isempty:
             r = ArrayUtil.zeros(nshape, 'int')
             return MIArray(r)
         
         if onlyrange:
-            r = ArrayMath.section(self.array.array, ranges)
+            r = ArrayMath.section(self.array, ranges)
         else:
             if alllist:
-                r = ArrayMath.takeValues(self.array.array, ranges)
+                r = ArrayMath.takeValues(self.array, ranges)
                 return MIArray(r)
             else:
-                r = ArrayMath.take(self.array.array, ranges)
+                r = ArrayMath.take(self.array, ranges)
         if r.getSize() == 1:
             return r.getObject(0)
         else:
@@ -251,152 +232,45 @@ class DimArray(object):
             rr = Array.factory(r.getDataType(), r.getShape());
             MAMath.copy(rr, r);
             array = MIArray(rr)
-            data = DimArray(array, dims, self.fill_value, self.proj)
-            return data
-        
-    def __setitem__(self, indices, value): 
-        #self.array.__setitem__(indices, value)
-        if isinstance(indices, (MIArray, DimArray)):
-            if isinstance(value, (MIArray, DimArray)):
-                value = value.asarray()
-            ArrayMath.setValue(self.asarray(), indices.asarray(), value)
-            return None
-        
-        if not isinstance(indices, tuple):
-            inds = []
-            inds.append(indices)
-            indices = inds
-        
-        if self.ndim == 0:
-            self.array.array.setObject(0, value)
-            return None
-        
-        if len(indices) != self.ndim:
-            print 'indices must be ' + str(self.ndim) + ' dimensions!'
-            return None
-
-        ranges = []
-        flips = []        
-        onlyrange = True
-        alllist = True
-        for i in range(0, self.ndim):   
-            k = indices[i]
-            if isinstance(k, int):
-                if k < 0:
-                    k = self.shape[i] + k
-                sidx = k
-                eidx = k
-                step = 1
-                alllist = False
-            elif isinstance(k, (list, tuple, MIArray)):
-                if isinstance(k, MIArray):
-                    k = k.aslist()
-                onlyrange = False
-                ranges.append(k)
-                continue
-            else:
-                sidx = 0 if k.start is None else k.start
-                if sidx < 0:
-                    sidx = self.shape[i] + sidx
-                eidx = self.shape[i] if k.stop is None else k.stop
-                if eidx < 0:
-                    eidx = self.shape[i] + eidx
-                eidx -= 1
-                step = 1 if k.step is None else k.step
-                alllist = False
-            if step < 0:
-                step = abs(step)
-                flips.append(i)
-            rr = Range(sidx, eidx, step)
-            ranges.append(rr)
-    
-        if isinstance(value, (MIArray, DimArray)):
-            value = value.asarray()
-        if onlyrange:
-            r = ArrayMath.setSection(self.array.array, ranges, value)
-        else:
-            if alllist:
-                r = ArrayMath.setSection_List(self.array.array, ranges, value)
-            else:
-                r = ArrayMath.setSection_Mix(self.array.array, ranges, value)
-        self.array.array = r
+            data = DimArray(array, ndims, self.fill_value, self.proj)
+            return data        
         
     def __add__(self, other):
-        if isinstance(other, DimArray):      
-            r = self.array.__add__(other.array)
-        else:
-            r = self.array.__add__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__add__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __radd__(self, other):
         return DimArray.__add__(self, other)
         
     def __sub__(self, other):
-        if isinstance(other, DimArray): 
-            r = self.array.__sub__(other.array)
-        else:
-            r = self.array.__sub__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__sub__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __rsub__(self, other):
-        if isinstance(other, DimArray): 
-            r = self.array.__rsub__(other.array)
-        else:
-            r = self.array.__rsub__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__rsub__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __mul__(self, other):
-        if isinstance(other, DimArray): 
-            r = self.array.__mul__(other.array)
-        else:
-            r = self.array.__mul__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__mul__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __rmul__(self, other):
         return DimArray.__mul__(self, other)
         
     def __div__(self, other):
-        if isinstance(other, DimArray): 
-            r = self.array.__div__(other.array)
-        else:
-            r = self.array.__div__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__div__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __rdiv__(self, other):
-        if isinstance(other, DimArray): 
-            r = self.array.__rdiv__(other.array)
-        else:
-            r = self.array.__rdiv__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__rdiv__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __pow__(self, other):
-        if isinstance(other, DimArray): 
-            r = self.array.__pow__(other.array)
-        else:
-            r = self.array.__pow__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__pow__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __rpow__(self, other):
-        if isinstance(other, DimArray): 
-            r = self.array.__rpow__(other.array)
-        else:
-            r = self.array.__rpow__(other)
-        if r is None:
-            raise ValueError('Dimension missmatch, can not broadcast!')
+        r = super(DimArray, self).__rpow__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __neg__(self):
@@ -404,89 +278,52 @@ class DimArray(object):
         return r
         
     def __lt__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__lt__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__lt__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __le__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__le__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__le__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __eq__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__eq__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__eq__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __ne__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__ne__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__ne__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __gt__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__gt__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__gt__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __ge__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__ge__(other), self.dims, self.fill_value, self.proj)
-        return r   
+        r = super(DimArray, self).__ge__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)  
 
     def __and__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__and__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__and__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __or__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__or__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__or__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __xor__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__xor__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__xor__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __invert__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__invert__(other), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__invert__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __lshift__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__lshift__(other), self.dims, self.fill_value, self.proj)
-        return r        
+        r = super(DimArray, self).__lshift__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)      
         
     def __rshift__(self, other):
-        if isinstance(other, DimArray):
-            other = other.array
-        r = DimArray(self.array.__rshift__(other), self.dims, self.fill_value, self.proj)
-        return r
-        
-    def __iter__(self):
-        """
-        provide iteration over the values of the array
-        """
-        self.array.idx = -1
-        return self
-        
-    def next(self):
-        self.array.idx += 1
-        if self.array.idx >= self.size:
-            raise StopIteration()        
-        return self.array.array.getObject(self.array.idx)
+        r = super(DimArray, self).__rshift__(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
     
     def in_values(self, other):
         '''
@@ -497,22 +334,19 @@ class DimArray(object):
         
         :returns: (*array*) The array with element value of 1 or 0.
         '''
-        if not isinstance(other, (list, tuple)):
-            other = other.aslist()
-        r = DimArray(MIArray(ArrayMath.inValues(self.asarray(), other)), self.dims, self.fill_value, self.proj)
-        return r
-        
-    def contains_nan(self):
-        '''
-        Check if the array contains nan value.
-        
-        :returns: (*boolean*) True if contains nan, otherwise return False.
-        '''
-        return ArrayMath.containsNaN(self.array.array)
+        r = super(DimArray, self).in_values(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def astype(self, dtype):
-        r = DimArray(self.array.astype(dtype), self.dims, self.fill_value, self.proj)
-        return r
+        '''
+        Convert to another data type.
+        
+        :param dtype: (*string*) Data type.
+        
+        :returns: (*array*) Converted array.
+        '''
+        r = super(DimArray, self).astype(other)
+        return DimArray(r, self.dims, self.fill_value, self.proj)
     
     def value(self, indices):
         #print type(indices)
@@ -570,8 +404,8 @@ class DimArray(object):
                 dim = self.dims[i]
                 dims.append(dim.extract(sidx, eidx, step))
                     
-        #r = ArrayMath.section(self.array.array, origin, size, stride)
-        r = ArrayMath.section(self.array.array, ranges)
+        #r = ArrayMath.section(self.array, origin, size, stride)
+        r = ArrayMath.section(self.array, ranges)
         for i in flips:
             r = r.flip(i)
         rr = Array.factory(r.getDataType(), r.getShape());
@@ -580,16 +414,15 @@ class DimArray(object):
         data = DimArray(array, dims, self.fill_value, self.proj)
         return data
     
-    def getsize():
-        if name == 'size':
-            sizestr = str(self.shape[0])
-            if self.ndim > 1:
-                for i in range(1, self.ndim):
-                    sizestr = sizestr + '*%s' % self.shape[i]
-            return sizestr
-    
     # get dimension length
     def dimlen(self, idx=0):
+        '''
+        Get dimension length.
+        
+        :param idx: (*int*) Dimension index.        
+        
+        :returns: (*int*) Dimension length.
+        '''
         return self.dims[idx].getLength()
         
     def dimvalue(self, idx=0, convert=False):
@@ -612,7 +445,13 @@ class DimArray(object):
             return MIArray(ArrayUtil.array(self.dims[idx].getDimValue()))
         
     def setdimvalue(self, idx, dimvalue):
-        if isinstance(dimvalue, (MIArray, DimArray)):
+        '''
+        Set dimension value.
+        
+        :param idx: (*int*) Dimension index.
+        :param dimvalue: (*array_like*) Dimension value.
+        '''
+        if isinstance(dimvalue, MIArray):
             dimvalue = dimvalue.aslist()
         self.dims[idx].setDimValues(dimvalue)
         
@@ -635,6 +474,13 @@ class DimArray(object):
         self.dims[idx].setDimType(dtype)
         
     def adddim(self, dimvalue, dimtype=None, index=None):
+        '''
+        Add a dimension.
+        
+        :param dimvalue: (*array_like*) Dimension value.
+        :param dimtype: (*string*) Dimension type.
+        :param index: (*int*) Index to be inserted.
+        '''
         if isinstance(dimvalue, Dimension):
             dim = dimvalue
         else:
@@ -664,6 +510,8 @@ class DimArray(object):
     def addtdim(self, t):
         '''
         Add a time dimension as first dimension.
+        
+        :param t: (*array_like*) datetime array.
         '''
         if self.tdim() is None:
             dim = Dimension(DimensionType.T)
@@ -678,30 +526,47 @@ class DimArray(object):
             self.shape = self.array.shape
         
     def xdim(self):
+        '''
+        Get x dimension.
+        '''
         for dim in self.dims:
             if dim.getDimType() == DimensionType.X:
                 return dim        
         return None
         
     def ydim(self):
+        '''
+        Get y dimension.
+        '''
         for dim in self.dims:
             if dim.getDimType() == DimensionType.Y:
                 return dim        
         return None
         
     def zdim(self):
+        '''
+        Get z dimension.
+        '''
         for dim in self.dims:
             if dim.getDimType() == DimensionType.Z:
                 return dim        
         return None
         
     def tdim(self):
+        '''
+        Get time dimension.
+        '''
         for dim in self.dims:
             if dim.getDimType() == DimensionType.T:
                 return dim        
         return None
         
     def islondim(self, idx=0):
+        '''
+        Check a dimension is a longitude dimension or not.
+        
+        :param idx: (*int*) Dimension index.
+        '''
         dim = self.dims[idx]
         if dim.getDimType() == DimensionType.X and self.proj.isLonLat():
             return True
@@ -709,6 +574,11 @@ class DimArray(object):
             return False
             
     def islatdim(self, idx=0):
+        '''
+        Check a dimension is a latitude dimension or not.
+        
+        :param idx: (*int*) Dimension index.
+        '''
         dim = self.dims[idx]
         if dim.getDimType() == DimensionType.Y and self.proj.isLonLat():
             return True
@@ -716,9 +586,19 @@ class DimArray(object):
             return False
             
     def islonlatdim(self, idx=0):
+        '''
+        Check a dimension is a longitude or latitude dimension or not.
+        
+        :param idx: (*int*) Dimension index.
+        '''
         return self.islondim(idx) or self.islatdim(idx)
             
     def istimedim(self, idx=0):
+        '''
+        Check a dimension is a time dimension or not.
+        
+        :param idx: (*int*) Dimension index.
+        '''
         dim = self.dims[idx]
         if dim.getDimType() == DimensionType.T:
             return True
@@ -728,13 +608,13 @@ class DimArray(object):
     def asgriddata(self):
         xdata = self.dims[1].getDimValue()
         ydata = self.dims[0].getDimValue()
-        gdata = GridData(self.array.array, xdata, ydata, self.fill_value, self.proj)
+        gdata = GridData(self.array, xdata, ydata, self.fill_value, self.proj)
         return PyGridData(gdata)
         
     def asgridarray(self):
         xdata = self.dims[1].getDimValue()
         ydata = self.dims[0].getDimValue()
-        gdata = GridArray(self.array.array, xdata, ydata, self.fill_value, self.proj)
+        gdata = GridArray(self.array, xdata, ydata, self.fill_value, self.proj)
         return gdata
         
     def abs(self):
@@ -744,111 +624,51 @@ class DimArray(object):
         :returns: An array containing the absolute value of each element in x. 
             For complex input, a + ib, the absolute value is \sqrt{ a^2 + b^2 }.
         '''
-        return DimArray(self.array.abs(), self.dims, self.fill_value, self.proj)
+        r = super(DimArray, self).abs()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def sqrt(self):
-        r = DimArray(self.array.sqrt(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).sqrt()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
     
     def sin(self):
-        r = DimArray(self.array.sin(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).sin()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def cos(self):
-        r = DimArray(self.array.cos(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).cos()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def tan(self):
-        r = DimArray(self.array.tan(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).tan()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def asin(self):
-        r = DimArray(self.array.asin(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).asin()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def acos(self):
         '''
         Calculate acos value.
         '''
-        r = DimArray(self.array.acos(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).acos()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def atan(self):
-        r = DimArray(self.array.atan(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).atan()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def exp(self):
-        r = DimArray(self.array.exp(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).exp()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def log(self):
-        r = DimArray(self.array.log(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).log()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def log10(self):
-        r = DimArray(self.array.log10(), self.dims, self.fill_value, self.proj)
-        return r
-        
-    def min(self):
-        return self.array.min()
-        
-    def max(self):
-        return self.array.max()
-        
-    def argmin(self, axis=None):
-        '''
-        Returns the indices of the minimum values along an axis.
-        
-        :param axis: (*int*) By default, the index is into the flattened array, otherwise 
-            along the specified axis.
-            
-        :returns: Array of indices into the array. It has the same shape as a.shape with the 
-            dimension along axis removed.
-        '''
-        return self.array.argmin(axis)
-            
-    def argmax(self, axis=None):
-        '''
-        Returns the indices of the minimum values along an axis.
-        
-        :param axis: (*int*) By default, the index is into the flattened array, otherwise 
-            along the specified axis.
-            
-        :returns: Array of indices into the array. It has the same shape as a.shape with the 
-            dimension along axis removed.
-        '''
-        return self.array.argmax(axis)
-        
-    def sum(self):
-        return self.array.sum()
-        
-    def prod(self):
-        '''
-        Return the product of array elements.
-        
-        :returns: (*float*) Produce value.
-        '''
-        return self.array.prod()
-        
-    def ave(self):
-        return self.array.ave()
-        
-    def median(self, axis=None):
-        return self.array.median(axis)
-        
-    def setdata(self, v, x=None, y=None, method='mean'):
-        '''
-        Set data values according the locations.
-        
-        :param v: (*array_like*) The data array.
-        :param x: (*array_like*) X coordinate array.
-        :param y: (*array_like*) Y coordinate array.
-        :param method: (*string*) Method, ['mean' | 'max' | 'min' | 'count'].               
-        '''
-        if x is None:
-            x = self.dimvalue(1)
-            y = self.dimvalue(0)
-        
+        r = super(DimArray, self).log10()
+        return DimArray(r, self.dims, self.fill_value, self.proj)        
         
     def inpolygon(self, polygon):
         #x = self.dims[1].getDimValue()
@@ -862,9 +682,9 @@ class DimArray(object):
                 x_p = x_p.aslist()
             if isinstance(y_p, MIArray):
                 y_p = y_p.aslist()
-            r = self.array.inpolygon(x, y, x_p, y_p)
+            r = self.inpolygon(x, y, x_p, y_p)
         else:
-            r = self.array.inpolygon(x, y, polygon)
+            r = self.inpolygon(x, y, polygon)
         r = DimArray(r, self.dims, self.fill_value, self.proj)
         return r
         
@@ -880,31 +700,6 @@ class DimArray(object):
             r = ArrayMath.maskout(self.asarray(), x, y, mask)
             r = DimArray(MIArray(r), self.dims, self.fill_value, self.proj)
             return r
-     
-    def aslist(self):
-        return self.array.aslist()
-        
-    def tolist(self):
-        '''
-        Convert to a list
-        '''
-        return self.array.tolist()
-        
-    def index(self, v):
-        '''
-        Get index of a value in the array.
-        
-        :param v: (*object*) Value object.
-        
-        :returns: (*int*) Value index.
-        '''
-        return self.tolist().index(v)
-        
-    def asarray(self):
-        return self.array.array
-        
-    def reshape(self, *args):
-        return self.array.reshape(*args)
         
     def transpose(self):
         '''
@@ -935,32 +730,10 @@ class DimArray(object):
         
         :returns: Inverse matrix array.
         '''
-        r = self.array.I
+        r = super(DimArray, self).inv()
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
-    I = property(inv)
-        
-    def flatten(self):
-        '''
-        Return a copy of the array collapsed into one dimension.
-        
-        :returns: (*MIArray*) A copy of the input array, flattened to one dimension.
-        '''
-        r = self.array.reshape(int(self.array.array.getSize()))
-        return r
-        
-    def repeat(self, repeats, axis=None):
-        '''
-        Repeat elements of an array.
-        
-        :param repeats: (*int or list of ints*) The number of repetitions for each 
-            element. repeats is broadcasted to fit the shape of the given axis.
-        :param axis: (*int*) The axis along which to repeat values. By default, use 
-            the flattened input array, and return a flat output array.
-        
-        :returns: (*array_like*) Repeated array.
-        '''
-        return self.array.repeat(repeats, axis)
+    I = property(inv)                
         
     def lonflip(self):
         '''
@@ -1104,7 +877,7 @@ class DimArray(object):
             toproj = self.proj
         
         if x is None or y is None:
-            pr = ArrayUtil.reproject(self.array.array, xx, yy, self.proj, toproj)
+            pr = ArrayUtil.reproject(self.array, xx, yy, self.proj, toproj)
             r = pr[0]
             x = pr[1]
             y = pr[2]
@@ -1123,19 +896,19 @@ class DimArray(object):
         else:
             method = ResampleMethods.NearestNeighbor
         if isinstance(x, list):
-            r = ArrayUtil.reproject(self.array.array, xx, yy, x, y, self.proj, toproj, self.fill_value, method)
+            r = ArrayUtil.reproject(self.array, xx, yy, x, y, self.proj, toproj, self.fill_value, method)
         elif isinstance(x, MIArray):
             if x.ndim == 1:
-                r = ArrayUtil.reproject(self.array.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value, method)
+                r = ArrayUtil.reproject(self.array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value, method)
             else:
-                r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
+                r = ArrayUtil.reproject(self.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
         else:
-            r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
-        #r = ArrayUtil.reproject(self.array.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
+            r = ArrayUtil.reproject(self.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
+        #r = ArrayUtil.reproject(self.array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
         return MIArray(r)
             
     def join(self, b, dimidx):
-        r = ArrayMath.join(self.array.array, b.array.array, dimidx)
+        r = ArrayMath.join(self.array, b.array, dimidx)
         dima = self.dimvalue(dimidx)
         dimb = b.dimvalue(dimidx)
         dimr = []

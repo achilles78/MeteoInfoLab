@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
-    <RecentFolder Folder="D:\Temp\test"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\wind"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
-    <RecentFolder Folder="D:\Working\MIScript"/>
-    <RecentFolder Folder="D:\Working\MIScript\mywork"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\meteo">
     <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
@@ -16,21 +8,25 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
-      <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\GPM_Swath_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\pcolor_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
+      <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\read_aqi_test.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
-      <RecentFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\GPM_Swath_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\pcolor_1.py"/>
+      <RecentFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
+      <RecentFile File="D:\Working\MIScript\mywork\aqi_data\read_aqi_test.py"/>
     </RecentFiles>
   </File>
   <Font>
