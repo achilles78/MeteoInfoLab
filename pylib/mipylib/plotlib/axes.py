@@ -8,6 +8,7 @@
 
 from org.meteoinfo.chart import ChartText3D
 from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot, Plot3D, GraphicFactory
+from org.meteoinfo.data import ArrayUtil
 from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import LegendManage, BreakTypes
 from org.meteoinfo.shape import ShapeTypes, Graphic
@@ -283,6 +284,50 @@ class Axes(object):
         top = kwargs.pop('top', None)
         if not top is None:
             gridline.setTop(top)
+            
+    def pcolor(self, *args, **kwargs):
+        '''
+        Draw a pseudocolor plot.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        
+        :returns: (*GraphicCollection*) Polygon graphic collection.
+        '''
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        n = len(args) 
+        if n <= 2:
+            a = args[0]
+            y = a.dimvalue(0)
+            x = a.dimvalue(1)
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            args = args[3:]
+        if a.ndim == 2 and x.ndim == 1:            
+            x, y = minum.meshgrid(x, y)            
+        ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)   
+        ls = ls.convertTo(ShapeTypes.Polygon)
+        plotutil.setlegendscheme(ls, **kwargs)
+        graphics = GraphicFactory.createPColorPolygons(x.asarray(), y.asarray(), a.asarray(), ls)            
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            self.axes.setExtent(graphics.getExtent())
+            self.axes.setDrawExtent(graphics.getExtent())
+            miplot.draw_if_interactive()
+        return graphics
         
 
 ##############################################        
@@ -434,6 +479,80 @@ class MapAxes(Axes):
         :param mfidx: (*int*) Map frame index.
         '''
         self.axes.loadMIProjectFile(mipfn, mfidx)
+        
+    def pcolor(self, *args, **kwargs):
+        """
+        Create a pseudocolor plot of a 2-D array in a MapAxes.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
+        :param order: (*int*) Z-order of created layer for display.
+        :param select: (*boolean*) Set the return layer as selected layer or not.
+        
+        :returns: (*VectoryLayer*) Polygon VectoryLayer created from array data.
+        """    
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        proj = kwargs.pop('proj', None)    
+        order = kwargs.pop('order', None)
+        n = len(args) 
+        if n <= 2:
+            a = args[0]
+            y = a.dimvalue(0)
+            x = a.dimvalue(1)
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            args = args[3:]
+            
+        if a.ndim == 2 and x.ndim == 1:            
+            x, y = minum.meshgrid(x, y)  
+            
+        ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)   
+        ls = ls.convertTo(ShapeTypes.Polygon)
+        plotutil.setlegendscheme(ls, **kwargs)
+            
+        if proj is None or proj.isLonLat():
+            lonlim = 90
+        else:
+            lonlim = 0
+            x, y = minum.project(x, y, toproj=proj)
+        layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
+        #layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls)
+        if not proj is None:
+            layer.setProjInfo(proj)
+            
+        # Add layer
+        visible = kwargs.pop('visible', True)
+        if visible:
+            shapetype = layer.getShapeType()
+            if order is None:
+                if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
+                    self.add_layer(layer, 0)
+                else:
+                    self.add_layer(layer)
+            else:
+                self.add_layer(layer, order)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+            select = kwargs.pop('select', True)
+            if select:
+                self.axes.setSelectedLayer(layer)
+                
+            miplot.draw_if_interactive()
+        return MILayer(layer)
             
 ###############################################
 class PolarAxes(Axes):

@@ -58,10 +58,10 @@ __all__ = [
     'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
     'figure','figsize','patch','rectangle','fill_between','fill_betweenx','webmap','geoshow','gifaddframe','gifanimation','giffinish',
     'grid','gridfm','hist','imshow','imshowm','legend','left_title','loglog','makecolors',
-    'makelegend','makesymbolspec','map','masklayer','pie','plot','plot3','plotm','quiver',
+    'makelegend','makesymbolspec','map','masklayer','pcolor','pcolorm','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','right_title','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
-    'surf','surfacem','surfacem_1','text','title','twinx','weatherspec','worldmap','xaxis',
+    'surf','text','title','twinx','weatherspec','worldmap','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zaxis','zlabel','zlim','zticks',
     'repaint','isinteractive'
     ]
@@ -4065,7 +4065,37 @@ def imshow(*args, **kwargs):
     if ls is None:
         return igraphic
     else:
-        return ls    
+        return ls  
+
+def pcolor(*args, **kwargs):
+    '''
+    Create a pseudocolor plot of a 2-D array.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    
+    :returns: (*GraphicCollection*) Polygon graphic collection.
+    '''    
+    global gca
+    if chartpanel is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    return gca.pcolor(*args, **kwargs)
       
 def contour(*args, **kwargs):
     """
@@ -5047,46 +5077,9 @@ def gridfm(*args, **kwargs):
     gdata = None
     return MILayer(layer)
     
-def surfacem_1(*args, **kwargs):
-    plot = gca
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    proj = kwargs.pop('proj', None)    
-    order = kwargs.pop('order', None)
-    n = len(args) 
-    if n <= 2:
-        if isinstance(args[0], PyStationData):
-            gdata = args[0]
-        else:
-            gdata = minum.asgriddata(args[0])
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        if a.ndim == 2 and a.asarray().getSize() != x.asarray().getSize():            
-            gdata = minum.asgriddata(a, x, y, fill_value)
-        else:
-            if not plot.getProjInfo().isLonLat():
-                x, y = minum.project(x, y, plot.getProjInfo())
-            a, x_g, y_g = minum.griddata([x, y], a, method='surface')
-            gdata = minum.asgriddata(a, x_g, y_g, fill_value)
-        
-        args = args[3:]
-    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    symbolspec = kwargs.pop('symbolspec', None)
-    if symbolspec is None:
-        ls = plotutil.setlegendscheme_point(ls, **kwargs)    
-          
-    layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=plot.getProjInfo(), order=order)
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    gdata = None
-    return MILayer(layer)
-    
-def surfacem(*args, **kwargs):
+def pcolorm(*args, **kwargs):
     """
-    Plot irregular grid data as polygons.
+    Create a pseudocolor plot of a 2-D array in a MapAxes.
     
     :param x: (*array_like*) Optional. X coordinate array.
     :param y: (*array_like*) Optional. Y coordinate array.
@@ -5106,56 +5099,17 @@ def surfacem(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Polygon VectoryLayer created from array data.
     """    
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    proj = kwargs.pop('proj', None)    
-    order = kwargs.pop('order', None)
-    n = len(args) 
-    if n <= 2:
-        a = args[0]
-        y = a.dimvalue(0)
-        x = a.dimvalue(1)
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        args = args[3:]
-    if a.ndim == 2 and x.ndim == 1:            
-        x, y = minum.meshgrid(x, y)            
-    ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)   
-    ls = ls.convertTo(ShapeTypes.Polygon)
-    plotutil.setlegendscheme(ls, **kwargs)
+    global gca
+    if chartpanel is None:
+        figure()
         
-    if proj is None or proj.isLonLat():
-        lonlim = 90
+    if gca is None:    
+        gca = axesm()
     else:
-        lonlim = 0
-        x, y = minum.project(x, y, toproj=proj)
-    layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls, lonlim)
-    #layer = ArrayUtil.meshLayer(x.asarray(), y.asarray(), a.asarray(), ls)
-    if not proj is None:
-        layer.setProjInfo(proj)
-        
-    # Add layer
-    visible = kwargs.pop('visible', True)
-    if visible:
-        global gca
-        shapetype = layer.getShapeType()
-        if order is None:
-            if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-                gca.add_layer(layer, 0)
-            else:
-                gca.add_layer(layer)
-        else:
-            gca.add_layer(layer, order)
-        gca.axes.setDrawExtent(layer.getExtent().clone())
-        gca.axes.setExtent(layer.getExtent().clone())
-        select = kwargs.pop('select', True)
-        if select:
-            gca.axes.setSelectedLayer(layer)
+        if gca.axestype != 'map':
+            gca = axesm()
             
-        draw_if_interactive()
-    return MILayer(layer)
+    return gca.pcolor(*args, **kwargs)
     
 def quiverm(*args, **kwargs):
     """

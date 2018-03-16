@@ -255,71 +255,71 @@ class DimArray(object):
             return data
         
     def __setitem__(self, indices, value): 
-        self.array.__setitem__(indices, value)
-        # if isinstance(indices, (MIArray, DimArray)):
-            # if isinstance(value, (MIArray, DimArray)):
-                # value = value.asarray()
-            # ArrayMath.setValue(self.asarray(), indices.asarray(), value)
-            # return None
+        #self.array.__setitem__(indices, value)
+        if isinstance(indices, (MIArray, DimArray)):
+            if isinstance(value, (MIArray, DimArray)):
+                value = value.asarray()
+            ArrayMath.setValue(self.asarray(), indices.asarray(), value)
+            return None
         
-        # if not isinstance(indices, tuple):
-            # inds = []
-            # inds.append(indices)
-            # indices = inds
+        if not isinstance(indices, tuple):
+            inds = []
+            inds.append(indices)
+            indices = inds
         
-        # if self.ndim == 0:
-            # self.array.array.setObject(0, value)
-            # return None
+        if self.ndim == 0:
+            self.array.array.setObject(0, value)
+            return None
         
-        # if len(indices) != self.ndim:
-            # print 'indices must be ' + str(self.ndim) + ' dimensions!'
-            # return None
+        if len(indices) != self.ndim:
+            print 'indices must be ' + str(self.ndim) + ' dimensions!'
+            return None
 
-        # ranges = []
-        # flips = []        
-        # onlyrange = True
-        # alllist = True
-        # for i in range(0, self.ndim):   
-            # k = indices[i]
-            # if isinstance(k, int):
-                # if k < 0:
-                    # k = self.shape[i] + k
-                # sidx = k
-                # eidx = k
-                # step = 1
-                # alllist = False
-            # elif isinstance(k, (list, tuple, MIArray)):
-                # if isinstance(k, MIArray):
-                    # k = k.aslist()
-                # onlyrange = False
-                # ranges.append(k)
-                # continue
-            # else:
-                # sidx = 0 if k.start is None else k.start
-                # if sidx < 0:
-                    # sidx = self.shape[i] + sidx
-                # eidx = self.shape[i] if k.stop is None else k.stop
-                # if eidx < 0:
-                    # eidx = self.shape[i] + eidx
-                # eidx -= 1
-                # step = 1 if k.step is None else k.step
-                # alllist = False
-            # if step < 0:
-                # step = abs(step)
-                # flips.append(i)
-            # rr = Range(sidx, eidx, step)
-            # ranges.append(rr)
+        ranges = []
+        flips = []        
+        onlyrange = True
+        alllist = True
+        for i in range(0, self.ndim):   
+            k = indices[i]
+            if isinstance(k, int):
+                if k < 0:
+                    k = self.shape[i] + k
+                sidx = k
+                eidx = k
+                step = 1
+                alllist = False
+            elif isinstance(k, (list, tuple, MIArray)):
+                if isinstance(k, MIArray):
+                    k = k.aslist()
+                onlyrange = False
+                ranges.append(k)
+                continue
+            else:
+                sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.shape[i] + sidx
+                eidx = self.shape[i] if k.stop is None else k.stop
+                if eidx < 0:
+                    eidx = self.shape[i] + eidx
+                eidx -= 1
+                step = 1 if k.step is None else k.step
+                alllist = False
+            if step < 0:
+                step = abs(step)
+                flips.append(i)
+            rr = Range(sidx, eidx, step)
+            ranges.append(rr)
     
-        # if isinstance(value, (MIArray, DimArray)):
-            # value = value.asarray()
-        # if onlyrange:
-            # r = ArrayMath.setSection(self.array.array, ranges, value)
-        # else:
-            # if alllist:
-                # r = ArrayMath.setSection_List(self.array.array, ranges, value)
-            # else:
-                # r = ArrayMath.setSection_Mix(self.array.array, ranges, value)
-        # self.array.array = r
+        if isinstance(value, (MIArray, DimArray)):
+            value = value.asarray()
+        if onlyrange:
+            r = ArrayMath.setSection(self.array.array, ranges, value)
+        else:
+            if alllist:
+                r = ArrayMath.setSection_List(self.array.array, ranges, value)
+            else:
+                r = ArrayMath.setSection_Mix(self.array.array, ranges, value)
+        self.array.array = r
         
     def __add__(self, other):
         if isinstance(other, DimArray):      
