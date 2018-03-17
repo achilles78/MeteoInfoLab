@@ -12,7 +12,7 @@ from org.meteoinfo.shape import ShapeUtil
 from org.meteoinfo.legend import BreakTypes
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.data import ArrayMath
-from org.meteoinfo.data.mapdata import MapDataManage
+from org.meteoinfo.data.mapdata import MapDataManage, AttributeTable
 
 import milayer
 from milayer import MILayer
@@ -23,8 +23,8 @@ import mipylib.migl as migl
 from java.util import ArrayList
 
 __all__ = [
-    'arrayinpolygon','distance','georead','geotiffread','maplayer','inpolygon','maskout',
-    'polyarea','polygon','rmaskout','shaperead'
+    'arrayinpolygon','convert_encoding_dbf','distance','georead','geotiffread',
+    'maplayer','inpolygon','maskout','polyarea','polygon','rmaskout','shaperead'
     ]
 
 def shaperead(fn, encoding=None):   
@@ -95,6 +95,24 @@ def geotiffread(filename):
     geotiff.read()
     r = geotiff.readArray()
     return MIArray(r)
+    
+def convert_encoding_dbf(filename, fromencoding, toencoding):
+    '''
+    Convert encoding of a dBase file (.dbf).
+    
+    :param filename: (*string*) The dBase file name.
+    :param fromencoding: (*string*) From encoding.
+    :param toencoding: (*string*) To encoding.
+    '''
+    #Read dBase file
+    atable = AttributeTable()
+    atable.setEncoding(fromencoding)
+    atable.openDBF(filename)
+    atable.fill(atable.getNumRecords())
+    
+    #Save dBase file
+    atable.setEncoding(toencoding)
+    atable.save()
     
 def maplayer(shapetype='polygon'):
     '''
