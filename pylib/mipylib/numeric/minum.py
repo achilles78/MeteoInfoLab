@@ -18,8 +18,6 @@ from org.meteoinfo.data.mapdata import MapDataManage
 from org.meteoinfo.data.mapdata.geotiff import GeoTiff
 from org.meteoinfo.data.analysis import MeteoMath
 from org.meteoinfo.geoprocess import GeoComputation
-from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
-from org.meteoinfo.global import PointD
 from org.meteoinfo.shape import ShapeUtil
 from org.meteoinfo.legend import BreakTypes
 from ucar.nc2 import NetcdfFileWriter
@@ -54,7 +52,7 @@ __all__ = [
     'interpn','isarray','isnan','linregress','linspace','log','log10',
     'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
     'nonzero','ones','ones_like','pol2cart','polyval','power',
-    'project','projectxy','projinfo','radians','reshape','repeat',
+    'radians','reshape','repeat',
     'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','std','sum','tan',
     'tile','transpose','trapz','vdot','unravel_index',
     'where','zeros','zeros_like'
@@ -1691,121 +1689,6 @@ def asstationdata(data, x, y, fill_value=-9999.0):
     stdata = StationData(data.asarray(), x.asarray(), y.asarray(), fill_value)
     return PyStationData(stdata)
     
-def polygon(x, y = None):
-    '''
-    Create polygon from coordinate data.
-    
-    :param x: (*array_like*) X coordinate array. If y is ``None``, x should be 2-D array contains x and y.
-    :param y: (*array_like*) Y coordinate array.
-    
-    :returns: (*PolygonShape*) Created polygon.
-    '''
-    if y is None:
-        polygon = ShapeUtil.createPolygonShape(x)
-    else:
-        if isinstance(x, MIArray):
-            x = x.aslist()
-        if isinstance(y, MIArray):
-            y = y.aslist()
-        polygon = ShapeUtil.createPolygonShape(x, y)
-    return polygon
-    
-def inpolygon(x, y, polygon):
-    '''
-    Judge if a point is inside a polygon or not.
-    
-    :param x: (*float*) X coordinate of the point.
-    :param y: (*float*) Y coordinate of the point.
-    :param polygon: (*PolygonShape*) The polygon.
-    
-    :returns: (*boolean*) Inside or not.
-    '''
-    return GeoComputation.pointInPolygon(polygon, x, y)
-    
-def distance(x, y, islonlat=False):
-    """
-    Get distance of a line.
-    
-    :param x: (*array_like*) X coordinates.
-    :param y: (*array_like*) Y coordinates.
-    :param islonlat: (*boolean*) x/y is longitude/latitude or not.
-    
-    :returns: Distance, meters for lon/lat.
-    """
-    if isinstance(x, MIArray):
-        x = x.aslist()
-    if isinstance(y, MIArray):
-        y = y.aslist()
-    r = GeoComputation.getDistance(x, y, islonlat)
-    return r
-    
-def polyarea(*args, **kwargs):
-    '''
-    Calculate area of polygon.
-    
-    Parameter is a polygon object or x, y coordinate arrays.
-    
-    :return: The area of the polygon.
-    '''
-    islonlat = kwargs.pop('islonlat', False)
-    if len(args) == 1:
-        if islonlat:
-            r = args[0].getSphericalArea()
-        else:
-            r = args[0].getArea()
-    else:
-        x = args[0]
-        y = args[1]
-        if isinstance(x, MIArray):
-            x = x.aslist()
-        if isinstance(y, MIArray):
-            y = y.aslist()
-        r = GeoComputation.getArea(x, y, islonlat)
-    return r
-    
-def maskout(data, mask, x=None, y=None):
-    """
-    Maskout data by polygons - NaN values of elements outside polygons.
-    
-    :param mask: (*list*) Polygon list as maskout borders.
-    :param data: (*array_like*) Array data for maskout.
-    :param x: (*array_like*) X coordinate array.
-    :param y: (*array_like*) Y coordinate array.
-
-    :returns: (*array_like*) Maskouted data array.
-    """
-    if mask is None:
-        return data
-    elif isinstance(mask, MIArray):
-        r = ArrayMath.maskout(data.asarray(), mask.asarray())
-        return MIArray(r)
-    if x is None or y is None:
-        if isinstance(data, DimArray):
-            return data.maskout(mask)
-        else:
-            return None
-    else:
-        if not isinstance(mask, (list, ArrayList)):
-            mask = [mask]
-        r = ArrayMath.maskout(data.asarray(), x.asarray(), y.asarray(), mask)
-        return MIArray(r)
-        
-def rmaskout(data, x, y, mask):
-    """
-    Maskout data by polygons - the elements outside polygons will be removed
-    
-    :param data: (*array_like*) Array data for maskout.
-    :param x: (*array_like*) X coordinate array.
-    :param y: (*array_like*) Y coordinate array.
-    :param mask: (*list*) Polygon list as maskout borders.
-    
-    :returns: (*list*) Maskouted data, x and y array list.
-    """
-    if not isinstance(mask, (list, ArrayList)):
-        mask = [mask]
-    r = ArrayMath.maskout_Remove(data.asarray(), x.asarray(), y.asarray(), mask)
-    return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])  
-
 def interp2d(*args, **kwargs):
     """
     Interpolate over a 2-D grid.
@@ -1945,118 +1828,6 @@ def griddata(points, values, xi=None, **kwargs):
     else:
         return MIArray(r), x_g, y_g
 
-def projinfo(proj='longlat', **kwargs):
-    """
-    Create a projection object with Proj.4 parameters (http://proj4.org/)
-    
-    :param proj: (*string*) Projection name.
-    :param lat_0: (*float*) Latitude of origin.
-    :param lon_0: (*float*) Central meridian.
-    :param lat_1: (*float*) Latitude of first standard paralle.
-    :param lat_2: (*float*) Latitude of second standard paralle.
-    :param lat_ts: (*float*) Latitude of true scale.
-    :param k: (*float*) Scaling factor.
-    :param x_0: (*float*) False easting.
-    :param y_0: (*float*) False northing.
-    :param h: (*float*) Height from earth surface.
-    
-    :returns: (*ProjectionInfo*) ProjectionInfo object.
-    """
-    if proj == 'longlat' and len(kwargs) == 0:
-        return KnownCoordinateSystems.geographic.world.WGS1984
-        
-    origin = kwargs.pop('origin', (0, 0, 0))    
-    lat_0 = origin[0]
-    lon_0 = origin[1]
-    lat_0 = kwargs.pop('lat_0', lat_0)
-    lon_0 = kwargs.pop('lon_0', lon_0)
-    lat_ts = kwargs.pop('truescalelat', 0)
-    lat_ts = kwargs.pop('lat_ts', lat_ts)
-    k = kwargs.pop('scalefactor', 1)
-    k = kwargs.pop('k', k)
-    paralles = kwargs.pop('paralles', (30, 60))
-    lat_1 = paralles[0]
-    if len(paralles) == 2:
-        lat_2 = paralles[1]
-    else:
-        lat_2 = lat_1
-    lat_1 = kwargs.pop('lat_1', lat_1)
-    lat_2 = kwargs.pop('lat_2', lat_2)
-    x_0 = kwargs.pop('falseeasting', 0)
-    y_0 = kwargs.pop('falsenorthing', 0)
-    x_0 = kwargs.pop('x_0', x_0)
-    y_0 = kwargs.pop('y_0', y_0)
-    h = kwargs.pop('h', None)
-    projstr = '+proj=' + proj \
-        + ' +lat_0=' + str(lat_0) \
-        + ' +lon_0=' + str(lon_0) \
-        + ' +lat_1=' + str(lat_1) \
-        + ' +lat_2=' + str(lat_2) \
-        + ' +lat_ts=' + str(lat_ts) \
-        + ' +k=' + str(k) \
-        + ' +x_0=' + str(x_0) \
-        + ' +y_0=' + str(y_0)
-    if not h is None:
-        projstr = projstr + ' +h=' + str(h)
-        
-    return ProjectionInfo(projstr)     
-    
-def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, toproj=KnownCoordinateSystems.geographic.world.WGS1984):
-    """
-    Project geographic coordinates from one projection to another.
-    
-    :param x: (*array_like*) X coordinate values for projection.
-    :param y: (*array_like*) Y coordinate values for projection.
-    :param fromproj: (*ProjectionInfo*) From projection. Default is longlat projection.
-    :param toproj: (*ProjectionInfo*) To projection. Default is longlat projection.
-    
-    :returns: (*array_like*, *array_like*) Projected geographic coordinates.
-    """
-    if isinstance(fromproj, str):
-        fromproj = ProjectionInfo(fromproj)
-    if isinstance(toproj, str):
-        toproj = ProjectionInfo(toproj)
-    if isinstance(x, (tuple, list)):
-        x = array(x)
-    if isinstance(y, (tuple, list)):
-        y = array(y)
-    if isinstance(x, MIArray):
-        outxy = ArrayUtil.reproject(x.asarray(), y.asarray(), fromproj, toproj)
-        return MIArray(outxy[0]), MIArray(outxy[1])
-    else:
-        inpt = PointD(x, y)
-        outpt = Reproject.reprojectPoint(inpt, fromproj, toproj)
-        return outpt.X, outpt.Y
-    
-def projectxy(lon, lat, xnum, ynum, dx, dy, toproj, fromproj=None, pos='lowerleft'):
-    """
-    Get projected x, y coordinates by projection and a given lon, lat coordinate.
-    
-    :param lon: (*float*) Longitude value.
-    :param lat: (*float*) Latitude value.
-    :param xnum: (*int*) X number.
-    :param ynum: (*int*) Y number.
-    :param dx: (*float*) X delta.
-    :param dy: (*float*) Y delta.
-    :param toproj: (*ProjectionInfo*) To projection.
-    :param fromproj: (*ProjectionInfo*) From projection. Default is longlat projection.
-    :param pos: (*string*) ['lowerleft' | 'center'] Lon, lat coordinate position.
-
-    :returns: (*array_like*, *array_like*) Projected x, y coordinates.
-    """
-    if fromproj is None:
-        fromproj = KnownCoordinateSystems.geographic.world.WGS1984
-    x, y = project(lon, lat, toproj, fromproj)
-    if pos == 'lowerleft':
-        xx = arange1(x, xnum, dx)
-        yy = arange1(y, ynum, dy)
-    else:
-        llx = x - ((xnum - 1) * 0.5 * dx)
-        lly = y - ((ynum - 1) * 0.5 * dy)
-        xx = arange1(llx, xnum, dx)
-        yy = arange1(lly, ynum, dy)
-    return xx, yy
-    
 def pol2cart(theta, rho):
     '''
     Transform polar coordinates to Cartesian

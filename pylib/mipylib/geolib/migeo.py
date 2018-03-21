@@ -11,20 +11,24 @@ from org.meteoinfo.data.mapdata.geotiff import GeoTiff
 from org.meteoinfo.shape import ShapeUtil
 from org.meteoinfo.legend import BreakTypes
 from org.meteoinfo.geoprocess import GeoComputation
-from org.meteoinfo.data import ArrayMath
+from org.meteoinfo.data import ArrayMath, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage, AttributeTable
+from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
+from org.meteoinfo.global import PointD
 
 import milayer
 from milayer import MILayer
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import mipylib.migl as migl
+import mipylib.numeric.minum as minum
 
 from java.util import ArrayList
 
 __all__ = [
     'arrayinpolygon','convert_encoding_dbf','distance','georead','geotiffread',
-    'maplayer','inpolygon','maskout','polyarea','polygon','rmaskout','shaperead'
+    'maplayer','inpolygon','maskout','polyarea','polygon','rmaskout','shaperead',
+    'projinfo','project','projectxy'
     ]
 
 def shaperead(fn, encoding=None):   
@@ -269,3 +273,120 @@ def rmaskout(data, x, y, mask):
         mask = [mask]
     r = ArrayMath.maskout_Remove(data.asarray(), x.asarray(), y.asarray(), mask)
     return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])  
+    
+def projinfo(proj4string=None, proj='longlat', **kwargs):
+    """
+    Create a projection object with Proj.4 parameters (http://proj4.org/)
+    
+    :param proj4string: (*string*) Proj.4 projection string.
+    :param proj: (*string*) Projection name.
+    :param lat_0: (*float*) Latitude of origin.
+    :param lon_0: (*float*) Central meridian.
+    :param lat_1: (*float*) Latitude of first standard paralle.
+    :param lat_2: (*float*) Latitude of second standard paralle.
+    :param lat_ts: (*float*) Latitude of true scale.
+    :param k: (*float*) Scaling factor.
+    :param x_0: (*float*) False easting.
+    :param y_0: (*float*) False northing.
+    :param h: (*float*) Height from earth surface.
+    
+    :returns: (*ProjectionInfo*) ProjectionInfo object.
+    """
+    if not proj4string is None:
+        return ProjectionInfo(proj4string)
+    
+    if proj == 'longlat' and len(kwargs) == 0:
+        return KnownCoordinateSystems.geographic.world.WGS1984
+        
+    origin = kwargs.pop('origin', (0, 0, 0))    
+    lat_0 = origin[0]
+    lon_0 = origin[1]
+    lat_0 = kwargs.pop('lat_0', lat_0)
+    lon_0 = kwargs.pop('lon_0', lon_0)
+    lat_ts = kwargs.pop('truescalelat', 0)
+    lat_ts = kwargs.pop('lat_ts', lat_ts)
+    k = kwargs.pop('scalefactor', 1)
+    k = kwargs.pop('k', k)
+    paralles = kwargs.pop('paralles', (30, 60))
+    lat_1 = paralles[0]
+    if len(paralles) == 2:
+        lat_2 = paralles[1]
+    else:
+        lat_2 = lat_1
+    lat_1 = kwargs.pop('lat_1', lat_1)
+    lat_2 = kwargs.pop('lat_2', lat_2)
+    x_0 = kwargs.pop('falseeasting', 0)
+    y_0 = kwargs.pop('falsenorthing', 0)
+    x_0 = kwargs.pop('x_0', x_0)
+    y_0 = kwargs.pop('y_0', y_0)
+    h = kwargs.pop('h', None)
+    projstr = '+proj=' + proj \
+        + ' +lat_0=' + str(lat_0) \
+        + ' +lon_0=' + str(lon_0) \
+        + ' +lat_1=' + str(lat_1) \
+        + ' +lat_2=' + str(lat_2) \
+        + ' +lat_ts=' + str(lat_ts) \
+        + ' +k=' + str(k) \
+        + ' +x_0=' + str(x_0) \
+        + ' +y_0=' + str(y_0)
+    if not h is None:
+        projstr = projstr + ' +h=' + str(h)
+        
+    return ProjectionInfo(projstr) 
+
+def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, toproj=KnownCoordinateSystems.geographic.world.WGS1984):
+    """
+    Project geographic coordinates from one projection to another.
+    
+    :param x: (*array_like*) X coordinate values for projection.
+    :param y: (*array_like*) Y coordinate values for projection.
+    :param fromproj: (*ProjectionInfo*) From projection. Default is longlat projection.
+    :param toproj: (*ProjectionInfo*) To projection. Default is longlat projection.
+    
+    :returns: (*array_like*, *array_like*) Projected geographic coordinates.
+    """
+    if isinstance(fromproj, str):
+        fromproj = ProjectionInfo(fromproj)
+    if isinstance(toproj, str):
+        toproj = ProjectionInfo(toproj)
+    if isinstance(x, (tuple, list)):
+        x = array(x)
+    if isinstance(y, (tuple, list)):
+        y = array(y)
+    if isinstance(x, MIArray):
+        outxy = ArrayUtil.reproject(x.asarray(), y.asarray(), fromproj, toproj)
+        return MIArray(outxy[0]), MIArray(outxy[1])
+    else:
+        inpt = PointD(x, y)
+        outpt = Reproject.reprojectPoint(inpt, fromproj, toproj)
+        return outpt.X, outpt.Y
+    
+def projectxy(lon, lat, xnum, ynum, dx, dy, toproj, fromproj=None, pos='lowerleft'):
+    """
+    Get projected x, y coordinates by projection and a given lon, lat coordinate.
+    
+    :param lon: (*float*) Longitude value.
+    :param lat: (*float*) Latitude value.
+    :param xnum: (*int*) X number.
+    :param ynum: (*int*) Y number.
+    :param dx: (*float*) X delta.
+    :param dy: (*float*) Y delta.
+    :param toproj: (*ProjectionInfo*) To projection.
+    :param fromproj: (*ProjectionInfo*) From projection. Default is longlat projection.
+    :param pos: (*string*) ['lowerleft' | 'center'] Lon, lat coordinate position.
+
+    :returns: (*array_like*, *array_like*) Projected x, y coordinates.
+    """
+    if fromproj is None:
+        fromproj = KnownCoordinateSystems.geographic.world.WGS1984
+    x, y = project(lon, lat, toproj, fromproj)
+    if pos == 'lowerleft':
+        xx = minum.arange1(x, xnum, dx)
+        yy = minum.arange1(y, ynum, dy)
+    else:
+        llx = x - ((xnum - 1) * 0.5 * dx)
+        lly = y - ((ynum - 1) * 0.5 * dy)
+        xx = minum.arange1(llx, xnum, dx)
+        yy = minum.arange1(lly, ynum, dy)
+    return xx, yy
+        

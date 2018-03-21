@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\test"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\stats">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map\projection"/>
+    <RecentFolder Folder="C:\TEMP\wangping"/>
+    <RecentFolder Folder="C:\TEMP\wangping\fy4"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
+    <RecentFolder Folder="D:\Working\MIScript"/>
+    <RecentFolder Folder="D:\Working\MIScript\mywork"/>
+    <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
-      <OpenedFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\dbf_encoding_convert_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\read_shape_encoding_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\maplayer_proj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\random_seed_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_ind_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_1samp_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
-      <RecentFile File="D:\Working\MIScript\mywork\aqi_data\extract_aqi_regions_append.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\dbf_encoding_convert_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\read_shape_encoding_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\maplayer_proj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\random_seed_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_ind_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_1samp_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1287,693"/>
+  <Startup MainFormLocation="-6,-6" MainFormSize="1293,693"/>
 </MeteoInfo>

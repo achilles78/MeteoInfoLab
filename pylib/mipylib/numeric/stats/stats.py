@@ -11,9 +11,11 @@ from org.meteoinfo.data import ArrayMath, ArrayUtil
 from ucar.ma2 import Array
 
 from mipylib.numeric.miarray import MIArray
+import mipylib.numeric.minum as minum
 
 __all__ = [
-    'covariance','cov','pearsonr','spearmanr','kendalltau','linregress','mlinregress','percentile'
+    'chi2_contingency','chisquare','covariance','cov','pearsonr','spearmanr','kendalltau',
+    'linregress','mlinregress','percentile','ttest_1samp', 'ttest_ind','ttest_rel'
     ]
 
 def covariance(x, y, bias=False):
@@ -228,3 +230,100 @@ def percentile(a, q, axis=None):
         r = StatsUtil.percentile(a.asarray(), q, axis)
         r = MIArray(r)
     return r
+    
+def ttest_1samp(a, popmean):
+    '''
+    Calculate the T-test for the mean of ONE group of scores.
+
+    This is a two-sided test for the null hypothesis that the expected value (mean) of 
+    a sample of independent observations a is equal to the given population mean, popmean.
+    
+    :param a: (*array_like*) Sample observation.
+    :param popmean: (*float*) Expected value in null hypothesis.
+    
+    :returns: t-statistic and p-value
+    '''
+    if isinstance(a, list):
+        a = MIArray(ArrayUtil.array(x))
+    r = StatsUtil.tTest(a.asarray(), popmean)
+    return r[0], r[1]
+    
+def ttest_rel(a, b):
+    '''
+    Calculates the T-test on TWO RELATED samples of scores, a and b.
+
+    This is a two-sided test for the null hypothesis that 2 related or repeated samples 
+    have identical average (expected) values.
+    
+    :param a: (*array_like*) Sample data a.
+    :param b: (*array_like*) Sample data b.
+    
+    :returns: t-statistic and p-value
+    '''
+    if isinstance(a, list):
+        a = MIArray(ArrayUtil.array(a))
+    if isinstance(b, list):
+        b = MIArray(ArrayUtil.array(b))
+    r = StatsUtil.pairedTTest(a.asarray(), b.asarray())
+    return r[0], r[1]
+    
+def ttest_ind(a, b):
+    '''
+    Calculates the T-test for the means of TWO INDEPENDENT samples of scores.
+
+    This is a two-sided test for the null hypothesis that 2 independent samples have 
+    identical average (expected) values. This test assumes that the populations have 
+    identical variances.
+    
+    :param a: (*array_like*) Sample data a.
+    :param b: (*array_like*) Sample data b.
+    
+    :returns: t-statistic and p-value
+    '''
+    if isinstance(a, list):
+        a = MIArray(ArrayUtil.array(a))
+    if isinstance(b, list):
+        b = MIArray(ArrayUtil.array(b))
+    r = StatsUtil.tTest(a.asarray(), b.asarray())
+    return r[0], r[1]
+    
+def chisquare(f_obs, f_exp=None):
+    '''
+    Calculates a one-way chi square test.
+
+    The chi square test tests the null hypothesis that the categorical data has the 
+    given frequencies.
+    
+    :param f_obs: (*array_like*) Observed frequencies in each category.
+    :param f_exp: (*array_like*) Expected frequencies in each category. By default the categories 
+        are assumed to be equally likely.
+    
+    :returns: Chi-square statistic and p-value
+    '''
+    if isinstance(f_obs, list):
+        f_obs = MIArray(ArrayUtil.array(f_obs))
+    if f_exp is None:
+        n = len(f_obs)
+        f_exp = minum.ones(n) / n * f_obs.sum()
+    elif isinstance(f_exp, list):
+        f_exp = MIArray(ArrayUtil.array(f_exp))
+    r = StatsUtil.chiSquareTest(f_exp.asarray(), f_obs.asarray())
+    return r[0], r[1]
+    
+def chi2_contingency(observed):
+    '''
+    Chi-square test of independence of variables in a contingency table.
+
+    This function computes the chi-square statistic and p-value for the hypothesis test of 
+    independence of the observed frequencies in the contingency table observed.
+    
+    :param observed: (*array_like*) The contingency table. The table contains the observed 
+        frequencies (i.e. number of occurrences) in each category. In the two-dimensional case, 
+        the table is often described as an `R x C table`.
+    
+    :returns: Chi-square statistic and p-value
+    '''
+    if isinstance(observed, list):
+        observed = MIArray(ArrayUtil.array(observed))
+    r = StatsUtil.chiSquareTest(observed.asarray())
+    return r[0], r[1]

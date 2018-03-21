@@ -11,9 +11,21 @@ from org.meteoinfo.math import RandomUtil
 from mipylib.numeric.miarray import MIArray
 
 __all__ = [
-    'rand','randn','randint','poisson'
+    'rand','randn','randint','poisson','seed'
     ]
 
+def seed(seed=None):
+    '''
+    Seed the generator.
+    
+    :param seed: (*int*) Seed for random data generator.
+    '''
+    if seed is None:
+        RandomUtil.useSeed = False
+    else:
+        RandomUtil.useSeed = True
+        RandomUtil.seed = seed
+    
 def rand(*args):
     """
     Random values in a given shape.

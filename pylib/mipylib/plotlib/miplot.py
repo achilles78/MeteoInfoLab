@@ -3965,6 +3965,7 @@ def imshow(*args, **kwargs):
         string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
         color args (string, float, rgb, etc), different levels will be plotted in different colors in 
         the order specified.
+    :param interpolation: (*string*) Interpolation option [None | bilinear | bicubic].
     
     :returns: (*Image graphic*) Image graphic created from array data.
     """
@@ -4824,6 +4825,7 @@ def imshowm(*args, **kwargs):
     :param fill_color: (*color*) Fill_color. Default is None (white color).
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
     :param order: (*int*) Z-order of created layer for display.
+    :param interpolation: (*string*) Interpolation option [None | bilinear | bicubic].
     
     :returns: (*RasterLayer*) RasterLayer created from array data.
     """
