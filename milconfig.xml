@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\stats">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+  <Path OpenPath="U:\script\aqi">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map\projection"/>
     <RecentFolder Folder="C:\TEMP\wangping"/>
     <RecentFolder Folder="C:\TEMP\wangping\fy4"/>
@@ -16,21 +11,24 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\verification"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
+    <RecentFolder Folder="U:\script\aqi"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\maplayer_proj.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\random_seed_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_ind_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_1samp_1.py"/>
+      <OpenedFile File="U:\script\aqi\readtable_test_save.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\maplayer_proj.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\random_seed_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_ind_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_1samp_1.py"/>
+      <RecentFile File="U:\script\aqi\readtable_test_save.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -66,19 +66,19 @@ class PyTableData(object):
         '''
         Returns the row number.
         '''
-        return self.data.getDataTable().getRowCount()
+        return self.data.getRowCount()
         
     def colnum(self):
         '''
         Returns the column number.
         '''
-        return self.data.getDataTable().getColumnCount()
+        return self.data.getColumnCount()
     
     def colnames(self):
         '''
         Returns the column names.
         '''
-        return self.data.getDataTable().getColumnNames()
+        return self.data.getColumnNames()
         
     def setcolname(self, col, colname):
         '''
@@ -87,7 +87,7 @@ class PyTableData(object):
         :param col: (*int*) Column index.
         :param colname: (*string*) New column name.
         '''
-        self.data.getDataTable().renameColumn(col, colname)
+        self.data.renameColumn(col, colname)
         
     def setcolnames(self, colnames):
         '''
@@ -96,7 +96,7 @@ class PyTableData(object):
         :param colnames: (*list*) List of the column names.
         '''
         for i in range(len(colnames)):
-            self.data.getDataTable().renameColumn(i, colnames[i])
+            self.data.renameColumn(i, colnames[i])
     
     def coldata(self, key):
         '''
@@ -257,17 +257,17 @@ class PyTableData(object):
         else:
             self.data.join(other.data, colname, colname1)
         
-    def savefile(self, filename, delimiter=','):
+    def savefile(self, filename, delimiter=',', format=None, date_format=None, float_format=None):
         '''
         Save the table data to an ASCII file.
         
         :param filename: (*string*) The file name.
         :param delimiter: (*string*) Field delimiter character. Default is ``,``.
+        :param format: (*string*) Format string.
+        :param date_format: (*string*) Date format string. i.e. 'yyyyMMddHH'.
+        :param float_format: (*string*) Float format string. i.e. '%.2f'.
         '''
-        if delimiter == ',':
-            self.data.saveAsCSVFile(filename)
-        else:
-            self.data.saveAsASCIIFile(filename)
+        self.data.saveAsASCIIFile(filename, delimiter, date_format, float_format)
             
     def ave(self, colnames):
         '''
@@ -607,7 +607,7 @@ class PyTableData(object):
         '''
         Returns single row table if this table is single column table.
         '''
-        return PyTableData(TableData(self.data.toSingleRowTable(self.data.getDataTable())))
+        return PyTableData(TableData(self.data.toSingleRowTable()))
         
     def sql(self, expression):
         '''
