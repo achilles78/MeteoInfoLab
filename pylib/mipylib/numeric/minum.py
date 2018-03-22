@@ -50,11 +50,11 @@ __all__ = [
     'corrcoef','cos','degrees','diag','dim_array','datatable','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isarray','isnan','linregress','linspace','log','log10',
-    'logspace','magnitude','maximum','mean','median','meshgrid','minimum','monthname',
+    'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
     'nonzero','ones','ones_like','pol2cart','polyval','power',
     'radians','reshape','repeat',
     'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','std','sum','tan',
-    'tile','transpose','trapz','vdot','unravel_index',
+    'tile','transpose','trapz','vdot','unravel_index','var',
     'where','zeros','zeros_like'
     ]
 
@@ -895,11 +895,39 @@ def std(x, axis=None):
     
     returns: (*array_like*) Standart deviation result.
     '''
+    if isinstance(x, (list, tuple)):
+        x = array(x)
     if axis is None:
         r = sqrt(mean((x - mean(x))**2))
         return r
     else:
         r = ArrayMath.std(x.asarray(), axis)
+        if type(x) is MIArray:
+            return MIArray(r)
+        else:
+            dims = []
+            for i in range(0, x.ndim):
+                if i != axis:
+                    dims.append(x.dims[i])
+            return DimArray(MIArray(r), dims, x.fill_value, x.proj)
+            
+def var(x, axis=None):
+    '''
+    Compute variance along the specified axis.
+    
+    :param x: (*array_like or list*) Input values.
+    :param axis: (*int*) Axis along which the variance is computed. 
+        The default is to compute the variance of the flattened array.
+    
+    returns: (*array_like*) Variance result.
+    '''
+    if isinstance(x, (list, tuple)):
+        x = array(x)
+    if axis is None:
+        r = mean((x - mean(x))**2)
+        return r
+    else:
+        r = ArrayMath.var(x.asarray(), axis)
         if type(x) is MIArray:
             return MIArray(r)
         else:
@@ -1059,6 +1087,36 @@ def fmin(x1, x2):
         return DimArray(r, x1.dims, x1.fill_value, x1.proj)
     else:
         return min(x1, x2)
+        
+def min(a, axis=None):
+    '''
+    Returns the minimum values along an axis.
+    
+    :param a: (*array_like*) Input array.
+    :param axis: (*int*) By default, the minimum is into the flattened array, otherwise 
+        along the specified axis.
+        
+    :returns: Array of minimum values. It has the same shape as a.shape with the 
+        dimension along axis removed.
+    '''
+    if isinstance(a, (list, tuple)):
+        a = array(a)
+    return a.min(axis)
+    
+def max(a, axis=None):
+    '''
+    Returns the maximum values along an axis.
+    
+    :param a: (*array_like*) Input array.
+    :param axis: (*int*) By default, the maximum is into the flattened array, otherwise 
+        along the specified axis.
+        
+    :returns: Array of maximum values. It has the same shape as a.shape with the 
+        dimension along axis removed.
+    '''
+    if isinstance(a, (list, tuple)):
+        a = array(a)
+    return a.max(axis)
         
 def argmin(a, axis=None):
     '''

@@ -9,6 +9,7 @@ import os
 import inspect
 import datetime
 import math
+import numbers
 
 from org.meteoinfo.chart import ChartPanel, Location
 from org.meteoinfo.data import XYListDataset, XYErrorSeriesData, XYYSeriesData, GridData, ArrayUtil
@@ -1025,6 +1026,8 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
         
     #Create bar graphics
     x = plotutil.getplotdata(x)
+    if not isinstance(bins, numbers.Number):
+        bins = plotutil.getplotdata(bins)
     graphics = GraphicFactory.createHistBars(x, bins, barbreaks)        
     
     #Create bar plot

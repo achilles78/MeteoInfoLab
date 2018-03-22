@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="U:\script\aqi">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map\projection"/>
-    <RecentFolder Folder="C:\TEMP\wangping"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\stats\learn">
     <RecentFolder Folder="C:\TEMP\wangping\fy4"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython"/>
     <RecentFolder Folder="D:\Working\MIScript"/>
@@ -16,23 +14,25 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\verification"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
     <RecentFolder Folder="U:\script\aqi"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats\learn"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\maplayer_proj.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_ind_2.py"/>
-      <OpenedFile File="U:\script\aqi\readtable_test_save.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\learn\mean.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\learn\histogram.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\eof_elnino.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\maplayer_proj.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\ttest_ind_2.py"/>
-      <RecentFile File="U:\script\aqi\readtable_test_save.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\learn\mean.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\learn\histogram.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1359,734"/>
 </MeteoInfo>

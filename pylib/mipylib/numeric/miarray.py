@@ -444,18 +444,21 @@ class MIArray(object):
             r = self
         return r
         
-    def min(self, fill_value=None):
+    def min(self, axis=None):
         '''
-        Get minimum value.
+        Get minimum value along an axis.
         
-        :param fill_value: (*float*) Fill value.
-        
-        :returns: Minimum value.
+        :param axis: (*int*) Axis along which the minimum is computed. The default is to 
+            compute the minimum of the flattened array.
+            
+        :returns: Minimum values.
         '''
-        if fill_value == None:
-            return ArrayMath.getMinimum(self.array)
+        if axis is None:
+            r = ArrayMath.min(self.array)
+            return r
         else:
-            return ArrayMath.getMinimum(self.array, fill_value)
+            r = ArrayMath.min(self.array, axis)
+            return MIArray(r)
             
     def argmin(self, axis=None):
         '''
@@ -491,21 +494,21 @@ class MIArray(object):
             r = ArrayMath.argMax(self.array, axis)
             return MIArray(r)
         
-    def max(self, fill_value=None):
+    def max(self, axis=None):
         '''
-        Get maximum value.
+        Get maximum value along an axis.
         
-        :param fill_value: (*float*) Fill value.
-        
-        :returns: Maximum value.
+        :param axis: (*int*) Axis along which the maximum is computed. The default is to 
+            compute the maximum of the flattened array.
+            
+        :returns: Maximum values.
         '''
-        if fill_value == None:
-            return ArrayMath.getMaximum(self.array)
+        if axis is None:
+            r = ArrayMath.max(self.array)
+            return r
         else:
-            return ArrayMath.getMaximum(self.array, fill_value)
-        
-    def getshape(self):
-        return self.array.getShape()
+            r = ArrayMath.max(self.array, axis)
+            return MIArray(r)
         
     def sum(self, fill_value=None):
         '''
