@@ -44,6 +44,21 @@ class rv_continuous(object):
         Create a distribution object.
         '''
         return RealDistribution()
+        
+    def rvs(self, *args, **kwargs):
+        '''
+        Random variates of given type.
+
+        :param loc: (*float*) location parameter (default=0).
+        :param scale: (*float*) scale parameter (default=1).
+        :param size: (*int*) Size.
+        
+        :returns: Probability density function.
+        '''
+        dist = self._create_distribution(*args)
+        size = kwargs.pop('size', 1)        
+        r = DistributionUtil.rvs(dist, size)
+        return MIArray(r)
     
     def pdf(self, x, *args, **kwargs):
         '''
