@@ -82,23 +82,35 @@ def getcolor(style, alpha=None):
     
 def getcolor_style(style):
     c = Color.black
+    rr = None
     if 'r' in style:
         c = Color.red
+        rr = 'r'
     elif 'k' in style:
         c = Color.black
+        rr = 'k'
     elif 'b' in style:
         c = Color.blue
+        rr = 'b'
     elif 'g' in style:
         c = Color.green
+        rr = 'g'
     elif 'w' in style:
         c = Color.white
+        rr = 'w'
     elif 'c' in style:
         c = Color.cyan
+        rr = 'c'
     elif 'm' in style:
         c = Color.magenta
+        rr = 'm'
     elif 'y' in style:
-        c = Color.yellow     
-    return c
+        c = Color.yellow
+        rr = 'y'
+    
+    if not rr is None:
+        style = style.replace(rr, '')
+    return c, style
     
 def getcolors(cs, alpha=None):
     colors = []
@@ -200,16 +212,23 @@ def getlinestyle_1(style):
         return None
         
     lineStyle = None
+    rr = None
     if '--' in style:
         lineStyle = LineStyles.DASH
+        rr = '--'
     elif ':' in style:
         lineStyle = LineStyles.DOT
+        rr = ':'
     elif '-.' in style:
         lineStyle = LineStyles.DASHDOT
+        rr = '-.'
     elif '-' in style:
         lineStyle = LineStyles.SOLID
+        rr = '-'
     
-    return lineStyle
+    if not rr is None:
+        style = style.replace(rr, '')
+    return lineStyle, style
     
 def gethatch(h):
     if h is None:
@@ -223,9 +242,9 @@ def getplotstyle(style, caption, **kwargs):
         color = kwargs.pop('color', 'red')
         c = getcolor(color)
     else:
-        c = getcolor_style(style)
-    pointStyle = getpointstyle(style)
-    lineStyle = getlinestyle_1(style)
+        c, style = getcolor_style(style)
+    lineStyle, style = getlinestyle_1(style)
+    pointStyle = getpointstyle(style)    
     if not pointStyle is None:
         fill = kwargs.pop('fill', True)        
         if lineStyle is None:           

@@ -3631,8 +3631,8 @@ def legend(*args, **kwargs):
     :param y: (*float*) Location y in normalized (0, 1) units when ``loc=custom`` .
     :param frameon: (*boolean*) Control whether a frame should be drawn around the legend. Default
         is True.
-    :param background: (*None or color*) Set draw background or not and/or background color.
-        Default is None which set not draw background.
+    :param facecolor: (*None or color*) Control the legend’s background color. Default is None which 
+        set not draw background.
     :param fontname: (*string*) Tick font name. Default is ``Arial`` .
     :param fontsize: (*int*) Tick font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
@@ -3726,6 +3726,7 @@ def legend(*args, **kwargs):
     frameon = kwargs.pop('frameon', True)
     clegend.setDrawNeatLine(frameon)
     bcobj = kwargs.pop('background', None)
+    bcobj = kwargs.pop('facecolor', bcobj)
     if bcobj is None:
         clegend.setDrawBackground(False)
     else:
