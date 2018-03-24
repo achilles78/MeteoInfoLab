@@ -27,6 +27,8 @@ def covariance(x, y, bias=False):
         that of x.
     :param bias: (*boolean*) Default normalization (False) is by (N - 1), where N is the number of observations 
         given (unbiased estimate). If bias is True, then normalization is by N.
+        
+    returns: Covariance
     '''
     if isinstance(x, (list, tuple)):
         x = MIArray(ArrayUtil.array(x))
