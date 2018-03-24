@@ -6,9 +6,10 @@
 #-----------------------------------------------------
 
 import os
+import numbers
 
 from org.meteoinfo.data.mapdata.geotiff import GeoTiff
-from org.meteoinfo.shape import ShapeUtil
+from org.meteoinfo.shape import ShapeUtil, PolygonShape
 from org.meteoinfo.legend import BreakTypes
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.data import ArrayMath, ArrayUtil
@@ -149,15 +150,35 @@ def polygon(x, y = None):
     
 def inpolygon(x, y, polygon):
     '''
-    Judge if a point is inside a polygon or not.
+    Check if x/y points are inside a polygon or not.
     
-    :param x: (*float*) X coordinate of the point.
-    :param y: (*float*) Y coordinate of the point.
-    :param polygon: (*PolygonShape*) The polygon.
+    :param x: (*array_like*) X coordinate of the points.
+    :param y: (*array_like*) Y coordinate of the points.
+    :param polygon: (*PolygonShape list*) The polygon list.
     
-    :returns: (*boolean*) Inside or not.
+    :returns: (*boolean array*) Inside or not.
     '''
-    return GeoComputation.pointInPolygon(polygon, x, y)
+    if isinstance(x, numbers.Number):
+        return GeoComputation.pointInPolygon(polygon, x, y)
+    
+    if isinstance(x, (list, tuple)):
+        x = minum.array(x)
+    if isinstance(y, (list, tuple)):
+        y = minum.array(y)
+    if isinstance(polygon, tuple):
+        x_p = polygon[0]
+        y_p = polygon[1]
+        if isinstance(x_p, (list, tuple)):
+            x_p = minum.array(x_p)
+        if isinstance(y_p, (list, tuple)):
+            y_p = minum.array(y_p)
+        return MIArray(ArrayMath.inPolygon(x.array, y.array, x_p.array, y_p.array))
+    else:
+        if isinstance(polygon, MILayer):
+            polygon = polygon.shapes()
+        elif isinstance(polygon, PolygonShape):
+            polygon = [polygon]
+        return MIArray(ArrayMath.inPolygon(x.array, y.array, polygon))
     
 def arrayinpolygon(a, polygon, x=None, y=None):
     '''

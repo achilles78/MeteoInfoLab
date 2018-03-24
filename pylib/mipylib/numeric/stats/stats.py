@@ -176,11 +176,12 @@ def spearmanr(m, y=None, axis=0):
         r = StatsUtil.spearmanr(m.asarray(), y.asarray())
         return MIArray(r)
         
-def linregress(x, y):
+def linregress(x, y, outvdn=False):
     '''
     Calculate a linear least-squares regression for two sets of measurements.
     
     :param x, y: (*array_like*) Two sets of measurements. Both arrays should have the same length.
+    :param outvdn: (*boolean*) Output validate data number or not. Default is False.
     
     :returns: Result slope, intercept, relative coefficient, two-sided p-value for a hypothesis test 
         whose null hypothesis is that the slope is zero, standard error of the estimated gradient, 
@@ -191,7 +192,10 @@ def linregress(x, y):
     if isinstance(y, list):
         y = MIArray(ArrayUtil.array(y))
     r = ArrayMath.lineRegress(x.asarray(), y.asarray())
-    return r[0], r[1], r[2], r[3], r[4], r[5]
+    if outvdn:
+        return r[0], r[1], r[2], r[3], r[4], r[5]
+    else:
+        return r[0], r[1], r[2], r[3], r[4]
     
 def mlinregress(y, x):
     '''

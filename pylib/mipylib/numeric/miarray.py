@@ -704,37 +704,6 @@ class MIArray(object):
         r = ArrayMath.join(self.array, b.array, dimidx)
         return MIArray(r)
         
-    def inpolygon(self, x, y, polygon):
-        if isinstance(polygon, tuple):
-            x_p = polygon[0]
-            y_p = polygon[1]
-            if isinstance(x_p, MIArray):
-                x_p = x_p.aslist()
-            if isinstance(y_p, MIArray):
-                y_p = y_p.aslist()
-            return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), x_p, y_p))
-        else:
-            if isinstance(polygon, MILayer):
-                polygon = polygon.layer
-            return MIArray(ArrayMath.inPolygon(self.array, x.aslist(), y.aslist(), polygon))
-        
-    # def maskout(self, mask, x=None, y=None, fill_value=Double.NaN):
-        # if isinstance(mask, MIArray):
-            # r = ArrayMath.maskout(self.array, mask.asarray(), fill_value)
-            # return MIArray(r)
-        # else:
-            # if isinstance(x, MIArray):
-                # xl = x.aslist()
-            # else:
-                # xl = x
-            # if isinstance(y, MIArray):
-                # yl = y.aslist()
-            # else:
-                # yl = y
-            # if isinstance(mask, MILayer):
-                # mask = mask.layer
-            # return MIArray(ArrayMath.maskout(self.array, xl, yl, mask, fill_value))
-        
     def savegrid(self, x, y, fname, format='surfer', **kwargs):
         gdata = GridArray(self.array, x.array, y.array, -9999.0)
         if format == 'surfer':

@@ -681,26 +681,8 @@ class DimArray(MIArray):
         r = super(DimArray, self).log10()
         return DimArray(r, self.dims, self.fill_value, self.proj)        
         
-    def inpolygon(self, polygon):
-        #x = self.dims[1].getDimValue()
-        #y = self.dims[0].getDimValue()
-        x = self.dimvalue(1)
-        y = self.dimvalue(0)
-        if isinstance(polygon, tuple):
-            x_p = polygon[0]
-            y_p = polygon[1]
-            if isinstance(x_p, MIArray):
-                x_p = x_p.aslist()
-            if isinstance(y_p, MIArray):
-                y_p = y_p.aslist()
-            r = self.inpolygon(x, y, x_p, y_p)
-        else:
-            r = self.inpolygon(x, y, polygon)
-        r = DimArray(r, self.dims, self.fill_value, self.proj)
-        return r
-        
     def maskout(self, mask):
-        if isinstance(mask, (MIArray, DimArray)):
+        if isinstance(mask, MIArray):
             r = ArrayMath.maskout(self.asarray(), mask.asarray())
             return DimArray(MIArray(r), self.dims, self.fill_value, self.proj)
         else:
