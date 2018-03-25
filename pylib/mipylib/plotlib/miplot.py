@@ -4021,19 +4021,21 @@ def imshow(*args, **kwargs):
         igraphic = GraphicFactory.createImage(image)
         ls = None
     else:
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createImageLegend(gdata, cn, cmap)
+        ls = kwargs.pop('symbolspec', None)
+        if ls is None:
+            if len(args) > 0:
+                level_arg = args[0]
+                if isinstance(level_arg, int):
+                    cn = level_arg
+                    ls = LegendManage.createImageLegend(gdata, cn, cmap)
+                else:
+                    if isinstance(level_arg, MIArray):
+                        level_arg = level_arg.aslist()
+                    ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
             else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
-        else:
-            ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-        ls = ls.convertTo(ShapeTypes.Image)
-        plotutil.setlegendscheme(ls, **kwargs)
+                ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
+            ls = ls.convertTo(ShapeTypes.Image)
+            plotutil.setlegendscheme(ls, **kwargs)
             
         igraphic = GraphicFactory.createImage(gdata, ls, extent)
     interpolation = kwargs.pop('interpolation', None)
