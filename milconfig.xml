@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
   <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
-    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
     <RecentFolder Folder="D:\Working\MIScript"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
@@ -16,17 +15,14 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats\learn"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+    <RecentFolder Folder="C:\TEMP\Data\dust\py"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\legend_two_side.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\beta_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\legend_two_side.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\beta_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
     </RecentFiles>
   </File>
   <Font>

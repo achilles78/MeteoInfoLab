@@ -3042,7 +3042,7 @@ def __setYAxisType(ax, axistype, timetickformat=None):
         r_axis.setMinorTickNum(10)
         ax.setAxis(r_axis, Location.RIGHT)
 
-def title(title, fontname=None, fontsize=14, bold=True, color='black'):
+def title(title, fontname=None, fontsize=14, bold=True, color='black', **kwargs):
     """
     Set a title of the current axes.
     
@@ -3050,7 +3050,8 @@ def title(title, fontname=None, fontsize=14, bold=True, color='black'):
     :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
-    :param color: (*color*) Title string color. Default is ``black`` .    
+    :param color: (*color*) Title string color. Default is ``black`` .  
+    :param linespace: (*int*) Line space of multiple line title.
     """
     exfont = False
     if fontname is None:
@@ -3067,6 +3068,9 @@ def title(title, fontname=None, fontsize=14, bold=True, color='black'):
     ctitile.setXAlign('center')
     ctitile.setUseExternalFont(exfont)
     ctitile.setColor(c)
+    linespace = kwargs.pop('linespace', None)
+    if not linespace is None:
+        ctitile.setLineSpace(linespace)
     gca.set_title(ctitile)
     draw_if_interactive()
     
