@@ -111,7 +111,7 @@ class MIArray(object):
             k = indices[i]
             if isinstance(k, int):
                 if k < 0:
-                    k = self.getshape()[i] + k
+                    k = self._shape[i] + k
                 sidx = k
                 eidx = k
                 step = 1
@@ -119,10 +119,10 @@ class MIArray(object):
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
-                    sidx = self.getshape()[i] + sidx
-                eidx = self.getshape()[i] if k.stop is None else k.stop
+                    sidx = self._shape[i] + sidx
+                eidx = self._shape[i] if k.stop is None else k.stop
                 if eidx < 0:
-                    eidx = self.getshape()[i] + eidx
+                    eidx = self._shape[i] + eidx
                 eidx -= 1                    
                 step = 1 if k.step is None else k.step
                 alllist = False
@@ -205,7 +205,7 @@ class MIArray(object):
             if isinstance(k, int):
                 sidx = k                
                 if sidx < 0:
-                    sidx = self.getshape()[i] + sidx                
+                    sidx = self._shape[i] + sidx                
                 eidx = sidx
                 step = 1
                 alllist = False
@@ -218,10 +218,10 @@ class MIArray(object):
             else:
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
-                    sidx = self.getshape()[i] + sidx
-                eidx = self.getshape()[i] if k.stop is None else k.stop
+                    sidx = self._shape[i] + sidx
+                eidx = self._shape[i] if k.stop is None else k.stop
                 if eidx < 0:
-                    eidx = self.getshape()[i] + eidx
+                    eidx = self._shape[i] + eidx
                 eidx -= 1
                 step = 1 if k.step is None else k.step
                 alllist = False
