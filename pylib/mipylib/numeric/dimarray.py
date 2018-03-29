@@ -285,8 +285,8 @@ class DimArray(MIArray):
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __neg__(self):
-        r = DimArray(self.array.__neg__(), self.dims, self.fill_value, self.proj)
-        return r
+        r = super(DimArray, self).__neg__()
+        return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def __lt__(self, other):
         r = super(DimArray, self).__lt__(other)

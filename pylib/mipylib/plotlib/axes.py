@@ -412,6 +412,12 @@ class MapAxes(Axes):
         '''
         self.axes.setSelectedLayer(layer.layer)
         
+    def add_circle(self, xy, radius=5, **kwargs):
+        '''
+        Add a circle patch
+        '''
+        pass
+        
     def grid(self, b=None, which='major', axis='both', **kwargs):
         """
         Turn the aexs grids on or off.

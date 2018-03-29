@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\io">
     <RecentFolder Folder="D:\Working\MIScript"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork"/>
     <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
@@ -15,18 +15,20 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats\learn"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
-    <RecentFolder Folder="C:\TEMP\Data\dust\py"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\radar_bin_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\io\radar_bin_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-5,0" MainFormSize="1287,686"/>
+  <Startup MainFormLocation="-5,0" MainFormSize="1380,767"/>
 </MeteoInfo>
