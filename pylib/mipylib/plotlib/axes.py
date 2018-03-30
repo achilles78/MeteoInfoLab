@@ -416,7 +416,9 @@ class MapAxes(Axes):
         '''
         Add a circle patch
         '''
-        pass
+        lbreak, isunique = plotutil.getlegendbreak('polygon', **kwargs)
+        circle = self.axes.addCircle(xy[0], xy[1], radius, lbreak)
+        miplot.draw_if_interactive()
         
     def grid(self, b=None, which='major', axis='both', **kwargs):
         """
