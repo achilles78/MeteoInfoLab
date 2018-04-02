@@ -682,6 +682,13 @@ class DimArray(MIArray):
         return DimArray(r, self.dims, self.fill_value, self.proj)        
         
     def maskout(self, mask):
+        '''
+        Maskout data by polygons - the elements outside polygons will be set as NaN.
+
+        :param mask: (*list*) Polygon list as mask borders.
+        
+        :returns: (*DimArray*) Maskouted data.
+        '''
         if isinstance(mask, MIArray):
             r = ArrayMath.maskout(self.asarray(), mask.asarray())
             return DimArray(MIArray(r), self.dims, self.fill_value, self.proj)
@@ -692,6 +699,26 @@ class DimArray(MIArray):
                 mask = [mask]
             r = ArrayMath.maskout(self.asarray(), x, y, mask)
             r = DimArray(MIArray(r), self.dims, self.fill_value, self.proj)
+            return r
+            
+    def maskin(self, mask):
+        '''
+        Maskin data by polygons - the elements inside polygons will be set as NaN.
+
+        :param mask: (*list*) Polygon list as mask borders.
+        
+        :returns: (*DimArray*) Maskined data.
+        '''
+        if isinstance(mask, MIArray):
+            r = ArrayMath.maskin(self.asarray(), mask.asarray())
+            return DimArray(r, self.dims, self.fill_value, self.proj)
+        else:
+            x = self.dimvalue(1)
+            y = self.dimvalue(0)
+            if not isinstance(mask, (list, ArrayList)):
+                mask = [mask]
+            r = ArrayMath.maskin(self.array, x.array, y.array, mask)
+            r = DimArray(r, self.dims, self.fill_value, self.proj)
             return r
         
     def transpose(self):

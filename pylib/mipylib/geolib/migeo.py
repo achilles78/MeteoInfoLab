@@ -28,7 +28,7 @@ from java.util import ArrayList
 
 __all__ = [
     'arrayinpolygon','convert_encoding_dbf','distance','georead','geotiffread',
-    'maplayer','inpolygon','maskout','polyarea','polygon','rmaskout','shaperead',
+    'maplayer','inpolygon','maskin','maskout','polyarea','polygon','rmaskin','rmaskout','shaperead',
     'projinfo','project','projectxy'
     ]
 
@@ -264,19 +264,27 @@ def maskout(data, mask, x=None, y=None):
     :returns: (*array_like*) Maskouted data array.
     """
     if mask is None:
-        return data
+        return data        
     elif isinstance(mask, (MIArray, DimArray)):
         r = ArrayMath.maskout(data.asarray(), mask.asarray())
-        return MIArray(r)
+        if isinstance(data, DimArray):
+            return DimArray(r, data.dims, data.fill_value, data.proj)
+        else:
+            return MIArray(r)
+            
     if x is None or y is None:
         if isinstance(data, DimArray):
-            return data.maskout(mask)
+            x = data.dimvalue(data.ndim - 1)
+            y = data.dimvalue(data.ndim - 2)
         else:
             return None
+
+    if not isinstance(mask, (list, ArrayList)):
+        mask = [mask]
+    r = ArrayMath.maskout(data.array, x.array, y.array, mask)
+    if isinstance(data, DimArray):
+        return DimArray(r, data.dims, data.fill_value, data.proj)
     else:
-        if not isinstance(mask, (list, ArrayList)):
-            mask = [mask]
-        r = ArrayMath.maskout(data.asarray(), x.asarray(), y.asarray(), mask)
         return MIArray(r)
         
 def rmaskout(data, x, y, mask):
@@ -293,6 +301,57 @@ def rmaskout(data, x, y, mask):
     if not isinstance(mask, (list, ArrayList)):
         mask = [mask]
     r = ArrayMath.maskout_Remove(data.asarray(), x.asarray(), y.asarray(), mask)
+    return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])  
+    
+def maskin(data, mask, x=None, y=None):
+    """
+    Maskin data by polygons - NaN values of elements inside polygons.
+    
+    :param data: (*array_like*) Array data for maskout.
+    :param mask: (*list*) Polygon list as maskin borders.    
+    :param x: (*array_like*) X coordinate array.
+    :param y: (*array_like*) Y coordinate array.
+
+    :returns: (*array_like*) Maskined data array.
+    """
+    if mask is None:
+        return data        
+    elif isinstance(mask, MIArray):
+        r = ArrayMath.maskin(data.array, mask.array)
+        if isinstance(data, DimArray):
+            return DimArray(r, data.dims, data.fill_value, data.proj)
+        else:
+            return MIArray(r)
+        
+    if x is None or y is None:
+        if isinstance(data, DimArray):
+            x = data.dimvalue(data.ndim - 1)
+            y = data.dimvalue(data.ndim - 2)
+        else:
+            return None
+
+    if not isinstance(mask, (list, ArrayList)):
+        mask = [mask]
+    r = ArrayMath.maskin(data.array, x.array, y.array, mask)
+    if isinstance(data, DimArray):
+        return DimArray(r, data.dims, data.fill_value, data.proj)
+    else:
+        return MIArray(r)
+        
+def rmaskin(data, x, y, mask):
+    """
+    Maskin data by polygons - the elements inside polygons will be removed
+    
+    :param data: (*array_like*) Array data for maskin.
+    :param x: (*array_like*) X coordinate array.
+    :param y: (*array_like*) Y coordinate array.
+    :param mask: (*list*) Polygon list as mask borders.
+    
+    :returns: (*list*) Masked data, x and y array list.
+    """
+    if not isinstance(mask, (list, ArrayList)):
+        mask = [mask]
+    r = ArrayMath.maskin_Remove(data.array, x.array, y.array, mask)
     return MIArray(r[0]), MIArray(r[1]), MIArray(r[2])  
     
 def projinfo(proj4string=None, proj='longlat', **kwargs):
