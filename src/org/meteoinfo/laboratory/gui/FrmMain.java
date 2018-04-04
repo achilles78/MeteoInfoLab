@@ -752,14 +752,17 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     private void jButton_RunScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RunScriptActionPerformed
         TextEditor te = this.editorDock.getActiveTextEditor();
         if (!te.getFileName().isEmpty() && te.getTextArea().isDirty()) {
-            te.saveFile(te.getFile());
+            te.saveFile(te.getFile());            
         }
-
-        String code = te.getTextArea().getText();
-        try {
-            this.consoleDock.runPythonScript(code);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        if (te.getFileName().isEmpty()) {
+            String code = te.getTextArea().getText();
+            try {
+                this.consoleDock.runPythonScript(code);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            this.consoleDock.execfile(te.getFileName());
         }
     }//GEN-LAST:event_jButton_RunScriptActionPerformed
 

@@ -170,6 +170,15 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("mipylib.plotlib.miplot.isinteractive = True");
         }
     }
+    
+    /**
+     * Do Enter key
+     */
+    public void enter() {
+        interp.console.print(">>> ", Color.red);
+        interp.console.setStyle(Color.black);
+        interp.exec("mipylib.plotlib.miplot.isinteractive = True");
+    }
 
     /**
      * Run a command line
@@ -183,6 +192,56 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         //this.interp.push(command);
         this.interp.out.print(">>> ");
         interp.exec("mipylib.plotlib.miplot.isinteractive = True");
+    }
+    
+    /**
+     * Run a python file
+     * @param fn Python file name
+     */
+    public void execfile(final String fn) {
+        SwingWorker worker = new SwingWorker<String, String>() {
+            PrintStream oout = System.out;
+            PrintStream oerr = System.err;
+
+            @Override
+            protected String doInBackground() throws Exception {
+                JTextPane jTextPane_Output = interp.console.getTextPane();
+                JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
+                JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
+
+                interp.console.println("run script...");
+                interp.setOut(writer);
+                interp.setErr(writer);
+                System.setOut(printStream);
+                System.setErr(printStream);
+
+                try {
+                    interp.exec("mipylib.plotlib.miplot.isinteractive = False");
+                    interp.exec("clf()");
+                    interp.execfile(fn);
+                    interp.exec("mipylib.plotlib.miplot.isinteractive = True");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    interp.console.print(">>> ", Color.red);
+                    interp.console.setStyle(Color.black);
+                    //interp.console.setForeground(Color.black);
+                    interp.exec("mipylib.plotlib.miplot.isinteractive = True");
+                }
+
+                return "";
+            }
+
+            @Override
+            protected void done() {
+                System.setOut(oout);
+                System.setErr(oerr);
+                ChartPanel cp = parent.getFigureDock().getCurrentFigure();
+                if (cp != null) {
+                    cp.paintGraphics();
+                }
+            }
+        };
+        worker.execute();
     }
 
     /**
@@ -215,52 +274,6 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         }
     }
 
-//    /**
-//     * Run Jython script
-//     * @param code
-//     */
-//    public void runPythonScript(final String code) {
-//
-//        SwingWorker worker = new SwingWorker<String, String>() {
-//            PrintStream oout = System.out;
-//            PrintStream oerr = System.err;
-//
-//            @Override
-//            protected String doInBackground() throws Exception {
-//                JTextPane jTextPane_Output = interp.console.getTextPane();
-//                JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
-//                JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
-//                //jTextPane_Output.setText("");
-//                interp.console.println("run script...");
-//                interp.setOut(writer);
-//                interp.setErr(writer);
-//                System.setOut(printStream);
-//                System.setErr(printStream);
-//                
-//                String encoding = EncodingUtil.findEncoding(code);
-//                if (encoding != null) {
-//                    try {
-//                        interp.execfile(new ByteArrayInputStream(code.getBytes(encoding)));
-//                    } catch (Exception e) {
-//                    }
-//                } else {
-//                    try {
-//                        interp.execfile(new ByteArrayInputStream(code.getBytes()));
-//                    } catch (Exception e) {
-//                    }
-//                }
-//                //interp.console.print(">>> ", Color.red);
-//                return "";
-//            }
-//
-//            @Override
-//            protected void done() {
-//                System.setOut(oout);
-//                System.setErr(oerr);
-//            }
-//        };
-//        worker.execute();
-//    }
     /**
      * Run Jython script
      *

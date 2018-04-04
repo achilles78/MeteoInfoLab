@@ -24,7 +24,7 @@ from org.meteoinfo.legend import MapFrame, LineStyles, BreakTypes, ColorBreak, P
 from org.meteoinfo.drawing import PointStyle, MarkerType
 from org.meteoinfo.global import Extent
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
-from org.meteoinfo.global.image import AnimatedGifEncoder
+from org.meteoinfo.image import AnimatedGifEncoder
 from org.meteoinfo.layer import LayerTypes, MapLayer, WebMapLayer
 from org.meteoinfo.layout import MapLayout
 from org.meteoinfo.map import MapView
@@ -4867,12 +4867,12 @@ def imshowm(*args, **kwargs):
         if isinstance(args[0], (list, tuple)):
             isrgb = True
             rgbdata = args[0]
-            if isinstance(rgbdata[0], MIArray):
+            if isinstance(rgbdata[0], DimArray):
+                x = rgbdata[0].dimvalue(1)
+                y = rgbdata[0].dimvalue(0)                
+            else:
                 x = minum.arange(0, rgbdata[0].shape[1])
                 y = minum.arange(0, rgbdata[0].shape[0])
-            else:
-                x = rgbdata[0].dimvalue(1)
-                y = rgbdata[0].dimvalue(0)
         elif args[0].ndim > 2:
             isrgb = True
             rgbdata = args[0]
@@ -4893,7 +4893,7 @@ def imshowm(*args, **kwargs):
             rgbdata = a
         else:
             gdata = minum.asgridarray(a, x, y, fill_value)
-            args = args[3:]
+            args = args[3:]    
     
     isplot = True
     interpolation = kwargs.pop('interpolation', None)
@@ -4904,10 +4904,11 @@ def imshowm(*args, **kwargs):
                 rgbd.append(d.asarray())
             rgbdata = rgbd
         else:
-            rgbdata = rgbdata.asarray()
+            rgbdata = rgbdata.asarray()        
+        extent = [x[0],x[-1],y[0],y[-1]]
+        igraphic = GraphicFactory.createImage(rgbdata, extent)
         x = plotutil.getplotdata(x)
         y = plotutil.getplotdata(y)
-        igraphic = GraphicFactory.createImage(x, y, rgbdata)
         layer = DrawMeteoData.createImageLayer(x, y, igraphic, 'layer_image')
         if not proj is None:
             layer.setProjInfo(proj)

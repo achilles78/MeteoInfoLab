@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\micaps">
-    <RecentFolder Folder="D:\Working\MIScript\mywork"/>
-    <RecentFolder Folder="D:\Working\MIScript\mywork\aqi_data"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\verification"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\qaqc"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats\learn"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\satellite">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
+    <RecentFolder Folder="D:\Working\MIScript"/>
+    <RecentFolder Folder="D:\Working"/>
+    <RecentFolder Folder="D:\Working\MIScript\cuace_dust"/>
+    <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_weather-mask.py"/>
+      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\satellite\himawari-8-true_color.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_weather-mask.py"/>
+      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\satellite\himawari-8-true_color.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,0" MainFormSize="1425,800"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1382,826"/>
 </MeteoInfo>
