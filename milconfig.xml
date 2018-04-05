@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\gui">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython"/>
     <RecentFolder Folder="D:\Working\MIScript"/>
     <RecentFolder Folder="D:\Working"/>
@@ -19,16 +19,18 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\gui\map.py"/>
+      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\bar_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_legend.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\gui\map.py"/>
+      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\bar_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,0" MainFormSize="1382,826"/>
+  <Startup MainFormLocation="-5,0" MainFormSize="1287,686"/>
 </MeteoInfo>

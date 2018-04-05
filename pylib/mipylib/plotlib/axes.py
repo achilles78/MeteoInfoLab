@@ -13,7 +13,7 @@ from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import LegendManage, BreakTypes
 from org.meteoinfo.shape import ShapeTypes, Graphic
 from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.global import MIMath
+from org.meteoinfo.global import MIMath, Extent
 
 from java.awt import Font
 
@@ -21,7 +21,6 @@ from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
 from mipylib.geolib.milayer import MILayer
 import plotutil
-import miplot
 import mipylib.numeric.minum as minum
 
 class Axes(object):
@@ -29,12 +28,13 @@ class Axes(object):
     Axes with Cartesian coordinate.
     '''
 
-    def __init__(self, axes=None):
+    def __init__(self, axes=None, figure=None):
         if axes is None:
             self.axes = Plot2D()
         else:
             self.axes = axes
         self.axestype = 'cartesian'
+        self.figure = figure
             
     def get_type(self):
         '''
@@ -222,7 +222,7 @@ class Axes(object):
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
-        sy = miplot.figsize()[1] - sy
+        sy = self.figure.get_size()[1] - sy
         return sx, sy
         
     def get_xlim(self):
@@ -326,7 +326,6 @@ class Axes(object):
             self.add_graphic(graphics)
             self.axes.setExtent(graphics.getExtent())
             self.axes.setDrawExtent(graphics.getExtent())
-            miplot.draw_if_interactive()
         return graphics
         
 
@@ -336,7 +335,8 @@ class MapAxes(Axes):
     Axes with geological map coordinate.
     '''
     
-    def __init__(self, axes=None, **kwargs):
+    def __init__(self, axes=None, figure=None, **kwargs):
+        self.figure = figure
         if axes is None:      
             projinfo = kwargs.pop('projinfo', None)
             if projinfo == None:
@@ -418,7 +418,6 @@ class MapAxes(Axes):
         '''
         lbreak, isunique = plotutil.getlegendbreak('polygon', **kwargs)
         circle = self.axes.addCircle(xy[0], xy[1], radius, lbreak)
-        miplot.draw_if_interactive()
         
     def grid(self, b=None, which='major', axis='both', **kwargs):
         """
@@ -460,6 +459,30 @@ class MapAxes(Axes):
             if not linestyle is None:
                 linestyle = plotutil.getlinestyle(linestyle)
                 mapframe.setGridLineStyle(linestyle)
+                
+    def xylim(self, limits=None):
+        """
+        Sets the min and max of the x and y map axes, with ``[xmin, xmax, ymin, ymax]`` .
+        
+        :param limits: (*list*) Min and max of the x and y map axes.
+        """
+        if limits is None:
+            self.axes.setDrawExtent(self.axes.getMapView().getExtent())
+            self.axes.setExtent(self.axes.getDrawExtent().clone())
+            return True
+        else:
+            if len(limits) == 4:
+                xmin = limits[0]
+                xmax = limits[1]
+                ymin = limits[2]
+                ymax = limits[3]
+                extent = Extent(xmin, xmax, ymin, ymax)
+                self.axes.setLonLatExtent(extent)
+                self.axes.setExtent(self.axes.getDrawExtent().clone())
+                return True
+            else:
+                print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
+                return None
         
     def data2pixel(self, x, y, z=None):
         '''
@@ -476,7 +499,7 @@ class MapAxes(Axes):
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
-        sy = miplot.figsize()[1] - sy
+        sy = self.figure.get_size()[1] - sy
         return sx, sy
         
     def loadmip(self, mipfn, mfidx=0):
@@ -558,8 +581,7 @@ class MapAxes(Axes):
             select = kwargs.pop('select', True)
             if select:
                 self.axes.setSelectedLayer(layer)
-                
-            miplot.draw_if_interactive()
+
         return MILayer(layer)
             
 ###############################################
@@ -568,12 +590,13 @@ class PolarAxes(Axes):
     Axes with polar coordinate.
     '''
     
-    def __init__(self, axes=None):
+    def __init__(self, axes=None, figure=None):
         if axes is None:
             self.axes = PolarPlot()
         else:
             self.axes = axes
         self.axestype = 'polar'
+        self.figure = figure
     
     def set_rmax(self, rmax):
         '''
@@ -702,7 +725,7 @@ class PolarAxes(Axes):
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
-        sy = miplot.figsize()[1] - sy
+        sy = self.figure.get_size()[1] - sy
         return sx, sy
         
 #########################################################
@@ -711,7 +734,8 @@ class Axes3D(Axes):
     Axes with 3 dimensional.
     '''
     
-    def __init__(self, axes=None, **kwargs):
+    def __init__(self, axes=None, figure=None, **kwargs):
+        self.figure = figure
         if axes is None:        
             self.axes = Plot3D()
         else:
@@ -750,7 +774,6 @@ class Axes3D(Axes):
         :param dis: (*float*) Distance to object.
         '''
         self.projector.setDistance(dis)
-        miplot.draw_if_interactive()
         
     def get_rotation(self):
         '''
@@ -767,7 +790,6 @@ class Axes3D(Axes):
         :param rotation: (*float*) Rotation angle.
         '''
         self.projector.setRotationAngle(rotation)
-        miplot.draw_if_interactive()
         
     def get_elevation(self):
         '''
@@ -784,7 +806,6 @@ class Axes3D(Axes):
         :param elevation: (*float*) Elevation angle.
         '''
         self.projector.setElevationAngle(elevation)
-        miplot.draw_if_interactive()
         
     def set_draw_xy(self, dxy):
         '''
@@ -793,7 +814,6 @@ class Axes3D(Axes):
         :param dxy: (*boolean*) Draw xy axis or not.
         '''
         self.axes.setDisplayXY(dxy)
-        miplot.draw_if_interactive()
         
     def set_draw_z(self, dz):
         '''
@@ -802,7 +822,6 @@ class Axes3D(Axes):
         :param dz: (*boolean*) Draw z axis or not.
         '''
         self.axes.setDisplayZ(dz)
-        miplot.draw_if_interactive()
         
     def set_draw_box(self, db):
         '''
@@ -811,7 +830,6 @@ class Axes3D(Axes):
         :param db: (*boolean*) Draw 3D box or not.
         '''
         self.axes.setBoxed(db)
-        miplot.draw_if_interactive()
         
     def set_draw_bbox(self, bbox):
         '''
@@ -820,7 +838,6 @@ class Axes3D(Axes):
         :param db: (*boolean*) Draw bounding box or not.
         '''
         self.axes.setDrawBoundingBox(bbox)
-        miplot.draw_if_interactive()
         
     def plot(self, x, y, z, *args, **kwargs):
         """
@@ -891,7 +908,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
-            miplot.draw_if_interactive()
         return graphics
         
     def scatter(self, x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None, 
@@ -989,7 +1005,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
-            miplot.draw_if_interactive()
         return graphics
         
     def plot_wireframe(self, *args, **kwargs):
@@ -1025,7 +1040,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
-            miplot.draw_if_interactive()
         return graphics
         
     def plot_surface(self, *args, **kwargs):
@@ -1075,7 +1089,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
-            miplot.draw_if_interactive()
         return graphics
         
     def contour(self, *args, **kwargs):
@@ -1142,7 +1155,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(igraphic)
-            miplot.draw_if_interactive()
         return igraphic
         
     def contourf(self, *args, **kwargs):
@@ -1214,7 +1226,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(igraphic)
-            miplot.draw_if_interactive()
         return igraphic
         
     def imshow(self, *args, **kwargs):
@@ -1320,7 +1331,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
-            miplot.draw_if_interactive()
         return graphics
         
     def plot_layer(self, layer, **kwargs):
@@ -1356,7 +1366,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
-            miplot.draw_if_interactive()
         return graphics
         
     def fill_between(self, x, y1, y2=0, where=None, **kwargs):
@@ -1418,7 +1427,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
-            miplot.draw_if_interactive()
         return graphics
         
     def text(self, x, y, z, s, zdir=None, **kwargs):
@@ -1490,7 +1498,6 @@ class Axes3D(Axes):
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphic)
-            miplot.draw_if_interactive()
         return graphic
         
     def data2pixel(self, x, y, z=None):
@@ -1508,7 +1515,7 @@ class Axes3D(Axes):
         r = self.axes.projToScreen(x, y, rect)
         sx = r[0] + rect.getX()
         sy = r[1] + rect.getY()
-        sy = miplot.figsize()[1] - sy
+        sy = self.figure.get_size()[1] - sy
         return sx, sy
         
         

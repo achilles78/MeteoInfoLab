@@ -3510,22 +3510,9 @@ def axism(limits=None):
     
     :param limits: (*list*) Min and max of the x and y map axes.
     """
-    if limits is None:
-        gca.axes.setDrawExtent(gca.axes.getMapView().getExtent())
-        gca.axes.setExtent(gca.axes.getDrawExtent().clone())
+    r = gca.xylim(limits)
+    if not r is None:
         draw_if_interactive()
-    else:
-        if len(limits) == 4:
-            xmin = limits[0]
-            xmax = limits[1]
-            ymin = limits[2]
-            ymax = limits[3]
-            extent = Extent(xmin, xmax, ymin, ymax)
-            gca.axes.setLonLatExtent(extent)
-            gca.axes.setExtent(gca.axes.getDrawExtent().clone())
-            draw_if_interactive()
-        else:
-            print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
 
 def grid(b=None, which='major', axis='both', **kwargs):
     """
@@ -4105,7 +4092,10 @@ def pcolor(*args, **kwargs):
         if gca.axestype != 'cartesian':
             gca = axes()
             
-    return gca.pcolor(*args, **kwargs)
+    r = gca.pcolor(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
       
 def contour(*args, **kwargs):
     """
@@ -5121,7 +5111,11 @@ def pcolorm(*args, **kwargs):
         if gca.axestype != 'map':
             gca = axesm()
             
-    return gca.pcolor(*args, **kwargs)
+    r = gca.pcolor(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    
+    return r
     
 def quiverm(*args, **kwargs):
     """

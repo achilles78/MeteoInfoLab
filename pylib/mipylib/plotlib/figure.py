@@ -6,7 +6,7 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.chart import ChartPanel, Chart, Location
+from org.meteoinfo.chart import ChartPanel, Chart, Location, MouseMode
 import plotutil
 from axes import Axes, PolarAxes, MapAxes, Axes3D
 from java.awt import Color, Font
@@ -30,6 +30,14 @@ class Figure(ChartPanel):
             super(Figure, self).__init__(chart)
         else:
             super(Figure, self).__init__(chart, figsize[0], figsize[1])
+            
+    def get_size(self):
+        '''
+        Get figure size.
+        
+        :returns: Figure width and height
+        '''
+        return self.getFigureWidth(), self.getFigureHeight()
      
     def __create_axes(self, *args, **kwargs):
         """
@@ -223,6 +231,15 @@ class Figure(ChartPanel):
         
         :returns: The map axes.
         """       
+        aspect = kwargs.pop('aspect', 'equal')
+        if aspect == 'equal':
+            ax.axes.setAutoAspect(False)
+        elif aspect == 'auto':
+            ax.axes.setAutoAspect(True)
+        else:
+            if isinstance(aspect, (int, float)):
+                ax.axes.setAspect(aspect)
+                ax.axes.setAutoAspect(False)
         axis = kwargs.pop('axis', True)
         if axis:
             bottomaxis = kwargs.pop('bottomaxis', True)
@@ -374,16 +391,16 @@ class Figure(ChartPanel):
         if polar:
             axestype = 'polar'
         if axestype == 'polar':
-            ax = PolarAxes()
+            ax = PolarAxes(figure=self)
             self.__set_axes(ax, **kwargs)
         elif axestype == 'map':
-            ax = MapAxes(**kwargs)
+            ax = MapAxes(figure=self, **kwargs)
             self.__set_axesm(ax, **kwargs)
         elif axestype == '3d':
-            ax = Axes3D(**kwargs)
+            ax = Axes3D(figure = self, **kwargs)
             self.__set_axes3d(ax, **kwargs)
         else:
-            ax = Axes()
+            ax = Axes(figure=self)
             self.__set_axes(ax, **kwargs)
         self.__set_axes_common(ax, *args, **kwargs)   
 
@@ -426,6 +443,21 @@ class Figure(ChartPanel):
 
         return ax
         
+    def draw(self):
+        '''
+        Re-paint the figure.
+        '''
+        self.paintGraphics()
+        
+    def set_mousemode(self, mm):
+        '''
+        Set MouseMode.
+        
+        :param mm: (*string*) MouseMode string [zoom_in | zoom_out | pan | identifer
+            | rotate | select].
+        '''
+        mm = MouseMode.valueOf(mm.upper())
+        self.setMouseMode(mm)
 
 ########################################################3
 class Test():
