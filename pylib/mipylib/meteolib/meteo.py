@@ -24,7 +24,7 @@ degCtoK=273.15      # Temperature offset between K and C (deg C)
 g = 9.8             # Gravitational acceleration (m / s^2)
 
 __all__ = [
-    'dewpoint2rh','dry_lapse','ds2uv','dt','equivalent_potential_temperature','h2p',
+    'dewpoint2rh','dry_lapse','ds2uv','equivalent_potential_temperature','h2p',
     'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh',
     'saturation_mixing_ratio','tc2tf','tf2tc','uv2ds','pressure_to_height_std',
     'height_to_pressure_std','eof','varimax'

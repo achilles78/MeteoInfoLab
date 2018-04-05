@@ -8,8 +8,9 @@
 
 from org.meteoinfo.chart import ChartPanel, Chart, Location, MouseMode
 import plotutil
-from axes import Axes, PolarAxes, MapAxes, Axes3D
-from java.awt import Color, Font
+from axes import Axes, PolarAxes, Axes3D
+from mapaxes import MapAxes
+from java.awt import Font
 
 class Figure(ChartPanel):
     '''
@@ -134,16 +135,6 @@ class Figure(ChartPanel):
             leftaxis = False
             topaxis = False
             rightaxis = False
-        xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
-        yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
-        xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
-        ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
-        xscale = kwargs.pop('xscale', 'linear')    #or 'log'
-        yscale = kwargs.pop('yscale', 'linear')    #or 'log'
-        xtick = kwargs.pop('xtick', [])
-        ytick = kwargs.pop('ytick', [])
-        xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
-        ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'
         xreverse = kwargs.pop('xreverse', False)
         yreverse = kwargs.pop('yreverse', False)
         xaxistype = kwargs.pop('xaxistype', None)
@@ -250,18 +241,7 @@ class Figure(ChartPanel):
             bottomaxis = False
             leftaxis = False
             topaxis = False
-            rightaxis = False
-        xaxisloc = kwargs.pop('xaxislocation', 'bottom')    #or 'top'
-        yaxisloc = kwargs.pop('yaxislocation', 'left')    #or 'right'
-        xdir = kwargs.pop('xdir', 'normal')    #or 'reverse'
-        ydir = kwargs.pop('ydir', 'normal')    #or 'reverse'
-        xscale = kwargs.pop('xscale', 'linear')    #or 'log'
-        yscale = kwargs.pop('yscale', 'linear')    #or 'log'
-        xtick = kwargs.pop('xtick', [])
-        ytick = kwargs.pop('ytick', [])
-        xtickmode = kwargs.pop('xtickmode', 'auto')    #or 'manual'
-        ytickmode = kwargs.pop('ytickmode', 'auto')    #or 'manual'  
-            
+            rightaxis = False            
         gridlabel = kwargs.pop('gridlabel', True)
         gridline = kwargs.pop('gridline', False)
         griddx = kwargs.pop('griddx', 10)
@@ -458,8 +438,3 @@ class Figure(ChartPanel):
         '''
         mm = MouseMode.valueOf(mm.upper())
         self.setMouseMode(mm)
-
-########################################################3
-class Test():
-    def test():
-        print 'Test...'

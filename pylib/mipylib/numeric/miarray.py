@@ -5,20 +5,17 @@
 # Note: Jython
 #-----------------------------------------------------
 #import math
-from org.meteoinfo.projection import ProjectionInfo
-from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
+from org.meteoinfo.data import GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension
 from org.meteoinfo.math import Complex
 from org.meteoinfo.math.linalg import LinalgUtil
-from ucar.ma2 import Array, Range, MAMath, DataType, Index
+from ucar.ma2 import Array, Range, MAMath
 import jarray
 import numbers
 
 #import milayer
 #from milayer import MILayer
-import mipylib.miutil
 
-from java.lang import Double
 import datetime
         
 # The encapsulate class of Array
@@ -418,7 +415,7 @@ class MIArray(object):
         '''
         return ArrayMath.containsNaN(self.array)
     
-    def getsize():
+    def getsize(self):
         if name == 'size':
             sizestr = str(self.shape[0])
             if self.ndim > 1:

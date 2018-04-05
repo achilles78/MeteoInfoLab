@@ -4,10 +4,9 @@
 # Purpose: MeteoInfo Dataset module
 # Note: Jython
 #-----------------------------------------------------
-from org.meteoinfo.data.meteodata import MeteoDataInfo, MeteoDataType
-from ucar.ma2 import Section, DataType
+from org.meteoinfo.data.meteodata import MeteoDataType
+from ucar.ma2 import DataType
 from ucar.nc2 import Attribute
-import dimvariable
 from dimvariable import DimVariable, TDimVariable
 from mipylib.numeric.dimarray import DimArray, PyGridData, PyStationData
 from mipylib.geolib.milayer import MILayer, MIXYListData

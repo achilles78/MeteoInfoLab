@@ -7,11 +7,11 @@
 
 import datetime
 
-from org.meteoinfo.legend import LineStyles, HatchStyle, BreakTypes, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
+from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage
 from org.meteoinfo.drawing import PointStyle, MarkerType
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.shape import ShapeTypes
-from java.awt import Color, Font
+from java.awt import Color
 
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray

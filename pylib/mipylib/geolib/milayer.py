@@ -7,7 +7,7 @@
 from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes, VectorLayer
 from org.meteoinfo.projection import ProjectionManage, KnownCoordinateSystems
-from org.meteoinfo.shape import PolygonShape, ShapeTypes, PointShape
+from org.meteoinfo.shape import PolygonShape, ShapeTypes
 from java.util import Date, Calendar
 from java.awt import Font
 from datetime import datetime

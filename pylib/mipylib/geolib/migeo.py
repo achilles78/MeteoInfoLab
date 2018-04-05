@@ -17,7 +17,6 @@ from org.meteoinfo.data.mapdata import MapDataManage, AttributeTable
 from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
 from org.meteoinfo.global import PointD
 
-import milayer
 from milayer import MILayer
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray

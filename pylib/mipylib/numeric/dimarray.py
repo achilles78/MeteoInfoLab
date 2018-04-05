@@ -4,14 +4,12 @@
 # Purpose: MeteoInfo dimarray module
 # Note: Jython
 #-----------------------------------------------------
-from org.meteoinfo.projection import ProjectionInfo, KnownCoordinateSystems, Reproject
-from org.meteoinfo.data import GridData, GridArray, StationData, ArrayMath, ArrayUtil
+from org.meteoinfo.projection import KnownCoordinateSystems, Reproject
+from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 from org.meteoinfo.geoprocess.analysis import ResampleMethods
-from org.meteoinfo.layer import VectorLayer
 from org.meteoinfo.global import PointD
-from ucar.ma2 import Array, Range, MAMath, Index
-import miarray
+from ucar.ma2 import Array, Range, MAMath
 #import milayer
 from miarray import MIArray
 #from milayer import MILayer

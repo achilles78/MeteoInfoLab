@@ -7,9 +7,8 @@
 
 import datetime
 
-from org.meteoinfo.data import TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
+from org.meteoinfo.data import TableData, TimeTableData, ArrayUtil, TableUtil, DataTypes
 
-import miarray
 from miarray import MIArray
 import mipylib.miutil as miutil
 

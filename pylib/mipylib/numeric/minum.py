@@ -4,38 +4,22 @@
 # Purpose: MeteoInfo numerical module
 # Note: Jython
 #-----------------------------------------------------
-import os
-import sys
 import math
 import cmath
 import datetime
-from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, TableData, TimeTableData, ArrayMath, ArrayUtil, TableUtil, DataTypes
-from org.meteoinfo.data.meteodata import MeteoDataInfo, Dimension, DimensionType
+from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, TableData, ArrayMath, ArrayUtil, TableUtil
+from org.meteoinfo.data.meteodata import Dimension
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
-from org.meteoinfo.data.meteodata.arl import ARLDataInfo
-from org.meteoinfo.data.meteodata.bufr import BufrDataInfo
-from org.meteoinfo.data.mapdata import MapDataManage
-from org.meteoinfo.data.mapdata.geotiff import GeoTiff
-from org.meteoinfo.data.analysis import MeteoMath
-from org.meteoinfo.geoprocess import GeoComputation
-from org.meteoinfo.shape import ShapeUtil
-from org.meteoinfo.legend import BreakTypes
-from ucar.nc2 import NetcdfFileWriter
-from ucar.ma2 import Array, DataType
+from ucar.ma2 import Array
 
-import dimarray
-import miarray
-import mipylib.miutil
 from dimarray import PyGridData, DimArray, PyStationData
 from miarray import MIArray
-import mitable
 from mitable import PyTableData
 import series
 from series import Series
 
-from java.awt import Color
 from java.lang import Math, Double
-from java.util import Calendar, ArrayList, Date
+from java.util import Calendar
 
 # Global variables
 pi = Math.PI
@@ -1835,7 +1819,6 @@ def griddata(points, values, xi=None, **kwargs):
     :returns: (*array*) Interpolated grid data (2-D array)
     '''
     method = kwargs.pop('method', 'idw')
-    fill_value = kwargs.pop('fill_value', nan)
     x_s = points[0]
     y_s = points[1]
     if xi is None:

@@ -20,7 +20,6 @@ import mipylib.miutil as miutil
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.mitable import PyTableData
-import dimdatafile
 from dimdatafile import DimDataFile, DimDataFiles
 import mipylib.migl as migl
 
