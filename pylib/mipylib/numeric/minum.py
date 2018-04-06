@@ -1864,8 +1864,8 @@ def griddata(points, values, xi=None, **kwargs):
     if convexhull:
         polyshape = ArrayUtil.convexHull(x_s.asarray(), y_s.asarray())
         x_gg, y_gg = meshgrid(x_g, y_g)
-        r = maskout(MIArray(r), x=x_gg, y=y_gg, mask=polyshape)
-        return r, x_g, y_g
+        r = ArrayMath.maskout(r, x_gg.array, y_gg.array, [polyshape])
+        return MIArray(r), x_g, y_g
     else:
         return MIArray(r), x_g, y_g
 

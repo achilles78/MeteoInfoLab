@@ -1819,7 +1819,7 @@ def caxes(ax=None):
         gca = ax
         chart.setCurrentPlot(chart.getPlotIndex(ax.axes))
     return gca
-    
+
 def subplot(nrows, ncols, plot_number, **kwargs):
     """
     Returen a subplot axes positioned by the given grid definition.
@@ -1836,84 +1836,12 @@ def subplot(nrows, ncols, plot_number, **kwargs):
         figure()
         
     global gca
-    chart = g_figure.getChart()
-    chart.setRowNum(nrows)
-    chart.setColumnNum(ncols)
-    gca = None
-    #if isinstance(plot_number, int):
-    #    gca = chart.getPlot(plot_number)          
-    isnew = gca is None
-    if isnew:
-        polar = kwargs.pop('polar', False)
-        if polar:
-            gca = PolarAxes()
-        else:
-            gca = Axes()
-        gca.axes.isSubPlot = True        
-        #gca.rowIndex = rowidx
-        #gca.columnIndex = colidx
-    else:
-        chart.setCurrentPlot(plot_number - 1)  
-    position = kwargs.pop('position', None)
-    if position is None:
-        if isnew:
-            if isinstance(plot_number, (list, tuple)):
-                i = 0
-                for pnum in plot_number:
-                    pnum -= 1
-                    rowidx = pnum / ncols
-                    colidx = pnum % ncols
-                    width = 1. / ncols
-                    height = 1. / nrows                    
-                    x = width * colidx
-                    y = 1. - height * (rowidx + 1)
-                    if i == 0:
-                        minx = x
-                        miny = y
-                        maxx = x + width
-                        maxy = y + height
-                    else:
-                        minx = min(x, minx)
-                        miny = min(y, miny)
-                        maxx = max(x + width, maxx)
-                        maxy = max(y + height, maxy)
-                    i += 1
-                x = minx
-                y = miny
-                width = maxx - minx
-                height = maxy - miny
-            else:
-                plot_number -= 1
-                rowidx = plot_number / ncols
-                colidx = plot_number % ncols
-                width = 1. / ncols
-                height = 1. / nrows
-                x = width * colidx
-                y = 1. - height * (rowidx + 1)
-            gca.set_position([x, y, width, height])
-            gca.set_outerposition([x, y, width, height])
-            gca.active_outerposition(True)
-    else:
-        gca.set_position(position)
-        gca.active_outerposition(False)
-    outerposition = kwargs.pop('outerposition', None)
-    if not outerposition is None:
-        gca.set_outerposition(outerposition)
-        gca.active_outerposition(True)
-        
-    if isinstance(gca, MapAxes):
-        __set_axesm(gca, **kwargs)
-    else:
-        __set_axes(gca, **kwargs)
-        
-    if isnew:
-        chart.addPlot(gca.axes)
-        chart.setCurrentPlot(chart.getPlots().size() - 1)
+    gca = g_figure.subplot(nrows, ncols, plot_number, **kwargs)
     
     return gca
     
 def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
-    subplot_kw=None, wspace=None, hspace=None, axestype='Axes', **kwargs):
+    wspace=None, hspace=None, axestype='Axes', **kwargs):
     '''
     Create a figure and a set of subplots.
     
@@ -1932,92 +1860,20 @@ def subplots(nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
     
     :returns: The figure and the axes tuple.
     '''
-    if position is None:
-        if wspace is None and hspace is None:
-            position = [0, 0, 1, 1]
-        else:
-            position = [0.13, 0.11, 0.775, 0.815]
-    left = float(position[0])
-    bottom = float(position[1])
-    width = float(position[2])
-    height = float(position[3])
-    
     global g_figure
     if g_figure is None:
         figure()
         
-    chart = g_figure.getChart()
-    chart.setRowNum(nrows)
-    chart.setColumnNum(ncols)
-    axs = []
-    ax2d = nrows > 1 and ncols > 1
-    w = width / ncols
-    h = height / nrows
-    iswspace = False
-    ishspace = False
-    if not wspace is None and ncols > 1:
-        w = (width - wspace * (ncols - 1)) / ncols
-        iswspace = True
-    if not hspace is None and nrows > 1:
-        h = (height - hspace * (nrows - 1)) / nrows
-        ishspace = True
-    axestype = axestype.lower()
-    y = bottom + height - h
-    for i in range(nrows):
-        if ax2d:
-            axs2d = []
-        x = left
-        if ishspace:
-            if i > 0:
-                y -= hspace
-        for j in range(ncols):   
-            if axestype == 'axes3d':
-                ax = Axes3D()
-                __set_axes3d(ax, **kwarg)
-            elif axestype == 'mapaxes':
-                ax = MapAxes()
-                __set_axesm(ax, **kwargs)
-            elif axestype == 'polaraxes':
-                ax = PolarAxes()
-            else:
-                ax = Axes()
-                __set_axes(ax, **kwargs)
-            ax.axes.isSubPlot = True             
-            if not iswspace and not ishspace:
-                x = left + w * j
-                y = (bottom + height) - h * (i + 1)
-                ax.set_position([x, y, w, h])
-                ax.set_outerposition([x, y, w, h])
-                ax.active_outerposition(True)
-            else:
-                if iswspace:
-                    if j > 0:
-                        x += wspace                
-                ax.set_position([x, y, w, h])
-                ax.active_outerposition(False)
-                x += w
-            if sharex:
-                if i < nrows - 1:
-                    ax.axes.getAxis(Location.BOTTOM).setDrawTickLabel(False)
-            if sharey:
-                if j > 0:
-                    ax.axes.getAxis(Location.LEFT).setDrawTickLabel(False)
-            chart.addPlot(ax.axes)
-            if ax2d:
-                axs2d.append(ax)
-            else:
-                axs.append(ax)
-        if ax2d:
-            axs.append(tuple(axs2d))
-        y -= h
+    axs = g_figure.subplots(nrows, ncols, position, sharex, sharey, \
+        wspace, hspace, axestype, **kwargs)
         
     global gca
-    if ax2d:
+    if isinstance(axs[0], tuple):
         gca = axs[0][0]
     else:
         gca = axs[0]
-    return g_figure, tuple(axs)
-    
+    return g_figure, axs
+
 def currentplot(plot_number):
     if g_figure is None:
         figure()
@@ -5293,6 +5149,23 @@ def webmap(provider='OpenStreetMap', order=0):
     return MILayer(layer)
         
 def geoshow(*args, **kwargs):
+    '''
+    Display map layer or longitude latitude data.
+    
+    Syntax:
+    --------    
+        geoshow(shapefilename) - Displays the map data from a shape file.
+        geoshow(layer) - Displays the map data from a map layer which may created by ``shaperead`` function.
+        geoshow(S) - Displays the vector geographic features stored in S as points, multipoints, lines, or 
+          polygons.
+        geoshow(lat, lon) - Displays the latitude and longitude vectors.
+    '''
+    global gca
+    r = gca.geoshow(*args, **kwargs)
+    draw_if_interactive()
+    return r
+        
+def geoshow_bak(*args, **kwargs):
     '''
     Display map layer or longitude latitude data.
     

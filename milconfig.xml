@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
-    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
-    <RecentFolder Folder="D:\Working\MIScript"/>
-    <RecentFolder Folder="D:\Working"/>
-    <RecentFolder Folder="D:\Working\MIScript\cuace_dust"/>
-    <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py"/>
+  <Path OpenPath="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
@@ -16,17 +11,22 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\gui"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\DustView"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\bar_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm.py"/>
+      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\configure.py"/>
+      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\frmDataFolder.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\bar_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\conoutm.py"/>
+      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\configure.py"/>
+      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\frmDataFolder.py"/>
     </RecentFiles>
   </File>
   <Font>

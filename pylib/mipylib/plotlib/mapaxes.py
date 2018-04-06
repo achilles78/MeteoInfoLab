@@ -6,13 +6,16 @@
 # Note: Jython
 #-----------------------------------------------------
 
+import os
+
 from org.meteoinfo.chart.plot import MapPlot
 from org.meteoinfo.data import ArrayUtil
 from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import BreakTypes
-from org.meteoinfo.shape import ShapeTypes, Graphic
+from org.meteoinfo.shape import Shape, ShapeTypes, Graphic
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.global import Extent
+from org.meteoinfo.layer import LayerTypes
 
 from java.awt import Font
 
@@ -416,4 +419,8 @@ class MapAxes(Axes):
                 self.axes.setSelectedLayer(layer)
 
         return MILayer(layer)
-            
+
+########################################################3
+class Test():
+    def test():
+        print 'Test...'        

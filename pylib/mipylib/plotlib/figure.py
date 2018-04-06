@@ -31,6 +31,8 @@ class Figure(ChartPanel):
             super(Figure, self).__init__(chart)
         else:
             super(Figure, self).__init__(chart, figsize[0], figsize[1])
+        self.axes = []
+        self.current_axes = -1
             
     def get_size(self):
         '''
@@ -411,7 +413,7 @@ class Figure(ChartPanel):
         newaxes = kwargs.pop('newaxes', True)
         chart = self.getChart()
         if newaxes:
-            chart.addPlot(ax.axes)
+            self._add_axes(ax)
         else:
             plot = chart.getCurrentPlot()
             if plot.isSubPlot:
@@ -422,6 +424,15 @@ class Figure(ChartPanel):
             chart.setCurrentPlot(ax.axes)
 
         return ax
+        
+    def _add_axes(self, ax):
+        '''
+        Add a axes.
+        
+        :param ax: (*Axes*) The axes.
+        '''
+        self.axes.append(ax)
+        self.getChart().addPlot(ax.axes)
         
     def draw(self):
         '''
@@ -438,3 +449,190 @@ class Figure(ChartPanel):
         '''
         mm = MouseMode.valueOf(mm.upper())
         self.setMouseMode(mm)
+
+    def subplot(self, nrows, ncols, plot_number, **kwargs):
+        """
+        Returen a subplot axes positioned by the given grid definition.
+
+        :param nrows, nrows: (*int*) Whree *nrows* and *ncols* are used to notionally spli the 
+            figure into ``nrows * ncols`` sub-axes.
+        :param plot_number: (*int) Is used to identify the particular subplot that this function
+            is to create within the notional gird. It starts at 1, increments across rows first
+            and has a maximum of ``nrows * ncols`` .
+
+        :returns: Current axes specified by ``plot_number`` .
+        """
+        chart = self.getChart()
+        chart.setRowNum(nrows)
+        chart.setColumnNum(ncols)
+        polar = kwargs.pop('polar', False)
+        isnew = True
+        if isnew:
+            polar = kwargs.pop('polar', False)
+            if polar:
+                ax = PolarAxes()
+            else:
+                ax = Axes()
+            ax.axes.isSubPlot = True        
+        else:
+            chart.setCurrentPlot(plot_number - 1)  
+        position = kwargs.pop('position', None)
+        if position is None:
+            if isnew:
+                if isinstance(plot_number, (list, tuple)):
+                    i = 0
+                    for pnum in plot_number:
+                        pnum -= 1
+                        rowidx = pnum / ncols
+                        colidx = pnum % ncols
+                        width = 1. / ncols
+                        height = 1. / nrows                    
+                        x = width * colidx
+                        y = 1. - height * (rowidx + 1)
+                        if i == 0:
+                            minx = x
+                            miny = y
+                            maxx = x + width
+                            maxy = y + height
+                        else:
+                            minx = min(x, minx)
+                            miny = min(y, miny)
+                            maxx = max(x + width, maxx)
+                            maxy = max(y + height, maxy)
+                        i += 1
+                    x = minx
+                    y = miny
+                    width = maxx - minx
+                    height = maxy - miny
+                else:
+                    plot_number -= 1
+                    rowidx = plot_number / ncols
+                    colidx = plot_number % ncols
+                    width = 1. / ncols
+                    height = 1. / nrows
+                    x = width * colidx
+                    y = 1. - height * (rowidx + 1)
+                ax.set_position([x, y, width, height])
+                ax.set_outerposition([x, y, width, height])
+                ax.active_outerposition(True)
+        else:
+            ax.set_position(position)
+            ax.active_outerposition(False)
+        outerposition = kwargs.pop('outerposition', None)
+        if not outerposition is None:
+            ax.set_outerposition(outerposition)
+            ax.active_outerposition(True)
+
+        if isinstance(ax, MapAxes):
+            self.__set_axesm(ax, **kwargs)
+        else:
+            self.__set_axes(ax, **kwargs)
+
+        if isnew:
+            chart.addPlot(ax.axes)
+            chart.setCurrentPlot(chart.getPlots().size() - 1)
+
+        return ax
+
+    def subplots(self, nrows=1, ncols=1, position=None, sharex=False, sharey=False, \
+        wspace=None, hspace=None, axestype='Axes', **kwargs):
+        '''
+        Create a figure and a set of subplots.
+
+        :param nrows: (*int*) Number of rows.
+        :param ncols: (*int*) Number of cols.
+        :param position: (*list*) All axes' position specified by *position=* [left, bottom, width
+            height] in normalized (0, 1) units. Default is [0,0,1,1].
+        :param sharex: (*boolean*) If share x axis.
+        :param sharey: (*boolean*) If share y axis.
+        :param subplot_kw: (*dict*) Subplot key words.
+        :param wspace: (*float*) The amount of width reserved for blank space between subplots,
+            expressed as a fraction of the average axis width.
+        :param hspace: (*float*) The amount of height reserved for blank space between subplots,
+            expressed as a fraction of the average axis height.
+        :param axestype: (*string*) Axes type [Axes | Axes3D | MapAxes | PolarAxes].
+
+        :returns: The figure and the axes tuple.
+        '''
+        if position is None:
+            if wspace is None and hspace is None:
+                position = [0, 0, 1, 1]
+            else:
+                position = [0.13, 0.11, 0.775, 0.815]
+        left = float(position[0])
+        bottom = float(position[1])
+        width = float(position[2])
+        height = float(position[3])
+
+        chart = self.getChart()
+        chart.setRowNum(nrows)
+        chart.setColumnNum(ncols)
+        axs = []
+        ax2d = nrows > 1 and ncols > 1
+        w = width / ncols
+        h = height / nrows
+        iswspace = False
+        ishspace = False
+        if not wspace is None and ncols > 1:
+            w = (width - wspace * (ncols - 1)) / ncols
+            iswspace = True
+        if not hspace is None and nrows > 1:
+            h = (height - hspace * (nrows - 1)) / nrows
+            ishspace = True
+        axestype = axestype.lower()
+        y = bottom + height - h
+        for i in range(nrows):
+            if ax2d:
+                axs2d = []
+            x = left
+            if ishspace:
+                if i > 0:
+                    y -= hspace
+            for j in range(ncols):   
+                if axestype == 'axes3d':
+                    ax = Axes3D()
+                    self.__set_axes3d(ax, **kwarg)
+                elif axestype == 'mapaxes':
+                    ax = MapAxes()
+                    self.__set_axesm(ax, **kwargs)
+                elif axestype == 'polaraxes':
+                    ax = PolarAxes()
+                else:
+                    ax = Axes()
+                    self.__set_axes(ax, **kwargs)
+                ax.axes.isSubPlot = True             
+                if not iswspace and not ishspace:
+                    x = left + w * j
+                    y = (bottom + height) - h * (i + 1)
+                    ax.set_position([x, y, w, h])
+                    ax.set_outerposition([x, y, w, h])
+                    ax.active_outerposition(True)
+                else:
+                    if iswspace:
+                        if j > 0:
+                            x += wspace                
+                    ax.set_position([x, y, w, h])
+                    ax.active_outerposition(False)
+                    x += w
+                if sharex:
+                    if i < nrows - 1:
+                        ax.axes.getAxis(Location.BOTTOM).setDrawTickLabel(False)
+                if sharey:
+                    if j > 0:
+                        ax.axes.getAxis(Location.LEFT).setDrawTickLabel(False)
+                chart.addPlot(ax.axes)
+                if ax2d:
+                    axs2d.append(ax)
+                else:
+                    axs.append(ax)
+            if ax2d:
+                axs.append(tuple(axs2d))
+            y -= h
+        
+        chart.setCurrentPlot(0)
+        return tuple(axs)
+        
+########################################################3
+class Test():
+    def test():
+        print 'Test...'
