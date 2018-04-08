@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
-    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+  <Path OpenPath="D:\MyProgram\jython\CARSNET\pylib">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\gui"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
-    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib"/>
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox"/>
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\DustView"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev"/>
+    <RecentFolder Folder="D:\MyProgram\java"/>
+    <RecentFolder Folder="D:\MyProgram"/>
+    <RecentFolder Folder="D:\MyProgram\jython"/>
+    <RecentFolder Folder="D:\MyProgram\jython\CARSNET"/>
+    <RecentFolder Folder="D:\MyProgram\jython\CARSNET\pylib"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
-      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\configure.py"/>
-      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\frmDataFolder.py"/>
+      <OpenedFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
+      <OpenedFile File="D:\MyProgram\jython\CARSNET\pylib\configure.py"/>
+      <OpenedFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
+      <OpenedFile File="D:\MyProgram\jython\CARSNET\pylib\spdata.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\mainGUI.py"/>
-      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\configure.py"/>
-      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\Sunphotometer\pylib\frmDataFolder.py"/>
+      <RecentFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
+      <RecentFile File="D:\MyProgram\jython\CARSNET\pylib\configure.py"/>
+      <RecentFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
+      <RecentFile File="D:\MyProgram\jython\CARSNET\pylib\spdata.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-5,0" MainFormSize="1287,686"/>
+  <Startup MainFormLocation="-5,0" MainFormSize="1380,777"/>
 </MeteoInfo>

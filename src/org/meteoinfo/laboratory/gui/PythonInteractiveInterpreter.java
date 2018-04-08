@@ -149,8 +149,8 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
             Logger.getLogger(PythonInteractiveInterpreter.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.console.print(">>> ", Color.red);
-        //this.console.setStyle(Color.black);
-        //this.console.setForeground(Color.black);
+        this.console.setStyle(Color.black);
+        this.console.setForeground(Color.black);
     }
 
     private void fireConsoleExecEvent(ConsoleExecEvent event) {

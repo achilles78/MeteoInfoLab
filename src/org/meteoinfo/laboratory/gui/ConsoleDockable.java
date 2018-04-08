@@ -200,20 +200,20 @@ public class ConsoleDockable extends DefaultSingleCDockable {
      */
     public void execfile(final String fn) {
         SwingWorker worker = new SwingWorker<String, String>() {
-            PrintStream oout = System.out;
-            PrintStream oerr = System.err;
+            //PrintStream oout = System.out;
+            //PrintStream oerr = System.err;
 
             @Override
             protected String doInBackground() throws Exception {
-                JTextPane jTextPane_Output = interp.console.getTextPane();
-                JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
-                JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
+                //JTextPane jTextPane_Output = interp.console.getTextPane();
+                //JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
+                //JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
 
                 interp.console.println("run script...");
-                interp.setOut(writer);
-                interp.setErr(writer);
-                System.setOut(printStream);
-                System.setErr(printStream);
+                //interp.setOut(writer);
+                //interp.setErr(writer);
+                //System.setOut(printStream);
+                //System.setErr(printStream);
 
                 try {
                     interp.exec("mipylib.plotlib.miplot.isinteractive = False");
@@ -233,8 +233,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
             @Override
             protected void done() {
-                System.setOut(oout);
-                System.setErr(oerr);
+                //System.setOut(oout);
+                //System.setErr(oerr);
                 ChartPanel cp = parent.getFigureDock().getCurrentFigure();
                 if (cp != null) {
                     cp.paintGraphics();
@@ -283,8 +283,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
     public void runPythonScript(final String code) throws InterruptedException {
 
         SwingWorker worker = new SwingWorker<String, String>() {
-            PrintStream oout = System.out;
-            PrintStream oerr = System.err;
+            //PrintStream oout = System.out;
+            //PrintStream oerr = System.err;
 
             @Override
             protected String doInBackground() throws Exception {
@@ -292,15 +292,15 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 //JTextAreaPrintStream printStream = new JTextAreaPrintStream(System.out, jTextArea_Output);
                 //jTextArea_Output.setText("");
 
-                JTextPane jTextPane_Output = interp.console.getTextPane();
-                JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
-                JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
+                //JTextPane jTextPane_Output = interp.console.getTextPane();
+                //JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
+                //JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
 
                 interp.console.println("run script...");
-                interp.setOut(writer);
-                interp.setErr(writer);
-                System.setOut(printStream);
-                System.setErr(printStream);
+                //interp.setOut(writer);
+                //interp.setErr(writer);
+                //System.setOut(printStream);
+                //System.setErr(printStream);
 
                 String encoding = "utf-8";
                 try {
@@ -310,10 +310,11 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                     interp.exec("mipylib.plotlib.miplot.isinteractive = True");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    interp.console.print(">>> ", Color.red);
-                    interp.console.setStyle(Color.black);
+                    //interp.console.print(">>> ", Color.red);
+                    //interp.console.setStyle(Color.black);
                     //interp.console.setForeground(Color.black);
                     interp.exec("mipylib.plotlib.miplot.isinteractive = True");
+                    interp.fireConsoleExecEvent();
                 }
 
                 //String encoding = EncodingUtil.findEncoding(code);                
@@ -341,8 +342,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
 
             @Override
             protected void done() {
-                System.setOut(oout);
-                System.setErr(oerr);
+                //System.setOut(oout);
+                //System.setErr(oerr);
                 ChartPanel cp = parent.getFigureDock().getCurrentFigure();
                 if (cp != null) {
                     cp.paintGraphics();

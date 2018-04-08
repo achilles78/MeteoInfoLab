@@ -768,6 +768,10 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
+        formClose();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formClose(){
         this.saveConfigureFile();
         boolean isDispose = true;
         for (int i = 0; i < this.editorDock.getTabbedPane().getTabCount(); i++) {
@@ -798,8 +802,8 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         if (isDispose) {
             System.exit(0);
         }
-    }//GEN-LAST:event_formWindowClosing
-
+    }
+    
     private void jButton_SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SaveAsActionPerformed
         // TODO add your handling code here:
         TextEditor editor = this.editorDock.getActiveTextEditor();
@@ -912,7 +916,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
 
     private void jMenuItem_ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_ExitActionPerformed
         // TODO add your handling code here:
-        this.dispose();
+        formClose();
     }//GEN-LAST:event_jMenuItem_ExitActionPerformed
 
     private void jMenuItem_CloseAllFilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_CloseAllFilesActionPerformed
