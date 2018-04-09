@@ -89,7 +89,7 @@ def draw():
     Draw the current figure.
     '''
     g_figure.paintGraphics()
-        
+    
 def plot(*args, **kwargs):
     """
     Plot lines and/or markers to the axes. *args* is a variable length argument, allowing
@@ -139,154 +139,20 @@ def plot(*args, **kwargs):
       =========  =====
     """
     global gca
-    
-    xdatalist = []
-    ydatalist = []    
-    styles = []
-    xaxistype = None
-    isxylistdata = False
-    if len(args) == 1:
-        if isinstance(args[0], MIXYListData):
-            dataset = args[0].data
-            snum = args[0].size()
-            isxylistdata = True
-        else:
-            ydata = args[0]
-            if isinstance(args[0], DimArray):
-                xdata = args[0].dimvalue(0)
-                if args[0].islondim(0):
-                    xaxistype = 'lon'
-                elif args[0].islatdim(0):
-                    xaxistype = 'lat'
-                elif args[0].istimedim(0):
-                    xaxistype = 'time'
-            else:
-                xdata = []
-                for i in range(0, len(args[0])):
-                    xdata.append(i)
-            xdatalist.append(xdata)
-            ydatalist.append(ydata)
-    elif len(args) == 2:
-        if isinstance(args[1], basestring):
-            ydata = args[0]
-            if isinstance(args[0], DimArray):
-                xdata = args[0].dimvalue(0)
-                if args[0].islondim(0):
-                    xaxistype = 'lon'
-                elif args[0].islatdim(0):
-                    xaxistype = 'lat'
-                elif args[0].istimedim(0):
-                    xaxistype = 'time'
-            else:
-                xdata = []
-                for i in range(0, len(args[0])):
-                    xdata.append(i)
-            styles.append(args[1])
-        else:
-            xdata = args[0]
-            ydata = args[1]
-        xdatalist.append(xdata)
-        ydatalist.append(ydata)
-    else:
-        c = 'x'
-        for arg in args: 
-            if c == 'x':   
-                xdatalist.append(arg)
-                c = 'y'
-            elif c == 'y':
-                ydatalist.append(arg)
-                c = 's'
-            elif c == 's':
-                if isinstance(arg, basestring):
-                    styles.append(arg)
-                    c = 'x'
-                else:
-                    styles.append('-')
-                    xdatalist.append(arg)
-                    c = 'y'
-    if len(styles) == 0:
-        styles = None
-    else:
-        while len(styles) < len(xdatalist):
-            styles.append('-')
-    
-    #Set plot data styles
-    lines = []
-    legend = kwargs.pop('legend', None)
-    if not legend is None:
-        lbs = legend.getLegendBreaks()
-        for i in range(0, snum):
-            line = lbs[i]
-            lines.append(line)
-    else:
-        if styles != None:
-            for i in range(0, len(styles)):
-                label = kwargs.pop('label', 'S_' + str(i + 1))
-                line = plotutil.getplotstyle(styles[i], label, **kwargs)
-                lines.append(line)
-        else:
-            snum = len(xdatalist)
-            for i in range(0, snum):
-                label = kwargs.pop('label', 'S_' + str(i + 1))
-                line = plotutil.getlegendbreak('line', **kwargs)[0]
-                line.setCaption(label)
-                lines.append(line)
-    
-    #Create axes
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    
-    if not xaxistype is None:
-        __setXAxisType(plot.axes, xaxistype)    
-    timetickformat = kwargs.pop('timetickformat', None)
-    if not timetickformat is None:
-        if not xaxistype == 'time':
-            plot.axes.setXAxis(TimeAxis('Time', True))
-        plot.axes.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
-        plot.axes.getAxis(Location.TOP).setTimeFormat(timetickformat)
-    #plot.setDataset(dataset)     
-
-    #Add graphics
-    iscurve = kwargs.pop('iscurve', False)
-    graphics = []
-    if isxylistdata:
-        graphic = GraphicFactory.createLineString(dataset, lines)
-        plot.add_graphic(graphic)
-        graphics.append(graphic)
-    else:
-        #Add data series
-        snum = len(xdatalist)
-        for i in range(0, snum):
-            label = kwargs.pop('label', 'S_' + str(i + 1))
-            xdata = plotutil.getplotdata(xdatalist[i])
-            ydata = plotutil.getplotdata(ydatalist[i])
-            graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
-            plot.add_graphic(graphic)
-            graphics.append(graphic)
-    plot.axes.setAutoExtent()
-    
-    #Paint dataset
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.clearPlots()
-        chart.setPlot(plot.axes)
-    gca = plot
-    #chart.setAntiAlias(True)
-    g_figure.setChart(chart)
-    draw_if_interactive()
-    if len(graphics) > 1:
-        return graphics
+
+    if gca is None:    
+        gca = axes()
     else:
-        return graphics[0]
-        
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.plot(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r    
+
 def step(x, y, *args, **kwargs):
     '''
     Make a step plot.
@@ -301,42 +167,20 @@ def step(x, y, *args, **kwargs):
     
     :returns: Step lines
     '''    
-    label = kwargs.pop('label', 'S_0')
-    xdata = plotutil.getplotdata(x)
-    ydata = plotutil.getplotdata(y)
-    if len(args) > 0:
-        fmt = args[0]
-        fmt = plotutil.getplotstyle(fmt, label, **kwargs)
-    else:
-        fmt = plotutil.getlegendbreak('line', **kwargs)[0]
-        fmt.setCaption(label)        
-    where = kwargs.pop('where', 'pre')
-    
-    #Create graphics
-    graphics = GraphicFactory.createStepLineString(xdata, ydata, fmt, where)
-    
-    #Create Axes
     global gca
-    if gca is None:
-        plot = axes()
-    else:
-        if gca.axestype == 'cartesian':
-            plot = gca
-        else:
-            plot = axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Chart panel
     if g_figure is None:
         figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
             
-    chart = g_figure.getChart()
-    if gca is None or (gca.axestype != 'cartesian'):
-        chart.addPlot(plot.axes)
-    gca = plot
-    draw_if_interactive()
-    return graphics 
+    r = gca.step(x, y, *args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r 
         
 def plot3(x, y, z, *args, **kwargs):
     """
@@ -446,11 +290,20 @@ def semilogy(*args, **kwargs):
       'k'        black
       =========  =====
     """       
-    lines = plot(*args, **kwargs)
     global gca
-    __setYAxisType(gca.axes, 'log')
-    gca.axes.setAutoExtent()
-    return lines
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.semilogy(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r 
     
 def semilogx(*args, **kwargs):
     """
@@ -499,11 +352,20 @@ def semilogx(*args, **kwargs):
       'k'        black
       =========  =====
     """       
-    lines = plot(*args, **kwargs)
     global gca
-    __setXAxisType(gca.axes, 'log')
-    gca.axes.setAutoExtent()
-    return lines
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.semilogx(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r 
     
 def loglog(*args, **kwargs):
     """
@@ -552,12 +414,20 @@ def loglog(*args, **kwargs):
       'k'        black
       =========  =====
     """       
-    lines = plot(*args, **kwargs)
     global gca
-    __setXAxisType(gca.axes, 'log')
-    __setYAxisType(gca.axes, 'log')
-    gca.axes.setAutoExtent()
-    return lines
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.loglog(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r    
         
 def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None, capsize=None,
             **kwargs):
@@ -575,97 +445,21 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None, c
 
     :returns: Error bar lines.
     '''
-    global gca  
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = plotutil.getplotdata(x)
-    ydata = plotutil.getplotdata(y)
-    if not yerr is None:
-        if isinstance(yerr, (int, float)):
-            ye = []
-            for i in range(xdata.getSize()):
-                ye.append(yerr)
-            yerrB = minum.array(ye).array
-            yerrU = yerrB
-        else:
-            if isinstance(yerr, (list, tuple)):
-                yerrB = plotutil.getplotdata(yerr[0])
-                yerrU = plotutil.getplotdata(yerr[1])
-            elif yerr.ndim == 2:
-                yerrB = yerr[0,:].asarray()
-                yerrU = yerr[1,:].asarray()
-            else:
-                yerrB = plotutil.getplotdata(yerr)
-                yerrU = yerrB
-    else:
-        yerrB = None
-        yerrU = None
-        
-    if not xerr is None:
-        if isinstance(xerr, (int, float)):
-            ye = []
-            for i in range(xdata.getSize()):
-                ye.append(xerr)
-            xerrL = minum.array(ye).array
-            xerrR = xerrL         
-        else:
-            if isinstance(xerr, (list, tuple)):
-                xerrL = plotutil.getplotdata(xerr[0])
-                xerrR = plotutil.getplotdata(xerr[1])
-            elif xerr.ndim == 2:
-                xerrL = xerr[0,:].asarray()
-                xerrR = xerr[1,:].asarray()
-            else:
-                xerrL = plotutil.getplotdata(xerr)
-                xerrR = xerrL
-    else:
-        xerrL = None
-        xerrR = None
-    
-    #Get plot data style
-    if fmt == '':
-        line = plotutil.getlegendbreak('line', **kwargs)[0]
-        line.setCaption(label)
-    else:
-        line = plotutil.getplotstyle(fmt, label, **kwargs)
-    eline = line.clone()
-    eline.setDrawSymbol(False)
-    eline.setStyle(LineStyles.SOLID)
-    if not ecolor is None:
-        ecolor = plotutil.getcolor(ecolor)
-        eline.setColor(ecolor)
-    if not elinewidth is None:
-        eline.setSize(elinewidth)
-    
-    #Create graphics
-    if capsize is None:
-        capsize = 10
-    graphics = GraphicFactory.createErrorLineString(xdata, ydata, xerrL, xerrR, yerrB, \
-        yerrU, line, eline, capsize)
-    
-    #Create Axes
-    if gca is None:
-        plot = axes()
-    else:
-        if gca.axestype == 'cartesian':
-            plot = gca
-        else:
-            plot = axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Chart panel
+    global gca
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None or (gca.axestype != 'cartesian'):
-        chart.addPlot(plot.axes)
-    gca = plot
-    draw_if_interactive()
-    return graphics 
-    
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.errorbar(x, y, yerr, xerr, fmt, ecolor, elinewidth, capsize, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r    
+
 def bar(*args, **kwargs):
     """
     Make a bar plot.
@@ -706,119 +500,21 @@ def bar(*args, **kwargs):
       =========  ===========
       
     """
-    #Get dataset
     global gca
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = None
-    autowidth = True
-    width = 0.8
-    if len(args) == 1:
-        ydata = args[0]
-    elif len(args) == 2:
-        if isinstance(args[1], (int, float)):
-            ydata = args[0]
-            width = args[1]
-            autowidth = False
-        else:
-            xdata = args[0]
-            ydata = args[1]
-    else:
-        xdata = args[0]
-        ydata = args[1]
-        width = args[2]
-        autowidth = False        
-    
-    if xdata is None:
-        xdata = []
-        for i in range(1, len(args[0]) + 1):
-            xdata.append(i)
-    xdata = plotutil.getplotdata(xdata)
-    ydata = plotutil.getplotdata(ydata)
-    width = plotutil.getplotdata(width)
-    yerr = kwargs.pop('yerr', None)
-    if not yerr is None:
-        if not isinstance(yerr, (int, float)):
-            yerr = plotutil.getplotdata(yerr)
-    bottom = kwargs.pop('bottom', None)   
-    if not bottom is None:
-        bottom = plotutil.getplotdata(bottom)
-    
-    #Set plot data styles
-    fcobj = kwargs.pop('color', None)
-    if fcobj is None:
-        fcobj = kwargs.pop('facecolor', 'b')
-    if isinstance(fcobj, (tuple, list)):
-        colors = plotutil.getcolors(fcobj)
-    else:
-        color = plotutil.getcolor(fcobj)
-        colors = [color]
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = plotutil.getcolor(ecobj)
-    linewidth = kwargs.pop('linewidth', 1.0) 
-    hatch = kwargs.pop('hatch', None)
-    hatch = plotutil.gethatch(hatch) 
-    hatchsize = kwargs.pop('hatchsize', None)
-    bgcolor = kwargs.pop('bgcolor', None)
-    bgcolor = plotutil.getcolor(bgcolor)
-    ecolor = kwargs.pop('ecolor', 'k')
-    ecolor = plotutil.getcolor(ecolor)
-    morepoints = kwargs.pop('morepoints', False)
-    barbreaks = []
-    for color in colors:
-        lb = BarBreak()
-        lb.setCaption(label)
-        lb.setColor(color)    
-        if edgecolor is None:
-            lb.setDrawOutline(False)
-        else:
-            lb.setOutlineColor(edgecolor)  
-        lb.setOutlineSize(linewidth)   
-        if not hatch is None:
-            lb.setStyle(hatch)
-            if not bgcolor is None:
-                lb.setBackColor(bgcolor)
-            if not hatchsize is None:
-                lb.setStyleSize(hatchsize)
-        lb.setErrorColor(ecolor)
-        barbreaks.append(lb)
-        
-    #Create bar graphics
-    if morepoints:
-        graphics = GraphicFactory.createBars1(xdata, ydata, autowidth, width, not yerr is None, yerr, \
-            not bottom is None, bottom, barbreaks)
-    else:
-        graphics = GraphicFactory.createBars(xdata, ydata, autowidth, width, not yerr is None, yerr, \
-            not bottom is None, bottom, barbreaks)        
-    
-    #Create bar plot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    if autowidth:
-        barswidth = kwargs.pop('barswidth', 0.8)
-        plot.axes.setBarsWidth(barswidth)
-    
-    #Create figure
     if g_figure is None:
         figure()
-    
-    #Set chart
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return barbreaks
-    
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.bar(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r    
+
 def barh(*args, **kwargs):
     """
     Make a horizontal bar plot.
@@ -859,113 +555,20 @@ def barh(*args, **kwargs):
       =========  ===========
       
     """
-    #Get dataset
     global gca
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = None
-    autoheight = True
-    height = 0.8
-    if len(args) == 1:
-        xdata = args[0]
-    elif len(args) == 2:
-        if isinstance(args[1], (int, float)):
-            xdata = args[0]
-            height = args[1]
-            autoheight = False
-        else:
-            ydata = args[0]
-            xdata = args[1]
-    else:
-        ydata = args[0]
-        xdata = args[1]
-        height = args[2]
-        autoheight = False        
-    
-    if ydata is None:
-        ydata = []
-        for i in range(1, len(args[0]) + 1):
-            ydata.append(i)
-    ydata = plotutil.getplotdata(ydata)
-    xdata = plotutil.getplotdata(xdata)
-    height = plotutil.getplotdata(height)
-    xerr = kwargs.pop('xerr', None)
-    if not xerr is None:
-        if not isinstance(xerr, (int, float)):
-            xerr = plotutil.getplotdata(xerr)
-    left = kwargs.pop('left', None)   
-    if not left is None:
-        left = plotutil.getplotdata(left)
-    
-    #Set plot data styles
-    fcobj = kwargs.pop('color', None)
-    if fcobj is None:
-        fcobj = kwargs.pop('facecolor', 'b')
-    if isinstance(fcobj, (tuple, list)):
-        colors = plotutil.getcolors(fcobj)
-    else:
-        color = plotutil.getcolor(fcobj)
-        colors = [color]
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = plotutil.getcolor(ecobj)
-    linewidth = kwargs.pop('linewidth', 1.0) 
-    hatch = kwargs.pop('hatch', None)
-    hatch = plotutil.gethatch(hatch) 
-    hatchsize = kwargs.pop('hatchsize', None)
-    bgcolor = kwargs.pop('bgcolor', None)
-    bgcolor = plotutil.getcolor(bgcolor)
-    ecolor = kwargs.pop('ecolor', 'k')
-    ecolor = plotutil.getcolor(ecolor)
-    barbreaks = []
-    for color in colors:
-        lb = BarBreak()
-        lb.setCaption(label)
-        lb.setColor(color)    
-        if edgecolor is None:
-            lb.setDrawOutline(False)
-        else:
-            lb.setOutlineColor(edgecolor)  
-        lb.setOutlineSize(linewidth)   
-        if not hatch is None:
-            lb.setStyle(hatch)
-            if not bgcolor is None:
-                lb.setBackColor(bgcolor)
-            if not hatchsize is None:
-                lb.setStyleSize(hatchsize)
-        lb.setErrorColor(ecolor)
-        barbreaks.append(lb)
-        
-    #Create bar graphics
-    graphics = GraphicFactory.createHBars(ydata, xdata, autoheight, height, not xerr is None, xerr, \
-        not left is None, left, barbreaks)  
-                  
-    #Create bar plot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    if autoheight:
-        barsheight = kwargs.pop('barsheight', 0.8)
-        plot.axes.setBarsWidth(barsheight)
-    
-    #Create figure
     if g_figure is None:
         figure()
-    
-    #Set chart
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return barbreaks
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.barh(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
           
 def hist(x, bins=10, range=None, normed=False, cumulative=False,
         bottom=None, histtype='bar', align='mid',
@@ -977,79 +580,21 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
         which are not required to be of the same length.
     :param bins: (*int*) If an integer is given, bins + 1 bin edges are returned.
     """
-    #Get dataset
     global gca
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    
-    #Set plot data styles
-    fcobj = kwargs.pop('color', None)
-    if fcobj is None:
-        fcobj = kwargs.pop('facecolor', 'b')
-    if isinstance(fcobj, (tuple, list)):
-        colors = plotutil.getcolors(fcobj)
-    else:
-        color = plotutil.getcolor(fcobj)
-        colors = [color]
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = plotutil.getcolor(ecobj)
-    linewidth = kwargs.pop('linewidth', 1.0) 
-    hatch = kwargs.pop('hatch', None)
-    hatch = plotutil.gethatch(hatch) 
-    hatchsize = kwargs.pop('hatchsize', None)
-    bgcolor = kwargs.pop('bgcolor', None)
-    bgcolor = plotutil.getcolor(bgcolor)
-    ecolor = kwargs.pop('ecolor', 'k')
-    ecolor = plotutil.getcolor(ecolor)
-    barbreaks = []
-    for color in colors:
-        lb = BarBreak()
-        lb.setCaption(label)
-        lb.setColor(color)    
-        if edgecolor is None:
-            lb.setDrawOutline(False)
-        else:
-            lb.setOutlineColor(edgecolor)  
-        lb.setOutlineSize(linewidth)   
-        if not hatch is None:
-            lb.setStyle(hatch)
-            if not bgcolor is None:
-                lb.setBackColor(bgcolor)
-            if not hatchsize is None:
-                lb.setStyleSize(hatchsize)
-        lb.setErrorColor(ecolor)
-        barbreaks.append(lb)
-        
-    #Create bar graphics
-    x = plotutil.getplotdata(x)
-    if not isinstance(bins, numbers.Number):
-        bins = plotutil.getplotdata(bins)
-    graphics = GraphicFactory.createHistBars(x, bins, barbreaks)        
-    
-    #Create bar plot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Create figure
     if g_figure is None:
         figure()
-    
-    #Set chart
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return lb
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.hist(x, bins, range, normed, cumulative,
+        bottom, histtype, align, orientation, rwidth, log, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
     
 def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
             alpha=None, linewidth=None, verts=None, hold=None, **kwargs):
@@ -1068,102 +613,21 @@ def scatter(x, y, s=8, c='b', marker='o', norm=None, vmin=None, vmax=None,
     
     :returns: Points legend break.
     """
-    global gca    
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    xdata = plotutil.getplotdata(x)
-    ydata = plotutil.getplotdata(y)
-    
-    #Set plot data styles
-    pb, isunique = plotutil.getlegendbreak('point', **kwargs)
-    pb.setCaption(label)
-    pstyle = plotutil.getpointstyle(marker)    
-    pb.setStyle(pstyle)
-    isvalue = False
-    if len(c) > 1:
-        if isinstance(c, (MIArray, DimArray)):
-            isvalue = True
-        elif isinstance(c[0], (int, long, float)):
-            isvalue = True            
-    if isvalue:
-        ls = kwargs.pop('symbolspec', None)
-        if ls is None:        
-            if isinstance(c, (list, tuple)):
-                c = minum.array(c)
-            levels = kwargs.pop('levs', None)
-            if levels is None:
-                levels = kwargs.pop('levels', None)
-            if levels is None:
-                cnum = kwargs.pop('cnum', None)
-                if cnum is None:
-                    ls = plotutil.getlegendscheme([], c.min(), c.max(), **kwargs)
-                else:
-                    ls = plotutil.getlegendscheme([cnum], c.min(), c.max(), **kwargs)
-            else:
-                ls = plotutil.getlegendscheme([levels], c.min(), c.max(), **kwargs)
-            ls = plotutil.setlegendscheme_point(ls, **kwargs)
-            if isinstance(s, int):
-                for lb in ls.getLegendBreaks():
-                    lb.setSize(s)
-            else:
-                n = len(s)
-                for i in range(0, n):
-                    ls.getLegendBreaks()[i].setSize(s[i])
-        #Create graphics
-        graphics = GraphicFactory.createPoints(xdata, ydata, c.asarray(), ls)
-    else:
-        colors = plotutil.getcolors(c, alpha)   
-        pbs = []
-        if isinstance(s, int):   
-            pb.setSize(s)
-            if len(colors) == 1:
-                pb.setColor(colors[0])
-                pbs.append(pb)
-            else:
-                n = len(colors)
-                for i in range(0, n):
-                    npb = pb.clone()
-                    npb.setColor(colors[i])
-                    pbs.append(npb)
-        else:
-            n = len(s)
-            if len(colors) == 1:
-                pb.setColor(colors[0])
-                for i in range(0, n):
-                    npb = pb.clone()
-                    npb.setSize(s[i])
-                    pbs.append(npb)
-            else:
-                for i in range(0, n):
-                    npb = pb.clone()
-                    npb.setSize(s[i])
-                    npb.setColor(colors[i])
-                    pbs.append(npb)
-        #Create graphics
-        graphics = GraphicFactory.createPoints(xdata, ydata, pbs)
-    
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Paint dataset
+    global gca
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return graphics
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.scatter(x, y, s, c, marker, norm, vmin, vmax,
+            alpha, linewidth, verts, hold, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
     
 def scatter3(x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None, 
             verts=None, **kwargs):
@@ -1203,36 +667,20 @@ def patch(x, y=None, **kwargs):
         is None.
     :param y: (*array_like*) Y coordinates for each vertex.
     '''
-    lbreak, isunique = plotutil.getlegendbreak('polygon', **kwargs)
-    if y is None:
-        graphics = Graphic(x, lbreak)
-    else:
-        x = plotutil.getplotdata(x)
-        y = plotutil.getplotdata(y)
-        graphics = GraphicFactory.createPolygons(x, y, lbreak)
-    
-    global gca 
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Paint dataset
+    global gca
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return graphics
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.patch(x, y, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
     
 def rectangle(position, curvature=None, **kwargs):
     '''
@@ -1241,33 +689,20 @@ def rectangle(position, curvature=None, **kwargs):
     :param position: (*list*) Position of the rectangle [x, y, width, height].
     :param curvature: (*list*) Curvature of the rectangle [x, y]. Default is None.
     '''
-    lbreak, isunique = plotutil.getlegendbreak('polygon', **kwargs)
-    if isinstance(curvature, (int, float)):
-        curvature = [curvature, curvature]
-    graphic = GraphicFactory.createRectangle(position, curvature, lbreak)
-    
-    global gca 
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    plot.add_graphic(graphic)
-    plot.axes.setAutoExtent()
-    
-    #Paint dataset
+    global gca
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return graphic
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.rectangle(position, curvature, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
     
 def fill_between(x, y1, y2=0, where=None, **kwargs):
     """
@@ -1279,67 +714,20 @@ def fill_between(x, y1, y2=0, where=None, **kwargs):
     :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
         N-length boolean array and the fill will only happen over the regions where ``where==True``.
     """
-    #Get dataset
-    global gca   
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    dn = len(x)
-    xdata = plotutil.getplotdata(x)
-    if isinstance(y1, (int, long, float)):
-        yy = []
-        for i in range(dn):
-            yy.append(y1)
-        y1 = minum.array(yy).array
-    else:
-        y1 = plotutil.getplotdata(y1)
-    if isinstance(y2, (int, long, float)):
-        yy = []
-        for i in range(dn):
-            yy.append(y2)
-        y2 = minum.array(yy).array
-    else:
-        y2 = plotutil.getplotdata(y2)
-    if not where is None:
-        if isinstance(where, (tuple, list)):
-            where = minum.array(where)
-        where = where.asarray()
-    
-    #Set plot data styles
-    if not 'fill' in kwargs:
-        kwargs['fill'] = True
-    if not 'edge' in kwargs:
-        kwargs['edge'] = False
-    pb, isunique = plotutil.getlegendbreak('polygon', **kwargs)
-    pb.setCaption(label)
-    
-    #Create graphics
-    graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb)    
-    
-    #Create axes
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes() 
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Paint dataset
+    global gca
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None:
-        chart.clearPlots()
-        chart.setPlot(plot.axes)
-    #chart.setAntiAlias(True)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return pb 
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.fill_between(x, y1, y2, where, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
     
 def fill_betweenx(y, x1, x2=0, where=None, **kwargs):
     """
@@ -1351,67 +739,20 @@ def fill_betweenx(y, x1, x2=0, where=None, **kwargs):
     :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
         N-length boolean array and the fill will only happen over the regions where ``where==True``.
     """
-    #Get dataset
-    global gca   
-    
-    #Add data series
-    label = kwargs.pop('label', 'S_0')
-    dn = len(y)
-    ydata = plotutil.getplotdata(y)
-    if isinstance(x1, (int, long, float)):
-        xx = []
-        for i in range(dn):
-            xx.append(x1)
-        x1 = minum.array(xx).array
-    else:
-        x1 = plotutil.getplotdata(x1)
-    if isinstance(x2, (int, long, float)):
-        xx = []
-        for i in range(dn):
-            xx.append(x2)
-        x2 = minum.array(xx).array
-    else:
-        x2 = plotutil.getplotdata(x2)
-    if not where is None:
-        if isinstance(where, (tuple, list)):
-            where = minum.array(where)
-        where = where.asarray()
-    
-    #Set plot data styles
-    if not 'fill' in kwargs:
-        kwargs['fill'] = True
-    if not 'edge' in kwargs:
-        kwargs['edge'] = False
-    pb, isunique = plotutil.getlegendbreak('polygon', **kwargs)
-    pb.setCaption(label)
-    
-    #Create graphics
-    graphics = GraphicFactory.createFillBetweenPolygonsX(ydata, x1, x2, where, pb)    
-    
-    #Create axes
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes() 
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Paint dataset
+    global gca
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None:
-        chart.clearPlots()
-        chart.setPlot(plot.axes)
-    #chart.setAntiAlias(True)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return pb 
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.fill_betweenx(y, x1, x2, where, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
         
 def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6, shadow=False, 
     labeldistance=1.1, startangle=0, radius=None, hold=None, **kwargs):
@@ -1443,57 +784,24 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None, pctdistance=0.6
     
     :returns: (*tuple*) Patches and texts.
     """        
-    n = len(x)
-    x = plotutil.getplotdata(x)
-    if colors is None:
-        colors = makecolors(n)
-    else:
-        colors = plotutil.getcolors(colors)
-        
-    fontname = kwargs.pop('fontname', 'Arial')
-    fontsize = kwargs.pop('fontsize', 14)
-    bold = kwargs.pop('bold', False)
-    fontcolor = kwargs.pop('fontcolor', 'black')
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    fontcolor = plotutil.getcolor(fontcolor)
-    
-    #Create graphics
-    graphics = GraphicFactory.createPieArcs(x, colors, labels, startangle, explode, font, fontcolor, \
-        labeldistance, autopct, pctdistance)
-    
-    #Get current axes
     global gca
-    if gca is None:
-        #plot = PieAxes()
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
         gca = axes()
     else:
         if gca.axestype != 'cartesian':
             gca = axes()
-    for graphic in graphics:
-        gca.add_graphic(graphic)
-    gca.axes.setAutoExtent()
-    gca.axes.setAutoAspect(False)
-    gca.axes.getAxis(Location.BOTTOM).setVisible(False)
-    gca.axes.getAxis(Location.LEFT).setVisible(False)
-    gca.axes.getAxis(Location.TOP).setVisible(False)
-    gca.axes.getAxis(Location.RIGHT).setVisible(False)
-    
-    #Paint dataset
-    if g_figure is None:
-        figure()
-        g_figure.getChart().addPlot(gca.axes)
+            
+    r = gca.pie(x, explode, labels, colors, autopct, pctdistance, shadow, 
+        labeldistance, startangle, radius, hold, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
 
-    draw_if_interactive()
-    if len(graphics) == 2:
-        return graphics[0], graphics[1]
-    else:
-        return graphics[0], graphics[1], graphics[2]
-    
 def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True, showfliers=True, showmeans=False, \
-    meanline=False, boxprops=None, medianprops=None, meanprops=None, whiskerprops=None, capprops=None, flierprops=None):
+        meanline=False, boxprops=None, medianprops=None, meanprops=None, whiskerprops=None, capprops=None, flierprops=None):
     """
     Make a box and whisker plot.
     
@@ -1522,119 +830,22 @@ def boxplot(x, sym=None, positions=None, widths=None, color=None, showcaps=True,
     :param capprops: (*dict*) Specifies the style of the caps.
     :param flierprops: (*dict*) Specifies the style of the fliers.
     """
-    #Get current axes
-    global gca   
-    
-    if isinstance(x, list):
-        x1 = []
-        for a in x:
-            x1.append(plotutil.getplotdata(a))
-        x = x1
-    else:
-        x = plotutil.getplotdata(x)
-        x = [x]
-    
-    if not positions is None:
-        if isinstance(positions, (MIArray, DimArray)):
-            positions = positions.tolist()
-    
-    if not widths is None:
-        if isinstance(widths, (int, float)):
-            nwidths = []
-            for i in range(len(x)):
-                nwidths.append(widths)
-            widths = nwidths
-        elif isinstance(widths, (MIArray, DimArray)):
-            widths = widths.tolist()
-        
-    #Get box plot properties
-    if not color is None:
-        color = plotutil.getcolor(color)
-    if not sym is None:
-        sym = plotutil.getplotstyle(sym, '')
-        sym.setDrawFill(False)
-        if not color is None:
-            sym.setColor(color)
-            sym.setOutlineColor(color)
-    if boxprops is None:
-        boxprops = PolygonBreak()
-        boxprops.setDrawFill(False)
-        boxprops.setOutlineColor(color is None and Color.blue or color)
-    else:
-        boxprops = plotutil.getlegendbreak('polygon', **boxprops)[0]
-    if medianprops is None:
-        medianprops = PolylineBreak()
-        medianprops.setColor(color is None and Color.red or color)
-    else:
-        medianprops = plotutil.getlegendbreak('line', **medianprops)[0]
-    if whiskerprops is None:
-        whiskerprops = PolylineBreak()
-        whiskerprops.setColor(color is None and Color.black or color)
-        whiskerprops.setStyle(LineStyles.DASH)
-    else:
-        whiskerprops = plotutil.getlegendbreak('line', **whiskerprops)[0]
-    if capprops is None:
-        capprops = PolylineBreak()
-        capprops.setColor(color is None and Color.black or color)
-    else:
-        capprops = plotutil.getlegendbreak('line', **capprops)[0]
-    if meanline:
-        if not meanprops is None:
-            meanprops = plotutil.getlegendbreak('line', **meanprops)[0]
-        else:
-            meanprops = PolylineBreak()
-            meanprops.setColor(color is None and Color.black or color)
-    else:
-        if meanprops is None:
-            meanprops = PointBreak()
-            meanprops.setStyle(PointStyle.Square)
-            meanprops.setColor(color is None and Color.red or color)
-            meanprops.setOutlineColor(color is None and Color.black or color)
-        else:
-            meanprops = plotutil.getlegendbreak('point', **meanprops)[0]
-    if not flierprops is None:
-        flierprops = plotutil.getlegendbreak('point', **flierprops)[0]
-    else:
-        flierprops = sym
-    if flierprops is None:
-        flierprops = PointBreak()
-        flierprops.setColor(color is None and Color.red or color)
-        flierprops.setStyle(PointStyle.Plus)
-    
-    #Create graphics
-    graphics = GraphicFactory.createBox(x, positions, widths, showcaps, showfliers, showmeans, boxprops, \
-        medianprops, whiskerprops, capprops, meanprops, flierprops)
-    
-    #Create XYPlot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    plot.add_graphic(graphics)
-    plot.axes.setAutoExtent()
-    
-    #Paint dataset
+    global gca
     if g_figure is None:
         figure()
-        
-    chart = g_figure.getChart()
-    if gca is None:
-        chart.setCurrentPlot(plot.axes)
-    elif not isinstance(gca, Axes):
-        if isinstance(gca.axes, Plot):
-            chart.removePlot(gca.axes)
-        chart.setCurrentPlot(plot.axes)
-    
-    #g_figure.setChart(chart)
-    gca = plot
-    #xlim(0.5, len(x) + 0.5)
-    #xticks(minum.arange(1, len(x) + 1, 1))
-    draw_if_interactive()
-    return graphics
-    
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.boxplot(x, sym, positions, widths, color, showcaps, showfliers, showmeans, \
+        meanline, boxprops, medianprops, meanprops, whiskerprops, capprops, flierprops)
+    if not r is None:
+        draw_if_interactive()
+    return r
+  
 def windrose(wd, ws, nwdbins=16, wsbins=None, degree=True, colors=None, cmap='matlab_jet', \
     alpha=0.7, rmax=None, rtickloc=None, rticks=None, rlabelpos=60, xticks=None, **kwargs):
     '''
@@ -2221,7 +1432,7 @@ def zaxis(ax=None, **kwargs):
     
 def box(ax=None, on=None):
     """
-    Display exes outline or not.
+    Display axes outline or not.
     
     :param ax: The axes. Current axes is used if ax is None.
     :param on: (*boolean*) Box on or off. If on is None, toggle state.
@@ -2966,59 +2177,12 @@ def text(x, y, s, **kwargs):
         1,1 in the upper right, 'data' are the axes data coordinates (Default value); 'inches' is 
         position in the figure in inches, with 0,0 at the lower left corner.
     """
-    fontname = kwargs.pop('fontname', None)
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-    fontsize = kwargs.pop('fontsize', 14)
-    bold = kwargs.pop('bold', False)
-    color = kwargs.pop('color', 'black')
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    c = plotutil.getcolor(color)
-    text = ChartText(s, font)
-    text.setUseExternalFont(exfont)
-    text.setColor(c)
-    text.setX(x)
-    text.setY(y)
-    bbox = kwargs.pop('bbox', None)
-    if not bbox is None:
-        fill = bbox.pop('fill', None)
-        if not fill is None:
-            text.setFill(fill)
-        facecolor = bbox.pop('facecolor', None)
-        if not facecolor is None:
-            facecolor = plotutil.getcolor(facecolor)
-            text.setFill(True)
-            text.setBackground(facecolor)
-        edge = bbox.pop('edge', None)
-        if not edge is None:
-            text.setDrawNeatline(edge)
-        edgecolor = bbox.pop('edgecolor', None)
-        if not edgecolor is None:
-            edgecolor = plotutil.getcolor(edgecolor)
-            text.setNeatlineColor(edgecolor)
-            text.setDrawNeatline(True)
-        linewidth = bbox.pop('linewidth', None)
-        if not linewidth is None:
-            text.setNeatlineSize(linewidth)
-            text.setDrawNeatline(True)
-        gap = bbox.pop('gap', None)
-        if not gap is None:
-            text.setGap(gap)
-    rotation = kwargs.pop('rotation', None)
-    if not rotation is None:
-        text.setAngle(rotation)
+    ctext = plotutil.text(x, y, s, **kwargs)
     coordinates = kwargs.pop('coordinates', 'data')
-    text.setCoordinates(coordinates)
     if coordinates == 'figure':
-        g_figure.getChart().addText(text)
+        g_figure.getChart().addText(ctext)
     else:
-        gca.axes.addText(text)
+        gca.axes.addText(ctext)
     draw_if_interactive()
     
 def axis(limits):
@@ -3498,106 +2662,20 @@ def imshow(*args, **kwargs):
     
     :returns: (*Image graphic*) Image graphic created from array data.
     """
-    #Get dataset
     global gca
-    
-    n = len(args)
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    xaxistype = None
-    isrgb = False
-    isimage = False
-    extent = None
-    if n >= 3:
-        xdata = args[0]
-        ydata = args[1]
-        extent = [xdata[0],xdata[-1],ydata[0],ydata[-1]]
-        args = args[2:]
-    X = args[0]
-    if isinstance(X, (list, tuple)):
-        isrgb = True
-    elif isinstance(X, BufferedImage):
-        isimage = True
-    elif X.ndim > 2:
-        isrgb = True
-    else:
-        gdata = minum.asgridarray(X)
-        if isinstance(X, DimArray):
-            if X.islondim(1):
-                xaxistype = 'lon'
-            elif X.islatdim(1):
-                xaxistype = 'lat'
-            elif X.istimedim(1):
-                xaxistype = 'time'
-    args = args[1:]   
-    
-    extent = kwargs.pop('extent', extent)
-    if isrgb:
-        if isinstance(X, (list, tuple)):
-            rgbd = []
-            for d in rgbdata:
-                rgbd.append(d.asarray())
-            rgbdata = rgbd
-        else:
-            rgbdata = X.asarray()
-        igraphic = GraphicFactory.createImage(rgbdata, extent)
-        ls = None
-    elif isimage:
-        igraphic = GraphicFactory.createImage(image)
-        ls = None
-    else:
-        ls = kwargs.pop('symbolspec', None)
-        if ls is None:
-            if len(args) > 0:
-                level_arg = args[0]
-                if isinstance(level_arg, int):
-                    cn = level_arg
-                    ls = LegendManage.createImageLegend(gdata, cn, cmap)
-                else:
-                    if isinstance(level_arg, MIArray):
-                        level_arg = level_arg.aslist()
-                    ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
-            else:
-                ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-            ls = ls.convertTo(ShapeTypes.Image)
-            plotutil.setlegendscheme(ls, **kwargs)
-            
-        igraphic = GraphicFactory.createImage(gdata, ls, extent)
-    interpolation = kwargs.pop('interpolation', None)
-    if not interpolation is None:
-        igraphic.getShape().setInterpolation(interpolation)
-    
-    #Create plot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    if not xaxistype is None:
-        __setXAxisType(plot.axes, xaxistype)
-        plot.axes.updateDrawExtent()
-    plot.add_graphic(igraphic)
-    plot.axes.setAutoExtent()
-    gridline = plot.axes.getGridLine()
-    gridline.setTop(True)
-    
-    #Create figure
     if g_figure is None:
         figure()
-    
-    #Set chart
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    if ls is None:
-        return igraphic
+
+    if gca is None:    
+        gca = axes()
     else:
-        return ls  
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.imshow(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
 
 def pcolor(*args, **kwargs):
     '''
@@ -3650,77 +2728,21 @@ def contour(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
     """
-    #Get dataset
     global gca
-    
-    n = len(args)
-    ls = kwargs.pop('symbolspec', None)
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    xaxistype = None
-    if n <= 2:
-        gdata = minum.asgriddata(args[0])
-        if isinstance(args[0], DimArray):
-            if args[0].islondim(1):
-                xaxistype = 'lon'
-            elif args[0].islatdim(1):
-                xaxistype = 'lat'
-            elif args[0].istimedim(1):
-                xaxistype = 'time'
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    if ls is None:
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-        else:    
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-        ls = ls.convertTo(ShapeTypes.Polyline)
-        plotutil.setlegendscheme(ls, **kwargs)
-    
-    smooth = kwargs.pop('smooth', True)
-    igraphic = GraphicFactory.createContourLines(gdata.data, ls, smooth)
-    
-    #Create plot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    if not xaxistype is None:
-        __setXAxisType(plot.axes, xaxistype)
-        plot.axes.updateDrawExtent()
-    plot.add_graphic(igraphic)
-    #plot.axes.setAutoExtent()
-    plot.axes.setExtent(igraphic.getExtent())
-    plot.axes.setDrawExtent(igraphic.getExtent())
-    
-    #Create figure
     if g_figure is None:
         figure()
-    
-    #Set chart
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return igraphic
-    
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.contour(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
+
 def contourf(*args, **kwargs):
     """
     Plot filled contours.
@@ -3739,78 +2761,21 @@ def contourf(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
     """
-    #Get dataset
     global gca
-    
-    n = len(args)    
-    ls = kwargs.pop('symbolspec', None)
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    xaxistype = None
-    if n <= 2:
-        gdata = minum.asgriddata(args[0])
-        if isinstance(args[0], DimArray):
-            if args[0].islondim(1):
-                xaxistype = 'lon'
-            elif args[0].islatdim(1):
-                xaxistype = 'lat'
-            elif args[0].istimedim(1):
-                xaxistype = 'time'
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    if ls is None:
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-        else:    
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-    ls = ls.convertTo(ShapeTypes.Polygon)
-    plotutil.setlegendscheme(ls, **kwargs)
-    smooth = kwargs.pop('smooth', True)
-    igraphic = GraphicFactory.createContourPolygons(gdata.data, ls, smooth)
-    
-    visible = kwargs.pop('visible', True)
-    if visible:
-        #Create plot
-        if gca is None:
-            plot = Axes()
-        else:
-            if isinstance(gca, Axes):
-                plot = gca
-            else:
-                plot = Axes()
-        if not xaxistype is None:
-            __setXAxisType(plot.axes, xaxistype)
-            plot.axes.updateDrawExtent()
-        plot.add_graphic(igraphic)
-        #plot.setAutoExtent()
-        plot.axes.setExtent(igraphic.getExtent())
-        plot.axes.setDrawExtent(igraphic.getExtent())
-        
-        #Create figure
-        if g_figure is None:
-            figure()
-        
-        #Set chart
-        chart = g_figure.getChart()
-        if gca is None or (not isinstance(gca, Axes)):
-            chart.setCurrentPlot(plot.axes)
-        g_figure.setChart(chart)
-        gca = plot
-        draw_if_interactive()    
-    return igraphic
-    
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.contourf(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
+
 def quiver(*args, **kwargs):
     """
     Plot a 2-D field of arrows.
@@ -3831,101 +2796,20 @@ def quiver(*args, **kwargs):
     :returns: (*VectoryLayer*) Created quiver VectoryLayer.
     """
     global gca
-    ls = kwargs.pop('symbolspec', None)
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    order = kwargs.pop('order', None)
-    isuv = kwargs.pop('isuv', True)
-    n = len(args) 
-    iscolor = False
-    cdata = None
-    xaxistype = None
-    if n < 4 or (n == 4 and isinstance(args[3], int)):
-        x = args[0].dimvalue(1)
-        y = args[0].dimvalue(0)
-        x, y = minum.meshgrid(x, y)
-        u = args[0]
-        v = args[1]
-        if args[0].islondim(1):
-            xaxistype = 'lon'
-        elif args[0].islatdim(1):
-            xaxistype = 'lat'
-        elif args[0].istimedim(1):
-            xaxistype = 'time'
-        args = args[2:]
-        if len(args) > 0:
-            cdata = args[0]
-            iscolor = True
-            args = args[1:]
-    elif n <= 6:
-        x = args[0]
-        y = args[1]
-        u = args[2]
-        v = args[3]
-        args = args[4:]
-        if len(args) > 0:
-            cdata = args[0]
-            iscolor = True
-            args = args[1:]
-    x = plotutil.getplotdata(x)
-    y = plotutil.getplotdata(y)
-    u = plotutil.getplotdata(u)
-    v = plotutil.getplotdata(v)    
-    
-    if ls is None:
-        if iscolor:
-            if len(args) > 0:
-                cn = args[0]
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                levs = kwargs.pop('levs', None)
-                if levs is None:
-                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
-                else:
-                    if isinstance(levs, MIArray):
-                        levs = levs.tolist()
-                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
-        else:    
-            if cmap.getColorCount() == 1:
-                c = cmap.getColor(0)
-            else:
-                c = Color.black
-            ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-        ls = plotutil.setlegendscheme_point(ls, **kwargs)
-    
-    if not cdata is None:
-        cdata = plotutil.getplotdata(cdata)
-    igraphic = GraphicFactory.createArrows(x, y, u, v, cdata, ls, isuv)
-    
-    #Create plot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    if not xaxistype is None:
-        __setXAxisType(plot.axes, xaxistype)
-        plot.axes.updateDrawExtent()
-    plot.add_graphic(igraphic)
-    plot.axes.setAutoExtent()
-    #plot.axes.setExtent(igraphic.getExtent())
-    #plot.axes.setDrawExtent(igraphic.getExtent())
-    
-    #Create figure
     if g_figure is None:
         figure()
-    
-    #Set chart
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return igraphic
-    
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.quiver(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r    
+ 
 def barbs(*args, **kwargs):
     """
     Plot a 2-D field of barbs.
@@ -3946,101 +2830,20 @@ def barbs(*args, **kwargs):
     :returns: (*VectoryLayer*) Created barbs VectoryLayer.
     """
     global gca
-    ls = kwargs.pop('symbolspec', None)
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    order = kwargs.pop('order', None)
-    isuv = kwargs.pop('isuv', True)
-    n = len(args) 
-    iscolor = False
-    cdata = None
-    xaxistype = None
-    if n <= 3 or (n == 4 and isinstance(args[3], int)):
-        x = args[0].dimvalue(1)
-        y = args[0].dimvalue(0)
-        x, y = minum.meshgrid(x, y)
-        u = args[0]
-        v = args[1]
-        if args[0].islondim(1):
-            xaxistype = 'lon'
-        elif args[0].islatdim(1):
-            xaxistype = 'lat'
-        elif args[0].istimedim(1):
-            xaxistype = 'time'
-        args = args[2:]
-        if len(args) > 0:
-            cdata = args[0]
-            iscolor = True
-            args = args[1:]
-    elif n <= 5:
-        x = args[0]
-        y = args[1]
-        u = args[2]
-        v = args[3]
-        args = args[4:]
-        if len(args) > 0:
-            cdata = args[0]
-            iscolor = True
-            args = args[1:]
-    x = plotutil.getplotdata(x)
-    y = plotutil.getplotdata(y)
-    u = plotutil.getplotdata(u)
-    v = plotutil.getplotdata(v)    
-    
-    if ls is None:
-        if iscolor:
-            if len(args) > 0:
-                cn = args[0]
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-            else:
-                levs = kwargs.pop('levs', None)
-                if levs is None:
-                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
-                else:
-                    if isinstance(levs, MIArray):
-                        levs = levs.aslist()
-                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
-        else:    
-            if cmap.getColorCount() == 1:
-                c = cmap.getColor(0)
-            else:
-                c = Color.black
-            ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-        ls = plotutil.setlegendscheme_point(ls, **kwargs)
-    
-    if not cdata is None:
-        cdata = plotutil.getplotdata(cdata)
-    igraphic = GraphicFactory.createBarbs(x, y, u, v, cdata, ls, isuv)
-    
-    #Create plot
-    if gca is None:
-        plot = Axes()
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            plot = Axes()
-    if not xaxistype is None:
-        __setXAxisType(plot.axes, xaxistype)
-        plot.axes.updateDrawExtent()
-    plot.add_graphic(igraphic)
-    plot.axes.setAutoExtent()
-    #plot.axes.setExtent(igraphic.getExtent())
-    #plot.axes.setDrawExtent(igraphic.getExtent())
-    
-    #Create figure
     if g_figure is None:
         figure()
-    
-    #Set chart
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    g_figure.setChart(chart)
-    gca = plot
-    draw_if_interactive()
-    return igraphic
-    
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian' and gca.axestype != 'polar':
+            gca = axes()
+            
+    r = gca.barbs(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r    
+ 
 def __plot_griddata(gdata, ls, type, xaxistype=None):
     #print 'GridData...'
     if type == 'contourf':
@@ -4754,52 +3557,9 @@ def quiverkey(*args, **kwargs):
     :param fontproperties: (*dict*) A dictionary with keyword arguments accepted by the FontProperties
         initializer: *family, style, variant, size, weight*.
     """
-    wa = ChartWindArrow()
-    Q = args[0]
-    if isinstance(Q, MILayer):
-        wa.setLayer(Q.layer)
-    else:
-        wa.setLayer(Q)
-    X = args[1]
-    Y = args[2]
-    wa.setX(X)
-    wa.setY(Y)
-    U = args[3]
-    wa.setLength(U)
-    if len(args) == 5:
-        label = args[4]
-        wa.setLabel(label)
-    cobj = kwargs.pop('color', 'b')
-    color = plotutil.getcolor(cobj)
-    wa.setColor(color)
-    lcobj = kwargs.pop('labelcolor', 'b')
-    lcolor = plotutil.getcolor(lcobj)
-    wa.setLabelColor(lcolor)
-    bbox = kwargs.pop('bbox', None)
-    if not bbox is None:
-        fill = bbox.pop('fill', None)
-        if not fill is None:
-            wa.setFill(fill)
-        facecolor = bbox.pop('facecolor', None)
-        if not facecolor is None:
-            facecolor = plotutil.getcolor(facecolor)
-            wa.setFill(True)
-            wa.setBackground(facecolor)
-        edge = bbox.pop('edge', None)
-        if not edge is None:
-            wa.setDrawNeatline(edge)
-        edgecolor = bbox.pop('edgecolor', None)
-        if not edgecolor is None:
-            edgecolor = plotutil.getcolor(edgecolor)
-            wa.setNeatlineColor(edgecolor)
-            wa.setDrawNeatline(True)
-        linewidth = bbox.pop('linewidth', None)
-        if not linewidth is None:
-            wa.setNeatlineSize(linewidth)
-            wa.setDrawNeatline(True)
-    gca.axes.setWindArrow(wa)
+    gca.quiverkey(*args, **kwargs)
     draw_if_interactive()
-    
+ 
 def barbsm(*args, **kwargs):
     """
     Plot a 2-D field of barbs in a map.
@@ -4821,67 +3581,21 @@ def barbsm(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Created barbs VectoryLayer.
     """
-    plot = gca
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    proj = kwargs.pop('proj', None)
-    order = kwargs.pop('order', None)
-    isuv = kwargs.pop('isuv', True)
-    n = len(args) 
-    iscolor = False
-    cdata = None
-    onlyuv = True
-    if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
-        onlyuv = False
-    if onlyuv:
-        u = minum.asmiarray(args[0])
-        v = minum.asmiarray(args[1])
-        xx = args[0].dimvalue(1)
-        yy = args[0].dimvalue(0)
-        x, y = minum.meshgrid(xx, yy)
-        args = args[2:]
-        if len(args) > 0:
-            cdata = minum.asmiarray(args[0])
-            iscolor = True
-            args = args[1:]
+    global gca
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axesm()
     else:
-        x = minum.asmiarray(args[0])
-        y = minum.asmiarray(args[1])
-        u = minum.asmiarray(args[2])
-        v = minum.asmiarray(args[3])
-        args = args[4:]
-        if len(args) > 0:
-            cdata = minum.asmiarray(args[0])
-            iscolor = True
-            args = args[1:]
-    if iscolor:
-        if len(args) > 0:
-            cn = args[0]
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-        else:
-            levs = kwargs.pop('levs', None)
-            if levs is None:
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
-            else:
-                if isinstance(levs, MIArray):
-                    levs = levs.tolist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
-    else:    
-        if cmap.getColorCount() == 1:
-            c = cmap.getColor(0)
-        else:
-            c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = plotutil.setlegendscheme_point(ls, **kwargs)
-    layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'barbs', isuv, proj=proj)
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    udata = None
-    vdata = None
-    cdata = None
-    return MILayer(layer)
-    
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.barbs(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r   
+  
 def streamplotm(*args, **kwargs):
     """
     Plot streamline in a map.
@@ -5132,21 +3846,18 @@ def worldmap():
     gca = plot
     return plot
 
-def webmap(provider='OpenStreetMap', order=0):
+def webmap(provider='OpenStreetMap', zorder=0):
     '''
     Add a new web map layer.
     
     :param provider: (*string*) Web map provider.
-    :param order: (*int*) Layer order.
+    :param zorder: (*int*) Layer order.
     
     :returns: Web map layer
     '''
-    layer = WebMapLayer()
-    provider = WebMapProvider.valueOf(provider)
-    layer.setWebMapProvider(provider)
-    gca.add_layer(layer, order)
+    layer = gca.webmap(provider, zorder)
     draw_if_interactive()
-    return MILayer(layer)
+    return layer
         
 def geoshow(*args, **kwargs):
     '''
@@ -5164,149 +3875,7 @@ def geoshow(*args, **kwargs):
     r = gca.geoshow(*args, **kwargs)
     draw_if_interactive()
     return r
-        
-def geoshow_bak(*args, **kwargs):
-    '''
-    Display map layer or longitude latitude data.
-    
-    Syntax:
-    --------    
-        geoshow(shapefilename) - Displays the map data from a shape file.
-        geoshow(layer) - Displays the map data from a map layer which may created by ``shaperead`` function.
-        geoshow(S) - Displays the vector geographic features stored in S as points, multipoints, lines, or 
-          polygons.
-        geoshow(lat, lon) - Displays the latitude and longitude vectors.
-    '''
-    plot = gca
-    islayer = False
-    if isinstance(args[0], basestring):
-        fn = args[0]
-        if not fn.endswith('.shp'):
-            fn = fn + '.shp'
-        if not os.path.exists(fn):
-            fn = os.path.join(migl.mapfolder, fn)
-        if os.path.exists(fn):
-            layer = migeo.shaperead(fn)
-            islayer = True
-        else:
-            raise IOError('File not exists: ' + fn)
-    elif isinstance(args[0], MILayer):
-        layer = args[0]
-        islayer = True
-    
-    if islayer:    
-        layer = layer.layer   
-        visible = kwargs.pop('visible', True)
-        layer.setVisible(visible)
-        order = kwargs.pop('order', None)
-        if layer.getLayerType() == LayerTypes.ImageLayer:
-            if order is None:
-                plot.add_layer(layer)
-            else:
-                plot.add_layer(layer, order)
-        else:
-            #LegendScheme
-            ls = kwargs.pop('symbolspec', None)
-            if ls is None:
-                if len(kwargs) > 0 and layer.getLegendScheme().getBreakNum() == 1:
-                    lb = layer.getLegendScheme().getLegendBreaks().get(0)
-                    btype = lb.getBreakType()
-                    geometry = 'point'
-                    if btype == BreakTypes.PolylineBreak:
-                        geometry = 'line'
-                    elif btype == BreakTypes.PolygonBreak:
-                        geometry = 'polygon'
-                    lb, isunique = plotutil.getlegendbreak(geometry, **kwargs)
-                    layer.getLegendScheme().getLegendBreaks().set(0, lb)
-            else:
-                layer.setLegendScheme(ls)
-            if order is None:
-                plot.add_layer(layer)
-            else:
-                plot.add_layer(layer, order)
-            #Labels        
-            labelfield = kwargs.pop('labelfield', None)
-            if not labelfield is None:
-                labelset = layer.getLabelSet()
-                labelset.setFieldName(labelfield)
-                fontname = kwargs.pop('fontname', 'Arial')
-                fontsize = kwargs.pop('fontsize', 14)
-                bold = kwargs.pop('bold', False)
-                if bold:
-                    font = Font(fontname, Font.BOLD, fontsize)
-                else:
-                    font = Font(fontname, Font.PLAIN, fontsize)
-                labelset.setLabelFont(font)
-                lcolor = kwargs.pop('labelcolor', None)
-                if not lcolor is None:
-                    lcolor = miutil.getcolor(lcolor)
-                    labelset.setLabelColor(lcolor)
-                xoffset = kwargs.pop('xoffset', 0)
-                labelset.setXOffset(xoffset)
-                yoffset = kwargs.pop('yoffset', 0)
-                labelset.setYOffset(yoffset)
-                avoidcoll = kwargs.pop('avoidcoll', True)
-                decimals = kwargs.pop('decimals', None)
-                if not decimals is None:
-                    labelset.setAutoDecimal(False)
-                    labelset.setDecimalDigits(decimals)
-                labelset.setAvoidCollision(avoidcoll)
-                layer.addLabels()  
-        plot.axes.setDrawExtent(layer.getExtent().clone())
-        plot.axes.setExtent(layer.getExtent().clone())
-        draw_if_interactive()
-        return MILayer(layer)
-    else:
-        if isinstance(args[0], Graphic):
-            graphic = args[0]
-            displaytype = 'point'
-            stype = graphic.getShape().getShapeType()
-            if stype == ShapeTypes.Polyline:
-                displaytype = 'line'
-            elif stype == ShapeTypes.Polygon:
-                displaytype = 'polygon'
-            lbreak, isunique = plotutil.getlegendbreak(displaytype, **kwargs)
-            graphic.setLegend(lbreak)
-            plot.add_graphic(graphic)            
-            draw_if_interactive()
-        elif isinstance(args[0], Shape):
-            shape = args[0]
-            displaytype = 'point'
-            stype = shape.getShapeType()
-            if stype == ShapeTypes.Polyline:
-                displaytype = 'line'
-            elif stype == ShapeTypes.Polygon:
-                displaytype = 'polygon'
-            lbreak, isunique = plotutil.getlegendbreak(displaytype, **kwargs)
-            graphic = Graphic(shape, lbreak)
-            plot.add_graphic(graphic)            
-            draw_if_interactive()
-        elif len(args) == 2:
-            lat = args[0]
-            lon = args[1]
-            displaytype = kwargs.pop('displaytype', 'line')
-            if isinstance(lat, (int, float)):
-                displaytype = 'point'
-            else:
-                if len(lat) == 1:
-                    displaytype = 'point'
-                else:
-                    if isinstance(lon, (MIArray, DimArray)):
-                        lon = lon.aslist()
-                    if isinstance(lat, (MIArray, DimArray)):
-                        lat = lat.aslist()
-
-            lbreak, isunique = plotutil.getlegendbreak(displaytype, **kwargs)
-            iscurve = kwargs.pop('iscurve', False)
-            if displaytype == 'point':
-                graphic = plot.axes.addPoint(lat, lon, lbreak)
-            elif displaytype == 'polyline' or displaytype == 'line':
-                graphic = plot.axes.addPolyline(lat, lon, lbreak, iscurve)
-            elif displaytype == 'polygon':
-                graphic = plot.axes.addPolygon(lat, lon, lbreak)
-            draw_if_interactive()
-        return graphic
-            
+          
 def surf(*args, **kwargs):
     '''
     creates a three-dimensional surface plot
@@ -5346,18 +3915,7 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
 
     :returns: (*list*) Created colors.
     '''
-    if isinstance(n, list):
-        cols = plotutil.getcolors(n, alpha)
-    else:
-        ocmap = ColorUtil.getColorMap(cmap)
-        if reverse:
-            ocmap.reverse()
-        if alpha is None:
-            cols = ocmap.getColorList(n)    
-        else:
-            alpha = (int)(alpha * 255)
-            cols = ocmap.getColorList(n, alpha)
-    return list(cols)
+    return plotutil.makecolors(n, cmap, reverse, alpha)
 
 def makelegend(source):
     '''

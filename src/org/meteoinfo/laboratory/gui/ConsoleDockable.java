@@ -74,8 +74,9 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         String toolboxPath = this.startupPath + "/toolbox";
         String mapPath = this.startupPath + "/map";
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("windows") && mapPath.substring(0, 1).equals("/"))
+        if (os.contains("windows") && mapPath.substring(0, 1).equals("/")) {
             mapPath = mapPath.substring(1);
+        }
         if (isDebug) {
             path = "D:/MyProgram/Java/MeteoInfoDev/MeteoInfoLab/pylib";
             toolboxPath = "D:/MyProgram/Java/MeteoInfoDev/toolbox";
@@ -93,7 +94,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("import datetime");
             //interp.exec("sys.setdefaultencoding('utf-8')");
             interp.exec("sys.path.append('" + path + "')");
-            interp.exec("from milab import *");            
+            interp.exec("from milab import *");
             interp.exec("sys.path.append('" + toolboxPath + "')");
             interp.exec("import toolbox");
             interp.exec("from toolbox import *");
@@ -101,13 +102,13 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             System.out.println(e.toString());
             e.printStackTrace();
         }
-        
+
         try {
             interp.exec("mipylib.plotlib.miplot.isinteractive = True");
             interp.exec("mipylib.migl.milapp = milapp");
             interp.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
-            currentPath = currentPath.replace("\\", "/");  
-            interp.exec("mipylib.migl.currentfolder = u'" + currentPath + "'");   
+            currentPath = currentPath.replace("\\", "/");
+            interp.exec("mipylib.migl.currentfolder = u'" + currentPath + "'");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -170,7 +171,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("mipylib.plotlib.miplot.isinteractive = True");
         }
     }
-    
+
     /**
      * Do Enter key
      */
@@ -193,9 +194,10 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         this.interp.out.print(">>> ");
         interp.exec("mipylib.plotlib.miplot.isinteractive = True");
     }
-    
+
     /**
      * Run a python file
+     *
      * @param fn Python file name
      */
     public void execfile(final String fn) {
@@ -222,6 +224,11 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                     interp.exec("mipylib.plotlib.miplot.isinteractive = True");
                 } catch (Exception e) {
                     e.printStackTrace();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(PythonInteractiveInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     interp.console.print(">>> ", Color.red);
                     interp.console.setStyle(Color.black);
                     //interp.console.setForeground(Color.black);
@@ -295,7 +302,6 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 //JTextPane jTextPane_Output = interp.console.getTextPane();
                 //JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
                 //JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
-
                 interp.console.println("run script...");
                 //interp.setOut(writer);
                 //interp.setErr(writer);

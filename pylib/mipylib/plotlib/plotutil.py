@@ -11,7 +11,9 @@ from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak,
 from org.meteoinfo.drawing import PointStyle, MarkerType
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.shape import ShapeTypes
-from java.awt import Color
+from org.meteoinfo.chart import ChartText
+
+from java.awt import Color, Font
 
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
@@ -154,6 +156,30 @@ def getcolormap(**kwargs):
     if reverse:
         cmap.reverse()
     return cmap
+    
+def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
+    '''
+    Make colors.
+    
+    :param n: (*int*) Colors number.
+    :param cmap: (*string*) Color map name. Default is ``matlab_jet``.
+    :param reverse: (*boolean*) Reverse the colors or not. Default is ``False``.
+    :param alpha: (*float*) Alpha value (0 - 1) of the colors. Defaul is ``None``.
+
+    :returns: (*list*) Created colors.
+    '''
+    if isinstance(n, list):
+        cols = getcolors(n, alpha)
+    else:
+        ocmap = ColorUtil.getColorMap(cmap)
+        if reverse:
+            ocmap.reverse()
+        if alpha is None:
+            cols = ocmap.getColorList(n)    
+        else:
+            alpha = (int)(alpha * 255)
+            cols = ocmap.getColorList(n, alpha)
+    return list(cols)
     
 def getpointstyle(style):
     if style is None:
@@ -565,3 +591,73 @@ def setpointlegendbreak(lb, **kwargs):
     edgesize = kwargs.pop('edgesize', None)
     if not edgesize is None:
         lb.setOutlineSize(edgesize)
+        
+def text(x, y, s, **kwargs):
+    """
+    Add text to the axes. Add text in string *s* to axis at location *x* , *y* , data
+    coordinates.
+    
+    :param x: (*float*) Data x coordinate.
+    :param y: (*float*) Data y coordinate.
+    :param s: (*string*) Text.
+    :param fontname: (*string*) Font name. Default is ``Arial`` .
+    :param fontsize: (*int*) Font size. Default is ``14`` .
+    :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+    :param color: (*color*) Tick label string color. Default is ``black`` .
+    :param coordinates=['axes'|'figure'|'data'|'inches']: (*string*) Coordinate system and units for 
+        *X, Y*. 'axes' and 'figure' are normalized coordinate system with 0,0 in the lower left and 
+        1,1 in the upper right, 'data' are the axes data coordinates (Default value); 'inches' is 
+        position in the figure in inches, with 0,0 at the lower left corner.
+    
+    :returns: (*ChartText*) text.
+    """
+    fontname = kwargs.pop('fontname', None)
+    exfont = False
+    if fontname is None:
+        fontname = 'Arial'
+    else:
+        exfont = True
+    fontsize = kwargs.pop('fontsize', 14)
+    bold = kwargs.pop('bold', False)
+    color = kwargs.pop('color', 'black')
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    c = getcolor(color)
+    text = ChartText(s, font)
+    text.setUseExternalFont(exfont)
+    text.setColor(c)
+    text.setX(x)
+    text.setY(y)
+    bbox = kwargs.pop('bbox', None)
+    if not bbox is None:
+        fill = bbox.pop('fill', None)
+        if not fill is None:
+            text.setFill(fill)
+        facecolor = bbox.pop('facecolor', None)
+        if not facecolor is None:
+            facecolor = getcolor(facecolor)
+            text.setFill(True)
+            text.setBackground(facecolor)
+        edge = bbox.pop('edge', None)
+        if not edge is None:
+            text.setDrawNeatline(edge)
+        edgecolor = bbox.pop('edgecolor', None)
+        if not edgecolor is None:
+            edgecolor = getcolor(edgecolor)
+            text.setNeatlineColor(edgecolor)
+            text.setDrawNeatline(True)
+        linewidth = bbox.pop('linewidth', None)
+        if not linewidth is None:
+            text.setNeatlineSize(linewidth)
+            text.setDrawNeatline(True)
+        gap = bbox.pop('gap', None)
+        if not gap is None:
+            text.setGap(gap)
+    rotation = kwargs.pop('rotation', None)
+    if not rotation is None:
+        text.setAngle(rotation)
+    coordinates = kwargs.pop('coordinates', 'data')
+    text.setCoordinates(coordinates)
+    return text
