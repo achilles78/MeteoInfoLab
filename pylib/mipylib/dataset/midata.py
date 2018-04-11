@@ -105,6 +105,8 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
             return addfile_geotiff(fname, False)
         elif fsufix == '.awx':
             return addfile_awx(fname, False)
+        elif fsufix == '.bil':
+            return addfile_bil(fname, False)
         
         meteodata = MeteoDataInfo()
         meteodata.openData(fname, keepopen)
@@ -330,6 +332,24 @@ def addfile_geotiff(fname, getfn=True):
         raise IOError('No such file: ' + fname)
     meteodata = MeteoDataInfo()
     meteodata.openGeoTiffData(fname)
+    datafile = DimDataFile(meteodata)
+    return datafile
+    
+def addfile_bil(fname, getfn=True):
+    '''
+    Add a bil data file.
+    
+    :param fname: (*string*) The bil file name.
+    :param getfn: (*string*) If run ``__getfilename`` function or not. Default is ``True``.
+    
+    :returns: (*DimDataFile*) Opened file object.
+    '''
+    if getfn:
+        fname, isweb = __getfilename(fname)
+    if not os.path.exists(fname):
+        raise IOError('No such file: ' + fname)
+    meteodata = MeteoDataInfo()
+    meteodata.openBILData(fname)
     datafile = DimDataFile(meteodata)
     return datafile
     
