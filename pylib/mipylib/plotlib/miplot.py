@@ -8,37 +8,26 @@
 import os
 import datetime
 import math
-import numbers
 
 from org.meteoinfo.chart import Location
-from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 from org.meteoinfo.data.meteodata import DrawMeteoData
-from org.meteoinfo.chart.plot import Plot, Plot2D, MapPlot, Plot3D, ChartPlotMethod, PlotOrientation, GraphicFactory
-from org.meteoinfo.chart import Chart, ChartText, ChartLegend, ChartColorBar, LegendPosition, ChartWindArrow
-from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
+from org.meteoinfo.chart.plot import Plot2D, MapPlot, Plot3D
+from org.meteoinfo.chart import ChartText
 from org.meteoinfo.script import ChartForm
-from org.meteoinfo.legend import LineStyles, BreakTypes, PointBreak, PolylineBreak, PolygonBreak, BarBreak, LegendManage, LegendScheme, LegendType
-from org.meteoinfo.drawing import PointStyle, MarkerType
-from org.meteoinfo.global import Extent
-from org.meteoinfo.global.colors import ColorUtil
+from org.meteoinfo.legend import LegendManage, LegendScheme, LegendType
 from org.meteoinfo.image import AnimatedGifEncoder
-from org.meteoinfo.layer import LayerTypes, MapLayer, WebMapLayer
-from org.meteoinfo.layout import MapLayout
-from org.meteoinfo.map import MapView
-from org.meteoinfo.shape import Shape, ShapeTypes, Graphic, GraphicCollection
+from org.meteoinfo.shape import ShapeTypes
 
 from javax.swing import WindowConstants
-from java.awt import Color, Font
-from java.awt.image import BufferedImage
+from java.awt import Font
 
-from mipylib.numeric.dimarray import DimArray, PyGridData, PyStationData
+from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
 import mipylib.numeric.minum as minum
-import mipylib.geolib.migeo as migeo
-from mipylib.geolib.milayer import MILayer, MIXYListData
 import mipylib.miutil as miutil
-from axes import Axes, PolarAxes, Axes3D
+from axes import Axes, PolarAxes
 from mapaxes import MapAxes
+from axes3d import Axes3D
 import plotutil
 from figure import Figure
 import mipylib.migl as migl
@@ -46,20 +35,19 @@ import mipylib.migl as migl
 ## Global ##
 batchmode = False
 isinteractive = False
-maplayout = MapLayout()
 g_figure = None
 gca = None
 
 __all__ = [
     'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barh','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
-    'contourfm','contourm','display','draw','draw_if_interactive','errorbar',
+    'contourfm','contourm','draw','draw_if_interactive','errorbar',
     'figure','figsize','patch','rectangle','fill_between','fill_betweenx','webmap','geoshow','gifaddframe','gifanimation','giffinish',
-    'grid','gridfm','hist','imshow','imshowm','legend','left_title','loglog','makecolors',
+    'grid','hist','imshow','imshowm','legend','left_title','loglog','makecolors',
     'makelegend','makesymbolspec','masklayer','pcolor','pcolorm','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','right_title','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
-    'surf','text','title','twinx','weatherspec','worldmap','xaxis',
+    'surf','text','title','twinx','weatherspec','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zaxis','zlabel','zlim','zticks',
     'isinteractive'
     ]
@@ -1232,66 +1220,7 @@ def xaxis(ax=None, **kwargs):
     """
     if ax is None:
         ax = gca
-    visible = kwargs.pop('visible', None)
-    shift = kwargs.pop('shift', None)
-    color = kwargs.pop('color', None)
-    if not color is None:
-        color = plotutil.getcolor(color)
-    linewidth = kwargs.pop('linewidth', None)
-    linestyle = kwargs.pop('linestyle', None)
-    tickline = kwargs.pop('tickline', None)
-    tickline = kwargs.pop('tickvisible', tickline)
-    ticklabel = kwargs.pop('ticklabel', None)
-    minortick = kwargs.pop('minortick', False)
-    tickin = kwargs.pop('tickin', True)
-    axistype = kwargs.pop('axistype', None)
-    timetickformat = kwargs.pop('timetickformat', None)
-    if not axistype is None:
-        if timetickformat is None:
-            __setXAxisType(ax.axes, axistype)
-        else:
-            __setXAxisType(ax.axes, axistype, timetickformat)
-        #ax.updateDrawExtent()
-        ax.axes.setAutoExtent()
-    tickfontname = kwargs.pop('tickfontname', 'Arial')
-    tickfontsize = kwargs.pop('tickfontsize', 14)
-    tickbold = kwargs.pop('tickbold', False)
-    if tickbold:
-        font = Font(tickfontname, Font.BOLD, tickfontsize)
-    else:
-        font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    location = kwargs.pop('location', 'both')
-    if location == 'top':
-        locs = [Location.TOP]
-    elif location == 'bottom':
-        locs = [Location.BOTTOM]
-    else:
-        locs = [Location.BOTTOM, Location.TOP]
-    axislist = []
-    if isinstance(ax, Axes3D):
-        axislist.append(ax.axes.getXAxis())
-    else:
-        for loc in locs:    
-            axislist.append(ax.axes.getAxis(loc))
-    for axis in axislist:
-        if not visible is None:
-            axis.setVisible(visible)
-        if not shift is None:
-            axis.setShift(shift)
-        if not color is None:
-            axis.setColor_All(color)
-        if not linewidth is None:
-            axis.setLineWidth(linewidth)
-        if not linestyle is None:
-            axis.setLineStyle(linestyle)
-        if not tickline is None:
-            axis.setDrawTickLine(tickline)
-        if not ticklabel is None:
-            axis.setDrawTickLabel(ticklabel)
-        axis.setMinorTickVisible(minortick)
-        axis.setInsideTick(tickin)
-        axis.setTickLabelFont(font)
-
+    ax.xaxis(**kwargs)
     draw_if_interactive()
     
 def yaxis(ax=None, **kwargs):
@@ -1304,64 +1233,7 @@ def yaxis(ax=None, **kwargs):
     """
     if ax is None:
         ax = gca
-    visible = kwargs.pop('visible', None)
-    shift = kwargs.pop('shift', None)
-    color = kwargs.pop('color', None)
-    if not color is None:
-        color = plotutil.getcolor(color)
-    linewidth = kwargs.pop('linewidth', None)
-    linestyle = kwargs.pop('linestyle', None)
-    tickline = kwargs.pop('tickline', None)
-    tickline = kwargs.pop('tickvisible', tickline)
-    ticklabel = kwargs.pop('ticklabel', None)
-    minortick = kwargs.pop('minortick', False)
-    tickin = kwargs.pop('tickin', True)
-    axistype = kwargs.pop('axistype', None)
-    timetickformat = kwargs.pop('timetickformat', None)
-    if not axistype is None:
-        if timetickformat is None:
-            __setYAxisType(ax.axes, axistype)
-        else:
-            __setYAxisType(ax.axes, axistype, timetickformat)
-        ax.axes.updateDrawExtent()
-    tickfontname = kwargs.pop('tickfontname', 'Arial')
-    tickfontsize = kwargs.pop('tickfontsize', 14)
-    tickbold = kwargs.pop('tickbold', False)
-    if tickbold:
-        font = Font(tickfontname, Font.BOLD, tickfontsize)
-    else:
-        font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    location = kwargs.pop('location', 'both')
-    if location == 'left':
-        locs = [Location.LEFT]
-    elif location == 'right':
-        locs = [Location.RIGHT]
-    else:
-        locs = [Location.LEFT, Location.RIGHT]
-    axislist = []
-    if isinstance(ax, Axes3D):
-        axislist.append(ax.axes.getYAxis())
-    else:
-        for loc in locs:    
-            axislist.append(ax.axes.getAxis(loc))
-    for axis in axislist:
-        if not visible is None:
-            axis.setVisible(visible)
-        if not shift is None:
-            axis.setShift(shift)
-        if not color is None:
-            axis.setColor_All(color)
-        if not linewidth is None:
-            axis.setLineWidth(linewidth)
-        if not linestyle is None:
-            axis.setLineStyle(linestyle)
-        if not tickline is None:
-            axis.setDrawTickLine(tickline)
-        if not ticklabel is None:
-            axis.setDrawTickLabel(ticklabel)
-        axis.setMinorTickVisible(minortick)
-        axis.setInsideTick(tickin)
-        axis.setTickLabelFont(font)
+    ax.yaxis(**kwargs)
     draw_if_interactive()
     
 def zaxis(ax=None, **kwargs):
@@ -1374,60 +1246,7 @@ def zaxis(ax=None, **kwargs):
     """
     if ax is None:
         ax = gca
-    visible = kwargs.pop('visible', None)
-    shift = kwargs.pop('shift', None)
-    color = kwargs.pop('color', None)
-    if not color is None:
-        color = plotutil.getcolor(color)
-    linewidth = kwargs.pop('linewidth', None)
-    linestyle = kwargs.pop('linestyle', None)
-    tickline = kwargs.pop('tickline', None)
-    tickline = kwargs.pop('tickvisible', tickline)
-    ticklabel = kwargs.pop('ticklabel', None)
-    minortick = kwargs.pop('minortick', False)
-    tickin = kwargs.pop('tickin', True)
-    axistype = kwargs.pop('axistype', None)
-    timetickformat = kwargs.pop('timetickformat', None)
-    if not axistype is None:
-        if timetickformat is None:
-            __setYAxisType(ax.axes, axistype)
-        else:
-            __setYAxisType(ax.axes, axistype, timetickformat)
-        ax.axes.updateDrawExtent()
-    tickfontname = kwargs.pop('tickfontname', 'Arial')
-    tickfontsize = kwargs.pop('tickfontsize', 14)
-    tickbold = kwargs.pop('tickbold', False)
-    if tickbold:
-        font = Font(tickfontname, Font.BOLD, tickfontsize)
-    else:
-        font = Font(tickfontname, Font.PLAIN, tickfontsize)
-    location = kwargs.pop('location', 'both')
-    if location == 'left':
-        locs = [Location.LEFT]
-    elif location == 'right':
-        locs = [Location.RIGHT]
-    else:
-        locs = [Location.LEFT, Location.RIGHT]
-    axislist = []
-    axislist.append(ax.axes.getZAxis())
-    for axis in axislist:
-        if not visible is None:
-            axis.setVisible(visible)
-        if not shift is None:
-            axis.setShift(shift)
-        if not color is None:
-            axis.setColor_All(color)
-        if not linewidth is None:
-            axis.setLineWidth(linewidth)
-        if not linestyle is None:
-            axis.setLineStyle(linestyle)
-        if not tickline is None:
-            axis.setDrawTickLine(tickline)
-        if not ticklabel is None:
-            axis.setDrawTickLabel(ticklabel)
-        axis.setMinorTickVisible(minortick)
-        axis.setInsideTick(tickin)
-        axis.setTickLabelFont(font)
+    ax.zaxis(**kwargs)
     draw_if_interactive()
     
 def box(ax=None, on=None):
@@ -1571,319 +1390,61 @@ def clc():
     '''
     if not migl.milapp is None:
         console = migl.milapp.getConsoleDockable().getConsole()
-        console.getTextPane().setText('')
+        console.getTextPane().setText('')    
 
-def __setplotstyle(plot, idx, style, n, **kwargs):    
-    linewidth = kwargs.pop('linewidth', 1.0)
-    color = kwargs.pop('color', 'red')
-    c = plotutil.getcolor(color)
-    #print 'Line width: ' + str(linewidth)
-    caption = plot.getLegendBreak(idx).getCaption()
-    if style is None:
-        plot.setChartPlotMethod(ChartPlotMethod.LINE)
-        plb = PolylineBreak()
-        plb.setCaption(caption)
-        plb.setSize(linewidth)
-        if not c is None:
-            plb.setColor(c)
-        plot.setLegendBreak(idx, plb)
-        return
-        
-    c = plotutil.getcolor(style)
-    pointStyle = plotutil.getpointstyle(style)
-    lineStyle = plotutil.getlinestyle(style)
-    if not pointStyle is None:
-        if lineStyle is None:
-            #plot.setChartPlotMethod(ChartPlotMethod.POINT)            
-            pb = PointBreak()
-            pb.setCaption(caption)
-            if '.' in style:
-                pb.setSize(4)
-                pb.setDrawOutline(False)
-            else:
-                pb.setSize(8)
-            pb.setDrawOutline(False)
-            pb.setStyle(pointStyle)
-            if not c is None:
-                pb.setColor(c)
-            plot.setLegendBreak(idx, pb)
-            return pb
-        else:
-            plot.setChartPlotMethod(ChartPlotMethod.LINE_POINT)
-            plb = PolylineBreak()
-            plb.setCaption(caption)
-            plb.setSize(linewidth)
-            plb.setStyle(lineStyle)
-            plb.setDrawSymbol(True)
-            plb.setSymbolStyle(pointStyle)
-            plb.setSymbolInterval(__getsymbolinterval(n))
-            plb.setFillSymbol(True)
-            if not c is None:
-                plb.setColor(c)
-                plb.setSymbolColor(c)
-                plb.setSymbolFillColor(c)
-            plot.setLegendBreak(idx, plb)
-            return plb
-    else:
-        plot.setChartPlotMethod(ChartPlotMethod.LINE)
-        plb = PolylineBreak()
-        plb.setCaption(caption)
-        plb.setSize(linewidth)
-        if not c is None:
-            plb.setColor(c)
-        if not lineStyle is None:
-            plb.setStyle(lineStyle)
-        plot.setLegendBreak(idx, plb)
-        return plb    
-    
-def __getcolors_value(v, n=None, cmap='matlab_jet'):
-    min = v.min()
-    max = v.max()
-    cmap = plotutil.getcolormap(cmap=cmap)
-    if n is None:
-        cs = ColorUtil.createColors(cmap, min, max)
-    else:
-        cs = ColorUtil.createColors(cmap, min, max, n)
-    colors = []
-    for c in cs:
-        colors.append(c)
-    return colors
-    
-def __getsymbolinterval(n):
-    i = 1
-    v = 20
-    if n < v:
-        i = 1
-    else:
-        i = n / v
-    
-    return i
-
-def __getfont(fontdic, **kwargs):
-    basefont = kwargs.pop('basefont', None)
-    if basefont is None:
-        name = 'Arial'
-        size = 14
-        bold = False
-        italic = False
-    else:
-        name = basefont.getName()
-        size = basefont.getSize()
-        bold = basefont.isBold()
-        italic = basefont.isItalic()
-    name = fontdic.pop('name', name)
-    size = fontdic.pop('size', size)
-    bold = fontdic.pop('bold', bold)
-    italic = fontdic.pop('italic', italic)
-    if bold:
-        if italic:
-            font = Font(name, Font.BOLD | Font.ITALIC, size)
-        else:
-            font = Font(name, Font.BOLD, size)
-    else:
-        if italic:
-            font = Font(name, Font.ITALIC, size)
-        else:
-            font = Font(name, Font.PLAIN, size)
-    return font
-    
-def __getfont_1(**kwargs):
-    fontname = kwargs.pop('fontname', 'Arial')
-    fontsize = kwargs.pop('fontsize', 14)
-    bold = kwargs.pop('bold', False)
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    return font
-    
-def __setXAxisType(ax, axistype, timetickformat=None):
-    if axistype == 'lon':
-        b_axis = LonLatAxis(ax.getAxis(Location.BOTTOM))
-        b_axis.setLabel('Longitude')
-        b_axis.setLongitude(True)
-        ax.setAxis(b_axis, Location.BOTTOM)
-        t_axis = LonLatAxis(ax.getAxis(Location.TOP))
-        t_axis.setLabel('Longitude')
-        t_axis.setLongitude(True)
-        ax.setAxis(t_axis, Location.TOP)
-    elif axistype == 'lat':
-        b_axis = LonLatAxis(ax.getAxis(Location.BOTTOM))
-        b_axis.setLabel('Latitude')
-        b_axis.setLongitude(False)
-        ax.setAxis(b_axis, Location.BOTTOM)
-        t_axis = LonLatAxis(ax.getAxis(Location.TOP))
-        t_axis.setLabel('Latitude')
-        t_axis.setLongitude(False)
-        ax.setAxis(t_axis, Location.TOP)
-    elif axistype == 'time':
-        b_axis = TimeAxis(ax.getAxis(Location.BOTTOM))
-        ax.setAxis(b_axis, Location.BOTTOM)
-        t_axis = TimeAxis(ax.getAxis(Location.TOP))
-        ax.setAxis(t_axis, Location.TOP)
-        if not timetickformat is None:
-            ax.getAxis(Location.BOTTOM).setTimeFormat(timetickformat)
-            ax.getAxis(Location.TOP).setTimeFormat(timetickformat)
-    elif axistype == 'log':
-        b_axis = LogAxis(ax.getAxis(Location.BOTTOM))
-        b_axis.setLabel('Log')
-        b_axis.setMinorTickNum(10)
-        ax.setAxis(b_axis, Location.BOTTOM)
-        t_axis = LogAxis(ax.getAxis(Location.TOP))
-        t_axis.setLabel('Log')
-        t_axis.setMinorTickNum(10)
-        ax.setAxis(t_axis, Location.TOP)        
-                
-def __setYAxisType(ax, axistype, timetickformat=None):
-    if axistype == 'lon':
-        b_axis = LonLatAxis(ax.getAxis(Location.LEFT))
-        b_axis.setLabel('Longitude')
-        b_axis.setLongitude(True)
-        ax.setAxis(b_axis, Location.LEFT)
-        t_axis = LonLatAxis(ax.getAxis(Location.RIGHT))
-        t_axis.setLabel('Longitude')
-        t_axis.setLongitude(True)
-        ax.setAxis(t_axis, Location.RIGHT)
-    elif axistype == 'lat':
-        b_axis = LonLatAxis(ax.getAxis(Location.LEFT))
-        b_axis.setLabel('Latitude')
-        b_axis.setLongitude(False)
-        ax.setAxis(b_axis, Location.LEFT)
-        t_axis = LonLatAxis(ax.getAxis(Location.RIGHT))
-        t_axis.setLabel('Latitude')
-        t_axis.setLongitude(False)
-        ax.setAxis(t_axis, Location.RIGHT)
-    elif axistype == 'time':
-        b_axis = TimeAxis(ax.getAxis(Location.LEFT))
-        ax.setAxis(b_axis, Location.LEFT)
-        t_axis = TimeAxis(ax.getAxis(Location.RIGHT))
-        ax.setAxis(t_axis, Location.RIGHT)
-        if not timetickformat is None:
-            ax.getAxis(Location.LEFT).setTimeFormat(timetickformat)
-            ax.getAxis(Location.RIGHT).setTimeFormat(timetickformat)
-    elif axistype == 'log':
-        l_axis = LogAxis(ax.getAxis(Location.LEFT))
-        l_axis.setLabel('Log')
-        l_axis.setMinorTickNum(10)
-        ax.setAxis(l_axis, Location.LEFT)
-        r_axis = LogAxis(ax.getAxis(Location.RIGHT))
-        r_axis.setLabel('Log')
-        r_axis.setMinorTickNum(10)
-        ax.setAxis(r_axis, Location.RIGHT)
-
-def title(title, fontname=None, fontsize=14, bold=True, color='black', **kwargs):
+def title(label, loc='center', fontname=None, fontsize=14, bold=True, color='black', **kwargs):
     """
     Set a title of the current axes.
     
-    :param title: (*string*) Title string.
+    :param label: (*string*) Title label string.
+    :param loc: (*string') Which title to set ['center' | 'left' | 'right'],
+        default to 'center'.
     :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Title string color. Default is ``black`` .  
     :param linespace: (*int*) Line space of multiple line title.
     """
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-        
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    c = plotutil.getcolor(color)
-    ctitile = ChartText(title, font)
-    ctitile.setXAlign('center')
-    ctitile.setUseExternalFont(exfont)
-    ctitile.setColor(c)
-    linespace = kwargs.pop('linespace', None)
-    if not linespace is None:
-        ctitile.setLineSpace(linespace)
-    gca.set_title(ctitile)
+    gca.set_title(label, loc, fontname, fontsize, bold, color, **kwargs)
     draw_if_interactive()
     
-def suptitle(title, fontname=None, fontsize=14, bold=True, color='black'):
+def suptitle(label, fontname=None, fontsize=14, bold=True, color='black'):
     """
     Add a centered title to the figure.
     
-    :param title: (*string*) Title string.
+    :param label: (*string*) Title label string.
     :param fontname: (*string*) Font name. Default is ``Arial`` .
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Title string color. Default is ``black`` .
-    """
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-    
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    c = plotutil.getcolor(color)
-    ctitle = ChartText(title, font)
-    ctitle.setUseExternalFont(exfont)
-    ctitle.setColor(c)
-    g_figure.getChart().setTitle(ctitle)
+    """    
+    g_figure.set_title(label, fontname, fontsize, bold, color)
     draw_if_interactive()
     
-def left_title(title, fontname=None, fontsize=14, bold=False, color='black'):
+def left_title(label, fontname=None, fontsize=14, bold=False, color='black', **kwargs):
     """
     Set a left sub title of the current axes.
     
-    :param title: (*string*) Title string.
+    :param label: (*string*) Title string.
     :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
     :param color: (*color*) Title string color. Default is ``black`` .    
     """
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-        
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    c = plotutil.getcolor(color)
-    ctitile = ChartText(title, font)
-    ctitile.setXAlign('left')
-    ctitile.setUseExternalFont(exfont)
-    ctitile.setColor(c)
-    gca.set_left_title(ctitile)
+    gca.set_title(label, 'left', fontname, fontsize, bold, color, **kwargs)
     draw_if_interactive()
     
-def right_title(title, fontname=None, fontsize=14, bold=False, color='black'):
+def right_title(label, fontname=None, fontsize=14, bold=False, color='black', **kwargs):
     """
     Set a right sub title of the current axes.
     
-    :param title: (*string*) Title string.
+    :param label: (*string*) Title string.
     :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
     :param fontsize: (*int*) Font size. Default is ``14`` .
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
     :param color: (*color*) Title string color. Default is ``black`` .    
     """
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-        
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    c = plotutil.getcolor(color)
-    ctitile = ChartText(title, font)
-    ctitile.setXAlign('right')
-    ctitile.setUseExternalFont(exfont)
-    ctitile.setColor(c)
-    gca.set_right_title(ctitile)
+    gca.set_title(label, 'right', fontname, fontsize, bold, color, **kwargs)
     draw_if_interactive()
 
 def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
@@ -1896,33 +1457,7 @@ def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Label string color. Default is ``black`` .
     """
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-        
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    c = plotutil.getcolor(color)
-    axis = gca.axes.getXAxis()
-    text = ChartText(label, font)
-    text.setUseExternalFont(exfont)
-    text.setColor(c)
-    text.setXAlign('center')
-    text.setYAlign('top')
-    axis.setLabel(text)
-    axis.setDrawLabel(True)
-    if not isinstance(gca, Axes3D):
-        axis_t = gca.axes.getAxis(Location.TOP)
-        text = ChartText(label, font)
-        text.setUseExternalFont(exfont)
-        text.setColor(c)
-        text.setXAlign('center')
-        text.setYAlign('bottom')
-        axis_t.setLabel(text)
+    gca.set_xlabel(label, fontname, fontsize, bold, color)
     draw_if_interactive()
     
 def ylabel(label, fontname=None, fontsize=14, bold=False, color='black'):
@@ -1935,35 +1470,7 @@ def ylabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Label string color. Default is ``black`` .
     """
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-    
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    c = plotutil.getcolor(color)
-    axis = gca.axes.getYAxis()
-    text = ChartText(label, font)
-    text.setUseExternalFont(exfont)
-    text.setAngle(90)
-    text.setColor(c)
-    text.setXAlign('right')
-    text.setYAlign('center')
-    axis.setLabel(text)
-    axis.setDrawLabel(True)
-    if not isinstance(gca, Axes3D):
-        axis_r = gca.axes.getAxis(Location.RIGHT)
-        text = ChartText(label, font)
-        text.setAngle(90)
-        text.setUseExternalFont(exfont)
-        text.setColor(c)
-        text.setXAlign('left')
-        text.setYAlign('center')
-        axis_r.setLabel(text)
+    gca.set_ylabel(label, fontname, fontsize, bold, color)
     draw_if_interactive()
     
 def zlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
@@ -2011,11 +1518,6 @@ def xticks(*args, **kwargs):
     :param color: (*color*) Tick label string color. Default is ``black`` .
     :param rotation: (*float*) Tick label rotation angle. Default is 0.
     """
-    axis = gca.axes.getXAxis()
-    if isinstance(gca, Axes3D):
-        axis_t = None
-    else:
-        axis_t = gca.axes.getAxis(Location.TOP)
     if len(args) > 0:
         locs = args[0]
         if isinstance(locs, (MIArray, DimArray)):
@@ -2023,40 +1525,16 @@ def xticks(*args, **kwargs):
         if isinstance(locs[0], datetime.datetime):
             for i in range(len(locs)):
                 locs[i] = miutil.date2num(locs[i])
-        axis.setTickLocations(locs)
-        if not axis_t is None:
-            axis_t.setTickLocations(locs)
+        gca.set_xticks(locs)
         args = args[1:]
     if len(args) > 0:
         labels = args[0]
         if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
-            axis.setTickLabels_Number(labels)
-            if not axis_t is None:
-                axis_t.setTickLabels_Number(labels)
-        else:
-            axis.setTickLabelText(labels)
-            if not axis_t is None:
-                axis_t.setTickLabelText(labels)
-    fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
-    fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
-    bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
     else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    color = kwargs.pop('color', axis.getTickLabelColor())
-    c = plotutil.getcolor(color)
-    angle = kwargs.pop('rotation', 0)
-    if angle == 'vertical':
-        angle = 90
-    axis.setTickLabelFont(font)
-    axis.setTickLabelColor(c)
-    axis.setTickLabelAngle(angle)
-    if not axis_t is None:
-        axis_t.setTickLabelFont(font)
-        axis_t.setTickLabelColor(c)
-        axis_t.setTickLabelAngle(angle)
+        labels = None
+    gca.set_xticklabels(labels, **kwargs)
+    
     draw_if_interactive()
     
 def yticks(*args, **kwargs):
@@ -2071,11 +1549,6 @@ def yticks(*args, **kwargs):
     :param color: (*color*) Tick label string color. Default is ``black`` .
     :param rotation: (*float*) Tick label rotation angle. Default is 0.
     """
-    axis = gca.axes.getYAxis()
-    if isinstance(gca, Axes3D):
-        axis_r = None
-    else:
-        axis_r = gca.axes.getAxis(Location.RIGHT)
     if len(args) > 0:
         locs = args[0]
         if isinstance(locs, (MIArray, DimArray)):
@@ -2083,36 +1556,16 @@ def yticks(*args, **kwargs):
         if isinstance(locs[0], datetime.datetime):
             for i in range(len(locs)):
                 locs[i] = miutil.date2num(locs[i])
-        axis.setTickLocations(locs)
-        if not axis_r is None:
-            axis_r.setTickLocations(locs)
+        gca.set_yticks(locs)
         args = args[1:]
     if len(args) > 0:
         labels = args[0]
         if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
-        if isinstance(labels[0], (int, long, float)):
-            axis.setTickLabels_Number(labels)
-            if not axis_r is None:
-                axis_r.setTickLabels_Number(labels)
-        else:
-            axis.setTickLabelText(labels)
-            if not axis_r is None:
-                axis_r.setTickLabelText(labels)
-    fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
-    fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
-    bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
     else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    color = kwargs.pop('color', axis.getTickLabelColor())
-    c = plotutil.getcolor(color)
-    axis.setTickLabelFont(font)
-    axis.setTickLabelColor(c)
-    if not axis_r is None:
-        axis_r.setTickLabelFont(font)
-        axis_r.setTickLabelColor(c)
+        labels = None
+    gca.set_yticklabels(labels, **kwargs)
+    
     draw_if_interactive()
     
 def zticks(*args, **kwargs):
@@ -2130,34 +1583,23 @@ def zticks(*args, **kwargs):
     if not isinstance(gca, Axes3D):
         return
         
-    axis = gca.axes.getZAxis()
     if len(args) > 0:
         locs = args[0]
-        if isinstance(locs, MIArray):
+        if isinstance(locs, (MIArray, DimArray)):
             locs = locs.aslist()
         if isinstance(locs[0], datetime.datetime):
             for i in range(len(locs)):
                 locs[i] = miutil.date2num(locs[i])
-        axis.setTickLocations(locs)
+        gca.set_zticks(locs)
         args = args[1:]
     if len(args) > 0:
         labels = args[0]
         if isinstance(labels, (MIArray, DimArray)):
             labels = labels.aslist()
-            axis.setTickLabels_Number(labels)
-        else:
-            axis.setTickLabelText(labels)
-    fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
-    fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
-    bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
     else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    color = kwargs.pop('color', axis.getTickLabelColor())
-    c = plotutil.getcolor(color)
-    axis.setTickLabelFont(font)
-    axis.setTickLabelColor(c)
+        labels = None
+    gca.set_zticklabels(labels, **kwargs)
+    
     draw_if_interactive()
     
 def text(x, y, s, **kwargs):
@@ -2191,25 +1633,17 @@ def axis(limits):
     
     :param limits: (*list*) Min and max of the x and y axes.
     """
-    if len(limits) == 4:
-        xmin = limits[0]
-        xmax = limits[1]
-        ymin = limits[2]
-        ymax = limits[3]
-        extent = Extent(xmin, xmax, ymin, ymax)
-        gca.axes.setDrawExtent(extent)
-        gca.axes.setExtent(extent.clone())
+    r = gca.axis(limits)
+    if not r is None:
         draw_if_interactive()
-    else:
-        print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'
-        
+            
 def axism(limits=None):
     """
     Sets the min and max of the x and y map axes, with ``[xmin, xmax, ymin, ymax]`` .
     
     :param limits: (*list*) Min and max of the x and y map axes.
     """
-    r = gca.xylim(limits)
+    r = gca.axis(limits)
     if not r is None:
         draw_if_interactive()
 
@@ -2235,21 +1669,7 @@ def xlim(xmin, xmax):
     :param xmin: (*float*) Minimum limit of the x axis.
     :param xmax: (*float*) Maximum limit of the x axis.
     """
-    global gca
-    
-    if isinstance(xmin, datetime.datetime):
-        xmin = miutil.date2num(xmin)
-    if isinstance(xmax, datetime.datetime):
-        xmax = miutil.date2num(xmax)    
-        
-    if isinstance(gca, Axes3D):
-        gca.axes.setXMinMax(xmin, xmax)
-    else:
-        extent = gca.axes.getDrawExtent()
-        extent.minX = xmin
-        extent.maxX = xmax
-        gca.axes.setDrawExtent(extent)
-        gca.axes.setExtent(extent.clone())
+    gca.set_xlim(xmin, xmax)
     draw_if_interactive()
             
 def ylim(ymin, ymax):
@@ -2259,20 +1679,7 @@ def ylim(ymin, ymax):
     :param ymin: (*float*) Minimum limit of the y axis.
     :param ymax: (*float*) Maximum limit of the y axis.
     """
-    global gca
-    if isinstance(ymin, datetime.datetime):
-        ymin = miutil.date2num(ymin)
-    if isinstance(ymax, datetime.datetime):
-        ymax = miutil.date2num(ymax) 
-    
-    if isinstance(gca, Axes3D):
-        gca.axes.setYMinMax(ymin, ymax)
-    else:
-        extent = gca.axes.getDrawExtent()
-        extent.minY = ymin
-        extent.maxY = ymax
-        gca.axes.setDrawExtent(extent)
-        gca.axes.setExtent(extent.clone())
+    gca.set_ylim(ymin, ymax)
     draw_if_interactive()   
     
 def zlim(zmin, zmax):
@@ -2282,28 +1689,21 @@ def zlim(zmin, zmax):
     :param zmin: (*float*) Minimum limit of the z axis.
     :param zmax: (*float*) Maximum limit of the z axis.
     """
-    global gca
-    if isinstance(zmin, datetime.datetime):
-        zmin = miutil.date2num(zmin)
-    if isinstance(zmax, datetime.datetime):
-        zmax = miutil.date2num(zmax) 
-    
-    if isinstance(gca, Axes3D):
-        gca.axes.setZMinMax(zmin, zmax)
-        draw_if_interactive()   
+    gca.set_zlim(zmin, zmax)
+    draw_if_interactive()   
 
 def xreverse():
     '''
     Reverse x axis.
     '''
-    gca.axes.getXAxis().setInverse(True)
+    gca.xreverse()
     draw_if_interactive()
     
 def yreverse():
     '''
     Reverse y axis.
     '''
-    gca.axes.getYAxis().setInverse(True)
+    gca.yreverse()
     draw_if_interactive()
             
 def legend(*args, **kwargs):
@@ -2338,139 +1738,10 @@ def legend(*args, **kwargs):
     
     :returns: (*ChartLegend*) The chart legend.
     """
-    global gca  
-    newlegend = kwargs.pop('newlegend', True)
-    ols = gca.axes.getLegendScheme()
-    if newlegend:
-        clegend = ChartLegend(ols)
-    else:
-        clegend = gca.axes.getLegend()   
-    ls = kwargs.pop('legend', None)
-    if len(args) > 0:
-        if isinstance(args[0], MILayer):
-            ls = args[0].legend()
-            args = args[1:]
-        elif isinstance(args[0], LegendScheme):
-            ls = args[0]
-            args = args[1:]
-        elif isinstance(args[0], GraphicCollection):
-            if not args[0].isSingleLegend():
-                ls = args[0].getLegendScheme()
-                args = args[1:]
-    if ls is None:
-        if len(args) > 0:
-            lbs = []
-            for lb in args[0]:
-                if isinstance(lb, Graphic):
-                    lbs.append(lb.getLegend().clone())
-                else:
-                    lbs.append(lb)
-            if len(args) == 2:
-                labels = args[1]
-                for i in range(0, len(lbs)):
-                    lbs[i].setCaption(labels[i])
-            if isinstance(lbs[0], basestring):
-                clegend.setTickCaptions(lbs)
-            else:
-                ls = LegendScheme()
-                for lb in lbs:
-                    ls.addLegendBreak(lb)
-                if lbs[0].getStartValue() == lbs[1].getEndValue():
-                    ls.setLegendType(LegendType.UniqueValue)
-                else:
-                    ls.setLegendType(LegendType.GraduatedColor)
-                if clegend is None:
-                    clegend = ChartLegend(ls)
-                    gca.axes.setLegend(clegend)
-                else:
-                    clegend.setLegendScheme(ls)
-    else:
-        if len(args) > 0:
-            labels = args[0]
-            for i in range(len(labels)):
-                if i < ls.getBreakNum():
-                    ls.getLegendBreak(i).setCaption(labels[i])
-        if clegend is None:
-            clegend = ChartLegend(ls)
-            gca.axes.setLegend(clegend)
-        else:
-            clegend.setLegendScheme(ls)
-        
-    loc = kwargs.pop('loc', 'upper right')    
-    lp = LegendPosition.fromString(loc)
-    clegend.setPosition(lp)
-    if lp == LegendPosition.CUSTOM:
-        x = kwargs.pop('x', 0)
-        y = kwargs.pop('y', 0)
-        clegend.setX(x)
-        clegend.setY(y) 
-    orien = 'vertical'
-    if lp == LegendPosition.UPPER_CENTER_OUTSIDE or lp == LegendPosition.LOWER_CENTER_OUTSIDE:
-        orien = 'horizontal'
-    orientation = kwargs.pop('orientation', orien)
-    if orientation == 'horizontal':
-        clegend.setPlotOrientation(PlotOrientation.HORIZONTAL)
-    else:
-        clegend.setPlotOrientation(PlotOrientation.VERTICAL)
-    frameon = kwargs.pop('frameon', True)
-    clegend.setDrawNeatLine(frameon)
-    bcobj = kwargs.pop('background', None)
-    bcobj = kwargs.pop('facecolor', bcobj)
-    if bcobj is None:
-        clegend.setDrawBackground(False)
-    else:
-        clegend.setDrawBackground(True)
-        background = plotutil.getcolor(bcobj)
-        clegend.setBackground(background)
-    tickfontdic = kwargs.pop('tickfont', None)
-    if tickfontdic is None:
-        tickfont = __getfont_1(**kwargs)    
-    else:
-        tickfont = __getfont(tickfontdic)
-    clegend.setTickLabelFont(tickfont)
-    fontname = kwargs.pop('labelfontname', None)
-    exfont = False
-    if fontname is None:
-        fontname = 'Arial'
-    else:
-        exfont = True
-    fontsize = kwargs.pop('labelfontsize', 14)
-    bold = kwargs.pop('labelbold', False)
-    labcolor = kwargs.pop('labcolor', 'black')
-    labcolor = plotutil.getcolor(labcolor)
-    if bold:
-        font = Font(fontname, Font.BOLD, fontsize)
-    else:
-        font = Font(fontname, Font.PLAIN, fontsize)
-    title = kwargs.pop('title', '')
-    title = ChartText(title, font)
-    title.setColor(labcolor)
-    title.setUseExternalFont(exfont)
-    clegend.setLabel(title)
-    markerscale = kwargs.pop('markerscale', None)
-    if not markerscale is None:
-        clegend.setSymbolScale(markerscale)
-    markerwidth = kwargs.pop('markerwidth', None)
-    markerheight = kwargs.pop('markerheight', None)
-    if not markerwidth is None:
-        clegend.setSymbolWidth(markerwidth)
-    if not markerheight is None:
-        clegend.setSymbolHeight(markerheight)
-    ncol = kwargs.pop('ncol', None)
-    if not ncol is None:
-        clegend.setColumnNumber(ncol)
-        clegend.setAutoRowColNum(False)
-    xshift = kwargs.pop('xshift', None)
-    if not xshift is None:
-        clegend.setXShift(xshift)
-    yshift = kwargs.pop('yshift', None)
-    if not yshift is None:
-        clegend.setYShift(yshift)
-    if newlegend:
-        gca.axes.addLegend(clegend)
-    
-    draw_if_interactive()
-    return clegend
+    r = gca.legend(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
     
 def readlegend(fn):
     """
@@ -2517,111 +1788,7 @@ def colorbar(mappable, **kwargs):
     cax = kwargs.pop('cax', None)
     if cax is None:
         cax = gca
-    cmap = kwargs.pop('cmap', None)
-    shrink = kwargs.pop('shrink', 1)
-    orientation = kwargs.pop('orientation', 'vertical')
-    aspect = kwargs.pop('aspect', 20)
-    tickfontdic = kwargs.pop('tickfont', None)
-    if tickfontdic is None:
-        tickfont = __getfont_1(**kwargs)    
-    else:
-        tickfont = __getfont(tickfontdic)
-    exfont = False
-    labelfontdic = kwargs.pop('labelfont', None)
-    if labelfontdic is None:
-        labfontname = kwargs.pop('labelfontname', tickfont.getName())
-        if labfontname is None:
-            labfontname = tickfont.getName()
-        else:
-            exfont = True
-        labfontsize = kwargs.pop('labelfontsize', tickfont.getSize())
-        labbold = kwargs.pop('labelbold', tickfont.isBold())
-        if labbold:
-            labelfont = Font(labfontname, Font.BOLD, labfontsize)
-        else:
-            labelfont = Font(labfontname, Font.PLAIN, labfontsize)    
-    else:
-        labelfont = __getfont(labelfontdic)
-    if isinstance(mappable, MILayer):
-        ls = mappable.legend()
-    elif isinstance(mappable, LegendScheme):
-        ls = mappable
-    elif isinstance(mappable, GraphicCollection):
-        ls = mappable.getLegendScheme()
-    else:
-        ls = makelegend(mappable)
-    
-    newlegend = kwargs.pop('newlegend', True)
-    if newlegend:
-        legend = ChartColorBar(ls)
-        cax.axes.addLegend(legend)
-    else:
-        legend = cax.axes.getLegend()   
-        if legend is None:
-            legend = ChartColorBar(ls)
-            cax.axes.setLegend(legend)
-        else:
-            legend.setLegendScheme(ls)
-    legend.setColorbar(True)   
-    legend.setShrink(shrink)
-    legend.setAspect(aspect)
-    legend.setTickLabelFont(tickfont)
-    label = kwargs.pop('label', None)
-    if not label is None:
-        label = ChartText(label, labelfont)
-        label.setUseExternalFont(exfont)
-        legend.setLabel(label)        
-    labelloc = kwargs.pop('labelloc', None)
-    if not labelloc is None:
-        legend.setLabelLocation(labelloc)
-    if orientation == 'horizontal':
-        legend.setPlotOrientation(PlotOrientation.HORIZONTAL)
-        legend.setPosition(LegendPosition.LOWER_CENTER_OUTSIDE)
-    else:
-        legend.setPlotOrientation(PlotOrientation.VERTICAL)
-        legend.setPosition(LegendPosition.RIGHT_OUTSIDE)
-    legend.setDrawNeatLine(False)
-    extendrect = kwargs.pop('extendrect', True)
-    legend.setExtendRect(extendrect)
-    extendfrac = kwargs.pop('extendfrac', None)
-    if extendfrac == 'auto':
-        legend.setAutoExtendFrac(True)
-    tickin = kwargs.pop('tickin', None)
-    if not tickin is None:
-        legend.setInsideTick(tickin)
-    ticklen = kwargs.pop('ticklen', None)
-    if not ticklen is None:
-        legend.setTickLength(ticklen)
-    ticks = kwargs.pop('ticks', None)
-    if not ticks is None:
-        if isinstance(ticks, MIArray):
-            ticks = ticks.aslist()
-        legend.setTickLocations(ticks)
-    ticklabels = kwargs.pop('ticklabels', None)
-    if not ticklabels is None:
-        if isinstance(ticklabels, (MIArray, DimArray)):
-            ticklabels = ticklabels.aslist()
-        if ls.getLegendType() == LegendType.UniqueValue:
-            legend.setTickCaptions(ticklabels)
-        else:
-            if isinstance(ticklabels[0], (int, long, float)):
-                legend.setTickLabels_Number(ticklabels)
-            else:
-                legend.setTickLabelText(ticklabels)
-    tickrotation = kwargs.pop('tickrotation', None)
-    if not tickrotation is None:
-        legend.setTickLabelAngle(tickrotation)
-    xshift = kwargs.pop('xshift', None)
-    if not xshift is None:
-        legend.setXShift(xshift)
-    yshift = kwargs.pop('yshift', None)
-    if not yshift is None:
-        legend.setYShift(yshift)
-    vmintick = kwargs.pop('vmintick', False)
-    vmaxtick = kwargs.pop('vmaxtick', False)
-    legend.setDrawMinLabel(vmintick)
-    legend.setDrawMaxLabel(vmaxtick)
-    #cax.axes.setDrawLegend(True)
+    cax.colorbar(mappable, **kwargs)
     draw_if_interactive()
 
 def set(obj, **kwargs):
@@ -2844,79 +2011,6 @@ def barbs(*args, **kwargs):
         draw_if_interactive()
     return r    
  
-def __plot_griddata(gdata, ls, type, xaxistype=None):
-    #print 'GridData...'
-    if type == 'contourf':
-        layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', True)
-    elif type == 'contour':
-        layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', True)
-    elif type == 'imshow':
-        layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls)
-    
-    #Create Axes
-    global gca
-    if gca is None:
-        mapview = MapView()
-        plot = MapAxes(mapview)
-    else:
-        if isinstance(gca, Axes):
-            plot = gca
-        else:
-            mapview = MapView()
-            plot = MapAxes(mapview)
-    
-    if xaxistype == 'lon':
-        plot.axes.setXAxis(LonLatAxis('Longitude', True))
-    elif xaxistype == 'lat':
-        plot.axes.setXAxis(LonLatAxis('Latitude', False))
-    elif xaxistype == 'time':
-        plot.axes.setXAxis(TimeAxis('Time', True))
-    
-    plot.add_layer(layer)
-    plot.axes.setDrawExtent(layer.getExtent().clone())
-    
-    if g_figure is None:
-        figure()
-        
-    chart = g_figure.getChart()
-    if gca is None or (not isinstance(gca, Axes)):
-        chart.setCurrentPlot(plot.axes)
-    gca = plot
-    #chart.setAntiAlias(True)
-    g_figure.setChart(chart)
-    draw_if_interactive()
-    return layer
-    
-def __plot_uvgriddata(udata, vdata, cdata, ls, type, isuv):
-    #print 'GridData...'
-    if type == 'quiver':
-        if cdata == None:
-            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
-        else:
-            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
-    elif type == 'barbs':
-        if cdata == None:
-            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, ls, 'layer', isuv)
-        else:
-            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
-    
-    shapetype = layer.getShapeType()
-    mapview = MapView()
-    plot = MapAxes(mapview)
-    plot.add_layer(layer)
-    plot.axes.setDrawExtent(layer.getExtent().clone())
-    
-    if g_figure is None:
-        figure()
-    
-    chart = Chart(plot.axes)
-    #chart.setAntiAlias(True)
-    g_figure.setChart(chart)
-    global gca
-    gca = plot
-    draw_if_interactive()
-    return layer
-    
 def scatterm(*args, **kwargs):
     """
     Make a scatter plot on a map.
@@ -2942,66 +2036,20 @@ def scatterm(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Point VectoryLayer.
     """
-    plot = gca
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    proj = kwargs.pop('proj', None)    
-    order = kwargs.pop('order', None)
-    n = len(args) 
-    if n == 1:
-        if isinstance(args[0], PyStationData):
-            gdata = args[0]
-        else:
-            gdata = minum.asgriddata(args[0])
-        args = []
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        if not isinstance(x, (DimArray, MIArray)):
-            x = minum.array(x)
-        if not isinstance(y, (DimArray, MIArray)):
-            y = minum.array(y)
-        if n == 2:
-            a = x
-            args = []
-        else:
-            a = args[2]
-            if not isinstance(a, (DimArray, MIArray)):
-                a = minum.array(a)
-            args = args[3:]                
-        if a.ndim == 1:
-            gdata = minum.asstationdata(a, x, y, fill_value)
-        else:
-            if a.asarray().getSize() == x.asarray().getSize():
-                gdata = minum.asstationdata(a, x, y, fill_value)                
-            else:
-                gdata = minum.asgriddata(a, x, y, fill_value)
-    
-    ls = kwargs.pop('symbolspec', None)
-    isplot = kwargs.pop('isplot', True)
-    if ls is None:
-        isunique = False
-        colors = kwargs.get('colors', None) 
-        if not colors is None:
-            if isinstance(colors, (list, tuple)) and len(colors) == len(x):
-                isunique = True
-        size = kwargs.get('size', None)
-        if not size is None:
-            if isinstance(size, (list, tuple, MIArray)) and len(size) == len(x):
-                isunique = True
-        if isunique:
-            ls = LegendManage.createUniqValueLegendScheme(len(x), ShapeTypes.Point)
-        else:
-            ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-        ls = plotutil.setlegendscheme_point(ls, **kwargs)
-    if isinstance(gdata, PyGridData):
-        layer = __plot_griddata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
+    global gca
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
     else:
-        layer = __plot_stationdata_m(plot, gdata, ls, 'scatter', proj=proj, order=order, isplot=isplot)
-    avoidcoll = kwargs.pop('avoidcoll', None)
-    if not avoidcoll is None:
-        layer.setAvoidCollision(avoidcoll)
-    gdata = None
-    return MILayer(layer)
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.scatter(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r  
     
 def plotm(*args, **kwargs):
     """
@@ -3015,105 +2063,20 @@ def plotm(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Line VectoryLayer.
     """
-    plot = gca
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    proj = kwargs.pop('proj', None)    
-    order = kwargs.pop('order', None)
-    n = len(args) 
-    xdatalist = []
-    ydatalist = []    
-    styles = []
-    isxylistdata = False
-    if n == 1:
-        if isinstance(args[0], MIXYListData):
-            dataset = args[0]
-            snum = args[0].size()
-            isxylistdata = True
-        else:
-            ydata = plotutil.getplotdata(args[0])
-            if isinstance(args[0], DimArray):
-                xdata = args[0].dimvalue(0)
-            else:
-                xdata = []
-                for i in range(0, len(args[0])):
-                    xdata.append(i)
-            xdatalist.append(minum.asarray(xdata))
-            ydatalist.append(minum.asarray(ydata))
-    elif n == 2:
-        if isinstance(args[1], basestring):
-            ydata = plotutil.getplotdata(args[0])
-            if isinstance(args[0], DimArray):
-                xdata = args[0].dimvalue(0)
-            else:
-                xdata = []
-                for i in range(0, len(args[0])):
-                    xdata.append(i)
-            styles.append(args[1])
-        else:
-            xdata = plotutil.getplotdata(args[0])
-            ydata = plotutil.getplotdata(args[1])
-        xdatalist.append(minum.asarray(xdata))
-        ydatalist.append(minum.asarray(ydata))
-    else:
-        c = 'x'
-        for arg in args: 
-            if c == 'x':    
-                xdatalist.append(minum.asarray(arg))
-                c = 'y'
-            elif c == 'y':
-                ydatalist.append(minum.asarray(arg))
-                c = 's'
-            elif c == 's':
-                if isinstance(arg, basestring):
-                    styles.append(arg)
-                    c = 'x'
-                else:
-                    styles.append('-')
-                    xdatalist.append(minum.asarray(arg))
-                    c = 'y'
-    
-    if not isxylistdata:
-        snum = len(xdatalist)
-        
-    if len(styles) == 0:
-        styles = None
-    else:
-        while len(styles) < snum:
-            styles.append('-')
-    
-    #Get plot data styles - Legend
-    lines = []
-    ls = kwargs.pop('legend', None) 
-    if ls is None:
-        if styles != None:
-            for i in range(0, len(styles)):
-                line = plotutil.getplotstyle(styles[i], str(i), **kwargs)
-                lines.append(line)
-        else:
-            for i in range(0, snum):
-                label = kwargs.pop('label', 'S_' + str(i + 1))
-                line = plotutil.getlegendbreak('line', **kwargs)[0]
-                line.setCaption(label)
-                lines.append(line)
-        ls = LegendScheme(lines)
-    
-    if isxylistdata:
-        layer = DrawMeteoData.createPolylineLayer(dataset.data, ls, \
-            'Plot_lines', 'ID', -180, 180)
-    else:
-        layer = DrawMeteoData.createPolylineLayer(xdatalist, ydatalist, ls, \
-            'Plot_lines', 'ID', -180, 180)
-    if (proj != None):
-        layer.setProjInfo(proj)
- 
-    gca.add_layer(layer)
-    gca.axes.setDrawExtent(layer.getExtent())
-    
+    global gca
     if g_figure is None:
         figure()
 
-    draw_if_interactive()
-    return MILayer(layer)
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.plot(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r  
     
 def stationmodel(smdata, **kwargs):
     """
@@ -3127,22 +2090,20 @@ def stationmodel(smdata, **kwargs):
     
     :returns: (*VectoryLayer*) Station model VectoryLayer.
     """
-    proj = kwargs.pop('proj', None)
-    size = kwargs.pop('size', 12)
-    surface = kwargs.pop('surface', True)
-    ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, Color.blue, size)
-    layer = DrawMeteoData.createStationModelLayer(smdata, ls, 'stationmodel', surface)
-    if (proj != None):
-        layer.setProjInfo(proj)
- 
-    gca.add_layer(layer)
-    gca.axes.setDrawExtent(layer.getExtent())
-    
+    global gca
     if g_figure is None:
         figure()
 
-    draw_if_interactive()
-    return MILayer(layer)
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.stationmodel(smdata, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r  
         
 def imshowm(*args, **kwargs):
     """
@@ -3166,105 +2127,21 @@ def imshowm(*args, **kwargs):
     
     :returns: (*RasterLayer*) RasterLayer created from array data.
     """
-    plot = gca
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    proj = kwargs.pop('proj', None)
-    order = kwargs.pop('order', None)
-    ls = kwargs.pop('symbolspec', None)
-    n = len(args) 
-    isrgb = False
-    if n <= 2:
-        if isinstance(args[0], (list, tuple)):
-            isrgb = True
-            rgbdata = args[0]
-            if isinstance(rgbdata[0], DimArray):
-                x = rgbdata[0].dimvalue(1)
-                y = rgbdata[0].dimvalue(0)                
-            else:
-                x = minum.arange(0, rgbdata[0].shape[1])
-                y = minum.arange(0, rgbdata[0].shape[0])
-        elif args[0].ndim > 2:
-            isrgb = True
-            rgbdata = args[0]
-            x = rgbdata.dimvalue(1)
-            y = rgbdata.dimvalue(0)
-        else:
-            gdata = minum.asgridarray(args[0])
-            args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        if isinstance(a, (list, tuple)):
-            isrgb = True
-            rgbdata = a
-        elif a.ndim > 2:
-            isrgb = True
-            rgbdata = a
-        else:
-            gdata = minum.asgridarray(a, x, y, fill_value)
-            args = args[3:]    
-    
-    isplot = True
-    interpolation = kwargs.pop('interpolation', None)
-    if isrgb:
-        if isinstance(rgbdata, (list, tuple)):
-            rgbd = []
-            for d in rgbdata:
-                rgbd.append(d.asarray())
-            rgbdata = rgbd
-        else:
-            rgbdata = rgbdata.asarray()        
-        extent = [x[0],x[-1],y[0],y[-1]]
-        igraphic = GraphicFactory.createImage(rgbdata, extent)
-        x = plotutil.getplotdata(x)
-        y = plotutil.getplotdata(y)
-        layer = DrawMeteoData.createImageLayer(x, y, igraphic, 'layer_image')
-        if not proj is None:
-            layer.setProjInfo(proj)
-        if not interpolation is None:
-            layer.setInterpolation(interpolation)
-        if isplot:
-            shapetype = layer.getShapeType()
-            if order is None:
-                if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-                    plot.add_layer(layer, 0)
-                else:
-                    plot.add_layer(layer)
-            else:
-                plot.add_layer(layer, order)
-            plot.axes.setDrawExtent(layer.getExtent().clone())
-            plot.axes.setExtent(layer.getExtent().clone())
-
-            draw_if_interactive()
+    global gca
+    if g_figure is None:
+        figure()
+        
+    if gca is None:    
+        gca = axesm()
     else:
-        if len(args) > 0:
-            if ls is None:
-                level_arg = args[0]
-                if isinstance(level_arg, int):
-                    cn = level_arg
-                    ls = LegendManage.createImageLegend(gdata, cn, cmap)
-                else:
-                    if isinstance(level_arg, MIArray):
-                        level_arg = level_arg.aslist()
-                    ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
-        else:    
-            if ls is None:
-                #ls = LegendManage.createLegendScheme(gdata.getminvalue(), gdata.getmaxvalue(), cmap)
-                ls = LegendManage.createImageLegend(gdata, cmap)
-        plotutil.setlegendscheme(ls, **kwargs)
-        fill_color = kwargs.pop('fill_color', None)
-        if not fill_color is None:
-            cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
-            if cb.isNoData():
-                cb.setColor(plotutil.getcolor(fill_color))
-
-        layer = __plot_griddata_m(plot, gdata, ls, 'imshow', proj=proj, order=order)
-        if not interpolation is None:
-            layer.setInterpolation(interpolation)
-        gdata = None
-    return MILayer(layer)
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.imshow(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    
+    return r
     
 def contourm(*args, **kwargs):  
     """
@@ -3289,34 +2166,21 @@ def contourm(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
     """
-    fill_value = kwargs.pop('fill_value', -9999.0)      
-    proj = kwargs.pop('proj', None)
-    order = kwargs.pop('order', None)
-    n = len(args) 
-    if n <= 2:
-        gdata = minum.asgriddata(args[0])
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    ls = ls.convertTo(ShapeTypes.Polyline)
-    plotutil.setlegendscheme(ls, **kwargs)
-    isplot = kwargs.pop('isplot', True)
-    if isplot:
-        plot = gca
+    global gca
+    if g_figure is None:
+        figure()
+        
+    if gca is None:    
+        gca = axesm()
     else:
-        plot = None
-    smooth = kwargs.pop('smooth', True)
-    layer = __plot_griddata_m(plot, gdata, ls, 'contour', proj=proj, order=order, smooth=smooth)
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    gdata = None
-    return MILayer(layer)
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.contour(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    
+    return r
         
 def contourfm(*args, **kwargs):
     """
@@ -3334,88 +2198,28 @@ def contourfm(*args, **kwargs):
         the order specified.
     :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
-    :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
-    :param order: (*int*) Z-order of created layer for display.
+    :param isadd: (*boolean*) Add layer in the axes or not. Default is ``True``.
+    :param zorder: (*int*) Z-order of created layer for display.
     :param smooth: (*boolean*) Smooth countour lines or not.
     :param select: (*boolean*) Set the return layer as selected layer or not.
     
     :returns: (*VectoryLayer*) Contour filled VectoryLayer created from array data.
     """    
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    interpolate = kwargs.pop('interpolate', False)
-    proj = kwargs.pop('proj', None)
-    order = kwargs.pop('order', None)
-    n = len(args) 
-    if n <= 2:
-        gdata = minum.asgriddata(args[0])
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    ls = ls.convertTo(ShapeTypes.Polygon)
-    plotutil.setlegendscheme(ls, **kwargs)
-    if interpolate:
-        gdata = gdata.interpolate()
-    isplot = kwargs.pop('isplot', True)
-    plot = gca
-    smooth = kwargs.pop('smooth', True)
-    layer = __plot_griddata_m(plot, gdata, ls, 'contourf', proj=proj, order=order, smooth=smooth, isplot=isplot)
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    gdata = None
-    return MILayer(layer)
+    global gca
+    if g_figure is None:
+        figure()
+        
+    if gca is None:    
+        gca = axesm()
+    else:
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.contourf(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
     
-def gridfm(*args, **kwargs):
-    """
-    Plot grid data as grid rectangles polygons.
-    
-    :param x: (*array_like*) Optional. X coordinate array.
-    :param y: (*array_like*) Optional. Y coordinate array.
-    :param z: (*array_like*) 2-D z value array.
-    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
-        to draw, in increasing order.
-    :param cmap: (*string*) Color map string.
-    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-        the order specified.
-    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
-    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
-    :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
-    :param order: (*int*) Z-order of created layer for display.
-    :param select: (*boolean*) Set the return layer as selected layer or not.
-    
-    :returns: (*VectoryLayer*) Grid VectoryLayer created from array data.
-    """    
-    plot = gca
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    interpolate = kwargs.pop('interpolate', False)
-    proj = kwargs.pop('proj', None)
-    order = kwargs.pop('order', None)
-    n = len(args) 
-    if n <= 2:
-        gdata = minum.asgriddata(args[0])
-        args = args[1:]
-    elif n <=4:
-        x = args[0]
-        y = args[1]
-        a = args[2]
-        gdata = minum.asgriddata(a, x, y, fill_value)
-        args = args[3:]
-    ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-    if interpolate:
-        gdata = gdata.interpolate()
-    layer = __plot_griddata_m(plot, gdata, ls, 'gridf', proj=proj, order=order)
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    gdata = None
-    return MILayer(layer)
+    return r
     
 def pcolorm(*args, **kwargs):
     """
@@ -3476,64 +2280,21 @@ def quiverm(*args, **kwargs):
     
     :returns: (*VectoryLayer*) Created quiver VectoryLayer.
     """
-    plot = gca
-    cmap = plotutil.getcolormap(**kwargs)
-    proj = kwargs.pop('proj', None)
-    zorder = kwargs.pop('zorder', None)
-    isuv = kwargs.pop('isuv', True)
-    n = len(args) 
-    iscolor = False
-    cdata = None
-    onlyuv = True
-    if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
-        onlyuv = False
-    if onlyuv:
-        u = minum.asmiarray(args[0])
-        v = minum.asmiarray(args[1])
-        xx = args[0].dimvalue(1)
-        yy = args[0].dimvalue(0)
-        x, y = minum.meshgrid(xx, yy)
-        args = args[2:]
-        if len(args) > 0:
-            if isinstance(args[0], (DimArray, MIArray)):
-                cdata = minum.asmiarray(args[0])
-                iscolor = True
-            args = args[1:]
+    global gca
+    if g_figure is None:
+        figure()
+        
+    if gca is None:    
+        gca = axesm()
     else:
-        x = minum.asmiarray(args[0])
-        y = minum.asmiarray(args[1])
-        u = minum.asmiarray(args[2])
-        v = minum.asmiarray(args[3])
-        args = args[4:]
-        if len(args) > 0:
-            cdata = minum.asmiarray(args[0])
-            iscolor = True
-            args = args[1:]
-    if iscolor:
-        if len(args) > 0:
-            cn = args[0]
-            ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
-        else:
-            levs = kwargs.pop('levs', None)
-            if levs is None:
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
-            else:
-                if isinstance(levs, MIArray):
-                    levs = levs.tolist()
-                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
-    else:    
-        if cmap.getColorCount() == 1:
-            c = cmap.getColor(0)
-        else:
-            c = Color.black
-        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-    ls = plotutil.setlegendscheme_point(ls, **kwargs)
-    layer = __plot_uvdata_m(plot, x, y, u, v, cdata, ls, 'quiver', isuv, proj=proj)
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    cdata = None
-    return MILayer(layer)
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.quiver(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    
+    return r
     
 def quiverkey(*args, **kwargs):
     """
@@ -3610,172 +2371,26 @@ def streamplotm(*args, **kwargs):
     :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
     :param density: (*int*) Streamline density. Default is 4.
     :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
-    :param order: (*int*) Z-order of created layer for display.
+    :param zorder: (*int*) Z-order of created layer for display.
     :param select: (*boolean*) Set the return layer as selected layer or not.
     
     :returns: (*VectoryLayer*) Created streamline VectoryLayer.
     """
-    plot = gca
-    cmap = plotutil.getcolormap(**kwargs)
-    fill_value = kwargs.pop('fill_value', -9999.0)
-    proj = kwargs.pop('proj', None)
-    cobj = kwargs.pop('color', 'b')
-    color = plotutil.getcolor(cobj)
-    isuv = kwargs.pop('isuv', True)
-    density = kwargs.pop('density', 4)
-    n = len(args)
-    if n < 4:
-        udata = minum.asgriddata(args[0])
-        vdata = minum.asgriddata(args[1])
-        args = args[2:]
-    elif n <= 6:
-        x = args[0]
-        y = args[1]
-        u = args[2]
-        v = args[3]
-        udata = minum.asgriddata(u, x, y, fill_value)
-        vdata = minum.asgriddata(v, x, y, fill_value)
-        args = args[4:]  
-    ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Polyline, color, 1)
-    plotutil.setlegendscheme(ls, **kwargs)
-    layer = __plot_uvgriddata_m(plot, udata, vdata, None, ls, 'streamplot', isuv, proj=proj, density=density)
-    select = kwargs.pop('select', True)
-    if select:
-        plot.axes.setSelectedLayer(layer)
-    udata = None
-    vdata = None
-    return MILayer(layer)
-        
-def __plot_griddata_m(plot, gdata, ls, type, proj=None, order=None, smooth=True, isplot=True):
-    #print 'GridData...'
-    if type == 'contourf':
-        layer = DrawMeteoData.createShadedLayer(gdata.data, ls, 'layer', 'data', smooth)
-    elif type == 'contour':
-        layer = DrawMeteoData.createContourLayer(gdata.data, ls, 'layer', 'data', smooth)
-    elif type == 'imshow':
-        layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls)      
-    elif type == 'scatter':
-        layer = DrawMeteoData.createGridPointLayer(gdata.data, ls, 'layer', 'data')
-    elif type == 'gridf':
-        layer = DrawMeteoData.createGridFillLayer(gdata.data, ls, 'layer', 'data')
-    else:
-        layer = None
-        return layer
-    
-    if (proj != None):
-        layer.setProjInfo(proj)
-        
-    if isplot:
-        shapetype = layer.getShapeType()
-        if order is None:
-            if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-                plot.add_layer(layer, 0)
-            else:
-                plot.add_layer(layer)
-        else:
-            plot.add_layer(layer, order)
-        plot.axes.setDrawExtent(layer.getExtent().clone())
-        plot.axes.setExtent(layer.getExtent().clone())
-        
-        if g_figure is None:
-            figure()
-        
-        #chart = Chart(plot)
-        #chart.setAntiAlias(True)
-        #g_figure.setChart(chart)
-        #global gca
-        #gca = plot
-        draw_if_interactive()
-    return layer
-    
-def __plot_stationdata_m(plot, stdata, ls, type, proj=None, order=None, isplot=True):
-    if type == 'scatter':
-        if stdata.data.getStNum() == ls.getBreakNum() and ls.getLegendType() == LegendType.UniqueValue:
-            layer = DrawMeteoData.createSTPointLayer_Unique(stdata.data, ls, 'layer', 'data')
-        else:
-            layer = DrawMeteoData.createSTPointLayer(stdata.data, ls, 'layer', 'data')
-    elif type == 'surface':
-        layer = DrawMeteoData
-    else:
-        layer = None
-        return layer
-    
-    if (proj != None):
-        layer.setProjInfo(proj)
- 
-    if isplot:
-        if order is None:
-            plot.add_layer(layer)
-        else:
-            plot.add_layer(layer, order)
-        plot.axes.setDrawExtent(layer.getExtent().clone())
-        plot.axes.setExtent(layer.getExtent().clone())
-        
-        if g_figure is None:
-            figure()
-
-        draw_if_interactive()
-    return layer
-
-def __plot_uvdata_m(plot, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
-    if x.ndim == 1 and u.ndim == 2:
-        x, y = minum.meshgrid(x, y)
-    zv = z
-    if not z is None:
-        zv = z.array
-    if type == 'quiver':
-        layer = DrawMeteoData.createVectorLayer(x.array, y.array, u.array, v.array, zv, ls, 'layer', isuv)
-    elif type == 'barbs':
-        layer = DrawMeteoData.createBarbLayer(x.array, y.array, u.array, v.array, zv, ls, 'layer', isuv)
-    
-    if (proj != None):
-        layer.setProjInfo(proj)
-    
-    shapetype = layer.getShapeType()
-    plot.add_layer(layer)
-    plot.axes.setDrawExtent(layer.getExtent().clone())
-    plot.axes.setExtent(layer.getExtent().clone())
-    
+    global gca
     if g_figure is None:
         figure()
 
-    draw_if_interactive()
-    return layer
-    
-def __plot_uvgriddata_m(plot, udata, vdata, cdata, ls, type, isuv, proj=None, density=4):
-    #print 'GridData...'
-    if type == 'quiver':
-        if cdata == None:
-            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, ls, 'layer', isuv)
-        else:
-            layer = DrawMeteoData.createGridVectorLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
-    elif type == 'barbs':
-        if cdata == None:
-            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, ls, 'layer', isuv)
-        else:
-            layer = DrawMeteoData.createGridBarbLayer(udata.data, vdata.data, cdata.data, ls, 'layer', isuv)
-    elif type == 'streamplot':
-        layer = DrawMeteoData.createStreamlineLayer(udata.data, vdata.data, density, ls, 'layer', isuv)
-    
-    if (proj != None):
-        layer.setProjInfo(proj)
-    
-    shapetype = layer.getShapeType()
-    plot.add_layer(layer)
-    plot.axes.setDrawExtent(layer.getExtent().clone())
-    plot.axes.setExtent(layer.getExtent().clone())
-    
-    if g_figure is None:
-        figure()
-    
-    #chart = Chart(plot)
-    #chart.setAntiAlias(True)
-    #g_figure.setChart(chart)
-    #global gca
-    #gca = plot
-    draw_if_interactive()
-    return layer
-    
+    if gca is None:    
+        gca = axesm()
+    else:
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.streamplot(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r   
+
 def clabel(layer, **kwargs):
     '''
     Add contour layer labels.
@@ -3791,60 +2406,8 @@ def clabel(layer, **kwargs):
     :param yoffset: (int*) Y offset of the labels.
     :param avoidcoll: (*boolean*) Avoid labels collision or not.
     '''    
-    color = kwargs.pop('color', None)    
-    gc = layer
-    if isinstance(layer, MILayer):
-        gc = layer.layer   
-    dynamic = kwargs.pop('dynamic', True)
-    if gc.getShapeType() != ShapeTypes.Polyline:
-        dynamic = False
-    drawshadow = kwargs.pop('drawshadow', dynamic)    
-    labelset = gc.getLabelSet()
-    if isinstance(gc, MapLayer):
-        fieldname = kwargs.pop('fieldname', labelset.getFieldName())
-        if fieldname is None:
-            fieldname = gc.getFieldName(0)
-        labelset.setFieldName(fieldname)
-    fontdic = kwargs.pop('font', None)
-    if not fontdic is None:
-        font = __getfont(fontdic)
-        labelset.setLabelFont(font)
-    else:
-        font = __getfont_1(**kwargs)
-        labelset.setLabelFont(font)
-    if color is None:
-        labelset.setColorByLegend(True)
-    else:
-        labelset.setColorByLegend(False)
-        color = plotutil.getcolor(color)
-        labelset.setLabelColor(color)
-    labelset.setDrawShadow(drawshadow)
-    xoffset = kwargs.pop('xoffset', 0)
-    labelset.setXOffset(xoffset)
-    yoffset = kwargs.pop('yoffset', 0)
-    labelset.setYOffset(yoffset)
-    avoidcoll = kwargs.pop('avoidcoll', True)
-    labelset.setAvoidCollision(avoidcoll)    
-    if dynamic:
-        gc.addLabelsContourDynamic(gc.getExtent())
-    else:
-        gc.addLabels()
+    gca.clabel(layer, **kwargs)
     draw_if_interactive()
-        
-def worldmap():
-    '''
-    Return a map plot.
-    '''
-    mapview = MapView()
-    mapview.setXYScaleFactor(1.0)
-    #print 'Is GeoMap: ' + str(mapview.isGeoMap())
-    plot = MapAxes(mapview)
-    chart = g_figure.getChart()
-    chart.clearPlots()
-    chart.setPlot(plot.axes)
-    global gca
-    gca = plot
-    return plot
 
 def webmap(provider='OpenStreetMap', zorder=0):
     '''
@@ -3872,8 +2435,19 @@ def geoshow(*args, **kwargs):
         geoshow(lat, lon) - Displays the latitude and longitude vectors.
     '''
     global gca
+    if g_figure is None:
+        figure()
+        
+    if gca is None:    
+        gca = axesm()
+    else:
+        if gca.axestype != 'map':
+            gca = axesm()
+            
     r = gca.geoshow(*args, **kwargs)
-    draw_if_interactive()
+    if not r is None:
+        draw_if_interactive()
+    
     return r
           
 def surf(*args, **kwargs):
@@ -4033,34 +2607,6 @@ def cloudspec(size=12, color='b'):
     c = plotutil.getcolor(color)
     return DrawMeteoData.createCloudLegendScheme(size, c)
     
-def __getpointlegendbreak(**kwargs):
-    lb = PointBreak()        
-    marker = kwargs.pop('marker', 'o')
-    if marker == 'image':
-        imagepath = kwargs.pop('imagepath', None)
-        if not imagepath is None:
-            lb.setMarkerType(MarkerType.Image)
-            lb.setImagePath(imagepath)
-    elif marker == 'font':
-        fontname = kwargs.pop('fontname', 'Weather')
-        lb.setMarkerType(MarkerType.Character)
-        lb.setFontName(fontname)
-        charindex = kwargs.pop('charindex', 0)
-        lb.setCharIndex(charindex)
-    else:
-        pstyle = plotutil.getpointstyle(marker)
-        lb.setStyle(pstyle)
-    size = kwargs.pop('size', 6)
-    lb.setSize(size)
-    ecobj = kwargs.pop('edgecolor', 'k')
-    edgecolor = plotutil.getcolor(ecobj)
-    lb.setOutlineColor(edgecolor)
-    fill = kwargs.pop('fill', True)
-    lb.setDrawFill(fill)
-    edge = kwargs.pop('edge', True)
-    lb.setDrawOutline(edge)
-    return lb
-    
 def masklayer(mobj, layers):
     '''
     Mask layers.
@@ -4068,55 +2614,8 @@ def masklayer(mobj, layers):
     :param mobj: (*layer or polgyons*) Mask object.
     :param layers: (*list*) The layers will be masked.       
     '''
-    plot = gca
-    mapview = plot.axes.getMapView()
-    mapview.getMaskOut().setMask(True)
-    mapview.getMaskOut().setMaskLayer(mobj.layer.getLayerName())
-    for layer in layers:
-        layer.layer.setMaskout(True)
+    gca.masklayer(mobj, layers)
     draw_if_interactive()
-    
-def display(data):
-    '''
-    Old one - should not be used.
-    '''
-    if not ismap:
-        map()
-    
-    if c_meteodata is None:
-        print 'The current meteodata is None!'
-        return
-    
-    if isinstance(data, PyGridData):
-        print 'PyGridData'
-        layer = DrawMeteoData.createContourLayer(data.data, 'layer', 'data')
-        mapview = MapView()
-        mapview.setLockViewUpdate(True)
-        mapview.addLayer(layer)
-        mapview.setLockViewUpdate(False)
-        plot = MapPlot(mapview)
-        chart = Chart(plot)
-        #chart.setAntiAlias(True)
-        g_figure.setChart(chart)
-        if isinteractive:
-            g_figure.paintGraphics()
-    elif isinstance(data, basestring):
-        if c_meteodata.isGridData():
-            gdata = c_meteodata.getGridData(data)
-            layer = DrawMeteoData.createContourLayer(gdata, data, data)
-            #if maplayout is None:
-                #maplayout = MapLayout()
-            mapFrame = maplayout.getActiveMapFrame()
-            mapView = mapFrame.getMapView()
-            mapView.setLockViewUpdate(True)
-            mapFrame.addLayer(layer)
-            maplayout.getActiveLayoutMap().zoomToExtentLonLatEx(mapView.getMeteoLayersExtent())
-            mapView.setLockViewUpdate(False)
-            if isinteractive:
-                maplayout.paintGraphics()
-    else:
-        print 'Unkown data type!'
-        print type(data)
         
 def gifanimation(filename, repeat=0, delay=1000):
     """

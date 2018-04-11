@@ -6,10 +6,13 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.chart import ChartPanel, Chart, Location, MouseMode
+from org.meteoinfo.chart import ChartPanel, Chart, Location, MouseMode, ChartText
+
 import plotutil
-from axes import Axes, PolarAxes, Axes3D
+from axes import Axes, PolarAxes
 from mapaxes import MapAxes
+from axes3d import Axes3D
+
 from java.awt import Font
 
 class Figure(ChartPanel):
@@ -631,6 +634,38 @@ class Figure(ChartPanel):
         
         chart.setCurrentPlot(0)
         return tuple(axs)
+        
+    def get_title(self):
+        '''
+        Get title               
+        '''
+        return self.getChart().getTitle()  
+        
+    def set_title(self, label, fontname=None, fontsize=14, bold=True, color='black'):
+        """
+        Add a centered title to the figure.
+        
+        :param label: (*string*) Title label string.
+        :param fontname: (*string*) Font name. Default is ``Arial`` .
+        :param fontsize: (*int*) Font size. Default is ``14`` .
+        :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
+        :param color: (*color*) Title string color. Default is ``black`` .
+        """
+        exfont = False
+        if fontname is None:
+            fontname = 'Arial'
+        else:
+            exfont = True
+        
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        c = plotutil.getcolor(color)
+        ctitle = ChartText(label, font)
+        ctitle.setUseExternalFont(exfont)
+        ctitle.setColor(c)
+        self.getChart().setTitle(ctitle)
         
 ########################################################3
 class Test():

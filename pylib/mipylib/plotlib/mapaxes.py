@@ -8,11 +8,11 @@
 
 import os
 
-from org.meteoinfo.chart.plot import MapPlot
+from org.meteoinfo.chart.plot import MapPlot, GraphicFactory
 from org.meteoinfo.data import ArrayUtil
 from org.meteoinfo.data.meteodata import DrawMeteoData
 from org.meteoinfo.map import MapView
-from org.meteoinfo.legend import BreakTypes, LegendManage
+from org.meteoinfo.legend import BreakTypes, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.shape import Shape, ShapeTypes, Graphic
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.global import Extent
@@ -91,12 +91,13 @@ class MapAxes(Axes):
         '''
         return self.proj.isLonLat()
             
-    def add_layer(self, layer, zorder=None):
+    def add_layer(self, layer, zorder=None, select=None):
         '''
         Add a map layer
         
         :param layer: (*MapLayer*) The map layer.
         :param zorder: (*int*) Layer z order.
+        :param select: (*boolean*) Select layer or not.
         '''
         if isinstance(layer, MILayer):
             layer = layer.layer
@@ -104,6 +105,9 @@ class MapAxes(Axes):
             self.axes.addLayer(layer)
         else:
             self.axes.addLayer(zorder, layer)
+        if not select is None:
+            if select:
+                self.axes.setSelectedLayer(layer)
             
     def set_active_layer(self, layer):
         '''
@@ -162,7 +166,7 @@ class MapAxes(Axes):
                 linestyle = plotutil.getlinestyle(linestyle)
                 mapframe.setGridLineStyle(linestyle)
                 
-    def xylim(self, limits=None):
+    def axis(self, limits=None):
         """
         Sets the min and max of the x and y map axes, with ``[xmin, xmax, ymin, ymax]`` .
         
@@ -349,6 +353,416 @@ class MapAxes(Axes):
                 elif displaytype == 'polygon':
                     graphic = self.axes.addPolygon(lat, lon, lbreak)
             return graphic
+            
+    def plot(self, *args, **kwargs):
+        """
+        Plot lines and/or markers to the map.
+        
+        :param x: (*array_like*) Input x data.
+        :param y: (*array_like*) Input y data.
+        :param style: (*string*) Line style for plot.
+        :param linewidth: (*float*) Line width.
+        :param color: (*Color*) Line color.
+        
+        :returns: (*VectoryLayer*) Line VectoryLayer.
+        """
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        proj = kwargs.pop('proj', None)    
+        order = kwargs.pop('order', None)
+        n = len(args) 
+        xdatalist = []
+        ydatalist = []    
+        styles = []
+        if n == 1:
+            ydata = plotutil.getplotdata(args[0])
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            xdatalist.append(minum.asarray(xdata).array)
+            ydatalist.append(minum.asarray(ydata).array)
+        elif n == 2:
+            if isinstance(args[1], basestring):
+                ydata = plotutil.getplotdata(args[0])
+                if isinstance(args[0], DimArray):
+                    xdata = args[0].dimvalue(0)
+                else:
+                    xdata = []
+                    for i in range(0, len(args[0])):
+                        xdata.append(i)
+                styles.append(args[1])
+            else:
+                xdata = plotutil.getplotdata(args[0])
+                ydata = plotutil.getplotdata(args[1])
+            xdatalist.append(minum.asarray(xdata).array)
+            ydatalist.append(minum.asarray(ydata).array)
+        else:
+            c = 'x'
+            for arg in args: 
+                if c == 'x':    
+                    xdatalist.append(minum.asarray(arg).array)
+                    c = 'y'
+                elif c == 'y':
+                    ydatalist.append(minum.asarray(arg).array)
+                    c = 's'
+                elif c == 's':
+                    if isinstance(arg, basestring):
+                        styles.append(arg)
+                        c = 'x'
+                    else:
+                        styles.append('-')
+                        xdatalist.append(minum.asarray(arg).array)
+                        c = 'y'
+        
+        snum = len(xdatalist)
+            
+        if len(styles) == 0:
+            styles = None
+        else:
+            while len(styles) < snum:
+                styles.append('-')
+        
+        #Get plot data styles - Legend
+        lines = []
+        ls = kwargs.pop('legend', None) 
+        if ls is None:
+            if styles != None:
+                for i in range(0, len(styles)):
+                    line = plotutil.getplotstyle(styles[i], str(i), **kwargs)
+                    lines.append(line)
+            else:
+                for i in range(0, snum):
+                    label = kwargs.pop('label', 'S_' + str(i + 1))
+                    line = plotutil.getlegendbreak('line', **kwargs)[0]
+                    line.setCaption(label)
+                    lines.append(line)
+            ls = LegendScheme(lines)
+        
+        layer = DrawMeteoData.createPolylineLayer(xdatalist, ydatalist, ls, \
+                'Plot_lines', 'ID', -180, 180)
+        if (proj != None):
+            layer.setProjInfo(proj)
+     
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+            
+        return MILayer(layer)
+        
+    def scatter(self, *args, **kwargs):
+        """
+        Make a scatter plot on a map.
+        
+        :param x: (*array_like*) Input x data.
+        :param y: (*array_like*) Input y data.
+        :param z: (*array_like*) Input z data.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple, different 
+            levels will be plotted in different colors in the order specified.
+        :param size: (*int of list*) Marker size.
+        :param marker: (*string*) Marker of the points.
+        :param fill: (*boolean*) Fill markers or not. Default is True.
+        :param edge: (*boolean*) Draw edge of markers or not. Default is True.
+        :param facecolor: (*Color*) Fill color of markers. Default is black.
+        :param edgecolor: (*Color*) Edge color of markers. Default is black.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param zorder: (*int*) Z-order of created layer for display.
+        
+        :returns: (*VectoryLayer*) Point VectoryLayer.
+        """
+        n = len(args) 
+        if n == 1:
+            a = args[0]
+            y = a.dimvalue(0)
+            x = a.dimvalue(1)
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            if not isinstance(x, MIArray):
+                x = minum.array(x)
+            if not isinstance(y, MIArray):
+                y = minum.array(y)
+            if n == 2:
+                a = x
+                args = args[2:]
+            else:
+                a = args[2]
+                if not isinstance(a, MIArray):
+                    a = minum.array(a)
+                args = args[3:]
+        
+        ls = kwargs.pop('symbolspec', None)
+        if ls is None:
+            isunique = False
+            colors = kwargs.get('colors', None) 
+            if not colors is None:
+                if isinstance(colors, (list, tuple)) and len(colors) == len(x):
+                    isunique = True
+            size = kwargs.get('size', None)
+            if not size is None:
+                if isinstance(size, (list, tuple, MIArray)) and len(size) == len(x):
+                    isunique = True
+            if isunique:
+                ls = LegendManage.createUniqValueLegendScheme(len(x), ShapeTypes.Point)
+            else:
+                ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)
+            ls = plotutil.setlegendscheme_point(ls, **kwargs)
+        
+        if a.size == ls.getBreakNum() and ls.getLegendType() == LegendType.UniqueValue:
+            layer = DrawMeteoData.createSTPointLayer_Unique(a.array, x.array, y.array, ls, 'layer', 'data')
+        else:
+            layer = DrawMeteoData.createSTPointLayer(a.array, x.array, y.array, ls, 'layer', 'data')
+        
+        proj = kwargs.pop('proj', None)
+        if not proj is None:
+            layer.setProjInfo(proj)
+        avoidcoll = kwargs.pop('avoidcoll', None)
+        if not avoidcoll is None:
+            layer.setAvoidCollision(avoidcoll)
+        
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+        
+        return MILayer(layer)
+        
+    def contour(self, *args, **kwargs):  
+        """
+        Plot contours on the map.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ``r`` or ``red``, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param isadd: (*boolean*) Add layer or not. Default is ``True``.
+        :param zorder: (*int*) Z-order of created layer for display.
+        :param smooth: (*boolean*) Smooth countour lines or not.
+        :param select: (*boolean*) Set the return layer as selected layer or not.
+        
+        :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
+        """
+        n = len(args) 
+        if n <= 2:
+            a = args[0]
+            y = a.dimvalue(0)
+            x = a.dimvalue(1)
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            args = args[3:]
+        ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)
+        ls = ls.convertTo(ShapeTypes.Polyline)
+        plotutil.setlegendscheme(ls, **kwargs)
+        isadd = kwargs.pop('isadd', True)
+        smooth = kwargs.pop('smooth', True)
+        layer = DrawMeteoData.createContourLayer(a.array, x.array, y.array, ls, 'layer', 'data', smooth)
+        proj = kwargs.pop('proj', None)
+        if not proj is None:
+            layer.setProjInfo(proj)
+        
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+                
+        return MILayer(layer)
+        
+    def contourf(self, *args, **kwargs):  
+        """
+        Plot filled contours on the map.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ``r`` or ``red``, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param isadd: (*boolean*) Add layer or not. Default is ``True``.
+        :param zorder: (*int*) Z-order of created layer for display.
+        :param smooth: (*boolean*) Smooth countour lines or not.
+        :param select: (*boolean*) Set the return layer as selected layer or not.
+        
+        :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
+        """
+        n = len(args) 
+        if n <= 2:
+            a = args[0]
+            y = a.dimvalue(0)
+            x = a.dimvalue(1)
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            args = args[3:]
+        ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)
+        ls = ls.convertTo(ShapeTypes.Polyline)
+        plotutil.setlegendscheme(ls, **kwargs)
+        isadd = kwargs.pop('isadd', True)
+        smooth = kwargs.pop('smooth', True)
+        layer = DrawMeteoData.createShadedLayer(a.array, x.array, y.array, ls, 'layer', 'data', smooth)
+        proj = kwargs.pop('proj', None)
+        if not proj is None:
+            layer.setProjInfo(proj)
+        
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            if zorder is None:
+                zorder = 0
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+                
+        return MILayer(layer)
+        
+    def imshow(self, *args, **kwargs):
+        """
+        Display an image on the map.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        :param fill_color: (*color*) Fill_color. Default is None (white color).
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param zorder: (*int*) Z-order of created layer for display.
+        :param interpolation: (*string*) Interpolation option [None | bilinear | bicubic].
+        
+        :returns: (*RasterLayer*) RasterLayer created from array data.
+        """
+        cmap = plotutil.getcolormap(**kwargs)
+        fill_value = kwargs.pop('fill_value', -9999.0)        
+        ls = kwargs.pop('symbolspec', None)
+        n = len(args) 
+        isrgb = False
+        if n <= 2:
+            if isinstance(args[0], (list, tuple)):
+                isrgb = True
+                rgbdata = args[0]
+                if isinstance(rgbdata[0], DimArray):
+                    x = rgbdata[0].dimvalue(1)
+                    y = rgbdata[0].dimvalue(0)                
+                else:
+                    x = minum.arange(0, rgbdata[0].shape[1])
+                    y = minum.arange(0, rgbdata[0].shape[0])
+            elif args[0].ndim > 2:
+                isrgb = True
+                rgbdata = args[0]
+                x = rgbdata.dimvalue(1)
+                y = rgbdata.dimvalue(0)
+            else:
+                gdata = minum.asgridarray(args[0])
+                args = args[1:]
+        elif n <=4:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            if isinstance(a, (list, tuple)):
+                isrgb = True
+                rgbdata = a
+            elif a.ndim > 2:
+                isrgb = True
+                rgbdata = a
+            else:
+                gdata = minum.asgridarray(a, x, y, fill_value)
+                args = args[3:]    
+        
+        isadd = kwargs.pop('isadd', True)
+        interpolation = kwargs.pop('interpolation', None)
+        if isrgb:
+            if isinstance(rgbdata, (list, tuple)):
+                rgbd = []
+                for d in rgbdata:
+                    rgbd.append(d.asarray())
+                rgbdata = rgbd
+            else:
+                rgbdata = rgbdata.asarray()        
+            extent = [x[0],x[-1],y[0],y[-1]]
+            igraphic = GraphicFactory.createImage(rgbdata, extent)
+            x = plotutil.getplotdata(x)
+            y = plotutil.getplotdata(y)
+            layer = DrawMeteoData.createImageLayer(x, y, igraphic, 'layer_image')
+        else:
+            if len(args) > 0:
+                if ls is None:
+                    level_arg = args[0]
+                    if isinstance(level_arg, int):
+                        cn = level_arg
+                        ls = LegendManage.createImageLegend(gdata, cn, cmap)
+                    else:
+                        if isinstance(level_arg, MIArray):
+                            level_arg = level_arg.aslist()
+                        ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
+            else:    
+                if ls is None:
+                    ls = LegendManage.createImageLegend(gdata, cmap)
+            plotutil.setlegendscheme(ls, **kwargs)
+            fill_color = kwargs.pop('fill_color', None)
+            if not fill_color is None:
+                cb = ls.getLegendBreaks().get(ls.getBreakNum() - 1)
+                if cb.isNoData():
+                    cb.setColor(plotutil.getcolor(fill_color))
+
+            layer = DrawMeteoData.createRasterLayer(gdata, 'layer', ls) 
+                            
+        proj = kwargs.pop('proj', None)
+        if not proj is None:
+            layer.setProjInfo(proj)
+        if not interpolation is None:
+            layer.setInterpolation(interpolation)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            if zorder is None:
+                zorder = 0
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+        return MILayer(layer)
         
     def pcolor(self, *args, **kwargs):
         """
@@ -366,14 +780,13 @@ class MapAxes(Axes):
             the order specified.
         :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
         :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
-        :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
-        :param order: (*int*) Z-order of created layer for display.
+        :param isadd: (*boolean*) Add layer or not. Default is ``True``.
+        :param zorder: (*int*) Z-order of created layer for display.
         :param select: (*boolean*) Set the return layer as selected layer or not.
         
         :returns: (*VectoryLayer*) Polygon VectoryLayer created from array data.
         """    
-        proj = kwargs.pop('proj', None)    
-        order = kwargs.pop('order', None)
+        proj = kwargs.pop('proj', None)            
         n = len(args) 
         if n <= 2:
             a = args[0]
@@ -404,27 +817,21 @@ class MapAxes(Axes):
             layer.setProjInfo(proj)
             
         # Add layer
-        visible = kwargs.pop('visible', True)
-        if visible:
-            shapetype = layer.getShapeType()
-            if order is None:
-                if shapetype == ShapeTypes.Polygon or shapetype == ShapeTypes.Image:
-                    self.add_layer(layer, 0)
-                else:
-                    self.add_layer(layer)
-            else:
-                self.add_layer(layer, order)
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            if zorder is None:
+                zorder = 0
+            self.add_layer(layer, zorder, select)
             self.axes.setDrawExtent(layer.getExtent().clone())
             self.axes.setExtent(layer.getExtent().clone())
-            select = kwargs.pop('select', True)
-            if select:
-                self.axes.setSelectedLayer(layer)
 
         return MILayer(layer)
-        
-    def barbs(self, *args, **kwargs):
+    
+    def quiver(self, *args, **kwargs):
         """
-        Plot a 2-D field of barbs in a map.
+        Plot a 2-D field of quiver in a map.
         
         :param x: (*array_like*) Optional. X coordinate array.
         :param y: (*array_like*) Optional. Y coordinate array.
@@ -432,13 +839,13 @@ class MapAxes(Axes):
         :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
         :param z: (*array_like*) Optional, 2-D z value array.
         :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
-            barbs to draw, in increasing order.
+            quiver to draw, in increasing order.
         :param cmap: (*string*) Color map string.
         :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
         :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
         :param size: (*float*) Base size of the arrows.
         :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
-        :param order: (*int*) Z-order of created layer for display.
+        :param zorder: (*int*) Z-order of created layer for display.
         :param select: (*boolean*) Set the return layer as selected layer or not.
         
         :returns: (*VectoryLayer*) Created barbs VectoryLayer.
@@ -455,24 +862,24 @@ class MapAxes(Axes):
         if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
             onlyuv = False
         if onlyuv:
-            u = minum.asmiarray(args[0])
-            v = minum.asmiarray(args[1])
+            u = minum.asarray(args[0])
+            v = minum.asarray(args[1])
             xx = args[0].dimvalue(1)
             yy = args[0].dimvalue(0)
             x, y = minum.meshgrid(xx, yy)
             args = args[2:]
             if len(args) > 0:
-                cdata = minum.asmiarray(args[0])
+                cdata = minum.asarray(args[0])
                 iscolor = True
                 args = args[1:]
         else:
-            x = minum.asmiarray(args[0])
-            y = minum.asmiarray(args[1])
-            u = minum.asmiarray(args[2])
-            v = minum.asmiarray(args[3])
+            x = minum.asarray(args[0])
+            y = minum.asarray(args[1])
+            u = minum.asarray(args[2])
+            v = minum.asarray(args[3])
             args = args[4:]
             if len(args) > 0:
-                cdata = minum.asmiarray(args[0])
+                cdata = minum.asarray(args[0])
                 iscolor = True
                 args = args[1:]
         if iscolor:
@@ -494,34 +901,201 @@ class MapAxes(Axes):
                 c = Color.black
             ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
         ls = plotutil.setlegendscheme_point(ls, **kwargs)
-        layer = self._plot_uvdata(x, y, u, v, cdata, ls, 'barbs', isuv, proj=proj)
-        select = kwargs.pop('select', True)
-        if select:
-            self.axes.setSelectedLayer(layer)
-        udata = None
-        vdata = None
+        if not cdata is None:
+            cdata = cdata.array
+        if u.ndim == 2 and x.ndim == 1:
+            x, y = minum.meshgrid(x, y)
+        layer = DrawMeteoData.createVectorLayer(x.array, y.array, u.array, v.array, cdata, ls, 'layer', isuv)
+        if not proj is None:
+            layer.setProjInfo(proj)
+            
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+
+        return MILayer(layer)
+    
+    def barbs(self, *args, **kwargs):
+        """
+        Plot a 2-D field of barbs in a map.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+        :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+        :param z: (*array_like*) Optional, 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+            barbs to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+        :param size: (*float*) Base size of the arrows.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param zorder: (*int*) Z-order of created layer for display.
+        :param select: (*boolean*) Set the return layer as selected layer or not.
+        
+        :returns: (*VectoryLayer*) Created barbs VectoryLayer.
+        """
+        cmap = plotutil.getcolormap(**kwargs)
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        proj = kwargs.pop('proj', None)
+        order = kwargs.pop('order', None)
+        isuv = kwargs.pop('isuv', True)
+        n = len(args) 
+        iscolor = False
         cdata = None
+        onlyuv = True
+        if n >= 4 and isinstance(args[3], (DimArray, MIArray)):
+            onlyuv = False
+        if onlyuv:
+            u = minum.asarray(args[0])
+            v = minum.asarray(args[1])
+            xx = args[0].dimvalue(1)
+            yy = args[0].dimvalue(0)
+            x, y = minum.meshgrid(xx, yy)
+            args = args[2:]
+            if len(args) > 0:
+                cdata = minum.asarray(args[0])
+                iscolor = True
+                args = args[1:]
+        else:
+            x = minum.asarray(args[0])
+            y = minum.asarray(args[1])
+            u = minum.asarray(args[2])
+            v = minum.asarray(args[3])
+            args = args[4:]
+            if len(args) > 0:
+                cdata = minum.asarray(args[0])
+                iscolor = True
+                args = args[1:]
+        if iscolor:
+            if len(args) > 0:
+                cn = args[0]
+                ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
+            else:
+                levs = kwargs.pop('levs', None)
+                if levs is None:
+                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+                else:
+                    if isinstance(levs, MIArray):
+                        levs = levs.tolist()
+                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
+        else:    
+            if cmap.getColorCount() == 1:
+                c = cmap.getColor(0)
+            else:
+                c = Color.black
+            ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+        ls = plotutil.setlegendscheme_point(ls, **kwargs)
+        if not cdata is None:
+            cdata = cdata.array
+        layer = DrawMeteoData.createBarbLayer(x.array, y.array, u.array, v.array, cdata, ls, 'layer', isuv)
+        if not proj is None:
+            layer.setProjInfo(proj)
+            
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+
         return MILayer(layer)
         
-    def _plot_uvdata(self, x, y, u, v, z, ls, type, isuv, proj=None, density=4):
-        if x.ndim == 1 and u.ndim == 2:
-            x, y = minum.meshgrid(x, y)
-        zv = z
-        if not z is None:
-            zv = z.array
-        if type == 'quiver':
-            layer = DrawMeteoData.createVectorLayer(x.array, y.array, u.array, v.array, zv, ls, 'layer', isuv)
-        elif type == 'barbs':
-            layer = DrawMeteoData.createBarbLayer(x.array, y.array, u.array, v.array, zv, ls, 'layer', isuv)
+    def streamplot(self, *args, **kwargs):
+        """
+        Plot streamline in a map.
         
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param u: (*array_like*) U component of the arrow vectors (wind field) or wind direction.
+        :param v: (*array_like*) V component of the arrow vectors (wind field) or wind speed.
+        :param z: (*array_like*) Optional, 2-D z value array.
+        :param color: (*Color*) Streamline color. Default is blue.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
+        :param density: (*int*) Streamline density. Default is 4.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param zorder: (*int*) Z-order of created layer for display.
+        :param select: (*boolean*) Set the return layer as selected layer or not.
+        
+        :returns: (*VectoryLayer*) Created streamline VectoryLayer.
+        """
+        cmap = plotutil.getcolormap(**kwargs)
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        proj = kwargs.pop('proj', None)
+        cobj = kwargs.pop('color', 'b')
+        color = plotutil.getcolor(cobj)
+        isuv = kwargs.pop('isuv', True)
+        density = kwargs.pop('density', 4)
+        n = len(args)
+        if n < 4:
+            u = args[0]
+            v = args[1]
+            y = u.dimvalue(0)
+            x = u.dimvalue(1)
+            args = args[2:]
+        else:
+            x = args[0]
+            y = args[1]
+            u = args[2]
+            v = args[3]
+            args = args[4:]  
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Polyline, color, 1)
+        plotutil.setlegendscheme(ls, **kwargs)
+        #layer = __plot_uvgriddata_m(plot, udata, vdata, None, ls, 'streamplot', isuv, proj=proj, density=density)
+        layer = DrawMeteoData.createStreamlineLayer(u.array, v.array, x.array, y.array, density, ls, 'layer', isuv)
+        if not proj is None:
+            layer.setProjInfo(proj)
+            
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+            
+        return MILayer(layer)
+        
+    def stationmodel(self, smdata, **kwargs):
+        """
+        Plot station model data on the map.
+        
+        :param smdata: (*StationModelData*) Station model data.
+        :param surface: (*boolean*) Is surface data or not. Default is True.
+        :param size: (*float*) Size of the station model symbols. Default is 12.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param order: (*int*) Z-order of created layer for display.
+        
+        :returns: (*VectoryLayer*) Station model VectoryLayer.
+        """
+        proj = kwargs.pop('proj', None)
+        size = kwargs.pop('size', 12)
+        surface = kwargs.pop('surface', True)
+        ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, Color.blue, size)
+        layer = DrawMeteoData.createStationModelLayer(smdata, ls, 'stationmodel', surface)
         if (proj != None):
             layer.setProjInfo(proj)
-        
-        shapetype = layer.getShapeType()
-        self.add_layer(layer)
-        self.axes.setDrawExtent(layer.getExtent().clone())
-        self.axes.setExtent(layer.getExtent().clone())
-        return layer
+     
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+            
+        return MILayer(layer)
         
     def webmap(self, provider='OpenStreetMap', order=0):
         '''
@@ -537,6 +1111,20 @@ class MapAxes(Axes):
         layer.setWebMapProvider(provider)
         self.add_layer(layer, order)
         return MILayer(layer)
+        
+    def masklayer(self, mobj, layers):
+        '''
+        Mask layers.
+        
+        :param mobj: (*layer or polgyons*) Mask object.
+        :param layers: (*list*) The layers will be masked.       
+        '''
+        mapview = self.axes.getMapView()
+        mapview.getMaskOut().setMask(True)
+        mapview.getMaskOut().setMaskLayer(mobj.layer.getLayerName())
+        for layer in layers:
+            layer.layer.setMaskout(True)
+
 
 ########################################################3
 class Test():

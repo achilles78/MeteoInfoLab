@@ -1652,27 +1652,18 @@ def magnitude(u, v):
 
 def asarray(data):
     '''
-    Get array from array_like data (ie., MIArray, DimArray and list).
+    Convert the array_like data to MIArray data.
     
     :param data: (*array_like*) The input data.
     
-    :returns: Array data.
+    :returns: MIArray data.
     '''
     if isinstance(data, Array):
+        return MIArray(data)
+    elif isinstance(data, MIArray):
         return data
-    elif isinstance(data, (DimArray, MIArray)):
-        return data.asarray()
-    elif isinstance(data, (list, tuple)):
-        if isinstance(data[0], datetime.datetime):
-            dd = []
-            for d in data:
-                v = miutil.date2num(d)
-                dd.append(v)
-            return array(dd).array
-        else:
-            return array(data).array
     else:
-        return array([data]).array()
+        return array(data) 
 
 def asmiarray(data):
     '''

@@ -6,29 +6,29 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.chart import ChartText3D, Location, ChartWindArrow
-from org.meteoinfo.chart.plot import Plot2D, MapPlot, PolarPlot, PiePlot, Plot3D, GraphicFactory
+from org.meteoinfo.chart import Location, ChartWindArrow, ChartText, LegendPosition, \
+    ChartLegend, ChartColorBar
+from org.meteoinfo.chart.plot import Plot2D, PolarPlot, GraphicFactory, \
+    PlotOrientation
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
-from org.meteoinfo.data import ArrayUtil
-from org.meteoinfo.map import MapView
-from org.meteoinfo.legend import LegendManage, BreakTypes, BarBreak, PolygonBreak, PolylineBreak, PointBreak, LineStyles
-from org.meteoinfo.drawing import PointStyle
-from org.meteoinfo.shape import ShapeTypes, Graphic
-from org.meteoinfo.projection import ProjectionInfo
+from org.meteoinfo.legend import LegendManage, BarBreak, PolygonBreak, PolylineBreak, \
+    PointBreak, LineStyles, PointStyle, LegendScheme
+from org.meteoinfo.shape import ShapeTypes, Graphic, GraphicCollection
 from org.meteoinfo.global import MIMath, Extent
+from org.meteoinfo.layer import MapLayer
 
 from java.awt import Font, Color
 from java.awt.image import BufferedImage
 
 import numbers
+import datetime
 
 from mipylib.numeric.dimarray import DimArray
 from mipylib.numeric.miarray import MIArray
 from mipylib.geolib.milayer import MILayer
-import mipylib.geolib.migeo as migeo
 import plotutil
 import mipylib.numeric.minum as minum
-import mipylib.migl as migl
+import mipylib.miutil as miutil
 
 class Axes(object):
     '''
@@ -105,36 +105,139 @@ class Axes(object):
         '''
         return self.axes.getAxis(loc)
         
-    def get_title(self):
+    def get_title(self, loc='center'):
         '''
-        Get title               
-        '''
-        return self.axes.getTitle()
+        Get title            
+
+        :param loc: (*string*) Which title to get ['center' | 'left' | 'right'],
+            default to 'center'.
         
-    def set_title(self, title):
+        :returns: The title.
         '''
-        Set title
+        if loc == 'left':
+            return self.aexs.getLeftTitle()
+        elif loc == 'right':
+            return self.axes.getRightTitle()
+        else:
+            return self.axes.getTitle()        
         
-        :param title: (*string*) Title
-        '''
-        self.axes.setTitle(title)
+    def set_title(self, label, loc='center', fontname=None, fontsize=14, bold=True, color='black', **kwargs):
+        """
+        Set a title of the current axes.
         
-    def set_left_title(self, title):
-        '''
-        Set left sub title
+        :param label: (*string*) Title string.
+        :param loc: (*string') Which title to set ['center' | 'left' | 'right'],
+            default to 'center'.
+        :param fontname: (*string*) Font name. Default is ``None``, using ``Arial`` .
+        :param fontsize: (*int*) Font size. Default is ``14`` .
+        :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
+        :param color: (*color*) Title string color. Default is ``black`` .  
+        :param linespace: (*int*) Line space of multiple line title.
+        """
+        exfont = False
+        if fontname is None:
+            fontname = 'Arial'
+        else:
+            exfont = True
+            
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        c = plotutil.getcolor(color)
+        title = ChartText(label, font)
+        title.setXAlign(loc)
+        title.setUseExternalFont(exfont)
+        title.setColor(c)
+        linespace = kwargs.pop('linespace', None)
+        if not linespace is None:
+            title.setLineSpace(linespace)
         
-        :param title: (*string*) Title
-        '''
-        self.axes.setLeftTitle(title)
+        if loc == 'left':
+            self.axes.setLeftTitle(title)
+        elif loc == 'right':
+            self.axes.setRightTitle(title)
+        else:
+            self.axes.setTitle(title)
+            
+    def set_xlabel(self, label, fontname=None, fontsize=14, bold=False, color='black'):
+        """
+        Set the x axis label of the current axes.
         
-    def set_right_title(self, title):
-        '''
-        Set right sub title
+        :param label: (*string*) Label string.
+        :param fontname: (*string*) Font name. Default is ``Arial`` .
+        :param fontsize: (*int*) Font size. Default is ``14`` .
+        :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
+        :param color: (*color*) Label string color. Default is ``black`` .
+        """
+        exfont = False
+        if fontname is None:
+            fontname = 'Arial'
+        else:
+            exfont = True
+            
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        c = plotutil.getcolor(color)
+        axis = self.axes.getXAxis()
+        text = ChartText(label, font)
+        text.setUseExternalFont(exfont)
+        text.setColor(c)
+        text.setXAlign('center')
+        text.setYAlign('top')
+        axis.setLabel(text)
+        axis.setDrawLabel(True)
+        if self.axestype != '3d':
+            axis_t = self.axes.getAxis(Location.TOP)
+            text = ChartText(label, font)
+            text.setUseExternalFont(exfont)
+            text.setColor(c)
+            text.setXAlign('center')
+            text.setYAlign('bottom')
+            axis_t.setLabel(text)
+    
+    def set_ylabel(self, label, fontname=None, fontsize=14, bold=False, color='black'):
+        """
+        Set the y axis label of the current axes.
         
-        :param title: (*string*) Title
-        '''
-        self.axes.setRightTitle(title)
+        :param label: (*string*) Label string.
+        :param fontname: (*string*) Font name. Default is ``Arial`` .
+        :param fontsize: (*int*) Font size. Default is ``14`` .
+        :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
+        :param color: (*color*) Label string color. Default is ``black`` .
+        """
+        exfont = False
+        if fontname is None:
+            fontname = 'Arial'
+        else:
+            exfont = True
         
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        c = plotutil.getcolor(color)
+        axis = self.axes.getYAxis()
+        text = ChartText(label, font)
+        text.setUseExternalFont(exfont)
+        text.setAngle(90)
+        text.setColor(c)
+        text.setXAlign('right')
+        text.setYAlign('center')
+        axis.setLabel(text)
+        axis.setDrawLabel(True)
+        if self.axestype != '3d':
+            axis_r = self.axes.getAxis(Location.RIGHT)
+            text = ChartText(label, font)
+            text.setAngle(90)
+            text.setUseExternalFont(exfont)
+            text.setColor(c)
+            text.setXAlign('left')
+            text.setYAlign('center')
+            axis_r.setLabel(text)
+    
     def get_xticks(self):
         '''
         Get x axis tick locations.
@@ -151,6 +254,13 @@ class Axes(object):
         if isinstance(locs, (MIArray, DimArray)):
             locs = labels.aslist()
         axis.setTickLocations(locs)
+        
+        if self.axestype == '3d':
+            axis_t = None
+        else:
+            axis_t = self.axes.getAxis(Location.TOP)
+        if not axis_t is None:
+            axis_t.setTickLocations(locs)
         
     def get_yticks(self):
         '''
@@ -169,6 +279,13 @@ class Axes(object):
             locs = labels.aslist()
         axis.setTickLocations(locs)
         
+        if self.axestype == '3d':
+            axis_r = None
+        else:
+            axis_r = self.axes.getAxis(Location.RIGHT)
+        if not axis_r is None:
+            axis_r.setTickLocations(locs)
+        
     def get_xticklabels(self):
         '''
         Get x axis tick labels.
@@ -177,17 +294,49 @@ class Axes(object):
         axis.updateTickLabels()
         return axis.getTickLabelText()
         
-    def set_xticklabels(self, labels):
+    def set_xticklabels(self, labels, **kwargs):
         '''
         Set x axis tick labels.
         '''
         axis = self.axes.getXAxis()
-        if isinstance(labels, (MIArray, DimArray)):
-            labels = labels.aslist()
-        if isinstance(labels[0], (int, long, float)):
-            axis.setTickLabels_Number(labels)
+        if self.axestype == '3d':
+            axis_t = None
         else:
-            axis.setTickLabelText(labels)
+            axis_t = self.axes.getAxis(Location.TOP)
+            
+        if not labels is None:
+            if isinstance(labels, (MIArray, DimArray)):
+                labels = labels.aslist()
+            if isinstance(labels[0], (int, long, float)):
+                axis.setTickLabels_Number(labels)
+            else:
+                axis.setTickLabelText(labels)                   
+            
+            if not axis_t is None:
+                if isinstance(labels[0], (int, long, float)):
+                    axis_t.setTickLabels_Number(labels)
+            else:
+                axis_t.setTickLabelText(labels)
+        
+        fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
+        fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
+        bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        color = kwargs.pop('color', axis.getTickLabelColor())
+        c = plotutil.getcolor(color)
+        angle = kwargs.pop('rotation', 0)
+        if angle == 'vertical':
+            angle = 90
+        axis.setTickLabelFont(font)
+        axis.setTickLabelColor(c)
+        axis.setTickLabelAngle(angle)
+        if not axis_t is None:
+            axis_t.setTickLabelFont(font)
+            axis_t.setTickLabelColor(c)
+            axis_t.setTickLabelAngle(angle)
             
     def get_yticklabels(self):
         '''
@@ -197,17 +346,49 @@ class Axes(object):
         axis.updateTickLabels()
         return axis.getTickLabelText()
         
-    def set_yticklabels(self, labels):
+    def set_yticklabels(self, labels, **kwargs):
         '''
         Set y axis tick labels.
         '''
         axis = self.axes.getYAxis()
-        if isinstance(labels, (MIArray, DimArray)):
-            labels = labels.aslist()
-        if isinstance(labels[0], (int, long, float)):
-            axis.setTickLabels_Number(labels)
+        if self.axestype == '3d':
+            axis_r = None
         else:
-            axis.setTickLabelText(labels)
+            axis_r = self.axes.getAxis(Location.RIGHT)
+            
+        if not labels is None:
+            if isinstance(labels, (MIArray, DimArray)):
+                labels = labels.aslist()
+            if isinstance(labels[0], (int, long, float)):
+                axis.setTickLabels_Number(labels)
+            else:
+                axis.setTickLabelText(labels)        
+        
+            if not axis_r is None:
+                if isinstance(labels[0], (int, long, float)):
+                    axis_r.setTickLabels_Number(labels)
+            else:
+                axis_r.setTickLabelText(labels)
+                
+        fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
+        fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
+        bold =kwargs.pop('bold', axis.getTickLabelFont().isBold())
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        color = kwargs.pop('color', axis.getTickLabelColor())
+        c = plotutil.getcolor(color)
+        angle = kwargs.pop('rotation', 0)
+        if angle == 'vertical':
+            angle = 90
+        axis.setTickLabelFont(font)
+        axis.setTickLabelColor(c)
+        axis.setTickLabelAngle(angle)
+        if not axis_r is None:
+            axis_r.setTickLabelFont(font)
+            axis_r.setTickLabelColor(c)
+            axis_r.setTickLabelAngle(angle)
             
     def set_xaxis_type(self, axistype, timetickformat=None):
         '''
@@ -297,6 +478,216 @@ class Axes(object):
             r_axis.setMinorTickNum(10)
             ax.setAxis(r_axis, Location.RIGHT)
         
+    def axis(self, limits):
+        """
+        Sets the min and max of the x and y axes, with ``[xmin, xmax, ymin, ymax]`` .
+        
+        :param limits: (*list*) Min and max of the x and y axes.
+        """
+        if len(limits) == 4:
+            xmin = limits[0]
+            xmax = limits[1]
+            ymin = limits[2]
+            ymax = limits[3]
+            extent = Extent(xmin, xmax, ymin, ymax)
+            self.axes.setDrawExtent(extent)
+            self.axes.setExtent(extent.clone())
+            return True
+        else:
+            print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'    
+            return None
+            
+    def get_xlim(self):
+        """
+        Get the *x* limits of the current axes.
+        
+        :returns: (*tuple*) x limits.
+        """
+        extent = self.axes.getDrawExtent()
+        return extent.minX, extent.maxX
+            
+    def set_xlim(self, xmin, xmax):
+        """
+        Set the *x* limits of the current axes.
+        
+        :param xmin: (*float*) Minimum limit of the x axis.
+        :param xmax: (*float*) Maximum limit of the x axis.
+        """
+        if isinstance(xmin, datetime.datetime):
+            xmin = miutil.date2num(xmin)
+        if isinstance(xmax, datetime.datetime):
+            xmax = miutil.date2num(xmax)    
+            
+        extent = self.axes.getDrawExtent()
+        extent.minX = xmin
+        extent.maxX = xmax
+        self.axes.setDrawExtent(extent)
+        self.axes.setExtent(extent.clone())    
+
+    def get_ylim(self):
+        """
+        Get the *y* limits of the current axes.
+        
+        :returns: (*tuple*) y limits.
+        """
+        extent = self.axes.getDrawExtent()
+        return extent.minY, extent.maxY
+            
+    def set_ylim(self, ymin, ymax):
+        """
+        Set the *yt* limits of the current axes.
+        
+        :param ymin: (*float*) Minimum limit of the y axis.
+        :param ymax: (*float*) Maximum limit of the y axis.
+        """
+        if isinstance(ymin, datetime.datetime):
+            ymin = miutil.date2num(ymin)
+        if isinstance(ymax, datetime.datetime):
+            ymax = miutil.date2num(ymax)    
+            
+        extent = self.axes.getDrawExtent()
+        extent.minY = ymin
+        extent.maxY = ymax
+        self.axes.setDrawExtent(extent)
+        self.axes.setExtent(extent.clone())  
+
+    def xaxis(self, **kwargs):
+        """
+        Set x axis of the axes.
+        
+        :param color: (*Color*) Color of the x axis. Default is 'black'.
+        :param shift: (*int) X axis shif along x direction. Units is pixel. Default is 0.
+        """
+        visible = kwargs.pop('visible', None)
+        shift = kwargs.pop('shift', None)
+        color = kwargs.pop('color', None)
+        if not color is None:
+            color = plotutil.getcolor(color)
+        linewidth = kwargs.pop('linewidth', None)
+        linestyle = kwargs.pop('linestyle', None)
+        tickline = kwargs.pop('tickline', None)
+        tickline = kwargs.pop('tickvisible', tickline)
+        ticklabel = kwargs.pop('ticklabel', None)
+        minortick = kwargs.pop('minortick', False)
+        tickin = kwargs.pop('tickin', True)
+        axistype = kwargs.pop('axistype', None)
+        timetickformat = kwargs.pop('timetickformat', None)
+        if not axistype is None:
+            self.set_xaxis_type(axistype, timetickformat)
+            self.axes.setAutoExtent()
+        tickfontname = kwargs.pop('tickfontname', 'Arial')
+        tickfontsize = kwargs.pop('tickfontsize', 14)
+        tickbold = kwargs.pop('tickbold', False)
+        if tickbold:
+            font = Font(tickfontname, Font.BOLD, tickfontsize)
+        else:
+            font = Font(tickfontname, Font.PLAIN, tickfontsize)
+        location = kwargs.pop('location', 'both')
+        if location == 'top':
+            locs = [Location.TOP]
+        elif location == 'bottom':
+            locs = [Location.BOTTOM]
+        else:
+            locs = [Location.BOTTOM, Location.TOP]
+        axislist = []
+        if self.axestype == '3d':
+            axislist.append(self.axes.getXAxis())
+        else:
+            for loc in locs:    
+                axislist.append(self.axes.getAxis(loc))
+        for axis in axislist:
+            if not visible is None:
+                axis.setVisible(visible)
+            if not shift is None:
+                axis.setShift(shift)
+            if not color is None:
+                axis.setColor_All(color)
+            if not linewidth is None:
+                axis.setLineWidth(linewidth)
+            if not linestyle is None:
+                axis.setLineStyle(linestyle)
+            if not tickline is None:
+                axis.setDrawTickLine(tickline)
+            if not ticklabel is None:
+                axis.setDrawTickLabel(ticklabel)
+            axis.setMinorTickVisible(minortick)
+            axis.setInsideTick(tickin)
+            axis.setTickLabelFont(font)
+        
+    def yaxis(self, **kwargs):
+        """
+        Set y axis of the axes.
+
+        :param color: (*Color*) Color of the y axis. Default is 'black'.
+        :param shift: (*int) Y axis shif along x direction. Units is pixel. Default is 0.
+        """
+        visible = kwargs.pop('visible', None)
+        shift = kwargs.pop('shift', None)
+        color = kwargs.pop('color', None)
+        if not color is None:
+            color = plotutil.getcolor(color)
+        linewidth = kwargs.pop('linewidth', None)
+        linestyle = kwargs.pop('linestyle', None)
+        tickline = kwargs.pop('tickline', None)
+        tickline = kwargs.pop('tickvisible', tickline)
+        ticklabel = kwargs.pop('ticklabel', None)
+        minortick = kwargs.pop('minortick', False)
+        tickin = kwargs.pop('tickin', True)
+        axistype = kwargs.pop('axistype', None)
+        timetickformat = kwargs.pop('timetickformat', None)
+        if not axistype is None:
+            self.set_yaxis_type(axistype, timetickformat)
+            self.axes.updateDrawExtent()
+        tickfontname = kwargs.pop('tickfontname', 'Arial')
+        tickfontsize = kwargs.pop('tickfontsize', 14)
+        tickbold = kwargs.pop('tickbold', False)
+        if tickbold:
+            font = Font(tickfontname, Font.BOLD, tickfontsize)
+        else:
+            font = Font(tickfontname, Font.PLAIN, tickfontsize)
+        location = kwargs.pop('location', 'both')
+        if location == 'left':
+            locs = [Location.LEFT]
+        elif location == 'right':
+            locs = [Location.RIGHT]
+        else:
+            locs = [Location.LEFT, Location.RIGHT]
+        axislist = []
+        if self.axestype == '3d':
+            axislist.append(self.axes.getYAxis())
+        else:
+            for loc in locs:    
+                axislist.append(self.axes.getAxis(loc))
+        for axis in axislist:
+            if not visible is None:
+                axis.setVisible(visible)
+            if not shift is None:
+                axis.setShift(shift)
+            if not color is None:
+                axis.setColor_All(color)
+            if not linewidth is None:
+                axis.setLineWidth(linewidth)
+            if not linestyle is None:
+                axis.setLineStyle(linestyle)
+            if not tickline is None:
+                axis.setDrawTickLine(tickline)
+            if not ticklabel is None:
+                axis.setDrawTickLabel(ticklabel)
+            axis.setMinorTickVisible(minortick)
+            axis.setInsideTick(tickin)
+            axis.setTickLabelFont(font)
+    
+    def xreverse(self):
+        '''
+        Reverse x axis.
+        '''
+        self.axes.getXAxis().setInverse(True)
+        
+    def yreverse(self):
+        '''
+        Reverse y axis.
+        '''
+        self.axes.getYAxis().setInverse(True)
     
     def add_graphic(self, graphic):
         '''
@@ -1309,6 +1700,60 @@ class Axes(object):
 
         return igraphic
         
+    def clabel(self, layer, **kwargs):
+        '''
+        Add contour layer labels.
+        
+        :param layer: (*MILayer*) The contour layer.
+        :param fontname, fontsize: The font auguments.
+        :param color: (*color*) The label color. Default is ``None``, the label color will be set as
+            same as color of the line.
+        :param dynamic: (*boolean*) Draw labels dynamic or not. Default is ``True``.
+        :param drawshadow: (*boolean*) Draw shadow under labels or not.
+        :param fieldname: (*string*) The field name used for label.
+        :param xoffset: (*int*) X offset of the labels.
+        :param yoffset: (int*) Y offset of the labels.
+        :param avoidcoll: (*boolean*) Avoid labels collision or not.
+        '''    
+        color = kwargs.pop('color', None)    
+        gc = layer
+        if isinstance(layer, MILayer):
+            gc = layer.layer   
+        dynamic = kwargs.pop('dynamic', True)
+        if gc.getShapeType() != ShapeTypes.Polyline:
+            dynamic = False
+        drawshadow = kwargs.pop('drawshadow', dynamic)    
+        labelset = gc.getLabelSet()
+        if isinstance(gc, MapLayer):
+            fieldname = kwargs.pop('fieldname', labelset.getFieldName())
+            if fieldname is None:
+                fieldname = gc.getFieldName(0)
+            labelset.setFieldName(fieldname)
+        fontdic = kwargs.pop('font', None)
+        if not fontdic is None:
+            font = plotutil.getfont(fontdic)
+            labelset.setLabelFont(font)
+        else:
+            font = plotutil.getfont_1(**kwargs)
+            labelset.setLabelFont(font)
+        if color is None:
+            labelset.setColorByLegend(True)
+        else:
+            labelset.setColorByLegend(False)
+            color = plotutil.getcolor(color)
+            labelset.setLabelColor(color)
+        labelset.setDrawShadow(drawshadow)
+        xoffset = kwargs.pop('xoffset', 0)
+        labelset.setXOffset(xoffset)
+        yoffset = kwargs.pop('yoffset', 0)
+        labelset.setYOffset(yoffset)
+        avoidcoll = kwargs.pop('avoidcoll', True)
+        labelset.setAvoidCollision(avoidcoll)    
+        if dynamic:
+            gc.addLabelsContourDynamic(gc.getExtent())
+        else:
+            gc.addLabels()
+        
     def contourf(self, *args, **kwargs):
         """
         Plot filled contours.
@@ -2099,6 +2544,302 @@ class Axes(object):
                 wa.setNeatlineSize(linewidth)
                 wa.setDrawNeatline(True)
         self.axes.setWindArrow(wa)
+        
+    def legend(self, *args, **kwargs):
+        """
+        Places a legend on the axes.
+        
+        :param breaks: (*ColorBreak*) Legend breaks (optional).
+        :param labels: (*list of string*) Legend labels (optional).
+        :param orientation: (*string*) Colorbar orientation: ``vertical`` or ``horizontal``.
+        :param loc: (*string*) The location of the legend, including: 'upper right', 'upper left',
+            'lower left', 'lower right', 'right', 'ceter left', 'center right', lower center',
+            'upper center', 'center' and 'custom'. Default is 'upper right'.
+        :param x: (*float*) Location x in normalized (0, 1) units when ``loc=custom`` .
+        :param y: (*float*) Location y in normalized (0, 1) units when ``loc=custom`` .
+        :param frameon: (*boolean*) Control whether a frame should be drawn around the legend. Default
+            is True.
+        :param facecolor: (*None or color*) Control the legend’s background color. Default is None which 
+            set not draw background.
+        :param fontname: (*string*) Tick font name. Default is ``Arial`` .
+        :param fontsize: (*int*) Tick font size. Default is ``14`` .
+        :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+        :param title: (*string*) Label string.
+        :param labelfontname: (*string*) Title font name.
+        :param labelfontsize: (*int*) Label font size.
+        :param labcolor: (*color*) Label color. Default is ``black`` .
+        :param markerscale: (*float*) Marker symbol scale.
+        :param markerwidth: (*float*) Marker symbol width.
+        :param markerheight: (*float*) Marker symbol height.
+        :param ncol: (*float*) Column number of the legend.
+        :param xshift: (*float*) X shift.
+        :param yshift: (*float*) Y shift.
+        
+        :returns: (*ChartLegend*) The chart legend.
+        """ 
+        newlegend = kwargs.pop('newlegend', True)
+        ols = self.axes.getLegendScheme()
+        if newlegend:
+            clegend = ChartLegend(ols)
+        else:
+            clegend = self.axes.getLegend()   
+        ls = kwargs.pop('legend', None)
+        if len(args) > 0:
+            if isinstance(args[0], MILayer):
+                ls = args[0].legend()
+                args = args[1:]
+            elif isinstance(args[0], LegendScheme):
+                ls = args[0]
+                args = args[1:]
+            elif isinstance(args[0], GraphicCollection):
+                if not args[0].isSingleLegend():
+                    ls = args[0].getLegendScheme()
+                    args = args[1:]
+        if ls is None:
+            if len(args) > 0:
+                lbs = []
+                for lb in args[0]:
+                    if isinstance(lb, Graphic):
+                        lbs.append(lb.getLegend().clone())
+                    else:
+                        lbs.append(lb)
+                if len(args) == 2:
+                    labels = args[1]
+                    for i in range(0, len(lbs)):
+                        lbs[i].setCaption(labels[i])
+                if isinstance(lbs[0], basestring):
+                    clegend.setTickCaptions(lbs)
+                else:
+                    ls = LegendScheme()
+                    for lb in lbs:
+                        ls.addLegendBreak(lb)
+                    if lbs[0].getStartValue() == lbs[1].getEndValue():
+                        ls.setLegendType(LegendType.UniqueValue)
+                    else:
+                        ls.setLegendType(LegendType.GraduatedColor)
+                    if clegend is None:
+                        clegend = ChartLegend(ls)
+                        self.axes.setLegend(clegend)
+                    else:
+                        clegend.setLegendScheme(ls)
+        else:
+            if len(args) > 0:
+                labels = args[0]
+                for i in range(len(labels)):
+                    if i < ls.getBreakNum():
+                        ls.getLegendBreak(i).setCaption(labels[i])
+            if clegend is None:
+                clegend = ChartLegend(ls)
+                self.axes.setLegend(clegend)
+            else:
+                clegend.setLegendScheme(ls)
+            
+        loc = kwargs.pop('loc', 'upper right')    
+        lp = LegendPosition.fromString(loc)
+        clegend.setPosition(lp)
+        if lp == LegendPosition.CUSTOM:
+            x = kwargs.pop('x', 0)
+            y = kwargs.pop('y', 0)
+            clegend.setX(x)
+            clegend.setY(y) 
+        orien = 'vertical'
+        if lp == LegendPosition.UPPER_CENTER_OUTSIDE or lp == LegendPosition.LOWER_CENTER_OUTSIDE:
+            orien = 'horizontal'
+        orientation = kwargs.pop('orientation', orien)
+        if orientation == 'horizontal':
+            clegend.setPlotOrientation(PlotOrientation.HORIZONTAL)
+        else:
+            clegend.setPlotOrientation(PlotOrientation.VERTICAL)
+        frameon = kwargs.pop('frameon', True)
+        clegend.setDrawNeatLine(frameon)
+        bcobj = kwargs.pop('background', None)
+        bcobj = kwargs.pop('facecolor', bcobj)
+        if bcobj is None:
+            clegend.setDrawBackground(False)
+        else:
+            clegend.setDrawBackground(True)
+            background = plotutil.getcolor(bcobj)
+            clegend.setBackground(background)
+        tickfontdic = kwargs.pop('tickfont', None)
+        if tickfontdic is None:
+            tickfont = plotutil.getfont_1(**kwargs)    
+        else:
+            tickfont = plotutil.getfont(tickfontdic)
+        clegend.setTickLabelFont(tickfont)
+        fontname = kwargs.pop('labelfontname', None)
+        exfont = False
+        if fontname is None:
+            fontname = 'Arial'
+        else:
+            exfont = True
+        fontsize = kwargs.pop('labelfontsize', 14)
+        bold = kwargs.pop('labelbold', False)
+        labcolor = kwargs.pop('labcolor', 'black')
+        labcolor = plotutil.getcolor(labcolor)
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        title = kwargs.pop('title', '')
+        title = ChartText(title, font)
+        title.setColor(labcolor)
+        title.setUseExternalFont(exfont)
+        clegend.setLabel(title)
+        markerscale = kwargs.pop('markerscale', None)
+        if not markerscale is None:
+            clegend.setSymbolScale(markerscale)
+        markerwidth = kwargs.pop('markerwidth', None)
+        markerheight = kwargs.pop('markerheight', None)
+        if not markerwidth is None:
+            clegend.setSymbolWidth(markerwidth)
+        if not markerheight is None:
+            clegend.setSymbolHeight(markerheight)
+        ncol = kwargs.pop('ncol', None)
+        if not ncol is None:
+            clegend.setColumnNumber(ncol)
+            clegend.setAutoRowColNum(False)
+        xshift = kwargs.pop('xshift', None)
+        if not xshift is None:
+            clegend.setXShift(xshift)
+        yshift = kwargs.pop('yshift', None)
+        if not yshift is None:
+            clegend.setYShift(yshift)
+        if newlegend:
+            self.axes.addLegend(clegend)
+
+        return clegend
+        
+    def colorbar(self, mappable, **kwargs):
+        """
+        Add a colorbar to a plot.
+        
+        :param mappable: (*MapLayer | LegendScheme | List of ColorBreak*) The mappable in plot.
+        :param cax: (*Plot*) None | axes object into which the colorbar will be drawn.
+        :param cmap: (*string*) Color map name. Default is None.
+        :param shrink: (*float*) Fraction by which to shrink the colorbar. Default is 1.0.
+        :param orientation: (*string*) Colorbar orientation: ``vertical`` or ``horizontal``.
+        :param aspect: (*int*) Ratio of long to short dimensions.
+        :param fontname: (*string*) Font name. Default is ``Arial`` .
+        :param fontsize: (*int*) Font size. Default is ``14`` .
+        :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
+        :param label: (*string*) Label. Default is ``None`` .
+        :param labelloc: (*string*) Label location ['in' | 'out' | 'top' | 'bottom' | 'left' | 'right'].
+            Defaul is ``out``.
+        :param extendrect: (*boolean*) If ``True`` the minimum and maximum colorbar extensions will be
+            rectangular (the default). If ``False`` the extensions will be triangular.
+        :param extendfrac: [None | 'auto' | length] If set to *None*, both the minimum and maximum triangular
+            colorbar extensions with have a length of 5% of the interior colorbar length (the default). If
+            set to 'auto', makes the triangular colorbar extensions the same lengths as the interior boxes
+            . If a scalar, indicates the length of both the minimum and maximum triangle colorbar extensions
+            as a fraction of the interior colorbar length.
+        :param ticks: [None | list of ticks] If None, ticks are determined automatically from the input.
+        :param ticklabels: [None | list of ticklabels] Tick labels.
+        """
+        cmap = kwargs.pop('cmap', None)
+        shrink = kwargs.pop('shrink', 1)
+        orientation = kwargs.pop('orientation', 'vertical')
+        aspect = kwargs.pop('aspect', 20)
+        tickfontdic = kwargs.pop('tickfont', None)
+        if tickfontdic is None:
+            tickfont = plotutil.getfont_1(**kwargs)    
+        else:
+            tickfont = plotutil.getfont(tickfontdic)
+        exfont = False
+        labelfontdic = kwargs.pop('labelfont', None)
+        if labelfontdic is None:
+            labfontname = kwargs.pop('labelfontname', tickfont.getName())
+            if labfontname is None:
+                labfontname = tickfont.getName()
+            else:
+                exfont = True
+            labfontsize = kwargs.pop('labelfontsize', tickfont.getSize())
+            labbold = kwargs.pop('labelbold', tickfont.isBold())
+            if labbold:
+                labelfont = Font(labfontname, Font.BOLD, labfontsize)
+            else:
+                labelfont = Font(labfontname, Font.PLAIN, labfontsize)    
+        else:
+            labelfont = plotutil.getfont(labelfontdic)
+        if isinstance(mappable, MILayer):
+            ls = mappable.legend()
+        elif isinstance(mappable, LegendScheme):
+            ls = mappable
+        elif isinstance(mappable, GraphicCollection):
+            ls = mappable.getLegendScheme()
+        else:
+            ls = makelegend(mappable)
+        
+        newlegend = kwargs.pop('newlegend', True)
+        if newlegend:
+            legend = ChartColorBar(ls)
+            self.axes.addLegend(legend)
+        else:
+            legend = self.axes.getLegend()   
+            if legend is None:
+                legend = ChartColorBar(ls)
+                self.axes.setLegend(legend)
+            else:
+                legend.setLegendScheme(ls)
+        legend.setColorbar(True)   
+        legend.setShrink(shrink)
+        legend.setAspect(aspect)
+        legend.setTickLabelFont(tickfont)
+        label = kwargs.pop('label', None)
+        if not label is None:
+            label = ChartText(label, labelfont)
+            label.setUseExternalFont(exfont)
+            legend.setLabel(label)        
+        labelloc = kwargs.pop('labelloc', None)
+        if not labelloc is None:
+            legend.setLabelLocation(labelloc)
+        if orientation == 'horizontal':
+            legend.setPlotOrientation(PlotOrientation.HORIZONTAL)
+            legend.setPosition(LegendPosition.LOWER_CENTER_OUTSIDE)
+        else:
+            legend.setPlotOrientation(PlotOrientation.VERTICAL)
+            legend.setPosition(LegendPosition.RIGHT_OUTSIDE)
+        legend.setDrawNeatLine(False)
+        extendrect = kwargs.pop('extendrect', True)
+        legend.setExtendRect(extendrect)
+        extendfrac = kwargs.pop('extendfrac', None)
+        if extendfrac == 'auto':
+            legend.setAutoExtendFrac(True)
+        tickin = kwargs.pop('tickin', None)
+        if not tickin is None:
+            legend.setInsideTick(tickin)
+        ticklen = kwargs.pop('ticklen', None)
+        if not ticklen is None:
+            legend.setTickLength(ticklen)
+        ticks = kwargs.pop('ticks', None)
+        if not ticks is None:
+            if isinstance(ticks, MIArray):
+                ticks = ticks.aslist()
+            legend.setTickLocations(ticks)
+        ticklabels = kwargs.pop('ticklabels', None)
+        if not ticklabels is None:
+            if isinstance(ticklabels, (MIArray, DimArray)):
+                ticklabels = ticklabels.aslist()
+            if ls.getLegendType() == LegendType.UniqueValue:
+                legend.setTickCaptions(ticklabels)
+            else:
+                if isinstance(ticklabels[0], (int, long, float)):
+                    legend.setTickLabels_Number(ticklabels)
+                else:
+                    legend.setTickLabelText(ticklabels)
+        tickrotation = kwargs.pop('tickrotation', None)
+        if not tickrotation is None:
+            legend.setTickLabelAngle(tickrotation)
+        xshift = kwargs.pop('xshift', None)
+        if not xshift is None:
+            legend.setXShift(xshift)
+        yshift = kwargs.pop('yshift', None)
+        if not yshift is None:
+            legend.setYShift(yshift)
+        vmintick = kwargs.pop('vmintick', False)
+        vmaxtick = kwargs.pop('vmaxtick', False)
+        legend.setDrawMinLabel(vmintick)
+        legend.setDrawMaxLabel(vmaxtick)
+
 
 ###############################################
 class PolarAxes(Axes):
@@ -2244,797 +2985,6 @@ class PolarAxes(Axes):
         sy = self.figure.get_size()[1] - sy
         return sx, sy
                 
-
-#########################################################
-class Axes3D(Axes):
-    '''
-    Axes with 3 dimensional.
-    '''
-    
-    def __init__(self, axes=None, figure=None, **kwargs):
-        self.figure = figure
-        if axes is None:        
-            self.axes = Plot3D()
-        else:
-            self.axes = axes
-        self.axestype = '3d'
-        self.projector = self.axes.getProjector()
-        #distance = kwargs.pop('distance', 10000)
-        #self.projector.setDistance(distance)
-        rotation_angle = kwargs.pop('rotation', 225)
-        self.projector.setRotationAngle(rotation_angle)
-        elevation_angle = kwargs.pop('elevation', 30)
-        self.projector.setElevationAngle(elevation_angle)
-        xyaxis = kwargs.pop('xyaxis', True)
-        self.axes.setDisplayXY(xyaxis)
-        zaxis = kwargs.pop('zaxis', True)
-        self.axes.setDisplayZ(zaxis)
-        grid = kwargs.pop('grid', True)
-        self.axes.setDisplayGrids(grid)
-        boxed = kwargs.pop('boxed', True)
-        self.axes.setBoxed(boxed)
-        bbox = kwargs.pop('bbox', False)
-        self.axes.setDrawBoundingBox(bbox)
-        
-    def get_distance(self):
-        '''
-        Get distance to object.
-        
-        :returns: Distance to object.
-        '''
-        return self.projector.getDistance()
-        
-    def set_distance(self, dis):
-        '''
-        Set distance to object.
-        
-        :param dis: (*float*) Distance to object.
-        '''
-        self.projector.setDistance(dis)
-        
-    def get_rotation(self):
-        '''
-        Get rotation angle.
-        
-        :returns: Rotation angle.
-        '''
-        return self.projector.getRotationAngle()
-        
-    def set_rotation(self, rotation):
-        '''
-        Set rotation angle.
-        
-        :param rotation: (*float*) Rotation angle.
-        '''
-        self.projector.setRotationAngle(rotation)
-        
-    def get_elevation(self):
-        '''
-        Get elevation angle.
-        
-        :returns: Elevation angle.
-        '''
-        return self.projector.getElevationAngle()
-        
-    def set_elevation(self, elevation):
-        '''
-        Set elevation angle.
-        
-        :param elevation: (*float*) Elevation angle.
-        '''
-        self.projector.setElevationAngle(elevation)
-        
-    def set_draw_xy(self, dxy):
-        '''
-        Set draw xy axis or not.
-        
-        :param dxy: (*boolean*) Draw xy axis or not.
-        '''
-        self.axes.setDisplayXY(dxy)
-        
-    def set_draw_z(self, dz):
-        '''
-        Set draw z axis or not.
-        
-        :param dz: (*boolean*) Draw z axis or not.
-        '''
-        self.axes.setDisplayZ(dz)
-        
-    def set_draw_box(self, db):
-        '''
-        Set draw 3D box or not.
-        
-        :param db: (*boolean*) Draw 3D box or not.
-        '''
-        self.axes.setBoxed(db)
-        
-    def set_draw_bbox(self, bbox):
-        '''
-        Set draw bounding box or not.
-        
-        :param db: (*boolean*) Draw bounding box or not.
-        '''
-        self.axes.setDrawBoundingBox(bbox)
-        
-    def plot(self, x, y, z, *args, **kwargs):
-        """
-        Plot 3D lines and/or markers to the axes. *args* is a variable length argument, allowing
-        for multiple *x, y* pairs with an optional format string.
-        
-        :param x: (*array_like*) Input x data.
-        :param y: (*array_like*) Input y data.
-        :param z: (*array_like*) Input z data.
-        :param style: (*string*) Line style for plot.
-        
-        :returns: Legend breaks of the lines.
-        
-        The following format string characters are accepted to control the line style or marker:
-        
-          =========  ===========
-          Character  Description
-          =========  ===========
-          '-'         solid line style
-          '--'        dashed line style
-          '-.'        dash-dot line style
-          ':'         dotted line style
-          '.'         point marker
-          ','         pixel marker
-          'o'         circle marker
-          'v'         triangle_down marker
-          '^'         triangle_up marker
-          '<'         triangle_left marker
-          '>'         triangle_right marker
-          's'         square marker
-          'p'         pentagon marker
-          '*'         star marker
-          'x'         x marker
-          'D'         diamond marker
-          =========  ===========
-          
-        The following color abbreviations are supported:
-          
-          =========  =====
-          Character  Color  
-          =========  =====
-          'b'        blue
-          'g'        green
-          'r'        red
-          'c'        cyan
-          'm'        magenta
-          'y'        yellow
-          'k'        black
-          =========  =====
-        """      
-        xdata = plotutil.getplotdata(x)
-        ydata = plotutil.getplotdata(y)
-        zdata = plotutil.getplotdata(z)  
-        style = None
-        if len(args) > 0:
-            style = args[0]
-        
-        #Set plot data styles
-        label = kwargs.pop('label', 'S_1')
-        if style is None:
-            line = plotutil.getlegendbreak('line', **kwargs)[0]
-            line.setCaption(label)
-        else:
-            line = plotutil.getplotstyle(style, label, **kwargs)   
-
-        #Add graphics
-        graphics = GraphicFactory.createLineString(xdata, ydata, zdata, line)
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphics)
-        return graphics
-        
-    def scatter(self, x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None, 
-                verts=None, **kwargs):
-        """
-        Make a 3D scatter plot of x, y and z, where x, y and z are sequence like objects of the same lengths.
-        
-        :param x: (*array_like*) Input x data.
-        :param y: (*array_like*) Input y data.
-        :param z: (*array_like*) Input z data.
-        :param s: (*int*) Size of points.
-        :param c: (*Color*) Color of the points. Or z vlaues.
-        :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
-        :param marker: (*string*) Marker of the points.
-        :param label: (*string*) Label of the points series.
-        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
-            points to draw, in increasing order.
-        
-        :returns: Points legend break.
-        """        
-        #Add data series
-        label = kwargs.pop('label', 'S_0')
-        xdata = plotutil.getplotdata(x)
-        ydata = plotutil.getplotdata(y)
-        zdata = plotutil.getplotdata(z)
-        
-        #Set plot data styles
-        pb, isunique = plotutil.getlegendbreak('point', **kwargs)
-        pb.setCaption(label)
-        pstyle = plotutil.getpointstyle(marker)    
-        pb.setStyle(pstyle)
-        isvalue = False
-        if len(c) > 1:
-            if isinstance(c, (MIArray, DimArray)):
-                isvalue = True
-            elif isinstance(c[0], (int, long, float)):
-                isvalue = True            
-        if isvalue:
-            ls = kwargs.pop('symbolspec', None)
-            if ls is None:        
-                if isinstance(c, (list, tuple)):
-                    c = minum.array(c)
-                levels = kwargs.pop('levs', None)
-                if levels is None:
-                    levels = kwargs.pop('levels', None)
-                if levels is None:
-                    cnum = kwargs.pop('cnum', None)
-                    if cnum is None:
-                        ls = plotutil.getlegendscheme([], c.min(), c.max(), **kwargs)
-                    else:
-                        ls = plotutil.getlegendscheme([cnum], c.min(), c.max(), **kwargs)
-                else:
-                    ls = plotutil.getlegendscheme([levels], c.min(), c.max(), **kwargs)
-                ls = plotutil.setlegendscheme_point(ls, **kwargs)
-                if isinstance(s, int):
-                    for lb in ls.getLegendBreaks():
-                        lb.setSize(s)
-                else:
-                    n = len(s)
-                    for i in range(0, n):
-                        ls.getLegendBreaks()[i].setSize(s[i])
-            #Create graphics
-            graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, c.asarray(), ls)
-        else:
-            colors = plotutil.getcolors(c, alpha)   
-            pbs = []
-            if isinstance(s, int):   
-                pb.setSize(s)
-                if len(colors) == 1:
-                    pb.setColor(colors[0])
-                    pbs.append(pb)
-                else:
-                    n = len(colors)
-                    for i in range(0, n):
-                        npb = pb.clone()
-                        npb.setColor(colors[i])
-                        pbs.append(npb)
-            else:
-                n = len(s)
-                if len(colors) == 1:
-                    pb.setColor(colors[0])
-                    for i in range(0, n):
-                        npb = pb.clone()
-                        npb.setSize(s[i])
-                        pbs.append(npb)
-                else:
-                    for i in range(0, n):
-                        npb = pb.clone()
-                        npb.setSize(s[i])
-                        npb.setColor(colors[i])
-                        pbs.append(npb)
-            #Create graphics
-            graphics = GraphicFactory.createPoints3D(xdata, ydata, zdata, pbs)
-        
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphics)
-        return graphics
-        
-    def plot_wireframe(self, *args, **kwargs):
-        '''
-        creates a three-dimensional wireframe plot
-        
-        :param x: (*array_like*) Optional. X coordinate array.
-        :param y: (*array_like*) Optional. Y coordinate array.
-        :param z: (*array_like*) 2-D z value array.
-        :param cmap: (*string*) Color map string.
-        :param xyaxis: (*boolean*) Draw x and y axis or not.
-        :param zaxis: (*boolean*) Draw z axis or not.
-        :param grid: (*boolean*) Draw grid or not.
-        :param boxed: (*boolean*) Draw boxed or not.
-        :param mesh: (*boolean*) Draw mesh line or not.
-        
-        :returns: Legend
-        '''        
-        if len(args) == 1:
-            x = args[0].dimvalue(1)
-            y = args[0].dimvalue(0)
-            x, y = minum.meshgrid(x, y)
-            z = args[0]    
-            args = args[1:]
-        else:
-            x = args[0]
-            y = args[1]
-            z = args[2]
-            args = args[3:]
- 
-        line = plotutil.getlegendbreak('line', **kwargs)[0]
-        graphics = GraphicFactory.createWireframe(x.asarray(), y.asarray(), z.asarray(), line)
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphics)
-        return graphics
-        
-    def plot_surface(self, *args, **kwargs):
-        '''
-        creates a three-dimensional surface plot
-        
-        :param x: (*array_like*) Optional. X coordinate array.
-        :param y: (*array_like*) Optional. Y coordinate array.
-        :param z: (*array_like*) 2-D z value array.
-        :param cmap: (*string*) Color map string.
-        :param xyaxis: (*boolean*) Draw x and y axis or not.
-        :param zaxis: (*boolean*) Draw z axis or not.
-        :param grid: (*boolean*) Draw grid or not.
-        :param boxed: (*boolean*) Draw boxed or not.
-        :param mesh: (*boolean*) Draw mesh line or not.
-        
-        :returns: Legend
-        '''        
-        if len(args) <= 2:
-            x = args[0].dimvalue(1)
-            y = args[0].dimvalue(0)
-            x, y = minum.meshgrid(x, y)
-            z = args[0]    
-            args = args[1:]
-        else:
-            x = args[0]
-            y = args[1]
-            z = args[2]
-            args = args[3:]
-        cmap = plotutil.getcolormap(**kwargs)
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(z.min(), z.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(z.min(), z.max(), level_arg, cmap)
-        else:    
-            ls = LegendManage.createLegendScheme(z.min(), z.max(), cmap)
-        ls = ls.convertTo(ShapeTypes.Polygon)
-        edge = kwargs.pop('edge', True)
-        kwargs['edge'] = edge
-        plotutil.setlegendscheme(ls, **kwargs)
-        graphics = GraphicFactory.createMeshPolygons(x.asarray(), y.asarray(), z.asarray(), ls)
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphics)
-        return graphics
-        
-    def contour(self, *args, **kwargs):
-        """
-        Plot contours.
-        
-        :param x: (*array_like*) Optional. X coordinate array.
-        :param y: (*array_like*) Optional. Y coordinate array.
-        :param z: (*array_like*) 2-D z value array.
-        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
-            to draw, in increasing order.
-        :param cmap: (*string*) Color map string.
-        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-            the order specified.
-        :param smooth: (*boolean*) Smooth countour lines or not.
-        
-        :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
-        """
-        n = len(args)
-        cmap = plotutil.getcolormap(**kwargs)
-        fill_value = kwargs.pop('fill_value', -9999.0)
-        offset = kwargs.pop('offset', 0)
-        xaxistype = None
-        if n <= 2:
-            gdata = minum.asgriddata(args[0])
-            if isinstance(args[0], DimArray):
-                if args[0].islondim(1):
-                    xaxistype = 'lon'
-                elif args[0].islatdim(1):
-                    xaxistype = 'lat'
-                elif args[0].istimedim(1):
-                    xaxistype = 'time'
-            args = args[1:]
-        elif n <=4:
-            x = args[0]
-            y = args[1]
-            a = args[2]
-            gdata = minum.asgriddata(a, x, y, fill_value)
-            args = args[3:]
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-        else:    
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-        ls = ls.convertTo(ShapeTypes.Polyline)
-        plotutil.setlegendscheme(ls, **kwargs)
-        
-        smooth = kwargs.pop('smooth', True)
-        zdir = kwargs.pop('zdir', 'z')
-        if zdir == 'xy':
-            sepoint = kwargs.pop('sepoint', [0,0,1,1])
-            igraphic = GraphicFactory.createContourLines(gdata.data, offset, zdir, ls, smooth, \
-                sepoint)
-        else:
-            igraphic = GraphicFactory.createContourLines(gdata.data, offset, zdir, ls, smooth)
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(igraphic)
-        return igraphic
-        
-    def contourf(self, *args, **kwargs):
-        """
-        Plot filled contours.
-        
-        :param x: (*array_like*) Optional. X coordinate array.
-        :param y: (*array_like*) Optional. Y coordinate array.
-        :param z: (*array_like*) 2-D z value array.
-        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
-            to draw, in increasing order.
-        :param cmap: (*string*) Color map string.
-        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-            the order specified.
-        :param smooth: (*boolean*) Smooth countour lines or not.
-        
-        :returns: (*VectoryLayer*) Contour VectoryLayer created from array data.
-        """
-        n = len(args)
-        cmap = plotutil.getcolormap(**kwargs)
-        fill_value = kwargs.pop('fill_value', -9999.0)
-        offset = kwargs.pop('offset', 0)
-        xaxistype = None
-        if n <= 2:
-            gdata = minum.asgriddata(args[0])
-            if isinstance(args[0], DimArray):
-                if args[0].islondim(1):
-                    xaxistype = 'lon'
-                elif args[0].islatdim(1):
-                    xaxistype = 'lat'
-                elif args[0].istimedim(1):
-                    xaxistype = 'time'
-            args = args[1:]
-        elif n <=4:
-            x = args[0]
-            y = args[1]
-            a = args[2]
-            gdata = minum.asgriddata(a, x, y, fill_value)
-            args = args[3:]
-        if len(args) > 0:
-            level_arg = args[0]
-            if isinstance(level_arg, int):
-                cn = level_arg
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cn, cmap)
-            else:
-                if isinstance(level_arg, MIArray):
-                    level_arg = level_arg.aslist()
-                ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), level_arg, cmap)
-        else:    
-            ls = LegendManage.createLegendScheme(gdata.min(), gdata.max(), cmap)
-        ls = ls.convertTo(ShapeTypes.Polygon)
-        edge = kwargs.pop('edge', None)
-        if edge is None:
-            kwargs['edge'] = False
-        else:
-            kwargs['edge'] = edge
-        plotutil.setlegendscheme(ls, **kwargs)
-        
-        smooth = kwargs.pop('smooth', True)
-        zdir = kwargs.pop('zdir', 'z')
-        if zdir == 'xy':
-            sepoint = kwargs.pop('sepoint', [0,0,1,1])
-            igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, zdir, ls, smooth, \
-                sepoint)
-        else:
-            igraphic = GraphicFactory.createContourPolygons(gdata.data, offset, zdir, ls, smooth)
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(igraphic)
-        return igraphic
-        
-    def imshow(self, *args, **kwargs):
-        """
-        Display an image on the 3D axes.
-        
-        :param x: (*array_like*) Optional. X coordinate array.
-        :param y: (*array_like*) Optional. Y coordinate array.
-        :param z: (*array_like*) 2-D or 3-D (RGB) z value array.
-        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
-            to draw, in increasing order.
-        :param cmap: (*string*) Color map string.
-        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
-            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
-            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
-            the order specified.
-        
-        :returns: (*RasterLayer*) RasterLayer created from array data.
-        """
-        n = len(args)
-        cmap = plotutil.getcolormap(**kwargs)
-        fill_value = kwargs.pop('fill_value', -9999.0)
-        xaxistype = None
-        isrgb = False
-        if n <= 2:
-            if isinstance(args[0], (list, tuple)):
-                isrgb = True
-                rgbdata = args[0]
-                if isinstance(rgbdata[0], MIArray):
-                    x = minum.arange(0, rgbdata[0].shape[1])
-                    y = minum.arange(0, rgbdata[0].shape[0])
-                else:
-                    x = rgbdata[0].dimvalue(1)
-                    y = rgbdata[0].dimvalue(0)
-            elif args[0].ndim > 2:
-                isrgb = True
-                rgbdata = args[0]
-                if isinstance(rgbdata, MIArray):
-                    x = minum.arange(0, rgbdata.shape[1])
-                    y = minum.arange(0, rgbdata.shape[0])
-                else:
-                    x = rgbdata.dimvalue(1)
-                    y = rgbdata.dimvalue(0)
-            else:
-                gdata = minum.asgridarray(args[0])
-                if isinstance(args[0], DimArray):
-                    if args[0].islondim(1):
-                        xaxistype = 'lon'
-                    elif args[0].islatdim(1):
-                        xaxistype = 'lat'
-                    elif args[0].istimedim(1):
-                        xaxistype = 'time'
-                args = args[1:]
-        elif n <=4:
-            x = args[0]
-            y = args[1]
-            a = args[2]
-            if isinstance(a, (list, tuple)):
-                isrgb = True
-                rgbdata = a
-            elif a.ndim > 2:
-                isrgb = True
-                rgbdata = a
-            else:
-                gdata = minum.asgridarray(a, x, y, fill_value)
-                args = args[3:]   
-        
-        offset = kwargs.pop('offset', 0)
-        zdir = kwargs.pop('zdir', 'z')
-        interpolation = kwargs.pop('interpolation', None)
-        if isrgb:
-            if isinstance(rgbdata, (list, tuple)):
-                rgbd = []
-                for d in rgbdata:
-                    rgbd.append(d.asarray())
-                rgbdata = rgbd
-            else:
-                rgbdata = rgbdata.asarray()
-            x = plotutil.getplotdata(x)
-            y = plotutil.getplotdata(y)
-            graphics = GraphicFactory.createImage(x, y, rgbdata, offset, zdir, interpolation)
-            ls = None
-        else:
-            if len(args) > 0:
-                level_arg = args[0]
-                if isinstance(level_arg, int):
-                    cn = level_arg
-                    ls = LegendManage.createImageLegend(gdata, cn, cmap)
-                else:
-                    if isinstance(level_arg, MIArray):
-                        level_arg = level_arg.aslist()
-                    ls = LegendManage.createImageLegend(gdata, level_arg, cmap)
-            else:
-                ls = plotutil.getlegendscheme(args, gdata.min(), gdata.max(), **kwargs)
-            ls = ls.convertTo(ShapeTypes.Image)
-            plotutil.setlegendscheme(ls, **kwargs)
-            if zdir == 'xy':
-                sepoint = kwargs.pop('sepoint', [0,0,1,1])
-            else:
-                sepoint = None
-            graphics = GraphicFactory.createImage(gdata, ls, offset, zdir, sepoint, interpolation)
-                
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphics)
-        return graphics
-        
-    def plot_layer(self, layer, **kwargs):
-        '''
-        Plot a layer in 3D axes.
-        
-        :param layer: (*MILayer*) The layer to be plotted.
-        
-        :returns: Graphics.
-        '''
-        ls = kwargs.pop('symbolspec', None)
-        layer = layer.layer
-        if ls is None:
-            ls = layer.getLegendScheme()
-            if len(kwargs) > 0 and layer.getLegendScheme().getBreakNum() == 1:
-                lb = layer.getLegendScheme().getLegendBreaks().get(0)
-                btype = lb.getBreakType()
-                geometry = 'point'
-                if btype == BreakTypes.PolylineBreak:
-                    geometry = 'line'
-                elif btype == BreakTypes.PolygonBreak:
-                    geometry = 'polygon'
-                lb, isunique = plotutil.getlegendbreak(geometry, **kwargs)
-                ls.getLegendBreaks().set(0, lb)
-
-        plotutil.setlegendscheme(ls, **kwargs)
-        layer.setLegendScheme(ls)
-            
-        offset = kwargs.pop('offset', 0)
-        xshift = kwargs.pop('xshift', 0)
-        graphics = GraphicFactory.createGraphicsFromLayer(layer, offset, xshift)
-        
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphics)
-        return graphics
-        
-    def fill_between(self, x, y1, y2=0, where=None, **kwargs):
-        """
-        Make filled polygons between two curves (y1 and y2) where ``where==True``.
-        
-        :param x: (*array_like*) An N-length array of the x data.
-        :param y1: (*array_like*) An N-length array (or scalar) of the y data.
-        :param y2: (*array_like*) An N-length array (or scalar) of the y data.
-        :param where: (*array_like*) If None, default to fill between everywhere. If not None, it is an 
-            N-length boolean array and the fill will only happen over the regions where ``where==True``.
-        """
-        #Get dataset
-        global gca   
-        
-        #Add data series
-        label = kwargs.pop('label', 'S_0')
-        dn = len(x)
-        xdata = plotutil.getplotdata(x)
-        if isinstance(y1, (int, long, float)):
-            yy = []
-            for i in range(dn):
-                yy.append(y1)
-            y1 = minum.array(yy).array
-        else:
-            y1 = plotutil.getplotdata(y1)
-        if isinstance(y2, (int, long, float)):
-            yy = []
-            for i in range(dn):
-                yy.append(y2)
-            y2 = minum.array(yy).array
-        else:
-            y2 = plotutil.getplotdata(y2)
-        if not where is None:
-            if isinstance(where, (tuple, list)):
-                where = minum.array(where)
-            where = where.asarray()
-        
-        #Set plot data styles
-        if not 'fill' in kwargs:
-            kwargs['fill'] = True
-        if not 'edge' in kwargs:
-            kwargs['edge'] = False
-        pb, isunique = plotutil.getlegendbreak('polygon', **kwargs)
-        pb.setCaption(label)
-        
-        #Create graphics
-        offset = kwargs.pop('offset', 0)
-        zdir = kwargs.pop('zdir', 'z')
-        if zdir == 'xy':
-            y = kwargs.pop('y', x)
-            ydata = plotutil.getplotdata(y)
-            graphics = GraphicFactory.createFillBetweenPolygons(xdata, ydata, y1, y2, where, pb, \
-                offset, zdir) 
-        else:
-            graphics = GraphicFactory.createFillBetweenPolygons(xdata, y1, y2, where, pb, \
-                offset, zdir) 
-            
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphics)
-        return graphics
-        
-    def text(self, x, y, z, s, zdir=None, **kwargs):
-        '''
-        Add text to the plot. kwargs will be passed on to text, except for the zdir 
-        keyword, which sets the direction to be used as the z direction.
-        
-        :param x: (*float*) X coordinate.
-        :param y: (*float*) Y coordinate.
-        :param z: (*float*) Z coordinate.
-        :param s: (*string*) Text string.
-        :param zdir: Z direction.
-        '''
-        fontname = kwargs.pop('fontname', 'Arial')
-        fontsize = kwargs.pop('fontsize', 14)
-        bold = kwargs.pop('bold', False)
-        color = kwargs.pop('color', 'black')
-        if bold:
-            font = Font(fontname, Font.BOLD, fontsize)
-        else:
-            font = Font(fontname, Font.PLAIN, fontsize)
-        c = plotutil.getcolor(color)
-        text = ChartText3D()
-        text.setText(s)
-        text.setFont(font)
-        text.setColor(c)
-        text.setPoint(x, y, z)
-        ha = kwargs.pop('horizontalalignment', None)
-        if ha is None:
-            ha = kwargs.pop('ha', None)
-        if not ha is None:
-            text.setXAlign(ha)
-        va = kwargs.pop('verticalalignment', None)
-        if va is None:
-            va = kwargs.pop('va', None)
-        if not va is None:
-            text.setYAlign(va)
-        bbox = kwargs.pop('bbox', None)
-        if not bbox is None:
-            fill = bbox.pop('fill', None)
-            if not fill is None:
-                text.setFill(fill)
-            facecolor = bbox.pop('facecolor', None)
-            if not facecolor is None:
-                facecolor = plotutil.getcolor(facecolor)
-                text.setFill(True)
-                text.setBackground(facecolor)
-            edge = bbox.pop('edge', None)
-            if not edge is None:
-                text.setDrawNeatline(edge)
-            edgecolor = bbox.pop('edgecolor', None)
-            if not edgecolor is None:
-                edgecolor = plotutil.getcolor(edgecolor)
-                text.setNeatlineColor(edgecolor)
-                text.setDrawNeatline(True)
-            linewidth = bbox.pop('linewidth', None)
-            if not linewidth is None:
-                text.setNeatlineSize(linewidth)
-                text.setDrawNeatline(True)
-            gap = bbox.pop('gap', None)
-            if not gap is None:
-                text.setGap(gap)
-        if not zdir is None:
-            if isinstance(zdir, (list, tuple)):
-                text.setZDir(zdir[0], zdir[1], zdir[2])
-            else:
-                text.setZDir(zdir)
-        graphic = Graphic(text, None)
-        visible = kwargs.pop('visible', True)
-        if visible:
-            self.add_graphic(graphic)
-        return graphic
-        
-    def data2pixel(self, x, y, z=None):
-        '''
-        Transform data coordinate to screen coordinate
-        
-        :param x: (*float*) X coordinate.
-        :param y: (*float*) Y coordinate.
-        :param z: (*float*) Z coordinate - only used for 3-D axes.
-        '''
-        r = self.axes.project(x, y, z) 
-        x = r.x
-        y = r.y
-        rect = self.axes.getPositionArea()
-        r = self.axes.projToScreen(x, y, rect)
-        sx = r[0] + rect.getX()
-        sy = r[1] + rect.getY()
-        sy = self.figure.get_size()[1] - sy
-        return sx, sy
-        
         
 ########################################################3
 class Test():

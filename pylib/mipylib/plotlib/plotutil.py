@@ -7,8 +7,8 @@
 
 import datetime
 
-from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak, PolylineBreak, PolygonBreak, LegendManage
-from org.meteoinfo.drawing import PointStyle, MarkerType
+from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak, PolylineBreak, \
+    PolygonBreak, LegendManage, PointStyle, MarkerType
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.shape import ShapeTypes
 from org.meteoinfo.chart import ChartText
@@ -34,6 +34,44 @@ def getplotdata(data):
             return minum.array(data).array
     else:
         return minum.array([data]).array
+        
+def getfont(fontdic, **kwargs):
+    basefont = kwargs.pop('basefont', None)
+    if basefont is None:
+        name = 'Arial'
+        size = 14
+        bold = False
+        italic = False
+    else:
+        name = basefont.getName()
+        size = basefont.getSize()
+        bold = basefont.isBold()
+        italic = basefont.isItalic()
+    name = fontdic.pop('name', name)
+    size = fontdic.pop('size', size)
+    bold = fontdic.pop('bold', bold)
+    italic = fontdic.pop('italic', italic)
+    if bold:
+        if italic:
+            font = Font(name, Font.BOLD | Font.ITALIC, size)
+        else:
+            font = Font(name, Font.BOLD, size)
+    else:
+        if italic:
+            font = Font(name, Font.ITALIC, size)
+        else:
+            font = Font(name, Font.PLAIN, size)
+    return font
+    
+def getfont_1(**kwargs):
+    fontname = kwargs.pop('fontname', 'Arial')
+    fontsize = kwargs.pop('fontsize', 14)
+    bold = kwargs.pop('bold', False)
+    if bold:
+        font = Font(fontname, Font.BOLD, fontsize)
+    else:
+        font = Font(fontname, Font.PLAIN, fontsize)
+    return font
 
 def getcolor(style, alpha=None):
     if style is None:
@@ -576,6 +614,8 @@ def setpointlegendbreak(lb, **kwargs):
         pstyle = getpointstyle(marker)
         lb.setStyle(pstyle)
     color = kwargs.pop('color', None)
+    if color is None:
+        color = kwargs.pop('facecolor', None)
     if not color is None:
         color = getcolor(color)
         lb.setColor(color)
