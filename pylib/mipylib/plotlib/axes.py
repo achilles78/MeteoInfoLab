@@ -12,7 +12,7 @@ from org.meteoinfo.chart.plot import Plot2D, PolarPlot, GraphicFactory, \
     PlotOrientation
 from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.legend import LegendManage, BarBreak, PolygonBreak, PolylineBreak, \
-    PointBreak, LineStyles, PointStyle, LegendScheme
+    PointBreak, LineStyles, PointStyle, LegendScheme, LegendType
 from org.meteoinfo.shape import ShapeTypes, Graphic, GraphicCollection
 from org.meteoinfo.global import MIMath, Extent
 from org.meteoinfo.layer import MapLayer

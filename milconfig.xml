@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\io">
-    <RecentFolder Folder="D:\MyProgram\jython"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis">
     <RecentFolder Folder="D:\MyProgram\jython\CARSNET"/>
     <RecentFolder Folder="D:\MyProgram\jython\CARSNET\pylib"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
@@ -16,23 +15,26 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
       <OpenedFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\geotif_gpw.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\geotif_7.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\bil_gpw.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
       <RecentFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\io\geotif_gpw.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\io\geotif_7.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\io\bil_gpw.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1491,838"/>
 </MeteoInfo>

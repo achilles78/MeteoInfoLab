@@ -354,7 +354,7 @@ class DimArray(MIArray):
         
         :returns: (*array*) Converted array.
         '''
-        r = super(DimArray, self).astype(other)
+        r = super(DimArray, self).astype(dtype)
         return DimArray(r, self.dims, self.fill_value, self.proj)
     
     def value(self, indices):
