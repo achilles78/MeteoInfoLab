@@ -697,6 +697,12 @@ class Axes(object):
         '''
         self.axes.addGraphic(graphic)
         
+    def remove(self):
+        '''
+        Remove all graphics.
+        '''
+        self.axes.getGraphics().clear()
+        
     def data2pixel(self, x, y, z=None):
         '''
         Transform data coordinate to screen coordinate
@@ -826,26 +832,21 @@ class Axes(object):
         xaxistype = None
         isxylistdata = False
         if len(args) == 1:
-            if isinstance(args[0], MIXYListData):
-                dataset = args[0].data
-                snum = args[0].size()
-                isxylistdata = True
+            ydata = args[0]
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+                if args[0].islondim(0):
+                    xaxistype = 'lon'
+                elif args[0].islatdim(0):
+                    xaxistype = 'lat'
+                elif args[0].istimedim(0):
+                    xaxistype = 'time'
             else:
-                ydata = args[0]
-                if isinstance(args[0], DimArray):
-                    xdata = args[0].dimvalue(0)
-                    if args[0].islondim(0):
-                        xaxistype = 'lon'
-                    elif args[0].islatdim(0):
-                        xaxistype = 'lat'
-                    elif args[0].istimedim(0):
-                        xaxistype = 'time'
-                else:
-                    xdata = []
-                    for i in range(0, len(args[0])):
-                        xdata.append(i)
-                xdatalist.append(xdata)
-                ydatalist.append(ydata)
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            xdatalist.append(xdata)
+            ydatalist.append(ydata)
         elif len(args) == 2:
             if isinstance(args[1], basestring):
                 ydata = args[0]

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis">
+  <Path OpenPath="D:\MyProgram\jython\CARSNET\pylib">
     <RecentFolder Folder="D:\MyProgram\jython\CARSNET"/>
     <RecentFolder Folder="D:\MyProgram\jython\CARSNET\pylib"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
@@ -21,16 +21,14 @@
     <OpenedFiles>
       <OpenedFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
       <OpenedFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\bil_gpw.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <OpenedFile File="D:\MyProgram\jython\CARSNET\pylib\frmChart.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
       <RecentFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\io\bil_gpw.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <RecentFile File="D:\MyProgram\jython\CARSNET\pylib\frmChart.py"/>
     </RecentFiles>
   </File>
   <Font>
