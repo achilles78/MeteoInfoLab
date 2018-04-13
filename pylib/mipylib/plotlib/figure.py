@@ -437,6 +437,22 @@ class Figure(ChartPanel):
         self.axes.append(ax)
         self.getChart().addPlot(ax.axes)
         
+    def remove_axes(self, ax=None):
+        '''
+        Remove the axes.
+        
+        :param ax: (*Axes*) The axes.
+        '''
+        if ax is None:
+            self.axes = []
+            self.getChart().getPlots().clear()
+        elif isinstance(ax, int):
+            self.axes.pop(ax)
+            self.getChart().getPlots().remove(ax)
+        else:
+            self.axes.remove(ax)
+            self.getChart().removePlot(ax.axes)
+        
     def draw(self):
         '''
         Re-paint the figure.

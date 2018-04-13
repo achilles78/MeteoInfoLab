@@ -58,10 +58,12 @@ import org.meteoinfo.plugin.IApplication;
 import org.meteoinfo.plugin.IPlugin;
 import org.meteoinfo.ui.ColorListCellRender;
 import org.python.core.PyInstance;
+import org.python.core.PyJavaType;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
+import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 import org.xml.sax.SAXException;
 
@@ -207,10 +209,13 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
                                     vars.add(new Object[]{name, className, "", ""});
                                     break;
                             }
+                        } else if (var instanceof PyType || var instanceof PyJavaType) {
+                            
                         } else {
                             className = var.getClass().getSimpleName();
                             value = "";
                             size = "";
+                            boolean isAdd = true;
                             switch (className) {
                                 case "PyInteger":
                                 case "PyFloat":
@@ -225,7 +230,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
                                     }
                                     size = String.valueOf(var.__len__());
                                     break;
-                                default:
+                                case "PyObjectDerived":
                                     className = var.getType().getName();
                                     switch (className) {
                                         case "DimArray":
@@ -239,8 +244,12 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
                                             break;
                                     }
                                     break;
+                                default:
+                                    isAdd = false;
+                                    break;
                             }
-                            vars.add(new Object[]{name, className, size, value});
+                            if (isAdd)
+                                vars.add(new Object[]{name, className, size, value});
                         }
                     }
                 }
