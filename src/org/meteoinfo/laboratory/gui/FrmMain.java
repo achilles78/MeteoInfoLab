@@ -124,7 +124,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         if (!this.options.getRecentFolders().contains(cf)) {
             this.jComboBox_CurrentFolder.addItem(cf);
         }
-        this.jComboBox_CurrentFolder.setSelectedItem(cf);                
+        this.jComboBox_CurrentFolder.setSelectedItem(cf);
 
         //Add dockable panels
         CControl control = new CControl(this);
@@ -137,13 +137,13 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         editorDock = new EditorDockable(this, "Editor", "Editor");
         //this.editorDock.setStartupPath(startupPath);
         this.editorDock.setTextFont(this.options.getTextFont());
-        
+
         consoleDock = new ConsoleDockable(this, this.startupPath, "Console", "Console");
-                
+
         this.editorDock.setInterp(this.consoleDock.getInterpreter());
         this.editorDock.addNewTextEditor("New file");
         this.editorDock.openFiles(this.options.getOpenedFiles());
-        
+
         //Load applications        
         String toolboxPath = this.startupPath + File.separator + "toolbox";
         if (isDebug) {
@@ -167,7 +167,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         } catch (ParserConfigurationException | SAXException ex) {
             Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
         }
-                
+
         final PythonInteractiveInterpreter interp = this.consoleDock.getInterpreter();
         PyStringMap locals = (PyStringMap) interp.getLocals();
         PyList items = locals.items();
@@ -196,7 +196,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
                             switch (className) {
                                 case "DimArray":
                                 case "MIArray":
-                                    if (var.__len__() <= 10){
+                                    if (var.__len__() <= 10) {
                                         value = var.__str__().toString();
                                     } else {
                                         value = "";
@@ -211,23 +211,38 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
                             className = var.getClass().getSimpleName();
                             value = "";
                             size = "";
-                            switch (className){
+                            switch (className) {
                                 case "PyInteger":
-                                case "PyFloat":                                
+                                case "PyFloat":
                                 case "PyString":
                                     value = var.toString();
                                     size = "1";
                                     break;
                                 case "PyList":
                                 case "PyTuple":
-                                    if (var.__len__() <= 10)
+                                    if (var.__len__() <= 10) {
                                         value = var.toString();
+                                    }
                                     size = String.valueOf(var.__len__());
+                                    break;
+                                default:
+                                    className = var.getType().getName();
+                                    switch (className) {
+                                        case "DimArray":
+                                        case "MIArray":
+                                            if (var.__len__() <= 10) {
+                                                value = var.__str__().toString();
+                                            } else {
+                                                value = "";
+                                            }
+                                            size = var.__getattr__("shape").toString();
+                                            break;
+                                    }
                                     break;
                             }
                             vars.add(new Object[]{name, className, size, value});
                         }
-                    }                    
+                    }
                 }
                 if (FrmMain.this.variableDock != null) {
                     FrmMain.this.variableDock.getVariableExplorer().updateVariables(vars);
@@ -269,7 +284,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         grid.add(5, 0, 5, 5, this.variableDock);
         grid.add(5, 0, 5, 5, this.fileDock);
         grid.add(5, 5, 5, 5, figuresDock);
-        control.getContentArea().deploy(grid);        
+        control.getContentArea().deploy(grid);
     }
 
     /**
@@ -289,12 +304,13 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     public String getStartupPath() {
         return this.startupPath;
     }
-    
+
     /**
      * Get configure options
+     *
      * @return Configure options
      */
-    public Options getOptions(){
+    public Options getOptions() {
         return this.options;
     }
 
@@ -752,7 +768,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
     private void jButton_RunScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RunScriptActionPerformed
         TextEditor te = this.editorDock.getActiveTextEditor();
         if (!te.getFileName().isEmpty() && te.getTextArea().isDirty()) {
-            te.saveFile(te.getFile());            
+            te.saveFile(te.getFile());
         }
         if (te.getFileName().isEmpty()) {
             String code = te.getTextArea().getText();
@@ -771,7 +787,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
         formClose();
     }//GEN-LAST:event_formWindowClosing
 
-    private void formClose(){
+    private void formClose() {
         this.saveConfigureFile();
         boolean isDispose = true;
         for (int i = 0; i < this.editorDock.getTabbedPane().getTabCount(); i++) {
@@ -803,7 +819,7 @@ public class FrmMain extends javax.swing.JFrame implements IApplication {
             System.exit(0);
         }
     }
-    
+
     private void jButton_SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SaveAsActionPerformed
         // TODO add your handling code here:
         TextEditor editor = this.editorDock.getActiveTextEditor();

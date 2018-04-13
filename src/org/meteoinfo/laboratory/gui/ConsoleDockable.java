@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 import org.meteoinfo.chart.ChartPanel;
 import org.meteoinfo.laboratory.codecomplete.JIntrospect;
