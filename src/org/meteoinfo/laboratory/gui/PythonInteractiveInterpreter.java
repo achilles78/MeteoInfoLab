@@ -48,6 +48,22 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
     public JConsole getConsole(){
         return this.console;
     }
+    
+    /**
+     * Get this.cflags.source_is_utf8
+     * @return Boolean
+     */
+    public boolean isSourceUTF8(){
+        return this.cflags.source_is_utf8;
+    }
+    
+    /**
+     * Set this.cflags.source_is_utf8
+     * @param value 
+     */
+    public void setSourceUTF8(boolean value){
+        this.cflags.source_is_utf8 = value;
+    }
 
     @Override
     public void run() {

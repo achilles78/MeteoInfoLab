@@ -179,7 +179,10 @@ public class MITextEditorPane extends TextEditorPane {
         // Found one completion (possibly what we already have
         if (complete.length == 1 && !complete.equals(part)) {
             //String append = complete[0].substring(part.length());
-            append(complete[0]);
+            int slen = this.getCaretPosition();
+            this.select(slen, slen);
+            this.replaceSelection(complete[0]);
+            //append(complete[0]);
             return;
         }
 

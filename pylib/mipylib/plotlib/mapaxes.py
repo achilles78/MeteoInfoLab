@@ -29,6 +29,7 @@ import mipylib.geolib.migeo as migeo
 import plotutil
 import mipylib.numeric.minum as minum
 import mipylib.migl as migl
+import mipylib.miutil as miutil
 
 ##############################################        
 class MapAxes(Axes):

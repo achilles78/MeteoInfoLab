@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 import org.meteoinfo.chart.ChartPanel;
 import org.meteoinfo.laboratory.codecomplete.JIntrospect;
@@ -82,6 +83,14 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         }
         //console.println(path);
         //console.println(toolboxPath);
+        
+        JTextPane jTextPane_Output = interp.console.getTextPane();
+        JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
+        JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
+        interp.setOut(writer);
+        interp.setErr(writer);
+        System.setOut(printStream);
+        System.setErr(printStream);
 
         //this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         new Thread(interp).start();
