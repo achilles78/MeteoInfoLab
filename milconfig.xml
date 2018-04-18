@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis">
-    <RecentFolder Folder="D:\MyProgram\jython\CARSNET\pylib"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\netcdf">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\wind"/>
@@ -16,17 +15,24 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\gui"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
       <OpenedFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\netcdf\ave_multi_files.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\netcdf\joinncfile_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\netcdf\join_test_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\MyProgram\jython\CARSNET\mainGUI.py"/>
       <RecentFile File="D:\MyProgram\jython\CARSNET\pylib\frmProcess.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\netcdf\ave_multi_files.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\netcdf\joinncfile_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\netcdf\join_test_1.py"/>
     </RecentFiles>
   </File>
   <Font>

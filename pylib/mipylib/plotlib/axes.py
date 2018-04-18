@@ -914,7 +914,7 @@ class Axes(object):
                     lines.append(line)        
         
         if not xaxistype is None:
-            __setXAxisType(self.axes, xaxistype)    
+            self.set_xaxis_type(xaxistype)    
         timetickformat = kwargs.pop('timetickformat', None)
         if not timetickformat is None:
             if not xaxistype == 'time':
