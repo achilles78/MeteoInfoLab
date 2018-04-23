@@ -550,6 +550,48 @@ class Axes(object):
         extent.maxY = ymax
         self.axes.setDrawExtent(extent)
         self.axes.setExtent(extent.clone())  
+        
+    def twinx(self):
+        """
+        Make a second axes that shares the x-axis. The new axes will overlay *ax*. The ticks 
+        for *ax2* will be placed on the right, and the *ax2* instance is returned.
+        
+        :returns: The second axes
+        """
+        self.axes.getAxis(Location.RIGHT).setVisible(False)
+        self.axes.setSameShrink(True) 
+        ax2 = Axes()
+        ax2.axes.setSameShrink(True)
+        ax2.axes.setPosition(self.get_position())
+        ax2.axes.setOuterPosActive(self.axes.isOuterPosActive())
+        ax2.axes.getAxis(Location.BOTTOM).setVisible(False)
+        ax2.axes.getAxis(Location.LEFT).setVisible(False)
+        ax2.axes.getAxis(Location.TOP).setVisible(False)
+        axis = ax2.axes.getAxis(Location.RIGHT)
+        axis.setDrawTickLabel(True)
+        axis.setDrawLabel(True)
+        return ax2
+        
+    def twiny(self):
+        """
+        Make a second axes that shares the y-axis. The new axes will overlay *ax*. The ticks 
+        for *ax2* will be placed on the top, and the *ax2* instance is returned.
+        
+        :returns: The second axes
+        """
+        self.axes.getAxis(Location.TOP).setVisible(False)
+        self.axes.setSameShrink(True) 
+        ax2 = Axes()
+        ax2.axes.setSameShrink(True)
+        ax2.axes.setPosition(self.get_position())
+        ax2.axes.setOuterPosActive(self.axes.isOuterPosActive())
+        ax2.axes.getAxis(Location.BOTTOM).setVisible(False)
+        ax2.axes.getAxis(Location.LEFT).setVisible(False)
+        ax2.axes.getAxis(Location.RIGHT).setVisible(False)
+        axis = ax2.axes.getAxis(Location.TOP)
+        axis.setDrawTickLabel(True)
+        axis.setDrawLabel(True)
+        return ax2
 
     def xaxis(self, **kwargs):
         """
@@ -2768,7 +2810,7 @@ class Axes(object):
         elif isinstance(mappable, GraphicCollection):
             ls = mappable.getLegendScheme()
         else:
-            ls = makelegend(mappable)
+            ls = plotutil.makelegend(mappable)
         
         newlegend = kwargs.pop('newlegend', True)
         if newlegend:

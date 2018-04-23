@@ -47,7 +47,7 @@ __all__ = [
     'makelegend','makesymbolspec','masklayer','pcolor','pcolorm','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','right_title','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
-    'surf','text','title','twinx','weatherspec','xaxis',
+    'surf','text','title','twinx','twiny','weatherspec','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zaxis','zlabel','zlim','zticks',
     'isinteractive'
     ]
@@ -1191,24 +1191,26 @@ def twinx(ax):
     
     :returns: The second axes
     """
-    ax.axes.getAxis(Location.RIGHT).setVisible(False)
-    ax.axes.setSameShrink(True)
-    #ax.active_outerposition(False) 
-    plot = Axes()
-    plot.axes.setSameShrink(True)
-    plot.axes.setPosition(ax.get_position())
-    #plot.active_outerposition(False) 
-    plot.axes.setOuterPosActive(ax.axes.isOuterPosActive())
-    plot.axes.getAxis(Location.BOTTOM).setVisible(False)
-    plot.axes.getAxis(Location.LEFT).setVisible(False)
-    plot.axes.getAxis(Location.TOP).setVisible(False)
-    axis = plot.axes.getAxis(Location.RIGHT)
-    axis.setDrawTickLabel(True)
-    axis.setDrawLabel(True)
-    g_figure.getChart().addPlot(plot.axes)
+    ax2 = ax.twinx()
+    g_figure._add_axes(ax2)
     global gca
-    gca = plot
-    return plot
+    gca = ax2
+    return ax2
+    
+def twiny(ax):
+    """
+    Make a second axes that shares the y-axis. The new axes will overlay *ax*. The ticks 
+    for *ax2* will be placed on the top, and the *ax2* instance is returned.
+    
+    :param ax: Existing axes.
+    
+    :returns: The second axes
+    """
+    ax2 = ax.twiny()
+    g_figure._add_axes(ax2)
+    global gca
+    gca = ax2
+    return ax2
 
 def xaxis(ax=None, **kwargs):
     """
@@ -2499,16 +2501,7 @@ def makelegend(source):
     
     :returns: Created legend.
     '''
-    if isinstance(source, basestring):
-        if os.path.exists(source):
-            ls = LegendScheme()
-            ls.importFromXMLFile(source, False)
-            return ls
-        else:
-            source = plotutil.getcolormap(source)
-    else:
-        ls = LegendScheme(source)
-    return ls
+    return plotutil.makelegend(source)
     
 def makesymbolspec(geometry, *args, **kwargs):
     '''

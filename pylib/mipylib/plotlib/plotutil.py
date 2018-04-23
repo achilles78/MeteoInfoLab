@@ -8,7 +8,7 @@
 import datetime
 
 from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak, PolylineBreak, \
-    PolygonBreak, LegendManage, PointStyle, MarkerType
+    PolygonBreak, LegendManage, PointStyle, MarkerType, LegendScheme
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.shape import ShapeTypes
 from org.meteoinfo.chart import ChartText
@@ -701,3 +701,22 @@ def text(x, y, s, **kwargs):
     coordinates = kwargs.pop('coordinates', 'data')
     text.setCoordinates(coordinates)
     return text
+    
+def makelegend(source):
+    '''
+    Make a legend.
+    
+    :param souce: Legend file name or list of the legen breaks.
+    
+    :returns: Created legend.
+    '''
+    if isinstance(source, basestring):
+        if os.path.exists(source):
+            ls = LegendScheme()
+            ls.importFromXMLFile(source, False)
+            return ls
+        else:
+            source = getcolormap(source)
+    else:
+        ls = LegendScheme(source)
+    return ls
