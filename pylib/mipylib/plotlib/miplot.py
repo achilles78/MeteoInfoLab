@@ -1639,13 +1639,14 @@ def axis(limits):
     if not r is None:
         draw_if_interactive()
             
-def axism(limits=None):
+def axism(limits=None, lonlat=True):
     """
     Sets the min and max of the x and y map axes, with ``[xmin, xmax, ymin, ymax]`` .
     
     :param limits: (*list*) Min and max of the x and y map axes.
+    :param lonlat: (*boolean*) Is longitude/latitude or not.
     """
-    r = gca.axis(limits)
+    r = gca.axis(limits, lonlat)
     if not r is None:
         draw_if_interactive()
 

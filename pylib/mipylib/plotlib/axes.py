@@ -315,8 +315,8 @@ class Axes(object):
             if not axis_t is None:
                 if isinstance(labels[0], (int, long, float)):
                     axis_t.setTickLabels_Number(labels)
-            else:
-                axis_t.setTickLabelText(labels)
+                else:
+                    axis_t.setTickLabelText(labels)
         
         fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
         fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
@@ -367,8 +367,8 @@ class Axes(object):
             if not axis_r is None:
                 if isinstance(labels[0], (int, long, float)):
                     axis_r.setTickLabels_Number(labels)
-            else:
-                axis_r.setTickLabelText(labels)
+                else:
+                    axis_r.setTickLabelText(labels)
                 
         fontname = kwargs.pop('fontname', axis.getTickLabelFont().getName())
         fontsize = kwargs.pop('fontsize', axis.getTickLabelFont().getSize())
@@ -1050,7 +1050,7 @@ class Axes(object):
         if len(c) > 1:
             if isinstance(c, (MIArray, DimArray)):
                 isvalue = True
-            elif isinstance(c[0], (int, long, float)):
+            elif len(x) == len(c) and isinstance(c[0], (int, long, float)):
                 isvalue = True            
         if isvalue:
             ls = kwargs.pop('symbolspec', None)

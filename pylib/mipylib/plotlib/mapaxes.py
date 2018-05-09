@@ -167,11 +167,12 @@ class MapAxes(Axes):
                 linestyle = plotutil.getlinestyle(linestyle)
                 mapframe.setGridLineStyle(linestyle)
                 
-    def axis(self, limits=None):
+    def axis(self, limits=None, lonlat=True):
         """
         Sets the min and max of the x and y map axes, with ``[xmin, xmax, ymin, ymax]`` .
         
         :param limits: (*list*) Min and max of the x and y map axes.
+        :param lonlat: (*boolean*) Is longitude/latitude or not.
         """
         if limits is None:
             self.axes.setDrawExtent(self.axes.getMapView().getExtent())
@@ -184,8 +185,12 @@ class MapAxes(Axes):
                 ymin = limits[2]
                 ymax = limits[3]
                 extent = Extent(xmin, xmax, ymin, ymax)
-                self.axes.setLonLatExtent(extent)
-                self.axes.setExtent(self.axes.getDrawExtent().clone())
+                if lonlat:
+                    self.axes.setLonLatExtent(extent)
+                    self.axes.setExtent(self.axes.getDrawExtent().clone())
+                else:
+                    self.axes.setDrawExtent(extent)
+                    self.axes.setExtent(extent)
                 return True
             else:
                 print 'The limits parameter must be a list with 4 elements: xmin, xmax, ymin, ymax!'

@@ -33,7 +33,7 @@ __all__ = [
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
     'corrcoef','cos','degrees','diag','dim_array','datatable','series','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
-    'interpn','isarray','isnan','linregress','linspace','log','log10',
+    'interpn','isarray','isnan','linint2','linregress','linspace','log','log10',
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
     'nonzero','ones','ones_like','pol2cart','polyval','power',
     'radians','reshape','repeat',
@@ -1721,6 +1721,38 @@ def asgridarray(data, x=None, y=None, fill_value=-9999.0):
 def asstationdata(data, x, y, fill_value=-9999.0):
     stdata = StationData(data.asarray(), x.asarray(), y.asarray(), fill_value)
     return PyStationData(stdata)
+
+def linint2(*args, **kwargs):
+    """
+    Interpolates from a rectilinear grid to another rectilinear grid using bilinear interpolation.
+    
+    :param x: (*array_like*) X coordinate array of the sample data (one dimension).
+    :param y: (*array_like*) Y coordinate array of the sample data (one dimension).
+    :param z: (*array_like*) Value array of the sample data (muti-dimension, last two dimensions are y and x).
+    :param xq: (*array_like*) X coordinate array of the query data (one dimension).
+    :param yq: (*array_like*) Y coordinate array of the query data (one dimension).
+    
+    :returns: (*array_like*) Interpolated array.
+    """
+    if len(args) == 3:
+        z = args[0]
+        x = z.dimvalue(z.ndim - 1)
+        y = z.dimvalue(z.ndim - 2)
+        xq = args[1]
+        yq = args[2]
+    else:
+        x = args[0]
+        y = args[1]
+        z = args[2]
+        xq = args[3]
+        yq = args[4]
+    x = array(x).array
+    y = array(y).array
+    z = array(z).array
+    xq = array(xq).array
+    yq = array(yq).array
+    r = ArrayUtil.linint2(z, x, y, xq, yq)
+    return MIArray(r)
     
 def interp2d(*args, **kwargs):
     """
