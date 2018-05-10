@@ -46,6 +46,11 @@ class PyTableData(object):
                 return r
             else:
                 return MIArray(ArrayUtil.array(coldata.getData()))
+        elif isinstance(key, (list, tuple)):
+            cols = self.data.findColumns(key)
+            dtable = self.data.colSelect(cols)
+            td = TableData(dtable)
+            return PyTableData(td)
         else:
             row = key[0]
             col = key[1]
@@ -61,6 +66,30 @@ class PyTableData(object):
     def __repr__(self):
         return self.data.toString()
         
+    @property
+    def loc(self):
+        return 'loc'
+    
+    def head(self, n=5):
+        '''
+        Get top rows
+        
+        :param n: (*int*) row number.
+        
+        :returns: Top rows
+        '''
+        print self.data.head(n)
+        
+    def tail(self, n=5):
+        '''
+        Get bottom rows
+        
+        :param n: (*int*) row number.
+        
+        :returns: Bottom rows
+        '''
+        print self.data.tail(n)
+    
     def rownum(self):
         '''
         Returns the row number.

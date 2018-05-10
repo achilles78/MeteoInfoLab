@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\interpolate">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\weather"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
@@ -16,19 +13,26 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\data_process"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\yy_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\linint2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\air_path_3d.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\image_zdir.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\yy_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\interpolate\linint2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\air_path_3d.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\image_zdir.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-6,-6" MainFormSize="1287,693"/>
 </MeteoInfo>
