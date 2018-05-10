@@ -636,7 +636,7 @@ class MapAxes(Axes):
             a = args[2]
             args = args[3:]
         ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)
-        ls = ls.convertTo(ShapeTypes.Polyline)
+        ls = ls.convertTo(ShapeTypes.Polygon)
         plotutil.setlegendscheme(ls, **kwargs)
         isadd = kwargs.pop('isadd', True)
         smooth = kwargs.pop('smooth', True)

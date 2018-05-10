@@ -9,6 +9,7 @@
 from org.meteoinfo.chart.plot import Plot3D, GraphicFactory
 from org.meteoinfo.legend import LegendManage, BreakTypes
 from org.meteoinfo.shape import ShapeTypes, Graphic
+from org.meteoinfo.layer import LayerTypes
 
 from axes import Axes
 from mipylib.numeric.dimarray import DimArray
@@ -801,26 +802,29 @@ class Axes3D(Axes):
         :returns: Graphics.
         '''
         ls = kwargs.pop('symbolspec', None)
-        layer = layer.layer
-        if ls is None:
-            ls = layer.getLegendScheme()
-            if len(kwargs) > 0 and layer.getLegendScheme().getBreakNum() == 1:
-                lb = layer.getLegendScheme().getLegendBreaks().get(0)
-                btype = lb.getBreakType()
-                geometry = 'point'
-                if btype == BreakTypes.PolylineBreak:
-                    geometry = 'line'
-                elif btype == BreakTypes.PolygonBreak:
-                    geometry = 'polygon'
-                lb, isunique = plotutil.getlegendbreak(geometry, **kwargs)
-                ls.getLegendBreaks().set(0, lb)
-
-        plotutil.setlegendscheme(ls, **kwargs)
-        layer.setLegendScheme(ls)
-            
         offset = kwargs.pop('offset', 0)
         xshift = kwargs.pop('xshift', 0)
-        graphics = GraphicFactory.createGraphicsFromLayer(layer, offset, xshift)
+        layer = layer.layer
+        if layer.getLayerType() == LayerTypes.VectorLayer:            
+            if ls is None:
+                ls = layer.getLegendScheme()
+                if len(kwargs) > 0 and layer.getLegendScheme().getBreakNum() == 1:
+                    lb = layer.getLegendScheme().getLegendBreaks().get(0)
+                    btype = lb.getBreakType()
+                    geometry = 'point'
+                    if btype == BreakTypes.PolylineBreak:
+                        geometry = 'line'
+                    elif btype == BreakTypes.PolygonBreak:
+                        geometry = 'polygon'
+                    lb, isunique = plotutil.getlegendbreak(geometry, **kwargs)
+                    ls.getLegendBreaks().set(0, lb)
+
+            plotutil.setlegendscheme(ls, **kwargs)
+            layer.setLegendScheme(ls)                    
+            graphics = GraphicFactory.createGraphicsFromLayer(layer, offset, xshift)
+        else:
+            interpolation = kwargs.pop('interpolation', None)
+            graphics = GraphicFactory.createImage(layer, offset, xshift, interpolation)
         
         visible = kwargs.pop('visible', True)
         if visible:
