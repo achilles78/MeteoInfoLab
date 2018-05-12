@@ -25,7 +25,7 @@ g = 9.8             # Gravitational acceleration (m / s^2)
 
 __all__ = [
     'dewpoint2rh','dry_lapse','ds2uv','equivalent_potential_temperature','h2p',
-    'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh',
+    'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh','rh2dewpoint',
     'saturation_mixing_ratio','tc2tf','tf2tc','uv2ds','pressure_to_height_std',
     'height_to_pressure_std','eof','varimax'
     ]
@@ -39,9 +39,14 @@ def uv2ds(u, v):
     
     :returns: Wind direction and wind speed.
     '''
-    if isinstance(u, (MIArray, DimArray)):
+    if isinstance(u, MIArray):
         r = ArrayMath.uv2ds(u.asarray(), v.asarray())
-        return MIArray(r[0]), MIArray(r[1])
+        d = MIArray(r[0])
+        s = MIArray(r[1])
+        if isinstance(u, DimArray) and isinstance(v, DimArray):
+            d = DimArray(d, u.dims, u.fill_value, u.proj)
+            s = DimArray(s, u.dims, u.fill_value, u.proj)
+        return d, s
     else:
         r = ArrayMath.uv2ds(u, v)
         return r[0], r[1]
@@ -55,9 +60,14 @@ def ds2uv(d, s):
     
     :returns: Wind U/V.
     '''
-    if isinstance(d, (MIArray, DimArray)):
+    if isinstance(d, MIArray):
         r = ArrayMath.ds2uv(d.asarray(), s.asarray())
-        return MIArray(r[0]), MIArray(r[1])
+        u = MIArray(r[0])
+        v = MIArray(r[1])
+        if isinstance(d, DimArray) and isinstance(s, DimArray):
+            u = DimArray(u, d.dims, d.fill_value, d.proj)
+            v = DimArray(v, d.dims, d.fill_value, d.proj)
+        return u, v
     else:
         r = ArrayMath.ds2uv(d, s)
         return r[0], r[1]
@@ -71,9 +81,10 @@ def p2h(press):
     :returns: (*float*) Height - meter.
     """
     if isinstance(press, MIArray):
-        return MIArray(ArrayMath.press2Height(press.asarray()))
-    elif isinstance(press, DimArray):
-        return DimArray(MIArray(ArrayMath.press2Height(press.asarray())), press.dims, press.fill_value, press.proj)
+        r = MIArray(ArrayMath.press2Height(press.asarray()))
+        if isinstance(press, DimArray):
+            r = DimArray(r, press.dims, press.fill_value, press.proj)
+        return r
     else:
         return MeteoMath.press2Height(press)
         
@@ -100,9 +111,10 @@ def h2p(height):
     :returns: (*float*) Pressure - hPa.
     """
     if isinstance(height, MIArray):
-        return MIArray(ArrayMath.height2Press(height.asarray()))
-    elif isinstance(height, DimArray):
-        return DimArray(MIArray(ArrayMath.height2Press(height.asarray())), height.dims, height.fill_value, height.proj)
+        r = MIArray(ArrayMath.height2Press(height.asarray()))
+        if isinstance(height, DimArray):
+            r = DimArray(r, height.dims, height.fill_value, height.proj)
+        return r
     else:
         return MeteoMath.height2Press(height)
         
@@ -132,9 +144,10 @@ def tf2tc(tf):
         Celsius temperature - degree c
     """    
     if isinstance(tf, MIArray):
-        return MIArray(ArrayMath.tf2tc(tf.asarray()))
-    elif isinstance(tf, DimArray):
-        return DimArray(MIArray(ArrayMath.tf2tc(tf.asarray())), tf.dims, tf.fill_value, tf.proj)
+        r = MIArray(ArrayMath.tf2tc(tf.asarray()))
+        if isinstance(tf, DimArray):
+            r = DimArray(r, tf.dims, tf.fill_value, tf.proj)
+        return r
     else:
         return MeteoMath.tf2tc(tf)
         
@@ -149,9 +162,10 @@ def tc2tf(tc):
         Fahrenheit temperature - degree f
     """    
     if isinstance(tc, MIArray):
-        return MIArray(ArrayMath.tc2tf(tc.asarray()))
-    elif isinstance(tc, DimArray):
-        return DimArray(MIArray(ArrayMath.tc2tf(tc.asarray())), tc.dims, tc.fill_value, tc.proj)
+        r = MIArray(ArrayMath.tc2tf(tc.asarray()))
+        if isinstance(tc, DimArray):
+            r = DimArray(r, tc.dims, tc.fill_value, tc.proj)
+        return r
     else:
         return MeteoMath.tc2tf(tc)
 
@@ -174,9 +188,10 @@ def qair2rh(qair, temp, press=1013.25):
     else:
         p = press
     if isinstance(qair, MIArray):
-        return MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p))
-    elif isinstance(qair, DimArray):
-        return DimArray(MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p)), qair.dims, qair.fill_value, qair.proj)
+        r = MIArray(ArrayMath.qair2rh(qair.asarray(), temp.asarray(), p))
+        if isinstance(qair, DimArray):
+            r = DimArray(r, qair.dims, qair.fill_value, qair.proj)
+        return r
     else:
         return MeteoMath.qair2rh(qair, temp, press)
         
@@ -193,11 +208,32 @@ def dewpoint2rh(dewpoint, temp):
         Relative humidity - %
     """    
     if isinstance(dewpoint, MIArray):
-        return MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray()))
-    elif isinstance(dewpoint, DimArray):
-        return DimArray(MIArray(ArrayMath.dewpoint2rh(dewpoint.asarray(), temp.asarray())), dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
+        r = MIArray(MeteoMath.dewpoint2rh(dewpoint.asarray(), temp.asarray()))
+        if isinstance(dewpoint, DimArray):
+            r = DimArray(r, dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
+        return r
     else:
         return MeteoMath.dewpoint2rh(temp, dewpoint)     
+        
+def rh2dewpoint(rh, temp):    
+    """
+    Calculate dewpoint from relative humidity and temperature
+        
+    rh: DimArray or MIArray or number 
+        Relative humidity - %
+    temp: DimArray or MIArray or number
+        Temperature - degree c
+        
+    return: DimArray or MIArray or number
+        Relative humidity - %
+    """    
+    if isinstance(rh, MIArray):
+        r = MIArray(MeteoMath.rh2dewpoint(rh.asarray(), temp.asarray()))
+        if isinstance(rh, DimArray):
+            r = DimArray(r, rh.dims, rh.fill_value, rh.proj)
+        return r
+    else:
+        return MeteoMath.rh2dewpoint(rh, temp)     
 
 def potential_temperature(pressure, temperature):
     """
