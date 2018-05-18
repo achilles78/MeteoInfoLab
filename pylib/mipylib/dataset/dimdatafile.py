@@ -290,6 +290,8 @@ class DimDataFile():
                     attrvalue[i] = Float(attrvalue[i])
             else:
                 attrvalue = Float(attrvalue)
+        if isinstance(attrvalue, MIArray):
+            attrvalue = attrvalue.array
         return self.ncfile.addGroupAttribute(group, Attribute(attrname, attrvalue))
  
     def __getdatatype(self, datatype):

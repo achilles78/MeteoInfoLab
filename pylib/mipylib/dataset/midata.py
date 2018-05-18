@@ -788,7 +788,7 @@ def dimension(dimvalue, dimname='null', dimtype=None):
     dim.setShortName(dimname)
     return dim
     
-def ncwrite(fn, data, varname, dims=None, attrs=None, largefile=False):
+def ncwrite(fn, data, varname, dims=None, attrs=None, gattrs=None, largefile=False):
     """
     Write a netCDF data file from an array.
     
@@ -796,7 +796,8 @@ def ncwrite(fn, data, varname, dims=None, attrs=None, largefile=False):
     :param data: (*array_like*) A numeric array variable of any dimensionality.
     :param varname: (*string*) Variable name.
     :param dims: (*list of dimensions*) Dimension list.
-    :param attrs: (*list of attributes*) Attributes list.
+    :param attrs: (*dict*) Variable attributes.
+    :param gattrs: (*dict*) Global attributes.
     :param largefile: (*boolean*) Create netCDF as large file or not.
     """
     if dims is None:
@@ -817,8 +818,12 @@ def ncwrite(fn, data, varname, dims=None, attrs=None, largefile=False):
     #Add global attributes
     ncfile.addgroupattr('Conventions', 'CF-1.6')
     ncfile.addgroupattr('Tools', 'Created using MeteoInfo')
+    if not gattrs is None:
+        for key in gattrs:
+            ncfile.addgroupattr(key, gattrs[key])
     #Add dimension variables
     dimvars = []
+    wdims = []
     for dim,midim in zip(ncdims,dims):
         dimtype = midim.getDimType()
         dimname = dim.getShortName()
@@ -839,20 +844,21 @@ def ncwrite(fn, data, varname, dims=None, attrs=None, largefile=False):
             var = ncfile.addvar(dimname, 'float', [dim])
             var.addattr('axis', 'X')
         else:
-            var = ncfile.addvar(dim.getShortName(), 'float', [dim])
-            var.addattr('axis', 'null')
-        dimvars.append(var)
+            var = None
+        if not var is None:
+            dimvars.append(var)
+            wdims.append(midim)
     #Add variable
     var = ncfile.addvar(varname, data.dtype, ncdims)
     if attrs is None:    
         var.addattr('name', varname)
     else:
         for key in attrs:
-            var.addattr(key, attr[key])
+            var.addattr(key, attrs[key])
     #Create netCDF file
     ncfile.create()
     #Write variable data
-    for dimvar, dim in zip(dimvars, dims):
+    for dimvar, dim in zip(dimvars, wdims):
         if dim.getDimType() == DimensionType.T:
             sst = datetime.datetime(1900,1,1)
             tt = miutil.nums2dates(dim.getDimValue())
