@@ -8,6 +8,7 @@
 import datetime
 
 from org.meteoinfo.data import TableData, TimeTableData, ArrayUtil, TableUtil, DataTypes
+from ucar.ma2 import Range
 
 from miarray import MIArray
 import mipylib.miutil as miutil
@@ -23,9 +24,11 @@ class PyTableData(object):
         if data is None:
             self.data = TableData()
         self.timedata = isinstance(data, TimeTableData)
+        self.columns = self.data.getColumnNames()
+        self.shape = (self.data.getRowCount(), self.data.getColumnCount())
         
     def __getitem__(self, key):
-        if isinstance(key, (str, unicode)):     
+        if isinstance(key, basestring):     
             coldata = self.data.getColumnData(key)
             if coldata.getDataType().isNumeric():
                 return MIArray(ArrayUtil.array(coldata.getDataValues()))
@@ -46,16 +49,78 @@ class PyTableData(object):
                 return r
             else:
                 return MIArray(ArrayUtil.array(coldata.getData()))
-        elif isinstance(key, (list, tuple)):
-            cols = self.data.findColumns(key)
-            dtable = self.data.colSelect(cols)
-            td = TableData(dtable)
-            return PyTableData(td)
+                        
+        hascolkey = True
+        if isinstance(key, tuple):            
+            if isinstance(key[0], int) and isinstance(key[1], int):
+                return self.data.getValue(key[0], key[1])
+            elif isinstance(key[0], int) and isinstance(key[1], basestring):
+                return self.data.getValue(key[0], key[1])
         else:
-            row = key[0]
-            col = key[1]
-            return self.data.getValue(row, col)
-        return None
+            key = (key, slice(None))
+            hascolkey = False
+            
+        k = key[0]
+        if isinstance(k, int):
+            sidx = k
+            if sidx < 0:
+                sidx = self.shape[0] + sidx
+            eidx = sidx + 1
+            step = 1
+            rowkey = Range(sidx, eidx, step)
+        elif isinstance(k, slice):
+            sidx = 0 if k.start is None else k.start
+            if sidx < 0:
+                sidx = self.shape[0] + sidx
+            eidx = self.shape[0] if k.stop is None else k.stop
+            if eidx < 0:
+                eidx = self.shape[0] + eidx                    
+            step = 1 if k.step is None else k.step
+            rowkey = Range(sidx, eidx, step)
+        elif isinstance(k, list):
+            rowkey = k
+        else:
+            return None
+                    
+        if not hascolkey:
+            r = self.data.select(rowkey)
+            return PyTableData(TableData(r))
+            
+        k = key[1]
+        if isinstance(k, int):
+            sidx = k
+            if sidx < 0:
+                sidx = self.shape[0] + sidx
+            eidx = sidx + 1
+            step = 1
+            colkey = Range(sidx, eidx, step)
+        elif isinstance(k, slice):
+            sidx = 0 if k.start is None else k.start
+            if sidx < 0:
+                sidx = self.shape[0] + sidx
+            eidx = self.shape[0] if k.stop is None else k.stop
+            if eidx < 0:
+                eidx = self.shape[0] + eidx                    
+            step = 1 if k.step is None else k.step
+            colkey = Range(sidx, eidx, step)        
+        elif isinstance(k, list):
+            if isinstance(k[0], basestring):
+                cols = self.data.findColumns(k)
+            else:
+                cols = self.data.findColumns_Index(k)
+            colkey = cols
+        elif isinstance(k, basestring):
+            rows = self.data.getRows(rowkey)
+            coldata = self.data.getColumnData(rows, k)
+            if coldata.getDataType().isNumeric():
+                return MIArray(ArrayUtil.array(coldata.getDataValues()))
+            else:
+                return MIArray(ArrayUtil.array(coldata.getData()))
+        else:
+            return None
+        
+        r = self.data.select(rowkey, colkey)
+        return PyTableData(TableData(r))
         
     def __setitem__(self, key, value):
         if isinstance(value, MIArray):

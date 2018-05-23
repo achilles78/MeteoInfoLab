@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\cuace_dust\py">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataset"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\ascii">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\gui"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
@@ -16,19 +14,15 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\yy_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble_mean.py"/>
-      <OpenedFile File="D:\Temp\test\boxplot_test\boxplot_test_1.py"/>
-      <OpenedFile File="D:\Temp\test\boxplot_test\boxplot_test_right.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\yy_1.py"/>
-      <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble_mean.py"/>
-      <RecentFile File="D:\Temp\test\boxplot_test\boxplot_test_1.py"/>
-      <RecentFile File="D:\Temp\test\boxplot_test\boxplot_test_right.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
     </RecentFiles>
   </File>
   <Font>
