@@ -20,13 +20,17 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_nan.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_sql.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_nan.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_sql.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1287,693"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1389,811"/>
 </MeteoInfo>

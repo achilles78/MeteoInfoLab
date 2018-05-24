@@ -103,6 +103,33 @@ def nums2dates(values):
         tt.append(pydate(t))
     return tt
     
+def str2date(dstr):
+    '''
+    Convert string to python date.
+    
+    :param dstr: (*string*) date string.
+    
+    :returns: Python date
+    '''
+    n = len(dstr)
+    if n == 8:
+        t = datetime.datetime.strptime(dstr, '%Y%m%d')
+    elif n == 10:
+        if '-' in dstr:
+            t = datetime.datetime.strptime(dstr, '%Y-%m-%d')
+        else:
+            t = datetime.datetime.strptime(dstr, '%Y%m%d%H')
+    elif n == 12:
+        t = datetime.datetime.strptime(dstr, '%Y%m%d%H%M')
+    elif n == 14:
+        t = datetime.datetime.strptime(dstr, '%Y%m%d%H%M%S')
+    elif n == 18:
+        t = datetime.datetime.strptime(dstr, '%Y-%m-%d %H:%M:%S')
+    else:
+        t = None
+        
+    return t
+    
 def dateformat(t, format, language=None):
     """
     Format python date to string using Java SimpleDateFormat.

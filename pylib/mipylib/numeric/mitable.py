@@ -51,11 +51,19 @@ class PyTableData(object):
                 return MIArray(ArrayUtil.array(coldata.getData()))
                         
         hascolkey = True
-        if isinstance(key, tuple):            
-            if isinstance(key[0], int) and isinstance(key[1], int):
-                return self.data.getValue(key[0], key[1])
-            elif isinstance(key[0], int) and isinstance(key[1], basestring):
-                return self.data.getValue(key[0], key[1])
+        if isinstance(key, tuple): 
+            ridx = key[0]
+            cidx = key[1]
+            if isinstance(ridx, int) and isinstance(cidx, int):
+                if ridx < 0:
+                    ridx = self.shape[0] + ridx
+                if cidx < 0:
+                    cidx = self.shape[1] + cidx
+                return self.data.getValue(ridx, cidx)
+            elif isinstance(ridx, int) and isinstance(cidx, basestring):
+                if ridx < 0:
+                    ridx = self.shape[0] + ridx
+                return self.data.getValue(ridx, cidx)
         else:
             key = (key, slice(None))
             hascolkey = False
@@ -69,12 +77,26 @@ class PyTableData(object):
             step = 1
             rowkey = Range(sidx, eidx, step)
         elif isinstance(k, slice):
-            sidx = 0 if k.start is None else k.start
-            if sidx < 0:
-                sidx = self.shape[0] + sidx
-            eidx = self.shape[0] if k.stop is None else k.stop
-            if eidx < 0:
-                eidx = self.shape[0] + eidx                    
+            if isinstance(k.start, basestring):
+                t = miutil.str2date(k.start)
+                t = miutil.jdate(t)
+                sidx = self.data.getTimeIndex(t)
+                if sidx < 0:
+                    sidx = 0
+            else:
+                sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.shape[0] + sidx
+            if isinstance(k.stop, basestring):
+                t = miutil.str2date(k.stop)
+                t = miutil.jdate(t)
+                eidx = self.data.getTimeIndex(t)
+                if eidx < 0:
+                    eidx = self.shape[0] - 1
+            else:
+                eidx = self.shape[0] if k.stop is None else k.stop
+                if eidx < 0:
+                    eidx = self.shape[0] + eidx                    
             step = 1 if k.step is None else k.step
             rowkey = Range(sidx, eidx, step)
         elif isinstance(k, list):
@@ -90,17 +112,17 @@ class PyTableData(object):
         if isinstance(k, int):
             sidx = k
             if sidx < 0:
-                sidx = self.shape[0] + sidx
+                sidx = self.shape[1] + sidx
             eidx = sidx + 1
             step = 1
             colkey = Range(sidx, eidx, step)
         elif isinstance(k, slice):
             sidx = 0 if k.start is None else k.start
             if sidx < 0:
-                sidx = self.shape[0] + sidx
-            eidx = self.shape[0] if k.stop is None else k.stop
+                sidx = self.shape[1] + sidx
+            eidx = self.shape[1] if k.stop is None else k.stop
             if eidx < 0:
-                eidx = self.shape[0] + eidx                    
+                eidx = self.shape[1] + eidx                    
             step = 1 if k.step is None else k.step
             colkey = Range(sidx, eidx, step)        
         elif isinstance(k, list):
@@ -177,10 +199,11 @@ class PyTableData(object):
         '''
         Set column name to a specified column.
         
-        :param col: (*int*) Column index.
+        :param col: (*int or string*) Column index or column name.
         :param colname: (*string*) New column name.
         '''
         self.data.renameColumn(col, colname)
+        self.columns = self.data.getColumnNames()
         
     def setcolnames(self, colnames):
         '''
@@ -190,6 +213,7 @@ class PyTableData(object):
         '''
         for i in range(len(colnames)):
             self.data.renameColumn(i, colnames[i])
+        self.columns = self.data.getColumnNames()
     
     def coldata(self, key):
         '''
@@ -275,6 +299,7 @@ class PyTableData(object):
             self.data.addRow()
         else:
             self.data.addRow(row)
+        self.shape = (self.data.getRowCount(), self.data.getColumnCount())
             
     def addrows(self, rows):
         '''
@@ -283,6 +308,7 @@ class PyTableData(object):
         :param rows: (*list*) The list of the rows.
         '''
         self.data.addRows(rows)
+        self.shape = (self.data.getRowCount(), self.data.getColumnCount())
         
     def delrow(self, row):
         '''
@@ -290,7 +316,8 @@ class PyTableData(object):
         
         :param row: (*int or DataRow*) Data row.
         '''
-        self.data.dataTable.removeRow(row)
+        self.data.removeRow(row)
+        self.shape = (self.data.getRowCount(), self.data.getColumnCount())
         
     def delrows(self, rows):
         '''
@@ -298,13 +325,15 @@ class PyTableData(object):
         
         :param rows: (*list*) Data rows.
         '''
-        self.data.dataTable.removRows(rows)
+        self.data.removRows(rows)
+        self.shape = (self.data.getRowCount(), self.data.getColumnCount())
         
     def clearrows(self):
         '''
         Clear all rows.               
         '''
-        self.data.dataTable.getRows().clear()
+        self.data.getRows().clear()
+        self.shape = (self.data.getRowCount(), self.data.getColumnCount())
         
     def getrow(self, index):
         '''
@@ -330,8 +359,7 @@ class PyTableData(object):
         :param colname: (*string*) The Name of the column which will be set as time column. For time
             statistic calculation such as daily average.
         '''
-        tdata = TimeTableData(self.data.dataTable)
-        tdata.setTimeColName(colname)
+        tdata = TimeTableData(self.data.dataTable, colname)
         self.data = tdata;
         self.timedata = True
         
@@ -602,8 +630,7 @@ class PyTableData(object):
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_Day(cols)
-            ttd = TimeTableData(dtable)
-            ttd.setTimeColName('Date')
+            ttd = TimeTableData(dtable, 'Date')
             return PyTableData(ttd)
             
     def sum_day(self, colnames, day=None):
@@ -620,8 +647,7 @@ class PyTableData(object):
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.sum_Day(cols)
-            ttd = TimeTableData(dtable)
-            ttd.setTimeColName('Date')
+            ttd = TimeTableData(dtable, 'Date')
             return PyTableData(ttd)
             
     def ave_dayofweek(self, colnames, day=None):
@@ -638,8 +664,7 @@ class PyTableData(object):
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_DayOfWeek(cols)
-            ttd = TimeTableData(dtable)
-            ttd.setTimeColName('Date')
+            ttd = TimeTableData(dtable, 'Date')
             return PyTableData(ttd)
             
     def sum_dayofweek(self, colnames, day=None):
@@ -656,8 +681,7 @@ class PyTableData(object):
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.sum_DayOfWeek(cols)
-            ttd = TimeTableData(dtable)
-            ttd.setTimeColName('Date')
+            ttd = TimeTableData(dtable, 'Date')
             return PyTableData(ttd)
             
     def ave_hour(self, colnames):
@@ -674,8 +698,7 @@ class PyTableData(object):
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.ave_Hour(cols)
-            ttd = TimeTableData(dtable)
-            ttd.setTimeColName('Date')
+            ttd = TimeTableData(dtable, 'Date')
             return PyTableData(ttd)
             
     def sum_hour(self, colnames):
@@ -692,8 +715,7 @@ class PyTableData(object):
         else:
             cols = self.data.findColumns(colnames)
             dtable = self.data.sum_Hour(cols)
-            ttd = TimeTableData(dtable)
-            ttd.setTimeColName('Date')
+            ttd = TimeTableData(dtable, 'Date')
             return PyTableData(ttd)
             
     def assinglerow(self):
