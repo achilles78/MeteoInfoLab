@@ -90,9 +90,9 @@ class PyTableData(object):
             if isinstance(k.stop, basestring):
                 t = miutil.str2date(k.stop)
                 t = miutil.jdate(t)
-                eidx = self.data.getTimeIndex(t)
+                eidx = self.data.getTimeIndex(t) + 1
                 if eidx < 0:
-                    eidx = self.shape[0] - 1
+                    eidx = self.shape[0]
             else:
                 eidx = self.shape[0] if k.stop is None else k.stop
                 if eidx < 0:
