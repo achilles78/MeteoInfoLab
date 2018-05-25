@@ -100,7 +100,16 @@ class PyTableData(object):
             step = 1 if k.step is None else k.step
             rowkey = Range(sidx, eidx, step)
         elif isinstance(k, list):
-            rowkey = k
+            if isinstance(k[0], basestring):
+                tlist = []
+                for tstr in k:
+                    t = miutil.jdate(miutil.str2date(tstr))
+                    idx = self.data.getTimeIndex_Ex(t)
+                    if idx >= 0:
+                        tlist.append(idx)
+                rowkey = tlist
+            else:
+                rowkey = k
         else:
             return None
                     
