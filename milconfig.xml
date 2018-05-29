@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\ascii">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\gui"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
@@ -20,11 +20,11 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_test.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\fill_between_test.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_test.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\fill_between_test.py"/>
     </RecentFiles>
   </File>
   <Font>
