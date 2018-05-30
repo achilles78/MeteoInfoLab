@@ -7,6 +7,7 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.chart.plot import Plot3D, GraphicFactory
+from org.meteoinfo.chart import ChartText3D
 from org.meteoinfo.legend import LegendManage, BreakTypes
 from org.meteoinfo.shape import ShapeTypes, Graphic
 from org.meteoinfo.layer import LayerTypes
