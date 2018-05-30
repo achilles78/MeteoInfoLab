@@ -112,10 +112,15 @@ class PyTableData(object):
                 rowkey = k
         else:
             return None
-                    
+                   
+        tcolname = self.data.getTimeColName()
         if not hascolkey:
             r = self.data.select(rowkey)
-            return PyTableData(TableData(r))
+            if r.findColumn(tcolname) is None:
+                r = TableData(r)
+            else:
+                r = TimeTableData(r, tcolname)
+            return PyTableData(r)
             
         k = key[1]
         if isinstance(k, int):
@@ -151,7 +156,11 @@ class PyTableData(object):
             return None
         
         r = self.data.select(rowkey, colkey)
-        return PyTableData(TableData(r))
+        if r.findColumn(tcolname) is None:
+            r = TableData(r)
+        else:
+            r = TimeTableData(r, tcolname)
+        return PyTableData(r)
         
     def __setitem__(self, key, value):
         if isinstance(value, MIArray):
