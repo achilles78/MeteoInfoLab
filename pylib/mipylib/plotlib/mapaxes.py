@@ -507,20 +507,26 @@ class MapAxes(Axes):
                 if not isinstance(a, MIArray):
                     a = minum.array(a)
                 args = args[3:]
+		
+		if (a.ndim == 2) and (x.ndim == 1):
+			x, y = minum.meshgrid(x, y)
+			
+		if (a.size != x.size) or (a.size != y.size):
+			raise ValueError('Sizes of x/y and data are not same!')			
         
         ls = kwargs.pop('symbolspec', None)
         if ls is None:
             isunique = False
             colors = kwargs.get('colors', None) 
             if not colors is None:
-                if isinstance(colors, (list, tuple)) and len(colors) == len(x):
+                if isinstance(colors, (list, tuple)) and len(colors) == x.size:
                     isunique = True
             size = kwargs.get('size', None)
             if not size is None:
-                if isinstance(size, (list, tuple, MIArray)) and len(size) == len(x):
+                if isinstance(size, (list, tuple, MIArray)) and len(size) == x.size:
                     isunique = True
             if isunique:
-                ls = LegendManage.createUniqValueLegendScheme(len(x), ShapeTypes.Point)
+                ls = LegendManage.createUniqValueLegendScheme(x.size, ShapeTypes.Point)
             else:
                 ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)
             ls = plotutil.setlegendscheme_point(ls, **kwargs)

@@ -166,7 +166,7 @@ class Figure(ChartPanel):
             l_axis.setInverse(True)
             r_axis.setInverse(True)        
         if not xaxistype is None:
-            __setXAxisType(ax.axes, xaxistype)
+            ax.set_xaxis_type(xaxistype)
         bgcolor = plotutil.getcolor(bgcobj)
         ax.axes.setBackground(bgcolor)
         tickline = kwargs.pop('tickline', True)

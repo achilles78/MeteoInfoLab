@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\io">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\gui"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
@@ -16,19 +14,21 @@
     <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\io\geotif_test.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\plot_traj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\scatterm_1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\ascii\readtable_3.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\io\geotif_test.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\plot_traj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\scatterm_1.py"/>
     </RecentFiles>
   </File>
   <Font>
-    <TextFont FontName="宋体" FontSize="15"/>
+    <TextFont FontName="SimSun" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1287,693"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1397,783"/>
 </MeteoInfo>
