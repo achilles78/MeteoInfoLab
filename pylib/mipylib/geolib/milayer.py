@@ -255,8 +255,7 @@ class MILayer(object):
         
         :param toproj: (*ProjectionInfo*) The projection to be projected.
         '''
-        r = ProjectionManage.projectLayer(self.layer, toproj)
-        return MILayer(r)
+        ProjectionManage.projectLayer(self.layer, toproj)
         
     def buffer(self, dist=0, merge=False):
         '''
