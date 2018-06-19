@@ -2008,6 +2008,48 @@ class Axes(object):
             self.axes.setDrawExtent(graphics.getExtent())
         return graphics
         
+    def gridshow(self, *args, **kwargs):
+        '''
+        Draw a grid plot.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        
+        :returns: (*GraphicCollection*) Polygon graphic collection.
+        '''
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        n = len(args) 
+        if n <= 2:
+            a = args[0]
+            y = a.dimvalue(0)
+            x = a.dimvalue(1)
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            args = args[3:]
+            
+        ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)   
+        ls = ls.convertTo(ShapeTypes.Polygon)
+        plotutil.setlegendscheme(ls, **kwargs)
+        graphics = GraphicFactory.createGridPolygons(x.asarray(), y.asarray(), a.asarray(), ls)            
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics)
+            self.axes.setExtent(graphics.getExtent())
+            self.axes.setDrawExtent(graphics.getExtent())
+        return graphics
+        
     def text(x, y, s, **kwargs):
         """
         Add text to the axes. Add text in string *s* to axis at location *x* , *y* , data

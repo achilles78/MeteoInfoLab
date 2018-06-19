@@ -43,7 +43,7 @@ __all__ = [
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','draw','draw_if_interactive','errorbar',
     'figure','figsize','patch','rectangle','fill_between','fill_betweenx','webmap','geoshow','gifaddframe','gifanimation','giffinish',
-    'grid','hist','imshow','imshowm','legend','left_title','loglog','makecolors',
+    'grid','gridshow','gridshowm','hist','imshow','imshowm','legend','left_title','loglog','makecolors',
     'makelegend','makesymbolspec','masklayer','pcolor','pcolorm','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','right_title','savefig','savefig_jpeg','scatter','scatter3','scatterm',
     'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
@@ -1879,6 +1879,39 @@ def pcolor(*args, **kwargs):
     if not r is None:
         draw_if_interactive()
     return r
+    
+def gridshow(*args, **kwargs):
+    '''
+    Draw a grid plot.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    
+    :returns: (*GraphicCollection*) Polygon graphic collection.
+    '''
+    global gca
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.gridshow(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
       
 def contour(*args, **kwargs):
     """
@@ -2257,6 +2290,44 @@ def pcolorm(*args, **kwargs):
             gca = axesm()
             
     r = gca.pcolor(*args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    
+    return r
+    
+def gridshowm(*args, **kwargs):
+    """
+    Create a grid plot of a 2-D array in a MapAxes.
+    
+    :param x: (*array_like*) Optional. X coordinate array.
+    :param y: (*array_like*) Optional. Y coordinate array.
+    :param z: (*array_like*) 2-D z value array.
+    :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+        to draw, in increasing order.
+    :param cmap: (*string*) Color map string.
+    :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+        string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+        color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+        the order specified.
+    :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+    :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+    :param isplot: (*boolean*) Plot layer or not. Default is ``True``.
+    :param order: (*int*) Z-order of created layer for display.
+    :param select: (*boolean*) Set the return layer as selected layer or not.
+    
+    :returns: (*VectoryLayer*) Polygon VectoryLayer created from array data.
+    """    
+    global gca
+    if g_figure is None:
+        figure()
+        
+    if gca is None:    
+        gca = axesm()
+    else:
+        if gca.axestype != 'map':
+            gca = axesm()
+            
+    r = gca.gridshow(*args, **kwargs)
     if not r is None:
         draw_if_interactive()
     

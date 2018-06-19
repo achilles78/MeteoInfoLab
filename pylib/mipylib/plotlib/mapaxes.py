@@ -840,6 +840,62 @@ class MapAxes(Axes):
             self.axes.setExtent(layer.getExtent().clone())
 
         return MILayer(layer)
+        
+    def gridshow(self, *args, **kwargs):
+        """
+        Create a grid plot of a 2-D array in a MapAxes.
+        
+        :param x: (*array_like*) Optional. X coordinate array.
+        :param y: (*array_like*) Optional. Y coordinate array.
+        :param z: (*array_like*) 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level curves 
+            to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param colors: (*list*) If None (default), the colormap specified by cmap will be used. If a 
+            string, like ‘r’ or ‘red’, all levels will be plotted in this color. If a tuple of matplotlib 
+            color args (string, float, rgb, etc), different levels will be plotted in different colors in 
+            the order specified.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        :param proj: (*ProjectionInfo*) Map projection of the data. Default is None.
+        :param isadd: (*boolean*) Add layer or not. Default is ``True``.
+        :param zorder: (*int*) Z-order of created layer for display.
+        :param select: (*boolean*) Set the return layer as selected layer or not.
+        
+        :returns: (*VectoryLayer*) Polygon VectoryLayer created from array data.
+        """    
+        proj = kwargs.pop('proj', None)            
+        n = len(args) 
+        if n <= 2:
+            a = args[0]
+            y = a.dimvalue(0)
+            x = a.dimvalue(1)
+            args = args[1:]
+        else:
+            x = args[0]
+            y = args[1]
+            a = args[2]
+            args = args[3:]  
+            
+        ls = plotutil.getlegendscheme(args, a.min(), a.max(), **kwargs)   
+        ls = ls.convertTo(ShapeTypes.Polygon)
+        plotutil.setlegendscheme(ls, **kwargs)
+
+        layer = DrawMeteoData.createGridFillLayer(x.array, y.array, a.array, ls, 'layer', 'data')
+        if not proj is None:
+            layer.setProjInfo(proj)
+            
+        # Add layer
+        isadd = kwargs.pop('isadd', True)
+        if isadd:
+            zorder = kwargs.pop('zorder', None)
+            select = kwargs.pop('select', True)
+            if zorder is None:
+                zorder = 0
+            self.add_layer(layer, zorder, select)
+            self.axes.setDrawExtent(layer.getExtent().clone())
+            self.axes.setExtent(layer.getExtent().clone())
+
+        return MILayer(layer)
     
     def quiver(self, *args, **kwargs):
         """
