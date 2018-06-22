@@ -30,8 +30,8 @@ def makeshapes(x, y, type=None, z=None, m=None):
         shape.setPoint(PointD(x, y))
         shapes.append(shape)    
     else:
-        x = minum.asarray(x)
-        y = minum.asarray(y)
+        x = minum.asarray(x).array
+        y = minum.asarray(y).array
         if not z is None:            
             if m is None:
                 m = minum.zeros(len(z)).array

@@ -532,7 +532,7 @@ class DimArray(MIArray):
             ss.insert(0, 1)
             ss = tuple(ss)
             self.array = self.array.reshape(ss)
-            self.shape = self.array.shape
+            #self.shape = self.array.shape
         
     def xdim(self):
         '''
