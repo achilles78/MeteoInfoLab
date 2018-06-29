@@ -942,10 +942,10 @@ class Axes(object):
         lines = []
         legend = kwargs.pop('legend', None)
         if not legend is None:
-            lbs = legend.getLegendBreaks()
-            for i in range(0, snum):
-                line = lbs[i]
-                lines.append(line)
+            if isinstance(legend, list):
+                lines = legend
+            else:
+                lines = legend.getLegendBreaks()
         else:
             if styles != None:
                 for i in range(0, len(styles)):
@@ -979,13 +979,20 @@ class Axes(object):
         else:
             #Add data series
             snum = len(xdatalist)
-            for i in range(0, snum):
-                label = kwargs.pop('label', 'S_' + str(i + 1))
-                xdata = plotutil.getplotdata(xdatalist[i])
-                ydata = plotutil.getplotdata(ydatalist[i])
-                graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
+            if snum == 1 and len(lines) > 1:
+                xdata = plotutil.getplotdata(xdatalist[0])
+                ydata = plotutil.getplotdata(ydatalist[0])
+                graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
                 self.add_graphic(graphic)
                 graphics.append(graphic)
+            else:
+                for i in range(0, snum):
+                    label = kwargs.pop('label', 'S_' + str(i + 1))
+                    xdata = plotutil.getplotdata(xdatalist[i])
+                    ydata = plotutil.getplotdata(ydatalist[i])
+                    graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
+                    self.add_graphic(graphic)
+                    graphics.append(graphic)
         self.axes.setAutoExtent()
 
         if len(graphics) > 1:

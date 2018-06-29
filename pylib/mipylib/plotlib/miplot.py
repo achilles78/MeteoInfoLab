@@ -2565,7 +2565,7 @@ def makecolors(n, cmap='matlab_jet', reverse=False, alpha=None):
     '''
     return plotutil.makecolors(n, cmap, reverse, alpha)
 
-def makelegend(source):
+def makelegend(source, **kwargs):
     '''
     Make a legend.
     
@@ -2573,7 +2573,7 @@ def makelegend(source):
     
     :returns: Created legend.
     '''
-    return plotutil.makelegend(source)
+    return plotutil.makelegend(source, **kwargs)
     
 def makesymbolspec(geometry, *args, **kwargs):
     '''
@@ -2609,7 +2609,14 @@ def makesymbolspec(geometry, *args, **kwargs):
         ls = LegendManage.createLegendScheme(shapetype, levels, colors)
         plotutil.setlegendscheme(ls, **kwargs)         
         ls.setFieldName(field)
-        return ls
+        values = kwargs.pop('values', None)
+        if values is None:
+            return ls
+        else:
+            nls = LegendScheme(ls.getShapeType())
+            for v in values:
+                nls.addLegendBreak(ls.findLegendBreak(v))
+            return nls
            
     n = len(args)
     isunique = True

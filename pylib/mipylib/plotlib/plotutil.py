@@ -702,7 +702,7 @@ def text(x, y, s, **kwargs):
     text.setCoordinates(coordinates)
     return text
     
-def makelegend(source):
+def makelegend(source, **kwargs):
     '''
     Make a legend.
     
@@ -718,5 +718,15 @@ def makelegend(source):
         else:
             source = getcolormap(source)
     else:
-        ls = LegendScheme(source)
+        if isinstance(source, list):
+            ls = LegendScheme(source)
+        else:
+            values = kwargs.pop('values', None)
+            if values is None:
+                ls = None
+            else:
+                if isinstance(values, MIArray):
+                    values = values.aslist()
+                cbs = source.findBreaks(values)
+                ls = LegendScheme(cbs)
     return ls

@@ -19,7 +19,7 @@ from org.meteoinfo.global import Extent
 from org.meteoinfo.layer import LayerTypes, WebMapLayer
 from org.meteoinfo.data.mapdata.webmap import WebMapProvider
 
-from java.awt import Font
+from java.awt import Font, Color
 
 from axes import Axes
 from mipylib.numeric.dimarray import DimArray

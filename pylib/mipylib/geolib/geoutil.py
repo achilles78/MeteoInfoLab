@@ -36,8 +36,8 @@ def makeshapes(x, y, type=None, z=None, m=None):
             if m is None:
                 m = minum.zeros(len(z)).array
             else:
-                m = minum.asarray(m)
-            z = minum.asarray(z)
+                m = minum.asarray(m).array
+            z = minum.asarray(z).array
         if type == 'point':
             if z is None:
                 shapes = ShapeUtil.createPointShapes(x, y)
