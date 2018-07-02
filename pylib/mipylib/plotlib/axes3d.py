@@ -8,7 +8,7 @@
 
 from org.meteoinfo.chart.plot import Plot3D, GraphicFactory
 from org.meteoinfo.chart import ChartText3D
-from org.meteoinfo.legend import LegendManage, BreakTypes
+from org.meteoinfo.legend import LegendManage, BreakTypes, PolylineBreak
 from org.meteoinfo.shape import ShapeTypes, Graphic
 from org.meteoinfo.layer import LayerTypes
 
@@ -21,7 +21,7 @@ import mipylib.miutil as miutil
 
 import datetime
 
-from java.awt import Font
+from java.awt import Font, Color
 
 #########################################################
 class Axes3D(Axes):
@@ -358,14 +358,37 @@ class Axes3D(Axes):
         
         #Set plot data styles
         label = kwargs.pop('label', 'S_1')
-        if style is None:
-            line = plotutil.getlegendbreak('line', **kwargs)[0]
-            line.setCaption(label)
+        mvalues = kwargs.pop('mvalues', None)
+        if mvalues is None:
+            if style is None:
+                line = plotutil.getlegendbreak('line', **kwargs)[0]
+                line.setCaption(label)
+            else:
+                line = plotutil.getplotstyle(style, label, **kwargs)   
         else:
-            line = plotutil.getplotstyle(style, label, **kwargs)   
+            ls = kwargs.pop('symbolspec', None)
+            if ls is None:        
+                if isinstance(mvalues, (list, tuple)):
+                    mvalues = minum.array(mvalues)
+                levels = kwargs.pop('levs', None)
+                if levels is None:
+                    levels = kwargs.pop('levels', None)
+                if levels is None:
+                    cnum = kwargs.pop('cnum', None)
+                    if cnum is None:
+                        ls = plotutil.getlegendscheme([], mvalues.min(), mvalues.max(), **kwargs)
+                    else:
+                        ls = plotutil.getlegendscheme([cnum], mvalues.min(), mvalues.max(), **kwargs)
+                else:
+                    ls = plotutil.getlegendscheme([levels], mvalues.min(), mvalues.max(), **kwargs)
+                ls = plotutil.setlegendscheme_line(ls, **kwargs)
 
         #Add graphics
-        graphics = GraphicFactory.createLineString(xdata, ydata, zdata, line)
+        if mvalues is None:
+            graphics = GraphicFactory.createLineString3D(xdata, ydata, zdata, line)
+        else:
+            mdata = plotutil.getplotdata(mvalues)
+            graphics = GraphicFactory.createLineString3D(xdata, ydata, zdata, mdata, ls)
         visible = kwargs.pop('visible', True)
         if visible:
             self.add_graphic(graphics)
@@ -467,6 +490,124 @@ class Axes3D(Axes):
         if visible:
             self.add_graphic(graphics)
         return graphics
+        
+    def stem(self, x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None, 
+                verts=None, **kwargs):
+        """
+        Make a 3D scatter plot of x, y and z, where x, y and z are sequence like objects of the same lengths.
+        
+        :param x: (*array_like*) Input x data.
+        :param y: (*array_like*) Input y data.
+        :param z: (*array_like*) Input z data.
+        :param s: (*int*) Size of points.
+        :param c: (*Color*) Color of the points. Or z vlaues.
+        :param alpha: (*int*) The alpha blending value, between 0 (transparent) and 1 (opaque).
+        :param marker: (*string*) Marker of the points.
+        :param label: (*string*) Label of the points series.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+            points to draw, in increasing order.
+        
+        :returns: Points legend break.
+        """        
+        #Add data series
+        label = kwargs.pop('label', 'S_0')
+        xdata = plotutil.getplotdata(x)
+        ydata = plotutil.getplotdata(y)
+        zdata = plotutil.getplotdata(z)
+        
+        #Set plot data styles
+        pb, isunique = plotutil.getlegendbreak('point', **kwargs)
+        pb.setCaption(label)
+        pstyle = plotutil.getpointstyle(marker)    
+        pb.setStyle(pstyle)
+        bottom = kwargs.pop('bottom', 0)   
+        samestemcolor = kwargs.pop('samestemcolor', False)
+        isvalue = False
+        if len(c) > 1:
+            if isinstance(c, (MIArray, DimArray)):
+                isvalue = True
+            elif isinstance(c[0], (int, long, float)):
+                isvalue = True            
+        if isvalue:
+            ls = kwargs.pop('symbolspec', None)
+            if ls is None:        
+                if isinstance(c, (list, tuple)):
+                    c = minum.array(c)
+                levels = kwargs.pop('levs', None)
+                if levels is None:
+                    levels = kwargs.pop('levels', None)
+                if levels is None:
+                    cnum = kwargs.pop('cnum', None)
+                    if cnum is None:
+                        ls = plotutil.getlegendscheme([], c.min(), c.max(), **kwargs)
+                    else:
+                        ls = plotutil.getlegendscheme([cnum], c.min(), c.max(), **kwargs)
+                else:
+                    ls = plotutil.getlegendscheme([levels], c.min(), c.max(), **kwargs)
+                ls = plotutil.setlegendscheme_point(ls, **kwargs)
+                if isinstance(s, int):
+                    for lb in ls.getLegendBreaks():
+                        lb.setSize(s)
+                else:
+                    n = len(s)
+                    for i in range(0, n):
+                        ls.getLegendBreaks()[i].setSize(s[i])
+            linefmt = kwargs.pop('linefmt', None)
+            if linefmt is None:
+                linefmt = PolylineBreak()
+                linefmt.setColor(Color.black)
+            else:
+                linefmt = plotutil.getlegendbreak('line', **linefmt)[0]
+            #Create graphics
+            graphics = GraphicFactory.createStems3D(xdata, ydata, zdata, c.asarray(), \
+                ls, linefmt, bottom, samestemcolor)
+        else:
+            colors = plotutil.getcolors(c, alpha)   
+            pbs = []
+            if isinstance(s, int):   
+                pb.setSize(s)
+                if len(colors) == 1:
+                    pb.setColor(colors[0])
+                    pb.setOutlineColor(colors[0])
+                    pbs.append(pb)
+                else:
+                    n = len(colors)
+                    for i in range(0, n):
+                        npb = pb.clone()
+                        npb.setColor(colors[i])
+                        npb.setOutlineColor(colors[i])
+                        pbs.append(npb)
+            else:
+                n = len(s)
+                if len(colors) == 1:
+                    pb.setColor(colors[0])
+                    pb.setOutlineColor(colors[0])
+                    for i in range(0, n):
+                        npb = pb.clone()
+                        npb.setSize(s[i])
+                        pbs.append(npb)
+                else:
+                    for i in range(0, n):
+                        npb = pb.clone()
+                        npb.setSize(s[i])
+                        npb.setColor(colors[i])
+                        npb.setOutlineColor(colors[i])
+                        pbs.append(npb)
+            linefmt = kwargs.pop('linefmt', None)
+            if linefmt is None:
+                linefmt = PolylineBreak()
+                linefmt.setColor(colors[0])
+            else:
+                linefmt = plotutil.getlegendbreak('line', **linefmt)[0]
+            #Create graphics
+            graphics = GraphicFactory.createStems3D(xdata, ydata, zdata, pbs, linefmt, \
+                bottom, samestemcolor)
+        
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(graphics[0])
+            self.add_graphic(graphics[1])
+        return graphics[0], graphics[1]
         
     def plot_wireframe(self, *args, **kwargs):
         '''

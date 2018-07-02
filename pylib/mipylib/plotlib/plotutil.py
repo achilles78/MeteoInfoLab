@@ -540,8 +540,9 @@ def setlegendscheme_point(ls, **kwargs):
     
 def setlegendscheme_line(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Polyline)
-    size = kwargs.pop('size', 1)
-    lsobj = kwargs.pop('linestyle', '-')
+    size = kwargs.pop('size', None)
+    size = kwargs.pop('linewidth', size)
+    lsobj = kwargs.pop('linestyle', None)
     linestyle = getlinestyle(lsobj)
     cobj = kwargs.pop('color', None)
     if cobj is None:
@@ -551,8 +552,10 @@ def setlegendscheme_line(ls, **kwargs):
     for lb in ls.getLegendBreaks():
         if not color is None:
             lb.setColor(color)
-        lb.setStyle(linestyle)
-        lb.setSize(size)
+        if not linestyle is None:
+            lb.setStyle(linestyle)
+        if not size is None:
+            lb.setSize(size)
     return ls
     
 def setlegendscheme_polygon(ls, **kwargs):

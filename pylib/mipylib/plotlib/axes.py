@@ -939,26 +939,45 @@ class Axes(object):
                 styles.append('-')
         
         #Set plot data styles
-        lines = []
-        legend = kwargs.pop('legend', None)
-        if not legend is None:
-            if isinstance(legend, list):
-                lines = legend
+        zvalues = kwargs.pop('zvalues', None)
+        if zvalues is None:
+            lines = []
+            legend = kwargs.pop('legend', None)
+            if not legend is None:
+                if isinstance(legend, list):
+                    lines = legend
+                else:
+                    lines = legend.getLegendBreaks()
             else:
-                lines = legend.getLegendBreaks()
+                if styles != None:
+                    for i in range(0, len(styles)):
+                        label = kwargs.pop('label', 'S_' + str(i + 1))
+                        line = plotutil.getplotstyle(styles[i], label, **kwargs)
+                        lines.append(line)
+                else:
+                    snum = len(xdatalist)
+                    for i in range(0, snum):
+                        label = kwargs.pop('label', 'S_' + str(i + 1))
+                        line = plotutil.getlegendbreak('line', **kwargs)[0]
+                        line.setCaption(label)
+                        lines.append(line) 
         else:
-            if styles != None:
-                for i in range(0, len(styles)):
-                    label = kwargs.pop('label', 'S_' + str(i + 1))
-                    line = plotutil.getplotstyle(styles[i], label, **kwargs)
-                    lines.append(line)
-            else:
-                snum = len(xdatalist)
-                for i in range(0, snum):
-                    label = kwargs.pop('label', 'S_' + str(i + 1))
-                    line = plotutil.getlegendbreak('line', **kwargs)[0]
-                    line.setCaption(label)
-                    lines.append(line)        
+            ls = kwargs.pop('symbolspec', None)
+            if ls is None:        
+                if isinstance(zvalues, (list, tuple)):
+                    zvalues = minum.array(zvalues)
+                levels = kwargs.pop('levs', None)
+                if levels is None:
+                    levels = kwargs.pop('levels', None)
+                if levels is None:
+                    cnum = kwargs.pop('cnum', None)
+                    if cnum is None:
+                        ls = plotutil.getlegendscheme([], zvalues.min(), zvalues.max(), **kwargs)
+                    else:
+                        ls = plotutil.getlegendscheme([cnum], zvalues.min(), zvalues.max(), **kwargs)
+                else:
+                    ls = plotutil.getlegendscheme([levels], zvalues.min(), zvalues.max(), **kwargs)
+                ls = plotutil.setlegendscheme_line(ls, **kwargs)
         
         if not xaxistype is None:
             self.set_xaxis_type(xaxistype)    
@@ -977,22 +996,30 @@ class Axes(object):
             self.add_graphic(graphic)
             graphics.append(graphic)
         else:
-            #Add data series
-            snum = len(xdatalist)
-            if snum == 1 and len(lines) > 1:
-                xdata = plotutil.getplotdata(xdatalist[0])
-                ydata = plotutil.getplotdata(ydatalist[0])
-                graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
-                self.add_graphic(graphic)
-                graphics.append(graphic)
-            else:
-                for i in range(0, snum):
-                    label = kwargs.pop('label', 'S_' + str(i + 1))
-                    xdata = plotutil.getplotdata(xdatalist[i])
-                    ydata = plotutil.getplotdata(ydatalist[i])
-                    graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
+            if zvalues is None:
+                #Add data series
+                snum = len(xdatalist)
+                if snum == 1 and len(lines) > 1:
+                    xdata = plotutil.getplotdata(xdatalist[0])
+                    ydata = plotutil.getplotdata(ydatalist[0])
+                    graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
                     self.add_graphic(graphic)
                     graphics.append(graphic)
+                else:
+                    for i in range(0, snum):
+                        label = kwargs.pop('label', 'S_' + str(i + 1))
+                        xdata = plotutil.getplotdata(xdatalist[i])
+                        ydata = plotutil.getplotdata(ydatalist[i])
+                        graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
+                        self.add_graphic(graphic)
+                        graphics.append(graphic)
+            else:
+                xdata = plotutil.getplotdata(xdatalist[0])
+                ydata = plotutil.getplotdata(ydatalist[0])
+                zdata = plotutil.getplotdata(zvalues)
+                graphic = GraphicFactory.createLineString(xdata, ydata, zdata, ls, iscurve)
+                self.add_graphic(graphic)
+                graphics.append(graphic)
         self.axes.setAutoExtent()
 
         if len(graphics) > 1:
@@ -1687,6 +1714,73 @@ class Axes(object):
         self.axes.setAutoExtent()
 
         return lb
+        
+    def stem(self, *args, **kwargs):
+        """
+        Make a stem plot.
+        
+        A stem plot plots vertical lines at each x location from the baseline to y, and 
+        places a marker there.
+        
+        :param x: (*array_like*) The x-positions of the stems.
+        :param y: (*array_like*) The y-values of the stem heads.
+        :param bottom: (*array_like*) Optional, The y-position of the baseline.
+        :param linefmt: (*dict*) Optional, stem line format.
+        :param markerfmt: (*dict*) Optional, stem marker format.
+        :param color: (*Color*) Optional, the color of the stem.
+        
+        :returns: Stem line legend break.                  
+        """
+        #Add data series
+        label = kwargs.pop('label', 'S_0')
+        xdata = None
+        if len(args) == 1:
+            ydata = args[0]
+        else:
+            xdata = args[0]
+            ydata = args[1]       
+        
+        if xdata is None:
+            xdata = []
+            for i in range(1, len(args[0]) + 1):
+                xdata.append(i)
+        xdata = plotutil.getplotdata(xdata)
+        ydata = plotutil.getplotdata(ydata)        
+        bottom = kwargs.pop('bottom', 0)   
+        
+        #Set plot data styles
+        color = kwargs.pop('color', None)
+        if not color is None:
+            color = plotutil.getcolor(color)
+        linefmt = kwargs.pop('linefmt', None)
+        if linefmt is None:
+            linefmt = PolylineBreak()
+            linefmt.setColor(color is None and Color.red or color)
+        else:
+            linefmt = plotutil.getlegendbreak('line', **linefmt)[0]
+        linefmt.setCaption(label)
+        markerfmt = kwargs.pop('markerfmt', None)
+        if markerfmt is None:
+            markerfmt = PointBreak()
+            markerfmt.setOutlineColor(color is None and Color.red or color)
+            markerfmt.setDrawFill(False)
+        else:
+            markerfmt = plotutil.getlegendbreak('point', **markerfmt)[0]
+        basefmt = kwargs.pop('basefmt', None)
+        if basefmt is None:
+            basefmt = PolylineBreak()
+            basefmt.setColor(color is None and Color.red or color)
+        else:
+            basefmt = plotutil.getlegendbreak('line', **basefmt)[0]
+        
+        #Create stem graphics
+        graphics = GraphicFactory.createStems(xdata, ydata, linefmt, markerfmt, \
+            basefmt, bottom)       
+
+        self.add_graphic(graphics)
+        self.axes.setAutoExtent()
+
+        return linefmt
         
     def contour(self, *args, **kwargs):
         """

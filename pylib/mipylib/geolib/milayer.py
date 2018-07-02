@@ -6,7 +6,7 @@
 #-----------------------------------------------------
 from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes, VectorLayer
-from org.meteoinfo.projection import ProjectionManage, KnownCoordinateSystems
+from org.meteoinfo.projection import ProjectionUtil, KnownCoordinateSystems
 from org.meteoinfo.shape import PolygonShape, ShapeTypes
 from java.util import Date, Calendar
 from java.awt import Font
@@ -255,7 +255,7 @@ class MILayer(object):
         
         :param toproj: (*ProjectionInfo*) The projection to be projected.
         '''
-        ProjectionManage.projectLayer(self.layer, toproj)
+        ProjectionUtil.projectLayer(self.layer, toproj)
         
     def buffer(self, dist=0, merge=False):
         '''

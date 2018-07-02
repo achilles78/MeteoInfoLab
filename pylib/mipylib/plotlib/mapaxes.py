@@ -118,6 +118,21 @@ class MapAxes(Axes):
         '''
         self.axes.setSelectedLayer(layer.layer)
         
+    def add_graphic(self, graphic, proj=None):
+        '''
+        Add a graphic
+        
+        :param graphic: (*Graphic*) The graphic to be added.
+        :param proj: (*ProjectionInfo*) Graphic projection.
+        
+        :returns: Added graphic
+        '''
+        if proj is None:
+            self.axes.addGraphic(graphic)
+        else:
+            graphic = self.axes.addGraphic(graphic, proj)
+        return graphic
+        
     def add_circle(self, xy, radius=5, **kwargs):
         '''
         Add a circle patch
@@ -361,6 +376,144 @@ class MapAxes(Axes):
             return graphic
             
     def plot(self, *args, **kwargs):
+        """
+        Plot lines and/or markers to the map.
+        
+        :param x: (*array_like*) Input x data.
+        :param y: (*array_like*) Input y data.
+        :param style: (*string*) Line style for plot.
+        :param linewidth: (*float*) Line width.
+        :param color: (*Color*) Line color.
+        
+        :returns: (*VectoryLayer*) Line VectoryLayer.
+        """
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        proj = kwargs.pop('proj', None)    
+        n = len(args) 
+        xdatalist = []
+        ydatalist = []    
+        styles = []
+        if n == 1:
+            ydata = plotutil.getplotdata(args[0])
+            if isinstance(args[0], DimArray):
+                xdata = args[0].dimvalue(0)
+            else:
+                xdata = []
+                for i in range(0, len(args[0])):
+                    xdata.append(i)
+            xdatalist.append(xdata)
+            ydatalist.append(ydata)
+        elif n == 2:
+            if isinstance(args[1], basestring):
+                ydata = plotutil.getplotdata(args[0])
+                if isinstance(args[0], DimArray):
+                    xdata = args[0].dimvalue(0)
+                else:
+                    xdata = []
+                    for i in range(0, len(args[0])):
+                        xdata.append(i)
+                styles.append(args[1])
+            else:
+                xdata = args[0]
+                ydata = args[1]
+            xdatalist.append(xdata)
+            ydatalist.append(ydata)
+        else:
+            c = 'x'
+            for arg in args: 
+                if c == 'x':    
+                    xdatalist.append(arg)
+                    c = 'y'
+                elif c == 'y':
+                    ydatalist.append(arg)
+                    c = 's'
+                elif c == 's':
+                    if isinstance(arg, basestring):
+                        styles.append(arg)
+                        c = 'x'
+                    else:
+                        styles.append('-')
+                        xdatalist.append(arg)
+                        c = 'y'
+        
+        snum = len(xdatalist)
+            
+        if len(styles) == 0:
+            styles = None
+        else:
+            while len(styles) < snum:
+                styles.append('-')
+        
+        #Get plot data styles - Legend
+        zvalues = kwargs.pop('zvalues', None)
+        if zvalues is None:
+            lines = []
+            ls = kwargs.pop('legend', None) 
+            if ls is None:
+                if styles != None:
+                    for i in range(0, len(styles)):
+                        line = plotutil.getplotstyle(styles[i], str(i), **kwargs)
+                        lines.append(line)
+                else:
+                    for i in range(0, snum):
+                        label = kwargs.pop('label', 'S_' + str(i + 1))
+                        line = plotutil.getlegendbreak('line', **kwargs)[0]
+                        line.setCaption(label)
+                        lines.append(line)
+                ls = LegendScheme(lines)
+        else:
+            ls = kwargs.pop('symbolspec', None)
+            if ls is None:        
+                if isinstance(zvalues, (list, tuple)):
+                    zvalues = minum.array(zvalues)
+                levels = kwargs.pop('levs', None)
+                if levels is None:
+                    levels = kwargs.pop('levels', None)
+                if levels is None:
+                    cnum = kwargs.pop('cnum', None)
+                    if cnum is None:
+                        ls = plotutil.getlegendscheme([], zvalues.min(), zvalues.max(), **kwargs)
+                    else:
+                        ls = plotutil.getlegendscheme([cnum], zvalues.min(), zvalues.max(), **kwargs)
+                else:
+                    ls = plotutil.getlegendscheme([levels], zvalues.min(), zvalues.max(), **kwargs)
+                ls = plotutil.setlegendscheme_line(ls, **kwargs)
+        
+        iscurve = False
+        graphics = []
+        if zvalues is None:
+            #Add data series
+            snum = len(xdatalist)
+            if snum == 1 and len(lines) > 1:
+                xdata = plotutil.getplotdata(xdatalist[0])
+                ydata = plotutil.getplotdata(ydatalist[0])
+                graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
+                graphic = self.add_graphic(graphic, proj)
+                graphics.append(graphic)
+            else:
+                for i in range(0, snum):
+                    label = kwargs.pop('label', 'S_' + str(i + 1))
+                    xdata = plotutil.getplotdata(xdatalist[i])
+                    ydata = plotutil.getplotdata(ydatalist[i])
+                    graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
+                    graphic = self.add_graphic(graphic, proj)
+                    graphics.append(graphic)
+        else:
+            xdata = plotutil.getplotdata(xdatalist[0])
+            ydata = plotutil.getplotdata(ydatalist[0])
+            zdata = plotutil.getplotdata(zvalues)
+            graphic = GraphicFactory.createLineString(xdata, ydata, zdata, ls, iscurve)
+            self.add_graphic(graphic)
+            graphics.append(graphic)
+        
+        self.axes.setAutoExtent()
+
+        if len(graphics) > 1:
+            return graphics
+        else:
+            return graphics[0]
+        
+    def plot_bak(self, *args, **kwargs):
         """
         Plot lines and/or markers to the map.
         

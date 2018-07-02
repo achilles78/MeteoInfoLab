@@ -46,7 +46,7 @@ __all__ = [
     'grid','gridshow','gridshowm','hist','imshow','imshowm','legend','left_title','loglog','makecolors',
     'makelegend','makesymbolspec','masklayer','pcolor','pcolorm','pie','plot','plot3','plotm','quiver',
     'quiverkey','quiverm','readlegend','right_title','savefig','savefig_jpeg','scatter','scatter3','scatterm',
-    'semilogx','semilogy','set','show','stationmodel','step','streamplotm','subplot','subplots','suptitle',
+    'semilogx','semilogy','set','show','stationmodel','stem','step','streamplotm','subplot','subplots','suptitle',
     'surf','text','title','twinx','twiny','weatherspec','xaxis',
     'xlabel','xlim','xreverse','xticks','yaxis','ylabel','ylim','yreverse','yticks','zaxis','zlabel','zlim','zticks',
     'isinteractive'
@@ -580,6 +580,37 @@ def hist(x, bins=10, range=None, normed=False, cumulative=False,
             
     r = gca.hist(x, bins, range, normed, cumulative,
         bottom, histtype, align, orientation, rwidth, log, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
+    
+def stem(self, *args, **kwargs):
+    """
+    Make a stem plot.
+    
+    A stem plot plots vertical lines at each x location from the baseline to y, and 
+    places a marker there.
+    
+    :param x: (*array_like*) The x-positions of the stems.
+    :param y: (*array_like*) The y-values of the stem heads.
+    :param bottom: (*array_like*) Optional, the y coordinates of the bars default: None
+    :param linefmt: (*dict*) Optional, stem line format.
+    :param markerfmt: (*dict*) Optional, stem marker format.
+    :param color: (*Color*) Optional, the color of the stem.
+    
+    :returns: Stem line legend break.                  
+    """
+    global gca
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.stem(*args, **kwargs)
     if not r is None:
         draw_if_interactive()
     return r

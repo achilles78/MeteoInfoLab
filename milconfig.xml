@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
@@ -19,14 +19,16 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\plot3_multi_color_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm_multi_color.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\plot3_multi_color_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm_multi_color.py"/>
     </RecentFiles>
   </File>
   <Font>
