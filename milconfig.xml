@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\sunphotometer"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\3d">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
@@ -19,20 +18,24 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\plot3_multi_color_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm_multi_color.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot_map.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_multi_color.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_antarctic_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_antarctic.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\plot3_multi_color_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm_multi_color.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\Traj_multi_color_plot_map.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_multi_color.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_antarctic_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\traj_antarctic.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="SimSun" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,0" MainFormSize="1490,852"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1635,908"/>
 </MeteoInfo>

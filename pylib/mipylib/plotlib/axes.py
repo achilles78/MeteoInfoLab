@@ -999,10 +999,24 @@ class Axes(object):
             if zvalues is None:
                 #Add data series
                 snum = len(xdatalist)
-                if snum == 1 and len(lines) > 1:
+                if snum == 1:
                     xdata = plotutil.getplotdata(xdatalist[0])
                     ydata = plotutil.getplotdata(ydatalist[0])
-                    graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
+                    if len(lines) == 1:
+                        colors = kwargs.pop('colors', None)
+                        if not colors is None:
+                            colors = plotutil.getcolors(colors)
+                            cb = lines[0]
+                            lines = []
+                            for cc in colors:
+                                ncb = cb.clone()
+                                ncb.setColor(cc)
+                                lines.append(ncb)
+                            graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
+                        else:
+                            graphic = GraphicFactory.createLineString(xdata, ydata, lines[0], iscurve)
+                    else:    #>1                        
+                        graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
                     self.add_graphic(graphic)
                     graphics.append(graphic)
                 else:

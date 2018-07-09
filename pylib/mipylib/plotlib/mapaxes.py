@@ -450,15 +450,19 @@ class MapAxes(Axes):
             lines = []
             ls = kwargs.pop('legend', None) 
             if ls is None:
-                if styles != None:
-                    for i in range(0, len(styles)):
-                        line = plotutil.getplotstyle(styles[i], str(i), **kwargs)
-                        lines.append(line)
-                else:
+                if styles is None:                
                     for i in range(0, snum):
                         label = kwargs.pop('label', 'S_' + str(i + 1))
                         line = plotutil.getlegendbreak('line', **kwargs)[0]
                         line.setCaption(label)
+                        line.setStartValue(i)
+                        line.setEndValue(i)
+                        lines.append(line)
+                else:
+                    for i in range(0, len(styles)):
+                        line = plotutil.getplotstyle(styles[i], str(i), **kwargs)
+                        line.setStartValue(i)
+                        line.setEndValue(i)
                         lines.append(line)
                 ls = LegendScheme(lines)
         else:
@@ -478,40 +482,98 @@ class MapAxes(Axes):
                 else:
                     ls = plotutil.getlegendscheme([levels], zvalues.min(), zvalues.max(), **kwargs)
                 ls = plotutil.setlegendscheme_line(ls, **kwargs)
+            ls.setFieldName('Geometry_Z')
         
-        iscurve = False
-        graphics = []
-        if zvalues is None:
-            #Add data series
-            snum = len(xdatalist)
-            if snum == 1 and len(lines) > 1:
+        aslayer = kwargs.pop('aslayer', True)
+        if aslayer:            
+            if zvalues is None:
+                for i in range(snum):
+                    xdatalist[i] = plotutil.getplotdata(xdatalist[i])
+                    ydatalist[i] = plotutil.getplotdata(ydatalist[i])
+                if snum == 1:
+                    if len(lines) == 1:
+                        colors = kwargs.pop('colors', None)
+                        if not colors is None:
+                            colors = plotutil.getcolors(colors)
+                            cb = lines[0]
+                            lines = []
+                            idx = 0
+                            for cc in colors:
+                                ncb = cb.clone()
+                                ncb.setColor(cc)
+                                ncb.setStartValue(idx)
+                                ncb.setEndValue(idx)
+                                lines.append(ncb)
+                                idx += 1
+                            ls = LegendScheme(lines)
+                layer = DrawMeteoData.createPolylineLayer(xdatalist, ydatalist, ls, \
+                    'Plot_lines', 'ID', -180, 180)
+            else:
                 xdata = plotutil.getplotdata(xdatalist[0])
                 ydata = plotutil.getplotdata(ydatalist[0])
-                graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
-                graphic = self.add_graphic(graphic, proj)
-                graphics.append(graphic)
-            else:
-                for i in range(0, snum):
-                    label = kwargs.pop('label', 'S_' + str(i + 1))
-                    xdata = plotutil.getplotdata(xdatalist[i])
-                    ydata = plotutil.getplotdata(ydatalist[i])
-                    graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
-                    graphic = self.add_graphic(graphic, proj)
+                zdata = plotutil.getplotdata(zvalues)
+                layer = DrawMeteoData.createPolylineLayer(xdata, ydata, zdata, ls, \
+                    'Plot_lines', 'ID', -180, 180)
+            if (proj != None):
+                layer.setProjInfo(proj)
+         
+            # Add layer
+            isadd = kwargs.pop('isadd', True)
+            if isadd:
+                zorder = kwargs.pop('zorder', None)
+                select = kwargs.pop('select', True)
+                self.add_layer(layer, zorder, select)
+                self.axes.setDrawExtent(layer.getExtent().clone())
+                self.axes.setExtent(layer.getExtent().clone())
+                
+            return MILayer(layer)
+        else:
+            iscurve = False
+            graphics = []
+            if zvalues is None:
+                #Add data series
+                if snum == 1:
+                    xdata = plotutil.getplotdata(xdatalist[0])
+                    ydata = plotutil.getplotdata(ydatalist[0])
+                    if len(lines) == 1:
+                        colors = kwargs.pop('colors', None)
+                        if not colors is None:
+                            colors = plotutil.getcolors(colors)
+                            cb = lines[0]
+                            lines = []
+                            for cc in colors:
+                                ncb = cb.clone()
+                                ncb.setColor(cc)
+                                lines.append(ncb)
+                            graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
+                        else:
+                            graphic = GraphicFactory.createLineString(xdata, ydata, lines[0], iscurve)
+                    else:    #>1                        
+                        graphic = GraphicFactory.createLineString(xdata, ydata, lines, iscurve)
+                    self.add_graphic(graphic)
                     graphics.append(graphic)
-        else:
-            xdata = plotutil.getplotdata(xdatalist[0])
-            ydata = plotutil.getplotdata(ydatalist[0])
-            zdata = plotutil.getplotdata(zvalues)
-            graphic = GraphicFactory.createLineString(xdata, ydata, zdata, ls, iscurve)
-            self.add_graphic(graphic)
-            graphics.append(graphic)
-        
-        self.axes.setAutoExtent()
+                else:
+                    for i in range(0, snum):
+                        label = kwargs.pop('label', 'S_' + str(i + 1))
+                        xdata = plotutil.getplotdata(xdatalist[i])
+                        ydata = plotutil.getplotdata(ydatalist[i])
+                        graphic = GraphicFactory.createLineString(xdata, ydata, lines[i], iscurve)
+                        graphic = self.add_graphic(graphic, proj)
+                        graphics.append(graphic)
+            else:
+                xdata = plotutil.getplotdata(xdatalist[0])
+                ydata = plotutil.getplotdata(ydatalist[0])
+                zdata = plotutil.getplotdata(zvalues)
+                graphic = GraphicFactory.createLineString(xdata, ydata, zdata, ls, iscurve)
+                self.add_graphic(graphic, proj)
+                graphics.append(graphic)
+            
+            self.axes.setAutoExtent()
 
-        if len(graphics) > 1:
-            return graphics
-        else:
-            return graphics[0]
+            if len(graphics) > 1:
+                return graphics
+            else:
+                return graphics[0]
         
     def plot_bak(self, *args, **kwargs):
         """

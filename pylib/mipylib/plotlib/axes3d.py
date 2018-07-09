@@ -364,7 +364,15 @@ class Axes3D(Axes):
                 line = plotutil.getlegendbreak('line', **kwargs)[0]
                 line.setCaption(label)
             else:
-                line = plotutil.getplotstyle(style, label, **kwargs)   
+                line = plotutil.getplotstyle(style, label, **kwargs)
+            colors = kwargs.pop('colors', None)
+            if not colors is None:
+                colors = plotutil.getcolors(colors)
+                cbs = []
+                for color in colors:
+                    cb = line.clone()
+                    cb.setColor(color)
+                    cbs.append(cb)
         else:
             ls = kwargs.pop('symbolspec', None)
             if ls is None:        
@@ -385,7 +393,10 @@ class Axes3D(Axes):
 
         #Add graphics
         if mvalues is None:
-            graphics = GraphicFactory.createLineString3D(xdata, ydata, zdata, line)
+            if colors is None:
+                graphics = GraphicFactory.createLineString3D(xdata, ydata, zdata, line)
+            else:
+                graphics = GraphicFactory.createLineString3D(xdata, ydata, zdata, cbs)
         else:
             mdata = plotutil.getplotdata(mvalues)
             graphics = GraphicFactory.createLineString3D(xdata, ydata, zdata, mdata, ls)
