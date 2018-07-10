@@ -880,35 +880,49 @@ class Axes(object):
                 isxylistdata = True
             else:
                 ydata = args[0]
-                if isinstance(args[0], DimArray):
-                    xdata = args[0].dimvalue(0)
-                    if args[0].islondim(0):
+                if isinstance(ydata, DimArray):
+                    xdata = ydata.dimvalue(0)
+                    if ydata.ndim == 2:
+                        xdata = ydata.dimvalue(1)
+                        xx = minum.zeros(ydata.shape)
+                        xx[:,:] = xdata
+                        xdata = xx
+                    if ydata.islondim(0):
                         xaxistype = 'lon'
-                    elif args[0].islatdim(0):
+                    elif ydata.islatdim(0):
                         xaxistype = 'lat'
-                    elif args[0].istimedim(0):
+                    elif ydata.istimedim(0):
                         xaxistype = 'time'
                 else:
-                    xdata = []
-                    for i in range(0, len(args[0])):
-                        xdata.append(i)
+                    xdata = minum.arange(ydata.shape[-1])
+                    if ydata.ndim == 2:
+                        xx = minum.zeros(ydata.shape)
+                        xx[:,:] = xdata
+                        xdata = xx
                 xdatalist.append(xdata)
                 ydatalist.append(ydata)
         elif len(args) == 2:
             if isinstance(args[1], basestring):
                 ydata = args[0]
-                if isinstance(args[0], DimArray):
-                    xdata = args[0].dimvalue(0)
-                    if args[0].islondim(0):
+                if isinstance(ydata, DimArray):
+                    xdata = ydata.dimvalue(0)
+                    if ydata.ndim == 2:
+                        xdata = ydata.dimvalue(1)
+                        xx = minum.zeros(ydata.shape)
+                        xx[:,:] = xdata
+                        xdata = xx
+                    if ydata.islondim(0):
                         xaxistype = 'lon'
-                    elif args[0].islatdim(0):
+                    elif ydata.islatdim(0):
                         xaxistype = 'lat'
-                    elif args[0].istimedim(0):
+                    elif ydata.istimedim(0):
                         xaxistype = 'time'
                 else:
-                    xdata = []
-                    for i in range(0, len(args[0])):
-                        xdata.append(i)
+                    xdata = minum.arange(ydata.shape[-1])
+                    if ydata.ndim == 2:
+                        xx = minum.zeros(ydata.shape)
+                        xx[:,:] = xdata
+                        xdata = xx
                 styles.append(args[1])
             else:
                 xdata = args[0]
