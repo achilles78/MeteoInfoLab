@@ -160,6 +160,8 @@ class Axes(object):
         else:
             self.axes.setTitle(title)
             
+        return title
+            
     def set_xlabel(self, label, fontname=None, fontsize=14, bold=False, color='black'):
         """
         Set the x axis label of the current axes.
@@ -879,7 +881,7 @@ class Axes(object):
                 snum = args[0].size()
                 isxylistdata = True
             else:
-                ydata = args[0]
+                ydata = minum.array(args[0])
                 if isinstance(ydata, DimArray):
                     xdata = ydata.dimvalue(0)
                     if ydata.ndim == 2:
@@ -903,7 +905,7 @@ class Axes(object):
                 ydatalist.append(ydata)
         elif len(args) == 2:
             if isinstance(args[1], basestring):
-                ydata = args[0]
+                ydata = minum.array(args[0])
                 if isinstance(ydata, DimArray):
                     xdata = ydata.dimvalue(0)
                     if ydata.ndim == 2:
@@ -2198,6 +2200,7 @@ class Axes(object):
         """
         ctext = plotutil.text(x, y, s, **kwargs)
         self.axes.addText(ctext)
+        return ctext
         
     def patch(self, x, y=None, **kwargs):
         '''

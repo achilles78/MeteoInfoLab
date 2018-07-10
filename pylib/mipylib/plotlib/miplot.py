@@ -1438,8 +1438,9 @@ def title(label, loc='center', fontname=None, fontsize=14, bold=True, color='bla
     :param color: (*color*) Title string color. Default is ``black`` .  
     :param linespace: (*int*) Line space of multiple line title.
     """
-    gca.set_title(label, loc, fontname, fontsize, bold, color, **kwargs)
+    r = gca.set_title(label, loc, fontname, fontsize, bold, color, **kwargs)
     draw_if_interactive()
+    return r
     
 def suptitle(label, fontname=None, fontsize=14, bold=True, color='black'):
     """
@@ -1451,8 +1452,9 @@ def suptitle(label, fontname=None, fontsize=14, bold=True, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Title string color. Default is ``black`` .
     """    
-    g_figure.set_title(label, fontname, fontsize, bold, color)
+    r = g_figure.set_title(label, fontname, fontsize, bold, color)
     draw_if_interactive()
+    return r
     
 def left_title(label, fontname=None, fontsize=14, bold=False, color='black', **kwargs):
     """
@@ -1464,8 +1466,9 @@ def left_title(label, fontname=None, fontsize=14, bold=False, color='black', **k
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
     :param color: (*color*) Title string color. Default is ``black`` .    
     """
-    gca.set_title(label, 'left', fontname, fontsize, bold, color, **kwargs)
+    r = gca.set_title(label, 'left', fontname, fontsize, bold, color, **kwargs)
     draw_if_interactive()
+    return r
     
 def right_title(label, fontname=None, fontsize=14, bold=False, color='black', **kwargs):
     """
@@ -1477,8 +1480,9 @@ def right_title(label, fontname=None, fontsize=14, bold=False, color='black', **
     :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
     :param color: (*color*) Title string color. Default is ``black`` .    
     """
-    gca.set_title(label, 'right', fontname, fontsize, bold, color, **kwargs)
+    r = gca.set_title(label, 'right', fontname, fontsize, bold, color, **kwargs)
     draw_if_interactive()
+    return r
 
 def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     """
@@ -1659,6 +1663,7 @@ def text(x, y, s, **kwargs):
     else:
         gca.axes.addText(ctext)
     draw_if_interactive()
+    return ctext
     
 def axis(limits):
     """

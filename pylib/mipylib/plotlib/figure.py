@@ -682,6 +682,7 @@ class Figure(ChartPanel):
         ctitle.setUseExternalFont(exfont)
         ctitle.setColor(c)
         self.getChart().setTitle(ctitle)
+        return ctitle
         
 ########################################################3
 class Test():

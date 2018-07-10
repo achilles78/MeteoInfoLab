@@ -673,6 +673,12 @@ def text(x, y, s, **kwargs):
     text.setColor(c)
     text.setX(x)
     text.setY(y)
+    xalign = kwargs.pop('xalign', None)
+    if not xalign is None:
+        text.setXAlign(xalign)
+    yalign = kwargs.pop('yalign', None)
+    if not yalign is None:
+        text.setYAlign(yalign)
     bbox = kwargs.pop('bbox', None)
     if not bbox is None:
         fill = bbox.pop('fill', None)
