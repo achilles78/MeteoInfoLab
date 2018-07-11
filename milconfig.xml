@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\grads">
+  <Path OpenPath="D:\KeyData\BC_New\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
@@ -15,6 +15,7 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
+    <RecentFolder Folder="D:\KeyData\BC_New\script"/>
   </Path>
   <File>
     <OpenedFiles>
@@ -22,14 +23,14 @@
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_6.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\grads\imshow.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\grads\edef_1.py"/>
+      <OpenedFile File="D:\KeyData\BC_New\script\test_read_data.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\plot3_multi_color_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\plotm.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_6.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\grads\imshow.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\grads\edef_1.py"/>
+      <RecentFile File="D:\KeyData\BC_New\script\test_read_data.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -271,18 +271,22 @@ class PyTableData(object):
         '''
         self.data.setValue(row, col, value)
     
-    def addcoldata(self, colname, dtype, coldata):
+    def addcoldata(self, colname, dtype, coldata, index=None):
         '''
         Add a column and its data.
         
         :param colname: (*string*) The new column name.
         :param dtype: (*string*) The data type. [string | int | float].
         :param value: (*array_like*) The data value.
+        :param index: (*int*) The order index of the column to be added. Default is ``None``, the
+            column will be added as last column.
         '''
         if isinstance(coldata, MIArray):
-            self.data.addColumnData(colname, dtype, coldata.aslist())
-        else:
+            coldata = coldata.aslist()
+        if index is None:
             self.data.addColumnData(colname, dtype, coldata)
+        else:
+            self.data.addColumnData(index, colname, dtype, coldata)
 
     def addcol(self, colname, dtype, index=None):
         '''
