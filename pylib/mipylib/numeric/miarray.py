@@ -507,18 +507,20 @@ class MIArray(object):
             r = ArrayMath.max(self.array, axis)
             return MIArray(r)
         
-    def sum(self, fill_value=None):
+    def sum(self, axis=None):
         '''
-        Get summarize value.
+        Sum of array elements over a given axis.
+
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
         
-        :param fill_value: (*float*) Fill value.
-        
-        :returns: Summarize value.
+        returns: (*array_like*) Sum result
         '''
-        if fill_value == None:
+        if axis is None:
             return ArrayMath.sum(self.array)
         else:
-            return ArrayMath.sum(self.array, fill_value)
+            r = ArrayMath.sum(self.array, axis)
+            return MIArray(r)
             
     def prod(self):
         '''
@@ -543,17 +545,50 @@ class MIArray(object):
         else:
             return ArrayMath.aveDouble(self.array, fill_value)
             
-    def mean(self, fill_value=None):
-        if fill_value == None:
-            return ArrayMath.aveDouble(self.array)
+    def mean(self, axis=None):
+        '''
+        Compute tha arithmetic mean along the specified axis.
+
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
+        
+        returns: (*array_like*) Mean result
+        '''
+        if axis is None:
+            return ArrayMath.mean(self.array)
         else:
-            return ArrayMath.aveDouble(self.array, fill_value)
+            return MIArray(ArrayMath.mean(self.array, axis))
             
     def median(self, axis=None):
+        '''
+        Compute tha median along the specified axis.
+
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
+        
+        returns: (*array_like*) Median result
+        '''
         if axis is None:
             return ArrayMath.median(self.array)
         else:
             return MIArray(ArrayMath.median(self.array, axis))
+            
+    def std(self, axis=None):
+        '''
+        Compute the standard deviation along the specified axis.
+    
+        :param x: (*array_like or list*) Input values.
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
+        
+        returns: (*array_like*) Standart deviation result.
+        '''
+        if axis is None:
+            r = ArrayMath.std(self.array)
+            return r
+        else:
+            r = ArrayMath.std(self.array, axis)
+            return MIArray(r)
             
     def sqrt(self):
         return MIArray(ArrayMath.sqrt(self.array))

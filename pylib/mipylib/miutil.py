@@ -23,15 +23,29 @@ def pydate(t):
     :returns: Python date
     """
     cal = Calendar.getInstance()
-    cal.setTime(t)
-    year = cal.get(Calendar.YEAR)
-    month = cal.get(Calendar.MONTH) + 1
-    day = cal.get(Calendar.DAY_OF_MONTH)
-    hour = cal.get(Calendar.HOUR_OF_DAY)
-    minute = cal.get(Calendar.MINUTE)
-    second = cal.get(Calendar.SECOND)
-    dt = datetime.datetime(year, month, day, hour, minute, second)
-    return dt
+    if isinstance(t, list):
+        r = []
+        for tt in t:
+            cal.setTime(tt)
+            year = cal.get(Calendar.YEAR)
+            month = cal.get(Calendar.MONTH) + 1
+            day = cal.get(Calendar.DAY_OF_MONTH)
+            hour = cal.get(Calendar.HOUR_OF_DAY)
+            minute = cal.get(Calendar.MINUTE)
+            second = cal.get(Calendar.SECOND)
+            dt = datetime.datetime(year, month, day, hour, minute, second)
+            r.append(tt)
+        return r
+    else:
+        cal.setTime(t)
+        year = cal.get(Calendar.YEAR)
+        month = cal.get(Calendar.MONTH) + 1
+        day = cal.get(Calendar.DAY_OF_MONTH)
+        hour = cal.get(Calendar.HOUR_OF_DAY)
+        minute = cal.get(Calendar.MINUTE)
+        second = cal.get(Calendar.SECOND)
+        dt = datetime.datetime(year, month, day, hour, minute, second)
+        return dt
     
 def jdate(t):
     """
@@ -131,6 +145,18 @@ def str2date(dstr):
         t = None
         
     return t
+    
+def str2jdate(dstr):
+    '''
+    Convert string to java date.
+    
+    :param dstr: (*string*) date string.
+    
+    :returns: Java date
+    '''
+    pt = str2date(dstr)
+    jt = jdate(pt)
+    return jt
     
 def dateformat(t, format, language=None):
     """

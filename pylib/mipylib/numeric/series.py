@@ -5,20 +5,22 @@
 # Note: Jython
 #-----------------------------------------------------
 
-from org.meteoinfo.data import SeriesUtil
+from org.meteoinfo.data.dataframe import Series as MISeries
 
 import miarray
 from miarray import MIArray
 import dimarray
 from dimarray import DimArray
 import minum as minum
+import index
+from index import Index
 
 from java.lang import Double
 nan = Double.NaN
 
 class Series(object):
 
-    def __init__(self, data=None, index=None, name=None):
+    def __init__(self, data=None, index=None, name=None, series=None):
         '''
         One-dimensional array with axis labels (including time series).
         
@@ -26,31 +28,60 @@ class Series(object):
         :param index: (*list*) Data index list. Values must be unique and hashable, same length as data.
         :param name: (*string*) Series name.
         '''
-        if isinstance(data, (list, tuple)):
-            data = minum.array(data)
-        self.data = data
-        if index is None:
-            index = range(0, len(data))
+        if series is None:
+            if isinstance(data, (list, tuple)):
+                data = minum.array(data)
+            if index is None:
+                index = range(0, len(data))
+            else:
+                if len(data) != len(index):
+                    raise ValueError('Wrong length of index!')
+            if isinstance(index, (MIArray, DimArray)):
+                index = index.tolist()
+            if isinstance(index, Index):
+                self._index = index
+            else:
+                self._index = Index(index)
+            self._data = data
+            self._series = MISeries(data.array, self._index._index, name)
         else:
-            if len(data) != len(index):
-                raise ValueError('Wrong length of index!')
-        # if isinstance(index, (list, tuple)):
-            # index = minum.array(index)
-        if isinstance(index, (MIArray, DimArray)):
-            index = index.tolist()
-        self._index = index
-        self.name = name
+            self._series = series
+            self._data = MIArray(self._series.getData())
         
-    #---- Index property
+    #---- index property
     def get_index(self):
         return self._index
         
     def set_index(self, value):
-        # if isinstance(value, (list, tuple)):
-            # value = minum.array(value)
-        self._index = value
+        self._index = Index(value)
+        self._series.setIndex(self._index.data)
         
     index = property(get_index, set_index)
+    
+    #---- data property
+    def get_data(self):
+        return self._data
+        
+    def set_data(self, value):
+        self._data = minum.array(value)
+        self._series.setData(self._data.array)
+        
+    data = property(get_data, set_data)
+    
+    #---- name property
+    def get_name(self):
+        return self._series.getName()
+        
+    def set_name(self, value):
+        self._series.setName(value)
+        
+    name = property(get_name, set_name)
+    
+    #---- dtype property
+    def get_dtype(self):
+        return self.data.dtype
+        
+    dtype = property(get_dtype)
         
     def __getitem__(self, key):
         rr = self.__getkey(key)
@@ -66,7 +97,7 @@ class Series(object):
                 if len(rr) == 4:
                     rfdata = rr[2]
                     rindex = list(rr[3])
-                    rdata = MIArray(SeriesUtil.fillKeyList(rdata.asarray(), rfdata))
+                    rdata = MIArray(self.index.fill_keylist(rdata, rfdata))
             r = Series(rdata, rindex)
             return r
         
@@ -75,11 +106,8 @@ class Series(object):
         self.data.__setitem__(ikey, value)
     
     def __getkey(self, key):
-        ii = self.index
-        if isinstance(ii, (MIArray, DimArray)):
-            ii = ii.tolist()
         if isinstance(key, basestring):
-            rkey = SeriesUtil.getIndices(ii, key)
+            rkey = self.index.get_indices(key)
             ikey = rkey[0]
             rindex = rkey[1]
             if len(ikey) == 1:
@@ -92,7 +120,7 @@ class Series(object):
         elif isinstance(key, (list, tuple, MIArray, DimArray)) and isinstance(key[0], basestring):
             if isinstance(key, (MIArray, DimArray)):
                 key = key.asarray()            
-            rkey = SeriesUtil.getIndices(ii, key)
+            rkey = self.index.get_indices(key)
             ikey = rkey[0]
             rindex = rkey[1]
             rdata = rkey[2]
@@ -123,22 +151,27 @@ class Series(object):
         return self.data.__len__()
         
     def __str__(self):
-        r = ''
-        for i, v in zip(self.index, self.data):
-            r += str(i) + '    ' + str(v)
-            r += '\n'
-        r += 'dtype: ' + str(self.data.dtype)
-        return r
+        return self.__repr__()
         
     def __repr__(self):
-        r = ''
-        n = 0
-        for i, v in zip(self.index, self.data):
-            r += str(i) + '    ' + str(v)
-            r += '\n'
-            n += 1
-            if n > 100:
-                r += '...\n'
-                break
-        r += 'dtype: ' + str(self.data.dtype)
-        return r        
+        return self._series.toString()
+
+    def head(self, n=5):
+        '''
+        Get top rows
+        
+        :param n: (*int*) row number.
+        
+        :returns: Top rows
+        '''
+        print self._series.head(n)
+        
+    def tail(self, n=5):
+        '''
+        Get bottom rows
+        
+        :param n: (*int*) row number.
+        
+        :returns: Bottom rows
+        '''
+        print self._series.tail(n)

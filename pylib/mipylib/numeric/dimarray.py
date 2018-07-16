@@ -626,6 +626,83 @@ class DimArray(MIArray):
         gdata = GridArray(self.array, xdata, ydata, self.fill_value, self.proj)
         return gdata
         
+    def sum(self, axis=None):
+        '''
+        Sum of array elements over a given axis.
+
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
+        
+        returns: (*array_like*) Sum result
+        '''
+        r = super(DimArray, self).sum(axis)
+        if axis is None:
+            return r
+        else:
+            dims = []
+            for i in range(0, self.ndim):
+                if i != axis:
+                    dims.append(self.dims[i])
+            return DimArray(r, dims, self.fill_value, self.proj)
+        
+    def mean(self, axis=None):
+        '''
+        Compute tha arithmetic mean along the specified axis.
+
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
+        
+        returns: (*array_like*) Mean result
+        '''
+        r = super(DimArray, self).mean(axis)
+        if axis is None:
+            return r
+        else:
+            dims = []
+            for i in range(0, self.ndim):
+                if i != axis:
+                    dims.append(self.dims[i])
+            return DimArray(r, dims, self.fill_value, self.proj)
+            
+    def median(self, axis=None):
+        '''
+        Compute tha median along the specified axis.
+
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
+        
+        returns: (*array_like*) Median result
+        '''
+        r = super(DimArray, self).median(axis)
+        if axis is None:
+            return r
+        else:
+            dims = []
+            for i in range(0, self.ndim):
+                if i != axis:
+                    dims.append(self.dims[i])
+            return DimArray(r, dims, self.fill_value, self.proj)
+            
+    def std(self, axis=None):
+        '''
+        Compute the standard deviation along the specified axis.
+    
+        :param x: (*array_like or list*) Input values.
+        :param axis: (*int*) Axis along which the standard deviation is computed. 
+            The default is to compute the standard deviation of the flattened array.
+        
+        returns: (*array_like*) Standart deviation result.
+        '''
+        r = super(DimArray, self).std(axis)
+        if axis is None:
+            return r
+        else:
+            dims = []
+            for i in range(0, self.ndim):
+                if i != axis:
+                    dims.append(self.dims[i])
+            return DimArray(r, dims, self.fill_value, self.proj)
+        
     def abs(self):
         '''
         Calculate the absolute value element-wise.
@@ -637,10 +714,20 @@ class DimArray(MIArray):
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
     def sqrt(self):
+        '''
+        Calculate sqrt value.
+        
+        :returns: (*DimArray*) Sqrt value array.
+        '''
         r = super(DimArray, self).sqrt()
         return DimArray(r, self.dims, self.fill_value, self.proj)
     
     def sin(self):
+        '''
+        Calculate sin value.
+        
+        :returns: (*DimArray*) Sin value array.
+        '''
         r = super(DimArray, self).sin()
         return DimArray(r, self.dims, self.fill_value, self.proj)
         
@@ -659,6 +746,8 @@ class DimArray(MIArray):
     def acos(self):
         '''
         Calculate acos value.
+        
+        :returns: (*DimArray*) Acos value array.
         '''
         r = super(DimArray, self).acos()
         return DimArray(r, self.dims, self.fill_value, self.proj)
