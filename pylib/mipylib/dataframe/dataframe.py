@@ -105,8 +105,7 @@ class DataFrame(object):
         value = minum.array(value)
         self._dataframe.setData(value.array)
         
-    data = property(get_data, set_data)
-    values = property(get_data)
+    values = property(get_data, set_data)
     
     #---- columns property
     def get_columns(self):
@@ -234,7 +233,7 @@ class DataFrame(object):
                 if isinstance(k[0], int):
                     colkey = key
                 else:
-                    colkey = self.columns.indexOf(k)               
+                    colkey = self.columns.indexOfName(k)               
             elif isinstance(k, basestring):
                 col = self.columns.indexOf(k)
                 colkey = Range(col, col + 1, 1)
@@ -358,6 +357,42 @@ class DataFrame(object):
         return DataFrame(dataframe=r)
         
     T = property(transpose)
+    
+    def groupby(self, by):
+        '''
+        Group DataFrame.
+        
+        :param by: Period string.
+        
+        :returns: Grouped DataFrame
+        '''
+        if isinstance(by, basestring):
+            by = [by]
+        df = self._dataframe.groupBy(by)
+        return DataFrame(dataframe=df)
+        
+    def resample(self, by):
+        '''
+        Group DataFrame by date time index.
+        
+        :param by: Used to determine the groups for the groupby.
+        
+        :returns: Grouped DataFrame
+        '''
+        df = self._dataframe.groupByIndex(by)
+        return DataFrame(dataframe=df)
+        
+    def sum(self):
+        '''
+        Return the sum of the values for the requested axis
+        '''
+        return self._dataframe.sum()
+        
+    def mean(self):
+        '''
+        Return the mean of the values for the requested axis
+        '''
+        return self._dataframe.mean()
     
     @classmethod
     def read_table(cls, filepath, **kwargs):

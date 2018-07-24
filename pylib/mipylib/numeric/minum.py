@@ -15,8 +15,6 @@ from ucar.ma2 import Array
 from dimarray import PyGridData, DimArray, PyStationData
 from miarray import MIArray
 from mitable import PyTableData
-import series
-from series import Series
 
 from java.lang import Math, Double
 from java.util import Calendar
@@ -31,7 +29,7 @@ __all__ = [
     'pi','e','inf','nan','absolute','arange','arange1',    
     'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','degrees','diag','dim_array','datatable','series','dot','exp','eye','fmax','fmin',
+    'corrcoef','cos','degrees','diag','dim_array','datatable','dot','exp','eye','fmax','fmin',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isarray','isnan','linint2','linregress','linspace','log','log10',
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
@@ -114,16 +112,7 @@ def datatable(data=None):
     
     :returns: (*PyTableData*) PyTableData object.
     '''
-    return PyTableData(data)
-    
-def series(data, index=None):
-    '''
-    One-dimensional array with axis labels (including time series).
-        
-    :param data: (*array_like*) One-dimensional array data.
-    :param index: (*list*) Data index list. Values must be unique and hashable, same length as data.
-    '''
-    return Series(data, index)
+    return PyTableData(data)   
     
 def arange(*args):
     """

@@ -56,15 +56,15 @@ class Series(object):
         
     index = property(get_index, set_index)
     
-    #---- data property
-    def get_data(self):
+    #---- values property
+    def get_values(self):
         return self._data
         
-    def set_data(self, value):
+    def set_values(self, value):
         self._data = minum.array(value)
         self._series.setData(self._data.array)
         
-    data = property(get_data, set_data)
+    values = property(get_values, set_values)
     
     #---- name property
     def get_name(self):
@@ -180,4 +180,26 @@ class Series(object):
         
         :returns: Mean value
         '''
-        return self._data.mean()
+        return self._series.mean()
+        
+    def groupby(self, by=None):
+        '''
+        Group Series.
+        
+        :param by: Used to determine the groups for the groupby.
+        
+        :returns: Grouped series
+        '''
+        r = self._series.groupBy(by)
+        return Series(series=r)
+        
+    def resample(self, by):
+        '''
+        Group series by date time index.
+        
+        :param by: Used to determine the groups for the groupby.
+        
+        :returns: Grouped Series
+        '''
+        df = self._series.groupByIndex(by)
+        return Series(series=df)

@@ -1072,14 +1072,15 @@ class DimArray(MIArray):
             level = kwargs.pop('level', 0)
             smooth = kwargs.pop('smooth', 1)
             boldvalue =kwargs.pop('boldvalue', 0)
+            float_fromat = kwargs.pop('float_fromat', None)
             proj = kwargs.pop('proj', self.proj)
             if proj is None:
-                gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue)
+                gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_fromat)
             else:
                 if proj.isLonLat():
-                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue)
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_fromat)
                 else:
-                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, proj)
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_fromat, proj)
     
        
 # The encapsulate class of GridData
