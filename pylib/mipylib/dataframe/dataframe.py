@@ -33,40 +33,42 @@ class DataFrame(object):
     '''   
     def __init__(self, data=None, index=None, columns=None, dataframe=None):                             
         if dataframe is None:
-            if isinstance(data, dict):
-                columns = data.keys()
-                dlist = []
-                n = 1
-                for v in data.values():
-                    if isinstance(v, (list, tuple)):
-                        n = len(v)
-                        v = minum.array(v)                    
-                    elif isinstance(v, MIArray):
-                        n = len(v)
-                    dlist.append(v)
-                for i in range(len(dlist)):
-                    d = dlist[i]
-                    if not isinstance(d, MIArray):
-                        d = [d] * n
-                        d = minum.array(d)
-                        dlist[i] = d
-                data = dlist
-                
-            if isinstance(data, MIArray):
-                n = len(data)
-                data = data.array
-            else:
-                dlist = []
-                n = len(data[0])
-                for dd in data:
-                    dlist.append(dd.array)
-                data = dlist
+            if not data is None:
+                if isinstance(data, dict):
+                    columns = data.keys()
+                    dlist = []
+                    n = 1
+                    for v in data.values():
+                        if isinstance(v, (list, tuple)):
+                            n = len(v)
+                            v = minum.array(v)                    
+                        elif isinstance(v, MIArray):
+                            n = len(v)
+                        dlist.append(v)
+                    for i in range(len(dlist)):
+                        d = dlist[i]
+                        if not isinstance(d, MIArray):
+                            d = [d] * n
+                            d = minum.array(d)
+                            dlist[i] = d
+                    data = dlist
                     
-            if index is None:
-                index = range(0, n)
-            else:
-                if n != len(index):
-                    raise ValueError('Wrong length of index!')
+                if isinstance(data, MIArray):
+                    n = len(data)
+                    data = data.array
+                else:
+                    dlist = []
+                    n = len(data[0])
+                    for dd in data:
+                        dlist.append(dd.array)
+                    data = dlist
+                        
+                if index is None:
+                    index = range(0, n)
+                else:
+                    if n != len(index):
+                        raise ValueError('Wrong length of index!')
+                        
             if isinstance(index, (MIArray, DimArray)):
                 index = index.tolist()
                 
@@ -74,7 +76,10 @@ class DataFrame(object):
                 self._index = index
             else:
                 self._index = Index(index)
-            self._dataframe = MIDataFrame(data, self._index._index, columns)
+            if data is None:
+                self._dataframe = MIDataFrame(self._index._index)
+            else:
+                self._dataframe = MIDataFrame(data, self._index._index, columns)
         else:
             self._dataframe = dataframe
             self._index = Index(index=self._dataframe.getIndex())
@@ -256,7 +261,9 @@ class DataFrame(object):
             value = value.array            
             
         if isinstance(key, basestring):
-            self._dataframe.setColumnData(key, value)
+            if isinstance(value, Series):
+                value = value.values.array
+            self._dataframe.setColumn(key, value)
             
         hascolkey = True
         if isinstance(key, tuple): 
@@ -386,13 +393,13 @@ class DataFrame(object):
         '''
         Return the sum of the values for the requested axis
         '''
-        return self._dataframe.sum()
+        return DataFrame(dataframe=self._dataframe.sum())
         
     def mean(self):
         '''
         Return the mean of the values for the requested axis
         '''
-        return self._dataframe.mean()
+        return DataFrame(dataframe=self._dataframe.mean())
     
     @classmethod
     def read_table(cls, filepath, **kwargs):

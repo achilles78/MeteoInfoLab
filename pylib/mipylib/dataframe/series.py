@@ -45,6 +45,7 @@ class Series(object):
         else:
             self._series = series
             self._data = MIArray(self._series.getData())
+            self._index = Index(index=self._series.getIndex())
         
     #---- index property
     def get_index(self):
@@ -77,31 +78,57 @@ class Series(object):
     
     #---- dtype property
     def get_dtype(self):
-        return self.data.dtype
+        return self.values.dtype
         
     dtype = property(get_dtype)
         
     def __getitem__(self, key):
-        rr = self.__getkey(key)
-        ikey = rr[0]
-        rdata = self.data.__getitem__(ikey)
-        if isinstance(ikey, int): 
-            return rdata
-        else: 
-            rindex = rr[1]
-            if rindex is None:
-                rindex = self.index.__getitem__(ikey)
+        if isinstance(key, int):
+            if key < 0 or key >= self.__len__():
+                raise KeyError(key)
+            return self._series.getValue(key)
+        elif isinstance(key, (list, tuple, MIArray)):
+            if isinstance(key, MIArray):
+                key = key.aslist()
+            if isinstance(key[0], int):
+                r = self._series.getValues(key)
             else:
-                if len(rr) == 4:
-                    rfdata = rr[2]
-                    rindex = list(rr[3])
-                    rdata = MIArray(self.index.fill_keylist(rdata, rfdata))
-            r = Series(rdata, rindex)
-            return r
+                r = self._series.getValuesByIndex(key)
+            return Series(series=r)
+        elif isinstance(key, slice):
+            if isinstance(key.start, basestring):
+                sidx = self._index.index(key.start)
+                if sidx < 0:
+                    sidx = 0
+            else:
+                sidx = 0 if key.start is None else key.start
+                if sidx < 0:
+                    sidx = self.__len__() + sidx
+            if isinstance(key.stop, basestring):
+                eidx = self._index.index(key.stop) + 1
+                if eidx < 0:
+                    eidx = self.__len__()
+            else:
+                eidx = self.__len__() if k.stop is None else k.stop
+                if eidx < 0:
+                    eidx = self.__len__() + eidx                    
+            step = 1 if k.step is None else k.step
+            rowkey = Range(sidx, eidx, step)   
+            r = self._series.getValues(rowkey)
+            return Series(series=r)
+        else:
+            i = self._series.getIndex().indexOf(key)
+            if i < 0:
+                raise KeyError(key)
+            return self._series.getValue(i)
         
     def __setitem__(self, key, value):
+        if isinstance(key, Series):
+            self._series.setValue(key._series, value)
+            return None
+            
         ikey = self.__getkey(key)[0]
-        self.data.__setitem__(ikey, value)
+        self.values.__setitem__(ikey, value)
     
     def __getkey(self, key):
         if isinstance(key, basestring):
@@ -135,8 +162,8 @@ class Series(object):
         """
         provide iteration over the values of the Series
         """
-        #return iter(self.data)
-        #return zip(iter(self.index), iter(self.data))
+        #return iter(self.values)
+        #return zip(iter(self.index), iter(self.values))
         return iter(self.index)
         
     def iteritems(self):
@@ -146,13 +173,17 @@ class Series(object):
         return zip(iter(self.index), iter(self))
         
     def __len__(self):
-        return self.data.__len__()
+        return self.values.__len__()
         
     def __str__(self):
         return self.__repr__()
         
     def __repr__(self):
         return self._series.toString()
+        
+    def __lt__(self, other):        
+        r = Series(series=self._series.lessThan(other))
+        return r
 
     def head(self, n=5):
         '''
@@ -180,7 +211,11 @@ class Series(object):
         
         :returns: Mean value
         '''
-        return self._series.mean()
+        r = self._series.mean()
+        if isinstance(r, (MISeries)):
+            return Series(series=r)
+        else:
+            return r
         
     def groupby(self, by=None):
         '''
@@ -201,5 +236,5 @@ class Series(object):
         
         :returns: Grouped Series
         '''
-        df = self._series.groupByIndex(by)
+        df = self._series.resample(by)
         return Series(series=df)
