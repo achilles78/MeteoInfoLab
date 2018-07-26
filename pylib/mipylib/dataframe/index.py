@@ -15,6 +15,22 @@ import mipylib.miutil as miutil
 
 class Index(object):
     
+    @staticmethod
+    def factory(data=None, name='Index', index=None):
+        '''
+        Factory method
+        '''
+        if index is None:
+            if isinstance(data[0], datetime.datetime):
+                return DateTimeIndex(data, name)
+            else:
+                return Index(data, name)
+        else:
+            if isinstance(index, MIDateTimeIndex):
+                return DateTimeIndex(index=index)
+            else:
+                return Index(index=index)
+    
     def __init__(self, data=None, name='Index', index=None):
         '''
         Index 
@@ -30,7 +46,7 @@ class Index(object):
             self.name = name
         else:
             self._index = index
-            self.data = list(self._index.getValues())
+            self.data = list(self._index.getData())
             self.name = self._index.getName()
         
     def __len__(self):
@@ -98,7 +114,7 @@ class DateTimeIndex(Index):
                 self.data = miutil.pydate(list(self._index.getDateValues()))
         else:
             self._index = index
-            self.data = list(self._index.getValues())
+            self.data = miutil.pydate(list(self._index.getDateValues()))
             
     def index(self, v):
         '''

@@ -454,7 +454,7 @@ def absolute(x):
     '''
     if isinstance(x, list):
         x = array(x)
-    if isinstance(x, (DimArray, MIArray)):
+    if isinstance(x, MIArray):
         return x.abs()
     else:
         return abs(x)
@@ -475,7 +475,7 @@ def sqrt(x):
     """
     if isinstance(x, list):
         return array(x).sqrt()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.sqrt()
     else:
         return math.sqrt(x)
@@ -493,13 +493,13 @@ def power(x1, x2):
         x1 = array(x1)
     if isinstance(x2, list):
         x2 = array(x2)
-    if isinstance(x1, (DimArray, MIArray)):
-        if isinstance(x2, (DimArray, MIArray)):
+    if isinstance(x1, MIArray):
+        if isinstance(x2, MIArray):
             return MIArray(ArrayMath.pow(x1.asarray(), x2.asarray()))
         else:
             return MIArray(ArrayMath.pow(x1.asarray(), x2))
     else:
-        if isinstance(x2, (DimArray, MIArray)):
+        if isinstance(x2, MIArray):
             return MIArray(ArrayMath.pow(x1, x2.asarray()))
         else:
             if isinstance(x1, complex):
@@ -517,7 +517,7 @@ def degrees(x):
     '''
     if isinstance(x, (list, tuple)):
         x = array(x)
-    if isinstance(x, (DimArray, MIArray)):
+    if isinstance(x, MIArray):
         return MIArray(ArrayMath.toDegrees(x.asarray()))
     else:
         return math.degrees(x)
@@ -532,7 +532,7 @@ def radians(x):
     '''
     if isinstance(x, (list, tuple)):
         x = array(x)
-    if isinstance(x, (DimArray, MIArray)):
+    if isinstance(x, MIArray):
         return MIArray(ArrayMath.toRadians(x.asarray()))
     else:
         return math.radians(x)
@@ -554,7 +554,7 @@ def sin(x):
     """
     if isinstance(x, list):
         return array(x).sin()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.sin()
     else:
         if isinstance(x, complex):
@@ -577,7 +577,7 @@ def cos(x):
     """
     if isinstance(x, list):
         return array(x).cos()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.cos()
     else:
         if isinstance(x, complex):
@@ -600,7 +600,7 @@ def tan(x):
     """
     if isinstance(x, list):
         return array(x).tan()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.tan()
     else:
         if isinstance(x, complex):
@@ -624,7 +624,7 @@ def asin(x):
     """
     if isinstance(x, list):
         return array(x).asin()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.asin()
     else:
         if isinstance(x, complex):
@@ -649,7 +649,7 @@ def acos(x):
     """
     if isinstance(x, list):
         return array(x).acos()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.acos()
     else:
         if isinstance(x, complex):
@@ -675,7 +675,7 @@ def atan(x):
     """
     if isinstance(x, list):
         return array(x).atan()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.atan()
     else:
         if isinstance(x, complex):
@@ -700,8 +700,12 @@ def atan2(x1, x2):
         >>> atan2(y, x) * 180 / pi
         array([-135.00000398439022, -45.000001328130075, 45.000001328130075, 135.00000398439022])
     """    
-    if isinstance(x1, DimArray) or isinstance(x1, MIArray):
-        return MIArray(ArrayMath.atan2(x1.asarray(), x2.asarray()))
+    if isinstance(x1, MIArray):
+        r = MIArray(ArrayMath.atan2(x1.array, x2.array))
+        if isinstance(x1, DimArray):
+            return DimArray(r, x1.dims, x1.fill_value, x1.proj)
+        else:
+            return r
     else:
         return math.atan2(x1, x2)
         
@@ -723,7 +727,7 @@ def exp(x):
     """
     if isinstance(x, list):
         return array(x).exp()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.exp()
     else:
         if isinstance(x, complex):
@@ -749,7 +753,7 @@ def log(x):
     """
     if isinstance(x, list):
         return array(x).log()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.log()
     else:
         if isinstance(x, complex):
@@ -772,7 +776,7 @@ def log10(x):
     """
     if isinstance(x, list):
         return array(x).log10()
-    elif isinstance(x, (DimArray, MIArray)):
+    elif isinstance(x, MIArray):
         return x.log10()
     else:
         if isinstance(x, complex):

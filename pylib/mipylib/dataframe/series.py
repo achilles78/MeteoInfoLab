@@ -39,13 +39,13 @@ class Series(object):
             if isinstance(index, Index):
                 self._index = index
             else:
-                self._index = Index(index)
+                self._index = Index.factory(index)
             self._data = data
             self._series = MISeries(data.array, self._index._index, name)
         else:
             self._series = series
             self._data = MIArray(self._series.getData())
-            self._index = Index(index=self._series.getIndex())
+            self._index = Index.factory(index=self._series.getIndex())
         
     #---- index property
     def get_index(self):

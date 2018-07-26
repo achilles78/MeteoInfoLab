@@ -34,7 +34,7 @@ def pydate(t):
             minute = cal.get(Calendar.MINUTE)
             second = cal.get(Calendar.SECOND)
             dt = datetime.datetime(year, month, day, hour, minute, second)
-            r.append(tt)
+            r.append(dt)
         return r
     else:
         cal.setTime(t)

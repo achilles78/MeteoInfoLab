@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\array">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
@@ -22,11 +22,13 @@
       <OpenedFile File="D:\KeyData\BC_New\script\average_all_1.py"/>
       <OpenedFile File="D:\KeyData\BC_New\script\average_month_of_year.py"/>
       <OpenedFile File="D:\KeyData\BC_New\script\test_read_data_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\KeyData\BC_New\script\average_all_1.py"/>
       <RecentFile File="D:\KeyData\BC_New\script\average_month_of_year.py"/>
       <RecentFile File="D:\KeyData\BC_New\script\test_read_data_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
     </RecentFiles>
   </File>
   <Font>

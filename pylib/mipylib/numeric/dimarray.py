@@ -1052,6 +1052,7 @@ class DimArray(MIArray):
         :param smooth: (*int*) 1 or 0 - only used for ``micaps4`` file.
         :param boldvalue: (*int*) Bold contour value - only used for ``micaps4`` file.
         :param proj: (*ProjectionInfo*) Data ProjectionInfo - only used for ``micaps4`` file.
+        :param float_format: (*string*) Float number format, such as '%.2f'.
         '''
         if self.ndim != 2:
             print 'The array must be 2 dimensional!'
@@ -1072,15 +1073,15 @@ class DimArray(MIArray):
             level = kwargs.pop('level', 0)
             smooth = kwargs.pop('smooth', 1)
             boldvalue =kwargs.pop('boldvalue', 0)
-            float_fromat = kwargs.pop('float_fromat', None)
+            float_format = kwargs.pop('float_format', None)
             proj = kwargs.pop('proj', self.proj)
             if proj is None:
-                gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_fromat)
+                gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_format)
             else:
                 if proj.isLonLat():
-                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_fromat)
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_format)
                 else:
-                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_fromat, proj)
+                    gdata.saveAsMICAPS4File(fname, desc, date, hours, level, smooth, boldvalue, float_format, proj)
     
        
 # The encapsulate class of GridData

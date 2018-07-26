@@ -75,14 +75,14 @@ class DataFrame(object):
             if isinstance(index, Index):
                 self._index = index
             else:
-                self._index = Index(index)
+                self._index = Index.factory(index)
             if data is None:
                 self._dataframe = MIDataFrame(self._index._index)
             else:
                 self._dataframe = MIDataFrame(data, self._index._index, columns)
         else:
             self._dataframe = dataframe
-            self._index = Index(index=self._dataframe.getIndex())
+            self._index = Index.factory(index=self._dataframe.getIndex())
         
     #---- index property
     def get_index(self):
