@@ -105,11 +105,11 @@ class Series(object):
                 if sidx < 0:
                     sidx = self.__len__() + sidx
             if isinstance(key.stop, basestring):
-                eidx = self._index.index(key.stop) + 1
+                eidx = self._index.index(key.stop)
                 if eidx < 0:
                     eidx = self.__len__()
             else:
-                eidx = self.__len__() if k.stop is None else k.stop
+                eidx = self.__len__() - 1 if k.stop is None else k.stop - 1
                 if eidx < 0:
                     eidx = self.__len__() + eidx                    
             step = 1 if k.step is None else k.step

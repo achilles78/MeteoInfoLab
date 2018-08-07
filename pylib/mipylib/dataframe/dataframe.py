@@ -92,8 +92,10 @@ class DataFrame(object):
         return self._index
         
     def set_index(self, value):
-        self._index = Index(value)
-        self._dataframe.setIndex(self._index.data)
+        if isinstance(value, Series):
+            value = value.values
+        self._index = Index.factory(value, self._index.name)
+        self._dataframe.setIndex(self._index._index)
         
     index = property(get_index, set_index)
     
@@ -175,14 +177,14 @@ class DataFrame(object):
             sidx = k
             if sidx < 0:
                 sidx = self.shape[0] + sidx
-            eidx = sidx + 1
+            eidx = sidx
             step = 1
             rowkey = Range(sidx, eidx, step)
         elif isinstance(k, basestring):
             sidx = self._index.index(k)
             if sidx < 0:
                 return None
-            eidx = sidx + 1
+            eidx = sidx
             step = 1
             rowkey = Range(sidx, eidx, step)
         elif isinstance(k, slice):
@@ -195,11 +197,11 @@ class DataFrame(object):
                 if sidx < 0:
                     sidx = self.shape[0] + sidx
             if isinstance(k.stop, basestring):
-                eidx = self._index.index(k.stop) + 1
+                eidx = self._index.index(k.stop)
                 if eidx < 0:
-                    eidx = self.shape[0]
+                    eidx = self.shape[0] + eidx
             else:
-                eidx = self.shape[0] if k.stop is None else k.stop
+                eidx = self.shape[0] - 1 if k.stop is None else k.stop - 1
                 if eidx < 0:
                     eidx = self.shape[0] + eidx                    
             step = 1 if k.step is None else k.step
@@ -218,21 +220,21 @@ class DataFrame(object):
             return None
                    
         if not hascolkey:
-            colkey = Range(0, self.shape[1], 1)
+            colkey = Range(0, self.shape[1] - 1, 1)
         else:
             k = key[1]
             if isinstance(k, int):
                 sidx = k
                 if sidx < 0:
                     sidx = self.shape[1] + sidx
-                eidx = sidx + 1
+                eidx = sidx
                 step = 1
                 colkey = Range(sidx, eidx, step)
             elif isinstance(k, slice):
                 sidx = 0 if k.start is None else k.start
                 if sidx < 0:
                     sidx = self.shape[1] + sidx
-                eidx = self.shape[1] if k.stop is None else k.stop
+                eidx = self.shape[1] - 1 if k.stop is None else k.stop - 1
                 if eidx < 0:
                     eidx = self.shape[1] + eidx                    
                 step = 1 if k.step is None else k.step
@@ -389,6 +391,17 @@ class DataFrame(object):
         if isinstance(value, MIArray):
             value = value.array 
         self._dataframe.addColumn(loc, column, value)
+        
+    def drop(self, columns=None):
+        '''
+        Drop specified labels from rows or columns.
+        
+        :param columns: (*list like*) Column labels.
+        '''
+        if isinstance(columns, basestring):
+            columns = [columns]
+        r = self._dataframe.drop(columns)
+        return DataFrame(dataframe=r)
     
     def append(self, other):
         '''

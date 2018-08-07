@@ -187,6 +187,18 @@ def str2jdate(dstr):
     jt = jdate(pt)
     return jt
     
+def str2jdatetime(dstr):
+    '''
+    Convert string to joda DateTime.
+    
+    :param dstr: (*string*) date string.
+    
+    :returns: Joda DateTime
+    '''
+    pt = str2date(dstr)
+    jt = jdatetime(pt)
+    return jt
+    
 def dateformat(t, format, language=None):
     """
     Format python date to string using Java SimpleDateFormat.
