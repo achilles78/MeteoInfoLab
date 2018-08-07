@@ -280,7 +280,7 @@ class Axes3D(Axes):
         else:
             font = Font(tickfontname, Font.PLAIN, tickfontsize)
         axislist = []
-        axislist.append(ax.axes.getZAxis())
+        axislist.append(self.axes.getZAxis())
         for axis in axislist:
             if not visible is None:
                 axis.setVisible(visible)

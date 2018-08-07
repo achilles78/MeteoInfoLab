@@ -5,6 +5,8 @@
 # Note: Jython
 #-----------------------------------------------------
 
+import datetime
+
 from org.meteoinfo.data.dataframe import DataFrame as MIDataFrame
 from org.meteoinfo.data.dataframe import Series as MISeries
 from ucar.ma2 import Range, Array
@@ -12,6 +14,7 @@ from ucar.ma2 import Range, Array
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import mipylib.numeric.minum as minum
+import mipylib.miutil as miutil
 import index
 from index import Index
 import series
@@ -255,7 +258,11 @@ class DataFrame(object):
         return r
         
     def __setitem__(self, key, value):
+        if isinstance(value, datetime.datetime):
+            value = miutil.jdatetime(value)
         if isinstance(value, (list, tuple)):
+            if isinstance(value[0], datetime.datetime):
+                value = miutil.jdatetime(value)
             value = minum.array(value)
         if isinstance(value, MIArray):
             value = value.array            
@@ -365,6 +372,35 @@ class DataFrame(object):
         
     T = property(transpose)
     
+    def insert(self, loc, column, value):
+        '''
+        Insert column into DataFrame at specified location.
+        
+        :param loc: (*int*) Insertation index.
+        :param column: (*string*) Label of inserted column.
+        :param value: (*array_like*) Column values.
+        '''
+        if isinstance(value, datetime.datetime):
+            value = miutil.jdatetime(value)
+        if isinstance(value, (list, tuple)):
+            if isinstance(value[0], datetime.datetime):
+                value = miutil.jdatetime(value)
+            value = minum.array(value)
+        if isinstance(value, MIArray):
+            value = value.array 
+        self._dataframe.addColumn(loc, column, value)
+    
+    def append(self, other):
+        '''
+        Append another data frame.
+        
+        :param other: (*DataFrame*) Other data frame.
+        
+        :returns: (*DataFrame*) Appended data frame.
+        '''
+        r = self._dataframe.append(other._dataframe)
+        return DataFrame(dataframe=r)
+    
     def groupby(self, by):
         '''
         Group DataFrame.
@@ -446,3 +482,5 @@ class DataFrame(object):
         :param index: (*boolean*) Write index or not.
         '''
         self._dataframe.saveCSV(filepath, delimiter, date_format, float_format, index)
+
+#################################################################

@@ -181,8 +181,24 @@ class Series(object):
     def __repr__(self):
         return self._series.toString()
         
+    def __eq__(self, other):
+        r = Series(series=self._series.equal(other))
+        return r
+        
     def __lt__(self, other):        
         r = Series(series=self._series.lessThan(other))
+        return r
+        
+    def __le__(self, other):        
+        r = Series(series=self._series.lessThanOrEqual(other))
+        return r
+        
+    def __gt__(self, other):        
+        r = Series(series=self._series.greaterThan(other))
+        return r
+        
+    def __ge__(self, other):        
+        r = Series(series=self._series.greaterThanOrEqual(other))
         return r
 
     def head(self, n=5):
@@ -216,6 +232,30 @@ class Series(object):
             return Series(series=r)
         else:
             return r
+            
+    def max(self):
+        '''
+        Return the maximum of the values
+        
+        :returns: Maximum value
+        '''
+        r = self._series.max()
+        if isinstance(r, (MISeries)):
+            return Series(series=r)
+        else:
+            return r
+            
+    def min(self):
+        '''
+        Return the minimum of the values
+        
+        :returns: Minimum value
+        '''
+        r = self._series.min()
+        if isinstance(r, (MISeries)):
+            return Series(series=r)
+        else:
+            return r
         
     def groupby(self, by=None):
         '''
@@ -238,3 +278,5 @@ class Series(object):
         '''
         df = self._series.resample(by)
         return Series(series=df)
+        
+#################################################################

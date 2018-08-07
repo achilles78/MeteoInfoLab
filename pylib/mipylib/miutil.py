@@ -12,6 +12,7 @@ from org.meteoinfo.shape import PointShape, ShapeUtil
 from java.util import Calendar, Locale
 from java.text import SimpleDateFormat
 from java.awt import Color
+from org.joda.time import DateTime
 import datetime
 
 def pydate(t):    
@@ -21,12 +22,35 @@ def pydate(t):
     :param t: Java date
     
     :returns: Python date
-    """
-    cal = Calendar.getInstance()
+    """    
     if isinstance(t, list):
         r = []
-        for tt in t:
-            cal.setTime(tt)
+        if isinstance(t[0], DateTime):
+            for tt in t:
+                dt = datetime.datetime(tt.getYear(), tt.getMonthOfYear(), tt.getDayOfMonth(), tt.getHourOfDay(), \
+                    tt.getMinuteOfHour(), tt.getSecondOfMinute(), tt.getMillisOfSecond() * 1000)
+                r.append(dt)            
+        else:
+            cal = Calendar.getInstance()
+            for tt in t:
+                cal.setTime(tt)
+                year = cal.get(Calendar.YEAR)
+                month = cal.get(Calendar.MONTH) + 1
+                day = cal.get(Calendar.DAY_OF_MONTH)
+                hour = cal.get(Calendar.HOUR_OF_DAY)
+                minute = cal.get(Calendar.MINUTE)
+                second = cal.get(Calendar.SECOND)
+                dt = datetime.datetime(year, month, day, hour, minute, second)
+                r.append(dt)
+        return r
+    else:
+        if isinstance(t, DateTime):
+            dt = datetime.datetime(tt.getYear(), tt.getMonthOfYear(), tt.getDayOfMonth(), \
+                tt.getHourOfDay(), tt.getMinuteOfHour(), tt.getSecondOfMinute(), tt.getMillisOfSecond())
+            return dt
+        else:
+            cal = Calendar.getInstance()
+            cal.setTime(t)
             year = cal.get(Calendar.YEAR)
             month = cal.get(Calendar.MONTH) + 1
             day = cal.get(Calendar.DAY_OF_MONTH)
@@ -34,18 +58,7 @@ def pydate(t):
             minute = cal.get(Calendar.MINUTE)
             second = cal.get(Calendar.SECOND)
             dt = datetime.datetime(year, month, day, hour, minute, second)
-            r.append(dt)
-        return r
-    else:
-        cal.setTime(t)
-        year = cal.get(Calendar.YEAR)
-        month = cal.get(Calendar.MONTH) + 1
-        day = cal.get(Calendar.DAY_OF_MONTH)
-        hour = cal.get(Calendar.HOUR_OF_DAY)
-        minute = cal.get(Calendar.MINUTE)
-        second = cal.get(Calendar.SECOND)
-        dt = datetime.datetime(year, month, day, hour, minute, second)
-        return dt
+            return dt
     
 def jdate(t):
     """
@@ -67,6 +80,22 @@ def jdate(t):
         cal.set(t.year, t.month - 1, t.day, t.hour, t.minute, t.second)
         cal.set(Calendar.MILLISECOND, 0)
         return cal.getTime()
+        
+def jdatetime(t):
+    """
+    Convert python date to joda DateTime.
+    
+    :param t: Python date
+    
+    :returns: Joda DateTime
+    """
+    if isinstance(t, list):
+        r = []
+        for tt in t:
+            r.append(DateTime(tt.year, tt.month, tt.day, tt.hour, tt.minute, tt.second, tt.microsecond / 1000))
+        return r
+    else:
+        return DateTime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond / 1000)
     
 def date2num(t):
     """

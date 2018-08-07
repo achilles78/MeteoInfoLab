@@ -11,7 +11,9 @@ from dimvariable import DimVariable, TDimVariable
 from mipylib.numeric.dimarray import DimArray, PyGridData, PyStationData
 from mipylib.geolib.milayer import MILayer, MIXYListData
 from mipylib.numeric.miarray import MIArray
+from mipylib.dataframe.dataframe import DataFrame
 import mipylib.miutil as miutil
+import mipylib.numeric.minum as minum
 
 import datetime
 
@@ -130,6 +132,20 @@ class DimDataFile():
         Print data file information
         '''
         print self.dataset.getInfoText()
+        
+    def read_dataframe(self):
+        '''
+        Read data frame from dataset.
+        '''
+        df = self.dataset.getDataInfo().readDataFrame()
+        return DataFrame(dataframe=df)
+        
+    def read_table(self):
+        '''
+        Read data table from dataset.
+        '''
+        dt = self.dataset.getDataInfo().readTable()
+        return minum.datatable(dt)
         
     def griddata(self, varname='var', timeindex=0, levelindex=0, yindex=None, xindex=None):
         if self.dataset.isGridData():
