@@ -8,6 +8,7 @@ from org.meteoinfo.data import TableUtil, XYListDataset
 from org.meteoinfo.layer import LayerTypes, VectorLayer
 from org.meteoinfo.projection import ProjectionUtil, KnownCoordinateSystems
 from org.meteoinfo.shape import PolygonShape, ShapeTypes
+from org.meteoinfo.legend import LegendType
 from java.util import Date, Calendar
 from java.awt import Font
 from datetime import datetime
@@ -127,6 +128,24 @@ class MILayer(object):
         :param legend: (*LegendScheme*) Legend scheme.
         '''
         self.layer.setLegendScheme(legend)
+        
+    def update_legend(self, ltype, fieldname):
+        '''
+        Update legend scheme.
+        
+        :param ltype: (*string*) Legend type [single | unique | graduate].
+        :param fieldname: (*string*) Field name.
+        '''
+        if ltype == 'single':
+            ltype = LegendType.SingleSymbol
+        elif ltype == 'unique':
+            ltype = LegendType.UniqueValue
+        elif ltyp == 'graduate':
+            ltype = LegendType.GraduatedColor
+        else:
+            raise ValueError(ltype)
+        self.layer.updateLegendScheme(ltype, fieldname)
+        return self.layer.getLegendScheme()
     
     def addfield(self, fieldname, dtype, values=None):
         '''
