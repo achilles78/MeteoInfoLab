@@ -95,6 +95,22 @@ class Index(object):
     def fill_keylist(self, rdata, rfdata):
         return self._index.fillKeyList(rdata.asarray(), rfdata)
         
+    def get_format(self):
+        '''
+        Get value to string format.
+        
+        :returns: (*string*) Format string.
+        '''
+        return self._index.getFormat()
+        
+    def set_format(self, format):
+        '''
+        Set value to string format.
+        
+        :param format: (*string*) Format string.
+        '''
+        self._index.setFormat(format)
+        
 ############################################
 class DateTimeIndex(Index):
     

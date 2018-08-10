@@ -6,6 +6,7 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.data.dataframe import Series as MISeries
+from ucar.ma2 import Range
 
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
@@ -109,10 +110,10 @@ class Series(object):
                 if eidx < 0:
                     eidx = self.__len__()
             else:
-                eidx = self.__len__() - 1 if k.stop is None else k.stop - 1
+                eidx = self.__len__() - 1 if key.stop is None else key.stop - 1
                 if eidx < 0:
                     eidx = self.__len__() + eidx                    
-            step = 1 if k.step is None else k.step
+            step = 1 if key.step is None else key.step
             rowkey = Range(sidx, eidx, step)   
             r = self._series.getValues(rowkey)
             return Series(series=r)

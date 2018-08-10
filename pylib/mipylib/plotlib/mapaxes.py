@@ -220,7 +220,7 @@ class MapAxes(Axes):
         :param z: (*float*) Z coordinate - only used for 3-D axes.
         '''
         if not self.axes.isLonLatMap():
-            x, y = minum.project(x, y, toproj=self.proj)  
+            x, y = migeo.project(x, y, toproj=self.proj)  
             
         rect = self.axes.getPositionArea()
         r = self.axes.projToScreen(x, y, rect)
