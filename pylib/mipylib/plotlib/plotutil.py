@@ -527,12 +527,15 @@ def setlegendscheme_point(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Point)  
     sizes = kwargs.get('size', None)
     colors = kwargs.get('colors', None)
+    marker = kwargs.get('marker', None)
     i = 0
     for lb in ls.getLegendBreaks():
         if isinstance(sizes, (list, tuple, MIArray)): 
             kwargs['size'] = sizes[i]
         if isinstance(colors, (list, tuple, MIArray)):
             kwargs['color'] = colors[i]
+        if isinstance(marker, (list, tuple, MIArray)):
+            kwargs['marker'] = marker[i]
         setpointlegendbreak(lb, **kwargs)
         i += 1
 

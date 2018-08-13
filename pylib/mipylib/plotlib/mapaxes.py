@@ -740,6 +740,10 @@ class MapAxes(Axes):
             if not size is None:
                 if isinstance(size, (list, tuple, MIArray)) and len(size) == x.size:
                     isunique = True
+            marker = kwargs.get('marker', None)
+            if not marker is None:
+                if isinstance(marker, (list, tuple, MIArray)) and len(marker) == x.size:
+                    isunique = True
             if isunique:
                 ls = LegendManage.createUniqValueLegendScheme(x.size, ShapeTypes.Point)
             else:
