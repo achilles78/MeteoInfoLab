@@ -467,7 +467,7 @@ def readtable(filename, **kwargs):
     encoding = kwargs.pop('encoding', 'UTF8')
     readvarnames = kwargs.pop('readvarnames', True)
     readrownames = kwargs.pop('readrownames', False)
-    tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding)
+    tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding, readvarnames)
     r = PyTableData(tdata)
     varnames = kwargs.pop('colnames', None)
     varnames = kwargs.pop('varnames', varnames)

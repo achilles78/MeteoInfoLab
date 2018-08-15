@@ -6,6 +6,7 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.shape import ShapeUtil, PointShape
+from org.meteoinfo.global import PointD
 import mipylib.numeric.minum as minum
 
 __all__ = [

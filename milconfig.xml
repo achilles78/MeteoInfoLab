@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\KeyData\BC_New\script">
-    <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\wind">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
@@ -16,21 +15,18 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\KeyData\BC_New"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe.py"/>
-      <OpenedFile File="D:\KeyData\BC_New\script\test_read_data_1.py"/>
-      <OpenedFile File="D:\KeyData\BC_New\script\average_month_1.py"/>
-      <OpenedFile File="D:\KeyData\BC_New\script\test_read_data_month.py"/>
-      <OpenedFile File="D:\KeyData\BC_New\script\test_read_data_df.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\radar_wind_df.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\barbs_2.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe.py"/>
-      <RecentFile File="D:\KeyData\BC_New\script\test_read_data_1.py"/>
-      <RecentFile File="D:\KeyData\BC_New\script\average_month_1.py"/>
-      <RecentFile File="D:\KeyData\BC_New\script\test_read_data_month.py"/>
-      <RecentFile File="D:\KeyData\BC_New\script\test_read_data_df.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\radar_wind_df.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\barbs_2.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -435,7 +435,7 @@ class MIArray(object):
             r = MIArray(ArrayUtil.toInteger(self.array))
         elif dtype == 'float' or dtype is float:
             r = MIArray(ArrayUtil.toFloat(self.array))
-        elif dtype == 'boolean' or dtype is boolean:
+        elif dtype == 'boolean' or dtype is bool:
             r = MIArray(ArrayUtil.toBoolean(self.array))
         else:
             r = self

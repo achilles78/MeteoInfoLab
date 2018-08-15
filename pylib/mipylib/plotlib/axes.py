@@ -2559,7 +2559,7 @@ class Axes(object):
                 cdata = args[0]
                 iscolor = True
                 args = args[1:]
-        elif n <= 5:
+        elif n <= 6:
             x = args[0]
             y = args[1]
             u = args[2]

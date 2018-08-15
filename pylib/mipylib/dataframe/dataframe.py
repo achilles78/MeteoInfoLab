@@ -460,26 +460,30 @@ class DataFrame(object):
             delimiter.
         :param format: (*string*) Colomn format of the file. Default is ``None``, means all columns were
             read as string variable. ``%s``: string; ``%i``: integer; ``%f``: float; ``%{yyyyMMdd...}D``: 
-            date time.
-        :param headerlines: (*int*) Lines to skip at beginning of the file. Default is ``0``. The line
-            after the skip lines will be read as variable names of the table. the ``headerlines`` should set
-            as ``-1`` if there is no field name line at beginning of the file.
+            date time.           
+        :param skiprows: (*int*) Lines to skip at beginning of the file. Default is ``0``.
+        :param skipfooter: (*int*) Number of lines at bottom of file to skip.
         :param encoding: (*string*) Character encoding scheme associated with the file. Default is ``UTF8``.
-        :param varnames: (*string*) Specified variable names for the readed table. Default is ``None``, means
-            the variable names should be read from the file.
-        :param readvarnames: (*boolean*) Read variable names or not. Default is ``True``.
-        :param readrownames: (*boolean*) Read row names or not. Default is ``False``.
+        :param names: (*array_like*) List of column names to use. If file contains no header row, then you should 
+            explicitly pass header=None. Default is None.
+        :param header: (*int*) Row number to use as the column names. If column names are passed explicitly 
+            then the behavior is identical to ``header=None``. 
+        :param index_col: (*int*) Column to use as the row labels (index) of the DataFrame.
+        :param index_format: (*string*) Index column format.
             
         :returns: (*DataFrame*) The DataFrame.
         '''
         delimiter = kwargs.pop('delimiter', None)
         format = kwargs.pop('format', None)
-        headerlines = kwargs.pop('headerlines', 0)
+        skiprows = kwargs.pop('skiprows', 0)
+        skipfooter = kwargs.pop('skipfooter', 0)
         encoding = kwargs.pop('encoding', 'UTF8')
+        names = kwargs.pop('names', None)
+        header = kwargs.pop('header', 0)
         index_col = kwargs.pop('index_col', -1)
         index_format = kwargs.pop('index_format', None)
-        midf = MIDataFrame.readTable(filepath, delimiter, headerlines, format, encoding,
-            index_col, index_format)
+        midf = MIDataFrame.readTable(filepath, delimiter, skiprows, format, encoding,
+            index_col, index_format, names, header, skipfooter)
         return DataFrame(dataframe=midf)
         
     def to_csv(self, filepath, delimiter=',', format=None, date_format=None, \
