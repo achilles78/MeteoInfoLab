@@ -338,7 +338,7 @@ class MILayer(object):
         if fn is None:
             fn = self.layer.getFileName()
             
-        if self.layer.getFileName().strip() == '':
+        if fn.strip() == '':
             print 'File name is needed to save the layer!'
             raise IOError
         else:
