@@ -89,8 +89,20 @@ class Index(object):
         '''
         return self._index.indexOf(v)
 
-    def get_indices(self, key):
-        return self._index.getIndices(key)
+    def get_loc(self, key, outkeys=False):
+        '''
+        Get integer location, slice or boolean mask for requested label.
+        
+        :param key: (*string or list*) Label.
+        :param outkeys: (*boolean*) If return location keys or not.
+        
+        :returns: int if unique index, slice if monotonic index, else mask.
+        '''
+        if outkeys:
+            r = self._index.getIndices(key)
+            return list(r[0]), list(r[1])
+        else:
+            return list(self._index.getIndices(key)[0])
         
     def fill_keylist(self, rdata, rfdata):
         return self._index.fillKeyList(rdata.asarray(), rfdata)

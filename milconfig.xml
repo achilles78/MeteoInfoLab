@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\wind">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\array">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
@@ -19,14 +19,14 @@
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\radar_wind_df.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\radar_wind_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\series_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\radar_wind_df.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\radar_wind_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\series_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
     </RecentFiles>
   </File>
   <Font>

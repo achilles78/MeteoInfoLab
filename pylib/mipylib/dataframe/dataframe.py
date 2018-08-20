@@ -15,10 +15,9 @@ from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import mipylib.numeric.minum as minum
 import mipylib.miutil as miutil
-import index
 from index import Index
-import series
 from series import Series
+from indexing import LocIndexer, ILocIndexer, AtIndexer, IAtIndexer
 
 from java.lang import Double
 nan = Double.NaN
@@ -144,6 +143,34 @@ class DataFrame(object):
         return r
         
     dtypes = property(get_dtypes)
+    
+    @property
+    def loc(self):
+        '''
+        Access a group of rows and columns by label(s) or a boolean array.
+        '''
+        return LocIndexer(self)
+        
+    @property
+    def iloc(self):
+        '''
+        Purely integer-location based indexing for selection by position.
+        '''
+        return ILocIndexer(self)
+        
+    @property
+    def at(self):
+        '''
+        Access a single value for a row/column label pair.
+        '''
+        return AtIndexer(self)
+       
+    @property
+    def iat(self):
+        '''
+        Access a single value for a row/column pair by integer position.
+        '''
+        return IAtIndexer(self)
         
     def __getitem__(self, key):
         if isinstance(key, basestring):
@@ -208,7 +235,7 @@ class DataFrame(object):
             rowkey = Range(sidx, eidx, step)
         elif isinstance(k, list):
             if isinstance(k[0], int):
-                rowkey = key
+                rowkey = k
             else:
                 tlist = []
                 for tstr in k:
@@ -241,7 +268,7 @@ class DataFrame(object):
                 colkey = Range(sidx, eidx, step)        
             elif isinstance(k, list):
                 if isinstance(k[0], int):
-                    colkey = key
+                    colkey = k
                 else:
                     colkey = self.columns.indexOfName(k)               
             elif isinstance(k, basestring):
@@ -291,6 +318,141 @@ class DataFrame(object):
         else:
             key = (key, slice(None))
             hascolkey = False
+        
+    def _getitem_loc(self, key):   
+        if not isinstance(key, tuple): 
+            key = (key, None)
+      
+        k = key[0]
+        rkeys = key[0]
+        if isinstance(k, slice):
+            sidx = 0 if k.start is None else self._index.index(k.start)
+            if sidx < 0:
+                raise KeyError(key)
+            eidx = self.shape[0] - 1 if k.stop is None else self._index.index(k.stop)
+            if eidx < 0:
+                raise KeyError(key)                   
+            step = 1 if k.step is None else k.step
+            rowkey = Range(sidx, eidx, step)
+        else:
+            rowkey, rkeys = self._index.get_loc(k, outkeys=True)   
+                   
+        k = key[1]
+        if k is None:
+            colkey = Range(0, self.shape[1] - 1, 1)
+        else:
+            if isinstance(k, slice):
+                sidx = 0 if k.start is None else self.columns.indexOfName(k.start)
+                if sidx < 0:
+                    raise KeyError(key)
+                eidx = self.shape[1] - 1 if k.stop is None else self.columns.indexOfName(k.stop)
+                if eidx < 0:
+                    raise KeyError(key)                  
+                step = 1 if k.step is None else k.step
+                colkey = Range(sidx, eidx, step)        
+            elif isinstance(k, list):
+                colkey = self.columns.indexOfName(k)               
+            elif isinstance(k, basestring):
+                col = self.columns.indexOfName(k)
+                if col < 0:
+                    raise KeyError(key)
+                colkey = Range(col, col + 1, 1)
+            else:
+                return None
+        
+        if isinstance(rowkey, Range):
+            r = self._dataframe.select(rowkey, colkey)
+        else:
+            if not isinstance(rkeys, list):
+                rkeys = [rkeys]
+            r = self._dataframe.select(rkeys, rowkey, colkey)
+        if r is None:
+            return None
+        if isinstance(r, MISeries):
+            r = Series(series=r)
+        else:
+            r = DataFrame(dataframe=r)
+        return r
+        
+    def _getitem_iloc(self, key):
+        if not isinstance(key, tuple): 
+            key = (key, None)
+    
+        k = key[0]
+        if isinstance(k, int):
+            sidx = k
+            if sidx < 0:
+                sidx = self.shape[0] + sidx
+            eidx = sidx
+            step = 1
+            rowkey = Range(sidx, eidx, step)
+        elif isinstance(k, slice):
+            sidx = 0 if k.start is None else k.start
+            if sidx < 0:
+                sidx = self.shape[0] + sidx
+            eidx = self.shape[0] - 1 if k.stop is None else k.stop - 1
+            if eidx < 0:
+                eidx = self.shape[0] + eidx                    
+            step = 1 if k.step is None else k.step
+            rowkey = Range(sidx, eidx, step)
+        elif isinstance(k, list):
+            rowkey = k            
+        else:
+            return None
+                   
+        k = key[1]
+        if k is None:
+            colkey = Range(0, self.shape[1] - 1, 1)
+        else:
+            if isinstance(k, int):
+                sidx = k
+                if sidx < 0:
+                    sidx = self.shape[1] + sidx
+                eidx = sidx
+                step = 1
+                colkey = Range(sidx, eidx, step)
+            elif isinstance(k, slice):
+                sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.shape[1] + sidx
+                eidx = self.shape[1] - 1 if k.stop is None else k.stop - 1
+                if eidx < 0:
+                    eidx = self.shape[1] + eidx                    
+                step = 1 if k.step is None else k.step
+                colkey = Range(sidx, eidx, step)        
+            elif isinstance(k, list):
+                colkey = k
+            else:
+                return None
+        
+        r = self._dataframe.select(rowkey, colkey)
+        if r is None:
+            return None
+        if isinstance(r, MISeries):
+            r = Series(series=r)
+        else:
+            r = DataFrame(dataframe=r)
+        return r     
+
+    def _getitem_at(self, key):
+        ridx = key[0]
+        cidx = key[1]
+        ridx = self._index.index(ridx)        
+        if ridx < 0:
+            raise KeyError(key)
+        cidx = self.columns.indexOfName(cidx)
+        if cidx < 0:
+            raise KeyError(key)
+        return self._dataframe.getValue(ridx, cidx)
+            
+    def _getitem_iat(self, key):
+        ridx = key[0]
+        cidx = key[1]
+        if ridx < 0:
+            ridx = self.shape[0] + ridx
+        if cidx < 0:
+            cidx = self.shape[1] + cidx
+        return self._dataframe.getValue(ridx, cidx)
     
     def __getkey(self, key):
         if isinstance(key, basestring):

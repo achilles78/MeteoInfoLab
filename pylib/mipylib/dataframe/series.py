@@ -11,7 +11,6 @@ from ucar.ma2 import Range
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import mipylib.numeric.minum as minum
-import index
 from index import Index
 
 from java.lang import Double
@@ -93,7 +92,7 @@ class Series(object):
                 key = key.aslist()
             if isinstance(key[0], int):
                 r = self._series.getValues(key)
-            else:
+            else:                
                 r = self._series.getValuesByIndex(key)
             return Series(series=r)
         elif isinstance(key, slice):
@@ -118,46 +117,45 @@ class Series(object):
             r = self._series.getValues(rowkey)
             return Series(series=r)
         else:
-            i = self._series.getIndex().indexOf(key)
-            if i < 0:
-                raise KeyError(key)
-            return self._series.getValue(i)
+            r = self._series.getValuesByIndex(key)
+            if isinstance(r, MISeries):
+                return Series(series=r)
+            else:
+                return r
+            # i = self._series.getIndex().indexOf(key)
+            # if i < 0:
+                # raise KeyError(key)
+            # return self._series.getValue(i)
         
     def __setitem__(self, key, value):
         if isinstance(key, Series):
             self._series.setValue(key._series, value)
             return None
             
-        ikey = self.__getkey(key)[0]
+        ikey = self.__getkey(key)
         self.values.__setitem__(ikey, value)
     
     def __getkey(self, key):
         if isinstance(key, basestring):
-            rkey = self.index.get_indices(key)
-            ikey = rkey[0]
-            rindex = rkey[1]
+            ikey = self.index.get_loc(key)
             if len(ikey) == 1:
                 ikey = ikey[0]
             elif len(ikey) > 1:
                 ikey = list(ikey)
             else:
                 raise KeyError(key)
-            return ikey, rindex
+            return ikey
         elif isinstance(key, (list, tuple, MIArray, DimArray)) and isinstance(key[0], basestring):
             if isinstance(key, (MIArray, DimArray)):
                 key = key.asarray()            
-            rkey = self.index.get_indices(key)
-            ikey = rkey[0]
-            rindex = rkey[1]
-            rdata = rkey[2]
-            rrindex = rkey[3]
+            ikey = self.index.get_indices(key)
             if len(ikey) == 0:
                 raise KeyError()
             else:
                 ikey = list(ikey)
-            return ikey, rindex, rdata, rrindex
+            return ikey
         else:
-            return key, None
+            return key
         
     def __iter__(self):
         """
