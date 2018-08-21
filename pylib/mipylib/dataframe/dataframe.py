@@ -1,3 +1,4 @@
+# coding=utf-8
 #-----------------------------------------------------
 # Author: Yaqiang Wang
 # Date: 2017-3-7
@@ -575,6 +576,36 @@ class DataFrame(object):
         '''
         r = self._dataframe.append(other._dataframe)
         return DataFrame(dataframe=r)
+        
+    def sort_index(self, axis=0, ascending=True):
+        '''
+        Sort by the index along either axis
+
+        :param axis: (*int*) Axis to be sorted {0 or ‘index’, 1 or ‘columns’}, default 0
+        :param ascending: (*boolean*) Sort ascending vs. descending. 
+            
+        :returns: Sorted DataFrame
+        '''
+        df = self._dataframe.sortByIndex(ascending)
+        return DataFrame(dataframe=df)
+        
+    def sort_values(self, by, axis=0, ascending=True):
+        '''
+        Sort by the values along either axis
+        
+        :param by: (*string or list of string*) Name or list of names to sort by.
+        :param axis: (*int*) Axis to be sorted {0 or ‘index’, 1 or ‘columns’}, default 0
+        :param ascending: (*boolean*) Sort ascending vs. descending. Specify list for multiple sort orders. 
+            If this is a list of bools, must match the length of the by.
+            
+        :returns: Sorted DataFrame
+        '''
+        if isinstance(by, basestring):
+            by = [by]
+        if isinstance(ascending, bool):
+            ascending = [ascending] * len(by)
+        df = self._dataframe.sortBy(by, ascending)
+        return DataFrame(dataframe=df)
     
     def groupby(self, by):
         '''
