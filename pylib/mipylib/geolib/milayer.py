@@ -273,7 +273,7 @@ class MILayer(object):
         :param xoffset: (*int*) X coordinate offset. Default is ``0``.
         :param yoffset: (*int*) Y coordinate offset. Default is ``0``.
         :param avoidcoll: (*boolean*) Avoid labels collision or not. Default is ``True``.
-        :param align: (*string*) Chart align type [center | left | right], Default is ``center``.
+        :param align: (*string*) Chart align type [center | left | right | none], Default is ``center``.
         :param view3d: (*boolean*) Draw chart as 3D or not. Default is ``False``.
         :param thickness: (*int*) 3D chart thickness. Default is ``5``.
         :param drawlabel: (*boolean*) Draw label or not. Default is ``False``.
@@ -336,6 +336,12 @@ class MILayer(object):
             chartset.setDecimalDigits(decimals)
         self.layer.updateChartSet()
         self.layer.addCharts()
+        
+    def get_chartlegend(self):
+        '''
+        Get legend of the chart graphics.
+        '''
+        return self.layer.getChartSet().getLegendScheme()
         
     def get_chart(self, index):
         '''
