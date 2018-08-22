@@ -311,7 +311,7 @@ class DataFrame(object):
                     ridx = self.shape[0] + ridx
                 if cidx < 0:
                     cidx = self.shape[1] + cidx
-                self._dataframe.getValue(ridx, cidx, value)
+                self._dataframe.setValue(ridx, cidx, value)
             elif isinstance(ridx, int) and isinstance(cidx, basestring):
                 if ridx < 0:
                     ridx = self.shape[0] + ridx

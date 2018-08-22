@@ -1411,7 +1411,18 @@ class MapAxes(Axes):
         mapview.getMaskOut().setMaskLayer(mobj.layer.getLayerName())
         for layer in layers:
             layer.layer.setMaskout(True)
-
+            
+    def move_graphic(self, graphic, x=0, y=0, coordinates='screen'):
+        '''
+        Move a graphic by screen coordinate.
+        
+        :param graphic: (*Graphic*) A graphic.
+        :param x: (*float*) X shift for moving.
+        :param y: (*float*) Y shift for moving.
+        :param coordinates: (*string*) Coordinates of x/y ['screen' | 'data'].
+        '''
+        mapview = self.axes.getMapView()
+        mapview.moveGraphic(graphic, x, y, coordinates == 'screen')
 
 ########################################################3
 class Test():

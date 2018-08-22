@@ -5,7 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 from org.meteoinfo.data import TableUtil, XYListDataset
-from org.meteoinfo.layer import LayerTypes, VectorLayer
+from org.meteoinfo.layer import LayerTypes, VectorLayer, ChartSet
 from org.meteoinfo.projection import ProjectionUtil, KnownCoordinateSystems
 from org.meteoinfo.shape import PolygonShape, ShapeTypes
 from org.meteoinfo.legend import LegendType
@@ -212,7 +212,7 @@ class MILayer(object):
         :param bold: (*boolean*) Font bold or not. Default is ``False``.
         :param color: (*color*) Label color. Default is ``None`` with black color.
         :param xoffset: (*int*) X coordinate offset. Default is ``0``.
-        :param yoffset: (*int*) Y coordinate offset. Default is ``1``.
+        :param yoffset: (*int*) Y coordinate offset. Default is ``0``.
         :param avoidcoll: (*boolean*) Avoid labels collision or not. Default is ``True``.
         :param decimals: (*int*) Number of decimals of labels.
         '''
@@ -259,6 +259,107 @@ class MILayer(object):
         :param y: (*float*) Y shift for moving in pixel unit.
         '''
         self.layer.moveLabel(label, x, y)
+        
+    def add_charts(self, fieldnames, legend, **kwargs):
+        '''
+        Add charts
+        
+        :param fieldnames: (*list of string*) Field name list.
+        :param legend: (*LegendScheme*) Chart legend.
+        :param charttype: (*string*) Chart type [bar | pie]. Default is ``bar``.
+        :param minsize: (*int*) Minimum chart size. Default is ``0``.
+        :param maxsize: (*int*) Maximum chart size. Default is ``50``.
+        :param barwidth: (*int*) Bar width. Only valid for bar chart. Default is ``8``.
+        :param xoffset: (*int*) X coordinate offset. Default is ``0``.
+        :param yoffset: (*int*) Y coordinate offset. Default is ``0``.
+        :param avoidcoll: (*boolean*) Avoid labels collision or not. Default is ``True``.
+        :param align: (*string*) Chart align type [center | left | right], Default is ``center``.
+        :param view3d: (*boolean*) Draw chart as 3D or not. Default is ``False``.
+        :param thickness: (*int*) 3D chart thickness. Default is ``5``.
+        :param drawlabel: (*boolean*) Draw label or not. Default is ``False``.
+        :param fontname: (*string*) Label font name.
+        :param fontsize: (*int*) Label font size.
+        :param bold: (*boolean*) Font bold or not. Default is ``False``.
+        :param labelcolor: (*color*) Label color.
+        :param decimals: (*int*) Number of decimals of labels.
+        '''
+        charttype = kwargs.pop('charttype', None)
+        minsize = kwargs.pop('minsize', None)
+        maxsize = kwargs.pop('maxsize', None)
+        barwidth = kwargs.pop('barwidth', None)
+        xoffset = kwargs.pop('xoffset', None)
+        yoffset = kwargs.pop('yoffset', None)
+        avoidcoll = kwargs.pop('avoidcoll', None)
+        align = kwargs.pop('align', None)
+        view3d = kwargs.pop('view3d', None)
+        thickness = kwargs.pop('thickness', None)
+        drawlabel = kwargs.pop('drawlabel', None)
+        fontname = kwargs.pop('fontname', 'Arial')
+        fontsize = kwargs.pop('fontsize', 12)
+        bold = kwargs.pop('bold', False)
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        labelcolor = kwargs.pop('labelcolor', None)
+        decimals = kwargs.pop('decimals', None)
+        
+        chartset = self.layer.getChartSet()
+        chartset.setFieldNames(fieldnames)
+        chartset.setLegendScheme(legend)
+        if not charttype is None:
+            chartset.setChartType(charttype)
+        if not minsize is None:
+            chartset.setMinSize(minsize)
+        if not maxsize is None:
+            chartset.setMaxSize(maxsize)
+        if not barwidth is None:
+            chartset.setBarWidth(barwidth)
+        if not xoffset is None:
+            chartset.setXShift(xoffset)
+        if not yoffset is None:
+            chartset.setYShift(yoffset)
+        if not avoidcoll is None:
+            chartset.setAvoidCollision(avoidcoll)
+        if not align is None:
+            chartset.setAlignType(align)
+        if not view3d is None:
+            chartset.setView3D(view3d)
+        if not thickness is None:
+            chartset.setThickness(thickness)
+        if not drawlabel is None:
+            chartset.setDrawLabel(drawlabel)
+        chartset.setLabelFont(font)
+        if not labelcolor is None:
+            chartset.setLabelColor(miutil.getcolor(labelcolor))
+        if not decimals is None:
+            chartset.setDecimalDigits(decimals)
+        self.layer.updateChartSet()
+        self.layer.addCharts()
+        
+    def get_chart(self, index):
+        '''
+        Get a chart graphic.
+        
+        :param index: (*int*) Chart index.
+        
+        :returns: Chart graphic
+        '''
+        return self.layer.getChartPoints()[index]
+        
+    def move_chart(self, index, x=0, y=0):
+        '''
+        Move a chart graphic.
+        
+        :param index: (*int*) Chart index.
+        :param x: (*float*) X shift for moving.
+        :param y: (*float*) Y shift for moving.
+        '''
+        s = self.layer.getChartPoints()[index].getShape()
+        p = s.getPoint()
+        p.X = p.X + x
+        p.Y = p.Y + y
+        s.setPoint(p)
         
     def set_avoidcoll(self, avoidcoll):
         '''
