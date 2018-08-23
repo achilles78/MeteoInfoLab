@@ -762,24 +762,6 @@ class Axes(object):
         sy = self.figure.get_size()[1] - sy
         return sx, sy
         
-    def get_xlim(self):
-        '''
-        Get x axis limits
-        
-        :returns: X axis limits
-        '''
-        extent = self.axes.getDrawExtent()
-        return extent.minX, extent.maxX
-        
-    def get_ylim(self):
-        '''
-        Get y axis limits
-        
-        :returns: Y axis limits
-        '''
-        extent = self.axes.getDrawExtent()
-        return extent.minY, extent.maxY
-        
     def grid(self, b=None, which='major', axis='both', **kwargs):
         """
         Turn the aexs grids on or off.
