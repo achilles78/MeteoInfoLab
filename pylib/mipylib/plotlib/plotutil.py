@@ -714,6 +714,81 @@ def text(x, y, s, **kwargs):
     text.setCoordinates(coordinates)
     return text
     
+def makesymbolspec(geometry, *args, **kwargs):
+    '''
+    Make a legend.
+    
+    :param geometry: (*string*) Geometry type. [point | line | polygon].
+    :param levels: (*array_like*) Value levels. Default is ``None``, not used.
+    :param colors: (*list*) Colors. Defaul is ``None``, not used.
+    :param legend break parameter maps: (*map*) Legend breaks.
+    :param field: (*string*) The field to be used in the legend.
+    
+    :returns: Created legend.
+    '''
+    shapetype = ShapeTypes.Image
+    if geometry == 'point':
+        shapetype = ShapeTypes.Point
+    elif geometry == 'line':
+        shapetype = ShapeTypes.Polyline
+    elif geometry == 'polygon':
+        shapetype = ShapeTypes.Polygon  
+    else:
+        shapetype = ShapeTypes.Image
+        
+    levels = kwargs.pop('levels', None)
+    cols = kwargs.pop('colors', None)
+    field = kwargs.pop('field', '')
+    if not levels is None and not cols is None:
+        if isinstance(levels, MIArray):
+            levels = levels.aslist()
+        colors = []
+        for cobj in cols:
+            colors.append(getcolor(cobj))
+        ls = LegendManage.createLegendScheme(shapetype, levels, colors)
+        setlegendscheme(ls, **kwargs)         
+        ls.setFieldName(field)
+        values = kwargs.pop('values', None)
+        if values is None:
+            return ls
+        else:
+            nls = LegendScheme(ls.getShapeType())
+            for v in values:
+                nls.addLegendBreak(ls.findLegendBreak(v))
+            return nls
+           
+    n = len(args)
+    isunique = True
+    if n == 0:
+        ls = LegendManage.createSingleSymbolLegendScheme(shapetype)
+        setlegendscheme(ls, **kwargs)
+    elif n == 1 and isinstance(args[0], int):
+        ls = LegendManage.createUniqValueLegendScheme(args[0], shapetype)
+        setlegendscheme(ls, **kwargs)
+    else:
+        ls = LegendScheme(shapetype)
+        for arg in args:
+            if isinstance(arg, (list, tuple)):
+                for argi in arg:
+                    lb, isu = getlegendbreak(geometry, **argi)
+                    if isunique and not isu:
+                        isunique = False
+                    ls.addLegendBreak(lb)
+            else:
+                lb, isu = getlegendbreak(geometry, **arg)
+                if isunique and not isu:
+                    isunique = False
+                ls.addLegendBreak(lb)
+       
+    ls.setFieldName(field)
+    if ls.getBreakNum() > 1:
+        if isunique:
+            ls.setLegendType(LegendType.UniqueValue)
+        else:
+            ls.setLegendType(LegendType.GraduatedColor)
+            
+    return ls
+    
 def makelegend(source, **kwargs):
     '''
     Make a legend.
