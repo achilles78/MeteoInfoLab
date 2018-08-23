@@ -260,7 +260,7 @@ class MILayer(object):
         '''
         self.layer.moveLabel(label, x, y)
         
-    def add_charts(self, fieldnames, legend, **kwargs):
+    def add_charts(self, fieldnames, legend=None, **kwargs):
         '''
         Add charts
         
@@ -336,6 +336,7 @@ class MILayer(object):
             chartset.setDecimalDigits(decimals)
         self.layer.updateChartSet()
         self.layer.addCharts()
+        return chartset
         
     def get_chartlegend(self):
         '''
