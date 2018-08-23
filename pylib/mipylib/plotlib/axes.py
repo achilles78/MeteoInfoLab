@@ -2767,6 +2767,14 @@ class Axes(object):
                 wa.setDrawNeatline(True)
         self.axes.setWindArrow(wa)
         
+    def get_legend(self):
+        '''
+        Get legend of the axes.
+        
+        :return: Legend
+        '''
+        return self.axes.getLegendScheme()
+        
     def legend(self, *args, **kwargs):
         """
         Places a legend on the axes.
