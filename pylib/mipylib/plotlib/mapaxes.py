@@ -109,6 +109,31 @@ class MapAxes(Axes):
         if not select is None:
             if select:
                 self.axes.setSelectedLayer(layer)
+                
+    def get_layers(self):
+        '''
+        Get all layers.
+        
+        :returns: All layers
+        '''
+        r = self.axes.getLayers()
+        layers = []
+        for layer in r:
+            layers.append(MILayer(layer))
+        return layers
+    
+    def get_layer(self, by):
+        '''
+        Get a layer by name or index.
+        
+        :param by: (*string or int*) Layer name or index.
+        
+        :returns: The layer.
+        '''
+        r = self.axes.getLayer(by)
+        if not r is None:
+            r = MILayer(r)
+        return r
             
     def set_active_layer(self, layer):
         '''

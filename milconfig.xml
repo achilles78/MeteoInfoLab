@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\map">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\grads"/>
     <RecentFolder Folder="D:\KeyData\BC_New\script"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
@@ -20,15 +20,13 @@
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\contour_3.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\load_mip_2.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\contour_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\contour_3.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\load_mip_2.py"/>
     </RecentFiles>
   </File>
   <Font>
