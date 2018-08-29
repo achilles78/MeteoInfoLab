@@ -577,6 +577,16 @@ class DataFrame(object):
         r = self._dataframe.append(other._dataframe)
         return DataFrame(dataframe=r)
         
+    def describe(self):
+        '''
+        Generates descriptive statistics that summarize the central tendency, dispersion and shape of a 
+        dataset’s distribution, excluding NaN values.
+        
+        :returns: Describe DataFrame.
+        '''
+        r = self._dataframe.describe()
+        return DataFrame(dataframe=r)
+        
     def sort_index(self, axis=0, ascending=True):
         '''
         Sort by the index along either axis

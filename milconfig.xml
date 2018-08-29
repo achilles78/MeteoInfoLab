@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\meteo">
-    <RecentFolder Folder="D:\Working\MIScript\mywork\haze_fog\script"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\io">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\wind"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
@@ -16,23 +14,27 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\load_mip_2.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_trapz_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\maplayer_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_groupby_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\load_mip_2.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\CALIPSO_trapz_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\maplayer_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_groupby_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="SimSun" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,0" MainFormSize="1382,810"/>
+  <Startup MainFormLocation="-6,-6" MainFormSize="1296,696"/>
 </MeteoInfo>

@@ -283,7 +283,8 @@ class MapAxes(Axes):
             if not os.path.exists(fn):
                 fn = os.path.join(migl.mapfolder, fn)
             if os.path.exists(fn):
-                layer = migeo.shaperead(fn)
+                encoding = kwargs.pop('encoding', None)
+                layer = migeo.shaperead(fn, encoding)
                 islayer = True
             else:
                 raise IOError('File not exists: ' + fn)
