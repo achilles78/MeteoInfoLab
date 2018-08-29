@@ -12,6 +12,7 @@ from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import mipylib.numeric.minum as minum
 from index import Index
+import groupby
 
 from java.lang import Double
 nan = Double.NaN
@@ -93,7 +94,7 @@ class Series(object):
             if isinstance(key[0], int):
                 r = self._series.getValues(key)
             else:                
-                r = self._series.getValuesByIndex(key)
+                r = self._series.getValueByIndex(key)
             return Series(series=r)
         elif isinstance(key, slice):
             if isinstance(key.start, basestring):
@@ -117,7 +118,7 @@ class Series(object):
             r = self._series.getValues(rowkey)
             return Series(series=r)
         else:
-            r = self._series.getValuesByIndex(key)
+            r = self._series.getValueByIndex(key)
             if isinstance(r, MISeries):
                 return Series(series=r)
             else:
@@ -262,10 +263,10 @@ class Series(object):
         
         :param by: Used to determine the groups for the groupby.
         
-        :returns: Grouped series
+        :returns: GroupBy object.
         '''
-        r = self._series.groupBy(by)
-        return Series(series=r)
+        gb = self._series.groupBy(by)
+        return groupby.GroupBy(gb)
         
     def resample(self, by):
         '''
@@ -273,9 +274,9 @@ class Series(object):
         
         :param by: Used to determine the groups for the groupby.
         
-        :returns: Grouped Series
+        :returns: GroupBy object.
         '''
-        df = self._series.resample(by)
-        return Series(series=df)
+        gb = self._series.resample(by)
+        return groupby.GroupBy(gb)
         
 #################################################################

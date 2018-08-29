@@ -17,7 +17,8 @@ from mipylib.numeric.dimarray import DimArray
 import mipylib.numeric.minum as minum
 import mipylib.miutil as miutil
 from index import Index
-from series import Series
+import series
+import groupby
 from indexing import LocIndexer, ILocIndexer, AtIndexer, IAtIndexer
 
 from java.lang import Double
@@ -92,7 +93,7 @@ class DataFrame(object):
         return self._index
         
     def set_index(self, value):
-        if isinstance(value, Series):
+        if isinstance(value, series.Series):
             value = value.values
         self._index = Index.factory(value, self._index.name)
         self._dataframe.setIndex(self._index._index)
@@ -140,7 +141,7 @@ class DataFrame(object):
     def get_dtypes(self):
         colnames = list(self.columns.getNames())
         datatypes = list(self.columns.getDataTypes())
-        r = Series(datatypes, colnames, 'DataTypes')
+        r = series.Series(datatypes, colnames, 'DataTypes')
         return r
         
     dtypes = property(get_dtypes)
@@ -179,7 +180,7 @@ class DataFrame(object):
             if data is None:
                 return data
             idx = self._index[:]
-            r = Series(MIArray(data), idx, key)
+            r = series.Series(MIArray(data), idx, key)
             return r
             
         hascolkey = True
@@ -282,7 +283,7 @@ class DataFrame(object):
         if r is None:
             return None
         if isinstance(r, MISeries):
-            r = Series(series=r)
+            r = series.Series(series=r)
         else:
             r = DataFrame(dataframe=r)
         return r
@@ -298,7 +299,7 @@ class DataFrame(object):
             value = value.array            
             
         if isinstance(key, basestring):
-            if isinstance(value, Series):
+            if isinstance(value, series.Series):
                 value = value.values.array
             self._dataframe.setColumn(key, value)
             
@@ -370,7 +371,7 @@ class DataFrame(object):
         if r is None:
             return None
         if isinstance(r, MISeries):
-            r = Series(series=r)
+            r = series.Series(series=r)
         else:
             r = DataFrame(dataframe=r)
         return r
@@ -430,7 +431,7 @@ class DataFrame(object):
         if r is None:
             return None
         if isinstance(r, MISeries):
-            r = Series(series=r)
+            r = series.Series(series=r)
         else:
             r = DataFrame(dataframe=r)
         return r     
@@ -623,12 +624,12 @@ class DataFrame(object):
         
         :param by: Period string.
         
-        :returns: Grouped DataFrame
+        :returns: GroupBy object.
         '''
         if isinstance(by, basestring):
             by = [by]
-        df = self._dataframe.groupBy(by)
-        return DataFrame(dataframe=df)
+        gb = self._dataframe.groupBy(by)
+        return groupby.GroupBy(gb)
         
     def resample(self, by):
         '''
@@ -636,10 +637,10 @@ class DataFrame(object):
         
         :param by: Used to determine the groups for the groupby.
         
-        :returns: Grouped DataFrame
+        :returns: GroupBy object
         '''
-        df = self._dataframe.groupByIndex(by)
-        return DataFrame(dataframe=df)
+        gb = self._dataframe.groupByIndex(by)
+        return groupby.GroupBy(gb)
         
     def count(self):
         '''
