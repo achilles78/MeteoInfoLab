@@ -641,6 +641,12 @@ class DataFrame(object):
         df = self._dataframe.groupByIndex(by)
         return DataFrame(dataframe=df)
         
+    def count(self):
+        '''
+        Return the count of the values for the requested axis
+        '''
+        return DataFrame(dataframe=self._dataframe.count())
+        
     def sum(self):
         '''
         Return the sum of the values for the requested axis
@@ -652,6 +658,24 @@ class DataFrame(object):
         Return the mean of the values for the requested axis
         '''
         return DataFrame(dataframe=self._dataframe.mean())
+        
+    def min(self):
+        '''
+        Return the minimum of the values for the requested axis
+        '''
+        return DataFrame(dataframe=self._dataframe.min())
+        
+    def max(self):
+        '''
+        Return the maximum of the values for the requested axis
+        '''
+        return DataFrame(dataframe=self._dataframe.max())
+        
+    def median(self):
+        '''
+        Return the median of the values for the requested axis
+        '''
+        return DataFrame(dataframe=self._dataframe.median())
     
     @classmethod
     def read_table(cls, filepath, **kwargs):
