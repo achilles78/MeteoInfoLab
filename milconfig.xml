@@ -21,18 +21,18 @@
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\maplayer_1.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\series_2.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\maplayer_1.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\array\series_2.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="SimSun" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-5,0" MainFormSize="1296,696"/>
+  <Startup MainFormLocation="-5,0" MainFormSize="1320,756"/>
 </MeteoInfo>

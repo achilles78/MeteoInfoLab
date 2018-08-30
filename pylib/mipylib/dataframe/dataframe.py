@@ -358,13 +358,15 @@ class DataFrame(object):
                 col = self.columns.indexOfName(k)
                 if col < 0:
                     raise KeyError(key)
-                colkey = Range(col, col + 1, 1)
+                colkey = [col]
             else:
                 return None
-        
+                
         if isinstance(rowkey, Range):
             r = self._dataframe.select(rowkey, colkey)
         else:
+            if len(rowkey) == 1 and len(colkey) == 1:
+                return self._dataframe.getValue(rowkey[0], colkey[0])
             if not isinstance(rkeys, list):
                 rkeys = [rkeys]
             r = self._dataframe.select(rkeys, rowkey, colkey)
@@ -379,6 +381,9 @@ class DataFrame(object):
     def _getitem_iloc(self, key):
         if not isinstance(key, tuple): 
             key = (key, None)
+    
+        if isinstance(key[0], int) and isinstance(key[1], int):
+            return self._dataframe.getValue(key[0], key[1])
     
         k = key[0]
         if isinstance(k, int):

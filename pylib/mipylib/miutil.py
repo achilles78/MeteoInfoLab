@@ -89,7 +89,7 @@ def jdatetime(t):
     
     :returns: Joda DateTime
     """
-    if isinstance(t, list):
+    if isinstance(t, (list, tuple)):
         r = []
         for tt in t:
             r.append(DateTime(tt.year, tt.month, tt.day, tt.hour, tt.minute, tt.second, tt.microsecond / 1000))
