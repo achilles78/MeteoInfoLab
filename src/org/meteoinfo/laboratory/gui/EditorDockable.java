@@ -28,6 +28,8 @@ import javax.swing.JPopupMenu.Separator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.TextEditorPane;
 import org.meteoinfo.global.GenericFileFilter;
@@ -52,6 +54,16 @@ public class EditorDockable extends DefaultSingleCDockable {
 
         this.parent = parent;
         tabbedPanel = new JTabbedPane();
+        tabbedPanel.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+                TextEditor te = (TextEditor)sourceTabbedPane.getSelectedComponent();
+                if (te != null)
+                    EditorDockable.this.setTitleText("Editor - " + te.getFileName());
+            }
+            
+        });
         this.getContentPane().add(tabbedPanel);
         //this.setCloseable(false);
     }
@@ -154,7 +166,7 @@ public class EditorDockable extends DefaultSingleCDockable {
                 closeFile(tab);
             }
         });
-        tabbedPanel.setTabComponentAt(tabbedPanel.indexOfComponent(tab), btc);
+        tabbedPanel.setTabComponentAt(tabbedPanel.indexOfComponent(tab), btc);        
 
         return tab;
     }
@@ -170,6 +182,15 @@ public class EditorDockable extends DefaultSingleCDockable {
         } else {
             return (TextEditor) this.tabbedPanel.getSelectedComponent();
         }
+    }
+    
+    /**
+     * Set active text editor
+     * @param te Text editor
+     */
+    public void setActiveTextEditor(TextEditor te) {
+        this.tabbedPanel.setSelectedComponent(te);
+        this.setTitleText("Editor - " + te.getFileName());
     }
 
     private TextEditorPane getActiveTextArea() {
@@ -269,6 +290,7 @@ public class EditorDockable extends DefaultSingleCDockable {
             }
             file = new File(fileName);
             editor.saveFile(file);
+            this.setTitleText(editor.getFileName());
             return true;
         }
         return false;
@@ -345,6 +367,7 @@ public class EditorDockable extends DefaultSingleCDockable {
                 TextEditor te = (TextEditor) this.tabbedPanel.getComponentAt(i);
                 if (file.getAbsolutePath().equals(te.getFileName())) {
                     isExist = true;
+                    this.setActiveTextEditor(te);
                     break;
                 }
             }
@@ -353,6 +376,7 @@ public class EditorDockable extends DefaultSingleCDockable {
             }
             TextEditor editor = addNewTextEditor(file.getName());
             editor.openFile(file);
+            this.setTitleText(editor.getFileName());
         }
     }
 
@@ -376,6 +400,7 @@ public class EditorDockable extends DefaultSingleCDockable {
             TextEditor te = (TextEditor) this.tabbedPanel.getComponentAt(i);
             if (file.getAbsolutePath().equals(te.getFileName())) {
                 isExist = true;
+                this.setActiveTextEditor(te);
                 break;
             }
         }
@@ -383,6 +408,7 @@ public class EditorDockable extends DefaultSingleCDockable {
             TextEditor editor = addNewTextEditor(file.getName());
             editor.openFile(file);
             this.parent.getOptions().addRecentFile(file.getAbsolutePath());
+            this.setTitleText(editor.getFileName());
         }
     }
     
