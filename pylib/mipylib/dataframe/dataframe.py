@@ -203,12 +203,9 @@ class DataFrame(object):
             
         k = key[0]
         if isinstance(k, int):
-            sidx = k
-            if sidx < 0:
-                sidx = self.shape[0] + sidx
-            eidx = sidx
-            step = 1
-            rowkey = Range(sidx, eidx, step)
+            if k < 0:
+                k = self.shape[0] + k
+            rowkey = k
         elif isinstance(k, basestring):
             sidx = self._index.index(k)
             if sidx < 0:
@@ -337,7 +334,12 @@ class DataFrame(object):
             step = 1 if k.step is None else k.step
             rowkey = Range(sidx, eidx, step)
         else:
-            rowkey, rkeys = self._index.get_loc(k, outkeys=True)   
+            if isinstance(k, (list, tuple, MIArray)):
+                rowkey, rkeys = self._index.get_loc(k, outkeys=True)
+            else:
+                rowkey = self._index.index(k)
+                if rowkey < 0:
+                    raise KeyError(key)
                    
         k = key[1]
         if k is None:
@@ -362,10 +364,14 @@ class DataFrame(object):
             else:
                 return None
                 
-        if isinstance(rowkey, Range):
+        if isinstance(rowkey, (int, Range)):
             r = self._dataframe.select(rowkey, colkey)
         else:
-            if len(rowkey) == 1 and len(colkey) == 1:
+            if isinstance(colkey, Range):
+                ncol = colkey.length()
+            else:
+                ncol = len(colkey)
+            if len(rowkey) == 1 and ncol == 1:
                 return self._dataframe.getValue(rowkey[0], colkey[0])
             if not isinstance(rkeys, list):
                 rkeys = [rkeys]
@@ -387,12 +393,9 @@ class DataFrame(object):
     
         k = key[0]
         if isinstance(k, int):
-            sidx = k
-            if sidx < 0:
-                sidx = self.shape[0] + sidx
-            eidx = sidx
-            step = 1
-            rowkey = Range(sidx, eidx, step)
+            if k < 0:
+                k = self.shape[0] + k
+            rowkey = k
         elif isinstance(k, slice):
             sidx = 0 if k.start is None else k.start
             if sidx < 0:

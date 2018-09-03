@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\array">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\micaps">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\KeyData\BC_New"/>
@@ -22,11 +22,13 @@
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\china_albers.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\latex_4.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\micaps\micaps_1_extract_st_data_dataframe.py"/>
     </RecentFiles>
   </File>
   <Font>
