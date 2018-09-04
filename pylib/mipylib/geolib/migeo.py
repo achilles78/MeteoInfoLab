@@ -16,6 +16,7 @@ from org.meteoinfo.data import ArrayMath, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage, AttributeTable
 from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
 from org.meteoinfo.global import PointD
+from org.meteoinfo.io import IOUtil
 
 from milayer import MILayer
 from mipylib.numeric.miarray import MIArray
@@ -48,9 +49,11 @@ def shaperead(fn, encoding=None):
     if os.path.exists(fn):        
         try:
             if encoding is None:
-                layer = MILayer(MapDataManage.readMapFile_ShapeFile(fn))
-            else:
-                layer = MILayer(MapDataManage.readMapFile_ShapeFile(fn, encoding))
+                dbfn = fn.replace('.shp', '.dbf')
+                encoding = IOUtil.encodingDetect(dbfn)
+                if encoding == 'ISO8859_1':
+                    encoding = 'utf-8'
+            layer = MILayer(MapDataManage.readMapFile_ShapeFile(fn, encoding))
             if not layer.legend() is None:
                 lb = layer.legend().getLegendBreaks()[0]
                 if lb.getBreakType() == BreakTypes.PolygonBreak:
