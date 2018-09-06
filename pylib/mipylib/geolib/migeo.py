@@ -49,10 +49,9 @@ def shaperead(fn, encoding=None):
     if os.path.exists(fn):        
         try:
             if encoding is None:
-                dbfn = fn.replace('.shp', '.dbf')
-                encoding = IOUtil.encodingDetect(dbfn)
+                encoding = IOUtil.encodingDetectShp(fn)
                 if encoding == 'ISO8859_1':
-                    encoding = 'utf-8'
+                    encoding = 'UTF-8'
             layer = MILayer(MapDataManage.readMapFile_ShapeFile(fn, encoding))
             if not layer.legend() is None:
                 lb = layer.legend().getLegendBreaks()[0]

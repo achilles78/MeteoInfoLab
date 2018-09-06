@@ -2937,6 +2937,7 @@ class Axes(object):
         :param label: (*string*) Label. Default is ``None`` .
         :param labelloc: (*string*) Label location ['in' | 'out' | 'top' | 'bottom' | 'left' | 'right'].
             Defaul is ``out``.
+        :param newlegend: (*boolean*) Add a new legend or replace existing one.
         :param extendrect: (*boolean*) If ``True`` the minimum and maximum colorbar extensions will be
             rectangular (the default). If ``False`` the extensions will be triangular.
         :param extendfrac: [None | 'auto' | length] If set to *None*, both the minimum and maximum triangular
