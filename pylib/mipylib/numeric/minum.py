@@ -1822,7 +1822,7 @@ def griddata(points, values, xi=None, **kwargs):
     :param values: (*array_like*) The scattered data array.
     :param xi: (*list*) The list contains x and y coordinate arrays of the grid data. Default is ``None``,
         the grid x and y coordinate size were both 500.
-    :param method: (*string*) The interpolation method. [idw | cressman | neareast | inside | inside_min
+    :param method: (*string*) The interpolation method. [idw | cressman | nearest | inside | inside_min
         | inside_max | inside_count | surface]
     :param fill_value: (*float*) Fill value, Default is ``nan``.
     :param pointnum: (*int*) Only used for 'idw' method. The number of the points to be used for each grid
@@ -1859,7 +1859,7 @@ def griddata(points, values, xi=None, **kwargs):
         if isinstance(radius, MIArray):
             radius = radius.aslist()
         r = ArrayUtil.cressman(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
-    elif method == 'neareast':
+    elif method == 'nearest':
         radius = kwargs.pop('radius', inf)
         r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
     elif method == 'inside':

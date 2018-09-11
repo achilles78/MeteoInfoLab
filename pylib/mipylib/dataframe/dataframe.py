@@ -299,6 +299,7 @@ class DataFrame(object):
             if isinstance(value, series.Series):
                 value = value.values.array
             self._dataframe.setColumn(key, value)
+            return
             
         hascolkey = True
         if isinstance(key, tuple): 
@@ -310,13 +311,92 @@ class DataFrame(object):
                 if cidx < 0:
                     cidx = self.shape[1] + cidx
                 self._dataframe.setValue(ridx, cidx, value)
+                return
             elif isinstance(ridx, int) and isinstance(cidx, basestring):
                 if ridx < 0:
                     ridx = self.shape[0] + ridx
                 self._dataframe.setValue(ridx, cidx, value)
+                return
         else:
             key = (key, slice(None))
             hascolkey = False
+            
+        k = key[0]
+        if isinstance(k, int):
+            if k < 0:
+                k = self.shape[0] + k
+            rowkey = k
+        elif isinstance(k, basestring):
+            sidx = self._index.index(k)
+            if sidx < 0:
+                return None
+            eidx = sidx
+            step = 1
+            rowkey = Range(sidx, eidx, step)
+        elif isinstance(k, slice):
+            if isinstance(k.start, basestring):
+                sidx = self._index.index(k.start)
+                if sidx < 0:
+                    sidx = 0
+            else:
+                sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.shape[0] + sidx
+            if isinstance(k.stop, basestring):
+                eidx = self._index.index(k.stop)
+                if eidx < 0:
+                    eidx = self.shape[0] + eidx
+            else:
+                eidx = self.shape[0] - 1 if k.stop is None else k.stop - 1
+                if eidx < 0:
+                    eidx = self.shape[0] + eidx                    
+            step = 1 if k.step is None else k.step
+            rowkey = Range(sidx, eidx, step)
+        elif isinstance(k, list):
+            if isinstance(k[0], int):
+                rowkey = k
+            else:
+                tlist = []
+                for tstr in k:
+                    idx = self._index.index(tstr)
+                    if idx >= 0:
+                        tlist.append(idx)
+                rowkey = tlist
+        else:
+            return
+            
+        if not hascolkey:
+            colkey = Range(0, self.shape[1] - 1, 1)
+        else:
+            k = key[1]
+            if isinstance(k, int):
+                sidx = k
+                if sidx < 0:
+                    sidx = self.shape[1] + sidx
+                eidx = sidx
+                step = 1
+                colkey = Range(sidx, eidx, step)
+            elif isinstance(k, slice):
+                sidx = 0 if k.start is None else k.start
+                if sidx < 0:
+                    sidx = self.shape[1] + sidx
+                eidx = self.shape[1] - 1 if k.stop is None else k.stop - 1
+                if eidx < 0:
+                    eidx = self.shape[1] + eidx                    
+                step = 1 if k.step is None else k.step
+                colkey = Range(sidx, eidx, step)        
+            elif isinstance(k, list):
+                if isinstance(k[0], int):
+                    colkey = k
+                else:
+                    colkey = self.columns.indexOfName(k)               
+            elif isinstance(k, basestring):
+                col = self.columns.indexOf(k)
+                colkey = Range(col, col + 1, 1)
+            else:
+                return
+        
+        self._dataframe.setValues(rowkey, colkey, value)
         
     def _getitem_loc(self, key):   
         if not isinstance(key, tuple): 
