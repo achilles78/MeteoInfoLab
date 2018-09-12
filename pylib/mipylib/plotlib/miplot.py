@@ -988,7 +988,7 @@ def figure(bgcolor='w', figsize=None, newfig=True):
     :param newfig: (*boolean*) Optional, if creates a new figure. Default is ``True`` .
     """
     global g_figure
-    g_figure = Figure(figsize, bgcolor)
+    g_figure = Figure(figsize, bgcolor=bgcolor)
     # chart = Chart()
     # chart.setBackground(plotutil.getcolor(bgcolor))
     # if figsize is None:
