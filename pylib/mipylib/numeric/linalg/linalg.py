@@ -7,11 +7,12 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.math.linalg import LinalgUtil
+from org.meteoinfo.math.stats import StatsUtil
 
 from mipylib.numeric.miarray import MIArray
 
 __all__ = [
-    'solve','cholesky','lu','qr', 'svd','eig','inv'
+    'solve','cholesky','lu','qr', 'svd','eig','inv','lstsq'
     ]
 
 def solve(a, b):
@@ -199,3 +200,17 @@ def inv(a):
     '''
     r = LinalgUtil.inv(a.asarray())
     return MIArray(r)
+    
+def lstsq(a, b):
+    '''
+    Compute least-squares solution to equation Ax = b.
+
+    Compute a vector x such that the 2-norm |b - A x| is minimized.
+    
+    :param a: (*array_like*) Left hand side matrix (2-D array).
+    :param b: (*array_like*) Right hand side matrix or vector (1-D or 2-D array).
+    
+    :returns: Least-squares solution. Return shape matches shape of b.
+    '''
+    r = StatsUtil.multipleLineRegress_OLS(b.asarray(), a.asarray(), True)
+    return MIArray(r[0]), MIArray(r[1])

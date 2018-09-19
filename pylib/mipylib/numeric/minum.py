@@ -1300,9 +1300,9 @@ def dot(a, b):
     Matrix multiplication.
     
     :param a: (*2D Array*) Matrix a.
-    :param b: (*2D Array*) Matrix b.
+    :param b: (*2D or 1D Array*) Matrix or vector b.
     
-    :returns: Result Matrix.
+    :returns: Result Matrix or vector.
     """
     if isinstance(a, (int, long, float, complex)) and isinstance(b, (int, long, float, complex)):
         return a * b

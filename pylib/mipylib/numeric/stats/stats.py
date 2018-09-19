@@ -213,7 +213,7 @@ def mlinregress(y, x):
         x = MIArray(ArrayUtil.array(x))
     if isinstance(y, list):
         y = MIArray(ArrayUtil.array(y))
-    r = StatsUtil.mutipleLineRegress_OLS(y.asarray(), x.asarray())
+    r = StatsUtil.multipleLineRegress_OLS(y.asarray(), x.asarray())
     return MIArray(r[0]), MIArray(r[1])
     
 def percentile(a, q, axis=None):

@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\chart">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
-    <RecentFolder Folder="D:\KeyData\BC_New"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map\projection"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\math">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
@@ -16,17 +9,24 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\CARSNET"/>
+    <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\CARSNET\pylib"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\linalg"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\add_layer_field.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\lstsq_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\partial_corr_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\add_layer_field.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\linalg\lstsq_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\math\partial_corr_1.py"/>
     </RecentFiles>
   </File>
   <Font>

@@ -126,6 +126,12 @@ class MIArray(object):
             elif isinstance(k, (list, tuple, MIArray)):
                 if isinstance(k, MIArray):
                     k = k.aslist()
+                if isinstance(k[0], bool):
+                    kk = []
+                    for i in range(len(k)):
+                        if k[i]:
+                            kk.append(i)
+                    k = kk                        
                 onlyrange = False
                 ranges.append(k)
                 continue
@@ -619,6 +625,19 @@ class MIArray(object):
         
     def log10(self):
         return MIArray(ArrayMath.log10(self.array))
+        
+    def dot(self, other):
+        """
+        Matrix multiplication.
+        
+        :param other: (*2D or 1D Array*) Matrix or vector b.
+        
+        :returns: Result Matrix or vector.
+        """  
+        if isinstance(other, list):
+            other = array(other)
+        r = ArrayMath.dot(self.array, other.array)
+        return MIArray(r)
             
     def aslist(self):
         r = ArrayMath.asList(self.array)
