@@ -11,6 +11,8 @@ import org.meteoinfo.console.JConsole;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -32,13 +34,15 @@ public class ConsoleDockable extends DefaultSingleCDockable {
     private String startupPath;
     private FrmMain parent;
     private PythonInteractiveInterpreter interp;
+    private JConsole console;
+    private SwingWorker myWorker;
 
     public ConsoleDockable(FrmMain parent, String startupPath, String id, String title, CAction... actions) {
         super(id, title, actions);
 
         this.parent = parent;
         this.startupPath = startupPath;
-        JConsole console = new JConsole();
+        console = new JConsole();
         console.setLocale(Locale.getDefault());
         //System.out.println(console.getFont());
         console.setPreferredSize(new Dimension(600, 400));
@@ -48,6 +52,30 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         console.setNameCompletion(nameComplete);
 
         this.getContentPane().add(console, BorderLayout.CENTER);
+        console.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent ke) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent ke) {
+                switch (ke.getKeyCode()) {
+                    // Control-C
+                    case (KeyEvent.VK_C):
+                        if (myWorker != null && !myWorker.isCancelled() && !myWorker.isDone()) {
+                            myWorker.cancel(true);
+                            interp.upate();
+                            //enter();
+                        }
+                        break;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent ke) {
+            }
+
+        });
     }
 
     /**
@@ -189,7 +217,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         //this.interp.console.error(this.interp.err);
         this.interp.exec(command);
         //this.interp.push(command);
-        this.interp.out.print(">>> ");
+        this.interp.console.print(">>> ");
         interp.exec("mipylib.plotlib.miplot.isinteractive = True");
     }
 
@@ -199,7 +227,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
      * @param fn Python file name
      */
     public void execfile(final String fn) {
-        SwingWorker worker = new SwingWorker<String, String>() {
+        myWorker = new SwingWorker<String, String>() {
             //PrintStream oout = System.out;
             //PrintStream oerr = System.err;
 
@@ -210,6 +238,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 //JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
 
                 interp.console.println("run script...");
+                interp.console.setFocusable(true);
+                interp.console.requestFocusInWindow();
                 //interp.setOut(writer);
                 //interp.setErr(writer);
                 //System.setOut(printStream);
@@ -246,7 +276,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 }
             }
         };
-        worker.execute();
+        myWorker.execute();
     }
 
     /**
@@ -273,7 +303,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 } catch (Exception e) {
                 }
             }
-            this.interp.out.print(">>> ");
+            this.interp.console.print(">>> ");
         } catch (IOException ex) {
             Logger.getLogger(ConsoleDockable.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -287,7 +317,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
      */
     public void runPythonScript(final String code) throws InterruptedException {
 
-        SwingWorker worker = new SwingWorker<String, String>() {
+        myWorker = new SwingWorker<String, String>() {
             //PrintStream oout = System.out;
             //PrintStream oerr = System.err;
 
@@ -301,6 +331,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 //JTextPaneWriter writer = new JTextPaneWriter(jTextPane_Output);
                 //JTextPanePrintStream printStream = new JTextPanePrintStream(System.out, jTextPane_Output);
                 interp.console.println("run script...");
+                interp.console.setFocusable(true);
+                interp.console.requestFocusInWindow();
                 //interp.setOut(writer);
                 //interp.setErr(writer);
                 //System.setOut(printStream);
@@ -354,6 +386,6 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                 }
             }
         };
-        worker.execute();
+        myWorker.execute();
     }
 }

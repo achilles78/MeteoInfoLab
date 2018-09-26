@@ -51,14 +51,17 @@ class DimVariable():
         if self.variable is None:
             return 'None'
             
-        str = self.datatype.toString() + ' ' + self.name + '('
+        r = self.datatype.toString() + ' ' + self.name + '('
         for dim in self.dims:
-            str = str + dim.getShortName() + ','
-        str = str[:-1] + '):'
+            dimname = dim.getShortName()
+            if dimname is None:
+                dimname = 'null'
+            r = r + dimname + ','
+        r = r[:-1] + '):'
         attrs = self.variable.getAttributes()
         for attr in attrs:
-            str = str + '\n\t' + self.name + ': ' + attr.toString()
-        return str
+            r = r + '\n\t' + self.name + ': ' + attr.toString()
+        return r
         
     def __repr__(self):
         return self.__str__()

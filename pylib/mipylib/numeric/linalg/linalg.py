@@ -207,10 +207,19 @@ def lstsq(a, b):
 
     Compute a vector x such that the 2-norm |b - A x| is minimized.
     
-    :param a: (*array_like*) Left hand side matrix (2-D array).
-    :param b: (*array_like*) Right hand side matrix or vector (1-D or 2-D array).
-    
-    :returns: Least-squares solution. Return shape matches shape of b.
+    Parameters
+    ----------
+    a : (M, N) array
+        Left hand side matrix (2-D array).
+    b : (M,) array
+        Right hand side vector.
+        
+    Returns
+    -------
+    x : (N,) array
+        Least-squares solution. Return shape matches shape of b.
+    residues : (0,) or () or (K,) ndarray
+        Sums of residues, squared 2-norm for each column in b - a x.
     '''
     r = StatsUtil.multipleLineRegress_OLS(b.asarray(), a.asarray(), True)
     return MIArray(r[0]), MIArray(r[1])

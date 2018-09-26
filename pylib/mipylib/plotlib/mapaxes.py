@@ -13,7 +13,7 @@ from org.meteoinfo.data import ArrayUtil
 from org.meteoinfo.data.meteodata import DrawMeteoData
 from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import BreakTypes, LegendManage, LegendScheme, LegendType
-from org.meteoinfo.shape import Shape, ShapeTypes, Graphic
+from org.meteoinfo.shape import Shape, PolylineShape, PolygonShape, ShapeTypes, Graphic
 from org.meteoinfo.projection import ProjectionInfo
 from org.meteoinfo.global import Extent
 from org.meteoinfo.layer import LayerTypes, WebMapLayer
@@ -368,10 +368,9 @@ class MapAxes(Axes):
             elif isinstance(args[0], Shape):
                 shape = args[0]
                 displaytype = 'point'
-                stype = shape.getShapeType()
-                if stype == ShapeTypes.Polyline:
+                if isinstance(shape, PolylineShape):
                     displaytype = 'line'
-                elif stype == ShapeTypes.Polygon:
+                elif isinstance(shape, PolygonShape):
                     displaytype = 'polygon'
                 lbreak, isunique = plotutil.getlegendbreak(displaytype, **kwargs)
                 graphic = Graphic(shape, lbreak)

@@ -23,9 +23,12 @@ import org.python.util.InteractiveConsole;
  */
 public class PythonInteractiveInterpreter extends InteractiveConsole implements Runnable {
 
-    transient Reader in;
-    transient PrintStream out;
-    transient PrintStream err;
+    //transient Reader in;
+    //transient PrintStream out;
+    //transient PrintStream err;
+    private Reader in;
+    private PrintStream out;
+    private PrintStream err;
     JConsole console;
     private final EventListenerList listeners = new EventListenerList();
 
@@ -47,6 +50,31 @@ public class PythonInteractiveInterpreter extends InteractiveConsole implements 
      */
     public JConsole getConsole(){
         return this.console;
+    }
+    
+    /**
+     * Set console
+     * @param console the JConsole
+     */
+    public void setConsole(JConsole console) {
+        this.console = console;
+        in = console.getIn();
+        out = console.getOut();
+        err = console.getErr();
+        setOut(out);
+        setErr(err);
+    }
+    
+    /**
+     * Update in, out and err
+     */
+    public void upate() {
+        console.updateOut();
+        in = console.getIn();
+        out = console.getOut();
+        err = console.getErr();
+        setOut(out);
+        setErr(err);
     }
     
     /**

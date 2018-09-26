@@ -27,7 +27,7 @@ import mipylib.numeric.minum as minum
 from java.util import ArrayList
 
 __all__ = [
-    'arrayinpolygon','convert_encoding_dbf','distance','georead','geotiffread',
+    'arrayinpolygon','circle','convert_encoding_dbf','distance','georead','geotiffread',
     'maplayer','inpolygon','maskin','maskout','polyarea','polygon','rmaskin','rmaskout','shaperead',
     'projinfo','project','projectxy'
     ]
@@ -130,7 +130,7 @@ def maplayer(shapetype='polygon'):
     '''
     return MILayer(shapetype=shapetype)
     
-def polygon(x, y = None):
+def polygon(x, y=None):
     '''
     Create polygon from coordinate data.
     
@@ -147,7 +147,19 @@ def polygon(x, y = None):
         if isinstance(y, MIArray):
             y = y.aslist()
         polygon = ShapeUtil.createPolygonShape(x, y)
-    return polygon    
+    return polygon  
+
+def circle(xy, radius=5):
+    '''
+    Create a circle patch
+    
+    :param xy: (*list of float*) X and Y coordinates of the circle center.
+    :param radius: (*float*) Circle radius.
+    
+    :returns: (*CircleShape*) Created circle.
+    '''
+    cc = ShapeUtil.createCircleShape(xy[0], xy[1], radius)
+    return cc    
     
 def inpolygon(x, y, polygon):
     '''
