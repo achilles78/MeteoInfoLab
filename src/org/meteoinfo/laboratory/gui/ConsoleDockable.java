@@ -64,7 +64,9 @@ public class ConsoleDockable extends DefaultSingleCDockable {
                     case (KeyEvent.VK_C):
                         if (myWorker != null && !myWorker.isCancelled() && !myWorker.isDone()) {
                             myWorker.cancel(true);
-                            interp.upate();
+                            myWorker = null;
+                            //myWorker = new SmallWorker();
+                            //myWorker.execute();
                             //enter();
                         }
                         break;
@@ -387,5 +389,15 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             }
         };
         myWorker.execute();
+    }
+    
+    class SmallWorker extends SwingWorker<String, String> {
+
+        @Override
+        protected String doInBackground() throws Exception {
+            interp.exec("print('Thread cancled!')");
+            return "";
+        }
+        
     }
 }

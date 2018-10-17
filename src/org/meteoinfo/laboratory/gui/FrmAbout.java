@@ -74,7 +74,7 @@ public class FrmAbout extends javax.swing.JDialog {
 
         jLabel6.setText("Yaqiang Wang");
 
-        jLabel_version.setText("1.4.7");
+        jLabel_version.setText("...");
 
         jLabel8.setFont(new java.awt.Font("宋体", 1, 15)); // NOI18N
         jLabel8.setText("Email:");
@@ -85,7 +85,7 @@ public class FrmAbout extends javax.swing.JDialog {
         jLabel10.setText("Homepage:");
 
         jLabel_web.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel_web.setText("htt://www.meteothinker.org");
+        jLabel_web.setText("htt://www.meteothink.org");
         jLabel_web.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_web.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -187,7 +187,7 @@ public class FrmAbout extends javax.swing.JDialog {
     private void jLabel_webMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_webMouseClicked
         // TODO add your handling code here:
         try {
-            URI uri = new URI("http://www.meteothinker.com");
+            URI uri = new URI("http://www.meteothink.org");
             Desktop desktop = null;
             if (Desktop.isDesktopSupported()) {
                 desktop = Desktop.getDesktop();
