@@ -10,7 +10,7 @@ from org.meteoinfo.chart import Location, ChartWindArrow, ChartText, LegendPosit
     ChartLegend, ChartColorBar
 from org.meteoinfo.chart.plot import Plot2D, PolarPlot, GraphicFactory, \
     PlotOrientation
-from org.meteoinfo.chart.axis import LonLatAxis, TimeAxis, LogAxis
+from org.meteoinfo.chart.axis import Axis, LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.legend import LegendManage, BarBreak, PolygonBreak, PolylineBreak, \
     PointBreak, LineStyles, PointStyle, LegendScheme, LegendType
 from org.meteoinfo.shape import ShapeTypes, Graphic, GraphicCollection
@@ -402,20 +402,20 @@ class Axes(object):
         ax = self.axes
         if axistype == 'lon':
             b_axis = LonLatAxis(ax.getAxis(Location.BOTTOM))
-            b_axis.setLabel('Longitude')
+            #b_axis.setLabel('Longitude')
             b_axis.setLongitude(True)
             ax.setAxis(b_axis, Location.BOTTOM)
             t_axis = LonLatAxis(ax.getAxis(Location.TOP))
-            t_axis.setLabel('Longitude')
+            #t_axis.setLabel('Longitude')
             t_axis.setLongitude(True)
             ax.setAxis(t_axis, Location.TOP)
         elif axistype == 'lat':
             b_axis = LonLatAxis(ax.getAxis(Location.BOTTOM))
-            b_axis.setLabel('Latitude')
+            #b_axis.setLabel('Latitude')
             b_axis.setLongitude(False)
             ax.setAxis(b_axis, Location.BOTTOM)
             t_axis = LonLatAxis(ax.getAxis(Location.TOP))
-            t_axis.setLabel('Latitude')
+            #t_axis.setLabel('Latitude')
             t_axis.setLongitude(False)
             ax.setAxis(t_axis, Location.TOP)
         elif axistype == 'time':
@@ -428,13 +428,18 @@ class Axes(object):
                 ax.getAxis(Location.TOP).setTimeFormat(timetickformat)
         elif axistype == 'log':
             b_axis = LogAxis(ax.getAxis(Location.BOTTOM))
-            b_axis.setLabel('Log')
+            #b_axis.setLabel('Log')
             b_axis.setMinorTickNum(10)
             ax.setAxis(b_axis, Location.BOTTOM)
             t_axis = LogAxis(ax.getAxis(Location.TOP))
-            t_axis.setLabel('Log')
+            #t_axis.setLabel('Log')
             t_axis.setMinorTickNum(10)
-            ax.setAxis(t_axis, Location.TOP)        
+            ax.setAxis(t_axis, Location.TOP)   
+        else:
+            b_axis = Axis(ax.getAxis(Location.BOTTOM))
+            ax.setAxis(b_axis, Location.BOTTOM)
+            t_axis = Axis(ax.getAxis(Location.TOP))
+            ax.setAxis(t_axis, Location.TOP)
                     
     def set_yaxis_type(self, axistype, timetickformat=None):
         '''
@@ -446,20 +451,20 @@ class Axes(object):
         ax = self.axes
         if axistype == 'lon':
             b_axis = LonLatAxis(ax.getAxis(Location.LEFT))
-            b_axis.setLabel('Longitude')
+            #b_axis.setLabel('Longitude')
             b_axis.setLongitude(True)
             ax.setAxis(b_axis, Location.LEFT)
             t_axis = LonLatAxis(ax.getAxis(Location.RIGHT))
-            t_axis.setLabel('Longitude')
+            #t_axis.setLabel('Longitude')
             t_axis.setLongitude(True)
             ax.setAxis(t_axis, Location.RIGHT)
         elif axistype == 'lat':
             b_axis = LonLatAxis(ax.getAxis(Location.LEFT))
-            b_axis.setLabel('Latitude')
+            #b_axis.setLabel('Latitude')
             b_axis.setLongitude(False)
             ax.setAxis(b_axis, Location.LEFT)
             t_axis = LonLatAxis(ax.getAxis(Location.RIGHT))
-            t_axis.setLabel('Latitude')
+            #t_axis.setLabel('Latitude')
             t_axis.setLongitude(False)
             ax.setAxis(t_axis, Location.RIGHT)
         elif axistype == 'time':
@@ -472,12 +477,17 @@ class Axes(object):
                 ax.getAxis(Location.RIGHT).setTimeFormat(timetickformat)
         elif axistype == 'log':
             l_axis = LogAxis(ax.getAxis(Location.LEFT))
-            l_axis.setLabel('Log')
+            #l_axis.setLabel('Log')
             l_axis.setMinorTickNum(10)
             ax.setAxis(l_axis, Location.LEFT)
             r_axis = LogAxis(ax.getAxis(Location.RIGHT))
-            r_axis.setLabel('Log')
+            #r_axis.setLabel('Log')
             r_axis.setMinorTickNum(10)
+            ax.setAxis(r_axis, Location.RIGHT)
+        else:
+            l_axis = Axis(ax.getAxis(Location.LEFT))
+            ax.setAxis(l_axis, Location.LEFT)
+            r_axis = Axis(ax.getAxis(Location.RIGHT))
             ax.setAxis(r_axis, Location.RIGHT)
         
     def axis(self, limits):

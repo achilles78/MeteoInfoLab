@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\math">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\fitting"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\netcdf">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython"/>
@@ -16,23 +15,22 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\io"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\math\array_loop_fast.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\inpolygon_circle.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\maskout_data_circle.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\netcdf\nws_precip_1.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\math\array_loop_fast.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\map\inpolygon_circle.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\maskout_data_circle.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\netcdf\nws_precip_1.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="SimSun" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1296,696"/>
+  <Startup MainFormLocation="-4,4" MainFormSize="1296,696"/>
 </MeteoInfo>
