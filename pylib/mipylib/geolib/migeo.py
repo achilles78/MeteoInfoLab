@@ -224,21 +224,26 @@ def arrayinpolygon(a, polygon, x=None, y=None):
     else:
         return None
             
-def distance(x, y, islonlat=False):
+def distance(*args, **kwargs):
     """
     Get distance of a line.
     
-    :param x: (*array_like*) X coordinates.
-    :param y: (*array_like*) Y coordinates.
+    :param args: LineString or x, y coordinate arrays.
     :param islonlat: (*boolean*) x/y is longitude/latitude or not.
     
     :returns: Distance, meters for lon/lat.
     """
-    if isinstance(x, (MIArray, DimArray)):
-        x = x.aslist()
-    if isinstance(y, (MIArray, DimArray)):
-        y = y.aslist()
-    r = GeoComputation.getDistance(x, y, islonlat)
+    islonlat = kwargs.pop('islonlat', False)
+    if len(args) == 1:
+        r = GeoComputation.getDistance(args[0].getPoints(), islonlat)
+    else:
+        x = args[0]
+        y = args[1]
+        if isinstance(x, (MIArray, DimArray)):
+            x = x.aslist()
+        if isinstance(y, (MIArray, DimArray)):
+            y = y.aslist()
+        r = GeoComputation.getDistance(x, y, islonlat)
     return r
     
 def polyarea(*args, **kwargs):

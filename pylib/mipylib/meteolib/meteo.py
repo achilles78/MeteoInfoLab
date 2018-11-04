@@ -2,7 +2,7 @@
 # Author: Yaqiang Wang
 # Date: 2015-12-23
 # Purpose: MeteoInfoLab meteo module
-# Note: Jython
+# Note: Jython, some functions code revised from MetPy
 #-----------------------------------------------------
 
 from org.meteoinfo.data import ArrayMath
@@ -20,14 +20,15 @@ Lv = 2.501e6        #Latent heat of vaporization for liquid water at 0C (J kg^-1
 Cp_d = 1005         #Specific heat at constant pressure for dry air (J kg^-1)
 epsilon = Mw / Md
 kappa = 0.286
-degCtoK=273.15      # Temperature offset between K and C (deg C)
+degCtoK = 273.15    # Temperature offset between K and C (deg C)
 g = 9.8             # Gravitational acceleration (m / s^2)
+sat_pressure_0c = 6.112  #Saturation presssure at 0 degree (hPa)
 
 __all__ = [
-    'dewpoint2rh','dry_lapse','ds2uv','equivalent_potential_temperature','h2p',
+    'dewpoint','dewpoint2rh','dewpoint_rh','dry_lapse','ds2uv','equivalent_potential_temperature','h2p',
     'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh','rh2dewpoint',
-    'saturation_mixing_ratio','tc2tf','tf2tc','uv2ds','pressure_to_height_std',
-    'height_to_pressure_std','eof','varimax'
+    'saturation_mixing_ratio','saturation_vapor_pressure','tc2tf','tf2tc','uv2ds','pressure_to_height_std',
+    'height_to_pressure_std','eof','vapor_pressure','varimax'
     ]
 
 def uv2ds(u, v):
@@ -234,6 +235,49 @@ def rh2dewpoint(rh, temp):
         return r
     else:
         return MeteoMath.rh2dewpoint(rh, temp)     
+        
+def dewpoint(e):
+    r"""Calculate the ambient dewpoint given the vapor pressure.
+    Parameters
+    ----------
+    e : `pint.Quantity`
+        Water vapor partial pressure
+    Returns
+    -------
+    `pint.Quantity`
+        Dew point temperature
+    See Also
+    --------
+    dewpoint_rh, saturation_vapor_pressure, vapor_pressure
+    Notes
+    -----
+    This function inverts the [Bolton1980]_ formula for saturation vapor
+    pressure to instead calculate the temperature. This yield the following
+    formula for dewpoint in degrees Celsius:
+    .. math:: T = \frac{243.5 log(e / 6.112)}{17.67 - log(e / 6.112)}
+    """
+    val = np.log(e / sat_pressure_0c)
+    return 243.5 * val / (17.67 - val)
+        
+def dewpoint_rh(temperature, rh):
+    r"""Calculate the ambient dewpoint given air temperature and relative humidity.
+    Parameters
+    ----------
+    temperature : `pint.Quantity`
+        Air temperature
+    rh : `pint.Quantity`
+        Relative humidity expressed as a ratio in the range 0 < rh <= 1
+    Returns
+    -------
+    `pint.Quantity`
+        The dew point temperature
+    See Also
+    --------
+    dewpoint, saturation_vapor_pressure
+    """
+    #if np.any(rh > 1.2):
+    #    warnings.warn('Relative humidity >120%, ensure proper units.')
+    return dewpoint(rh * saturation_vapor_pressure(temperature))
 
 def potential_temperature(pressure, temperature):
     """
@@ -381,34 +425,99 @@ def saturation_mixing_ratio(tot_press, temperature):
     """
 
     return mixing_ratio(saturation_vapor_pressure(temperature), tot_press)
-
-def equivalent_potential_temperature(pressure, temperature):
-    """
-    Calculates equivalent potential temperature given an air parcel's
-    pressure and temperature.
-    The implementation uses the formula outlined in [5]
+    
+def vapor_pressure(pressure, mixing):
+    r"""Calculate water vapor (partial) pressure.
+    Given total `pressure` and water vapor `mixing` ratio, calculates the
+    partial pressure of water vapor.
     Parameters
     ----------
-    pressure: array_like
-        Total atmospheric pressure
-    temperature: array_like
+    pressure : `pint.Quantity`
+        total atmospheric pressure
+    mixing : `pint.Quantity`
+        dimensionless mass mixing ratio
+    Returns
+    -------
+    `pint.Quantity`
+        The ambient water vapor (partial) pressure in the same units as
+        `pressure`.
+    Notes
+    -----
+    This function is a straightforward implementation of the equation given in many places,
+    such as [Hobbs1977]_ pg.71:
+    .. math:: e = p \frac{r}{r + \epsilon}
+    See Also
+    --------
+    saturation_vapor_pressure, dewpoint
+    """
+    return pressure * mixing / (epsilon + mixing)
+    
+def saturation_vapor_pressure(temperature):
+    r"""Calculate the saturation water vapor (partial) pressure.
+    Parameters
+    ----------
+    temperature : `pint.Quantity`
         The temperature
     Returns
     -------
-    array_like
-        The corresponding equivalent potential temperature of the parcel
+    `pint.Quantity`
+        The saturation water vapor (partial) pressure
+    See Also
+    --------
+    vapor_pressure, dewpoint
     Notes
     -----
-    .. math:: \Theta_e = \Theta e^\frac{L_v r_s}{C_{pd} T}
-    References
-    ----------
-    .. [5] Hobbs, Peter V. and Wallace, John M., 1977: Atmospheric Science, an Introductory
-            Survey. 78-79.
+    Instead of temperature, dewpoint may be used in order to calculate
+    the actual (ambient) water vapor (partial) pressure.
+    The formula used is that from [Bolton1980]_ for T in degrees Celsius:
+    .. math:: 6.112 e^\frac{17.67T}{T + 243.5}
     """
+    # Converted from original in terms of C to use kelvin. Using raw absolute values of C in
+    # a formula plays havoc with units support.
+    return sat_pressure_0c * np.exp(17.67 * (temperature - 273.15)
+                                    / (temperature - 29.65))
 
-    pottemp = potential_temperature(pressure, temperature)
-    smixr = saturation_mixing_ratio(pressure, temperature)
-    return pottemp * np.exp(Lv * smixr / (Cp_d * temperature))
+def equivalent_potential_temperature(pressure, temperature, dewpoint):
+    r"""Calculate equivalent potential temperature.
+    This calculation must be given an air parcel's pressure, temperature, and dewpoint.
+    The implementation uses the formula outlined in [Bolton1980]_:
+    First, the LCL temperature is calculated:
+    .. math:: T_{L}=\frac{1}{\frac{1}{T_{D}-56}+\frac{ln(T_{K}/T_{D})}{800}}+56
+    Which is then used to calculate the potential temperature at the LCL:
+    .. math:: \theta_{DL}=T_{K}\left(\frac{1000}{p-e}\right)^k
+              \left(\frac{T_{K}}{T_{L}}\right)^{.28r}
+    Both of these are used to calculate the final equivalent potential temperature:
+    .. math:: \theta_{E}=\theta_{DL}\exp\left[\left(\frac{3036.}{T_{L}}
+                                              -1.78\right)*r(1+.448r)\right]
+    Parameters
+    ----------
+    pressure: `pint.Quantity`
+        Total atmospheric pressure
+    temperature: `pint.Quantity`
+        Temperature of parcel
+    dewpoint: `pint.Quantity`
+        Dewpoint of parcel
+    Returns
+    -------
+    `pint.Quantity`
+        The equivalent potential temperature of the parcel
+    Notes
+    -----
+    [Bolton1980]_ formula for Theta-e is used, since according to
+    [DaviesJones2009]_ it is the most accurate non-iterative formulation
+    available.
+    """
+    t = temperature
+    td = dewpoint
+    p = pressure
+    e = saturation_vapor_pressure(dewpoint)
+    r = saturation_mixing_ratio(pressure, dewpoint)
+
+    t_l = 56 + 1. / (1. / (td - 56) + np.log(t / td) / 800.)
+    th_l = t * (1000 / (p - e)) ** kappa * (t / t_l) ** (0.28 * r)
+    th_e = th_l * np.exp((3036. / t_l - 1.78) * r * (1 + 0.448 * r))
+
+    return th_e
     
 def eof(x, svd=False, transform=False):
     '''
