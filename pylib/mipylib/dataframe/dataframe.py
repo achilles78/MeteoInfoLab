@@ -202,6 +202,8 @@ class DataFrame(object):
             hascolkey = False
             
         k = key[0]
+        if isinstance(k, Index):
+            k = k.data
         if isinstance(k, int):
             if k < 0:
                 k = self.shape[0] + k
@@ -232,7 +234,7 @@ class DataFrame(object):
                     eidx = self.shape[0] + eidx                    
             step = 1 if k.step is None else k.step
             rowkey = Range(sidx, eidx, step)
-        elif isinstance(k, list):
+        elif isinstance(k, (list,tuple,MIArray)):
             if isinstance(k[0], int):
                 rowkey = k
             else:
@@ -243,7 +245,7 @@ class DataFrame(object):
                         tlist.append(idx)
                 rowkey = tlist
         else:
-            return None
+            rowkey = self._index.get_loc(k)
                    
         if not hascolkey:
             colkey = Range(0, self.shape[1] - 1, 1)

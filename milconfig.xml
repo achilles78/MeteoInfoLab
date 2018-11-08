@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\traj">
-    <RecentFolder Folder="D:\Working\MIScript\Jython"/>
+  <Path OpenPath="D:\KeyData\PMMUL\script">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\test"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
@@ -16,19 +15,20 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\netcdf"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
+    <RecentFolder Folder="D:\KeyData\PMMUL\script"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\traj\traj_distance_1.py"/>
+      <OpenedFile File="D:\KeyData\PMMUL\script\average_year.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\traj\traj_distance_1.py"/>
+      <RecentFile File="D:\KeyData\PMMUL\script\average_year.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="SimSun" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1296,696"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1318,758"/>
 </MeteoInfo>

@@ -5,13 +5,16 @@
 # Note: Jython
 #-----------------------------------------------------
 
+import datetime
+
 from org.meteoinfo.data.dataframe import Series as MISeries
 from ucar.ma2 import Range
 
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
 import mipylib.numeric.minum as minum
-from index import Index
+import mipylib.miutil as miutil
+from index import Index, DateTimeIndex
 import groupby
 
 from java.lang import Double
@@ -84,6 +87,11 @@ class Series(object):
     dtype = property(get_dtype)
         
     def __getitem__(self, key):
+        if isinstance(key, Index):
+            key = key.data
+        elif isinstance(key, datetime.datetime):
+            key = miutil.jdatetime(key)
+            
         if isinstance(key, int):
             if key < 0 or key >= self.__len__():
                 raise KeyError(key)
@@ -91,6 +99,8 @@ class Series(object):
         elif isinstance(key, (list, tuple, MIArray)):
             if isinstance(key, MIArray):
                 key = key.aslist()
+            if isinstance(key[0], datetime.datetime):
+                key = miutil.jdatetime(key)
             if isinstance(key[0], int):
                 r = self._series.getValues(key)
             else:                
