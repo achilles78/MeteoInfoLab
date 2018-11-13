@@ -226,8 +226,8 @@ class Axes(object):
         text.setUseExternalFont(exfont)
         text.setAngle(90)
         text.setColor(c)
-        text.setXAlign('right')
-        text.setYAlign('center')
+        text.setXAlign('center')
+        text.setYAlign('bottom')
         axis.setLabel(text)
         axis.setDrawLabel(True)
         if self.axestype != '3d':
