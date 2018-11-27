@@ -6,28 +6,16 @@
 #-----------------------------------------------------
 
 from org.meteoinfo.data import ArrayMath
-from org.meteoinfo.data.analysis import MeteoMath
+from org.meteoinfo.math.meteo import MeteoMath
 import mipylib.numeric as np
 from mipylib.numeric.miarray import MIArray
 from mipylib.numeric.dimarray import DimArray
-
-P0 = 1000.          #reference pressure for potential temperature (hPa)
-R = 8.3144598       #molar gas constant (J / K / mol)
-Mw = 18.01528       #Molecular weight of water (g / mol)
-Md = 28.9644        #Nominal molecular weight of dry air at the surface of th Earth (g / mol)
-Rd = R / Md         #Gas constant for dry air at the surface of the Earth (J (K kg)^-1)
-Lv = 2.501e6        #Latent heat of vaporization for liquid water at 0C (J kg^-1)
-Cp_d = 1005         #Specific heat at constant pressure for dry air (J kg^-1)
-epsilon = Mw / Md
-kappa = 0.286
-degCtoK = 273.15    # Temperature offset between K and C (deg C)
-g = 9.8             # Gravitational acceleration (m / s^2)
-sat_pressure_0c = 6.112  #Saturation presssure at 0 degree (hPa)
+import constants as constants
 
 __all__ = [
-    'dewpoint','dewpoint2rh','dewpoint_rh','dry_lapse','ds2uv','equivalent_potential_temperature','h2p',
+    'dewpoint','dewpoint2rh','dewpoint_rh','dry_lapse','ds2uv','equivalent_potential_temperature','exner_function','h2p',
     'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh','rh2dewpoint',
-    'saturation_mixing_ratio','saturation_vapor_pressure','tc2tf','tf2tc','uv2ds','pressure_to_height_std',
+    'saturation_mixing_ratio','saturation_vapor_pressure','tc2tf','temperature_from_potential_temperature','tf2tc','uv2ds','pressure_to_height_std',
     'height_to_pressure_std','eof','vapor_pressure','varimax'
     ]
 
@@ -100,7 +88,7 @@ def pressure_to_height_std(press):
     t0 = 288.
     gamma = 6.5
     p0 = 1013.25
-    h = (t0 / gamma) * (1 - (press / p0)**(Rd * gamma / g)) * 1000
+    h = (t0 / gamma) * (1 - (press / p0)**(constants.Rd * gamma / constants.g)) * 1000
     return h
         
 def h2p(height):
@@ -131,7 +119,7 @@ def height_to_pressure_std(height):
     gamma = 6.5
     p0 = 1013.25
     height = height * 0.001
-    p = p0 * (1 - (gamma / t0) * height) ** (g / (Rd * gamma))
+    p = p0 * (1 - (gamma / t0) * height) ** (constants.g / (constants.Rd * gamma))
     return p
         
 def tf2tc(tf):
@@ -256,7 +244,7 @@ def dewpoint(e):
     formula for dewpoint in degrees Celsius:
     .. math:: T = \frac{243.5 log(e / 6.112)}{17.67 - log(e / 6.112)}
     """
-    val = np.log(e / sat_pressure_0c)
+    val = np.log(e / constants.sat_pressure_0c)
     return 243.5 * val / (17.67 - val)
         
 def dewpoint_rh(temperature, rh):
@@ -309,7 +297,7 @@ def potential_temperature(pressure, temperature):
     290.9814150577374
     """
 
-    return temperature * (P0 / pressure)**kappa
+    return temperature * (constants.P0 / pressure)**constants.kappa
 
 def dry_lapse(pressure, temperature):
     """
@@ -336,7 +324,7 @@ def dry_lapse(pressure, temperature):
     potential_temperature
     """
 
-    return temperature * (pressure / pressure[0])**kappa
+    return temperature * (pressure / pressure[0])**constants.kappa
     
 def moist_lapse(pressure, temperature):
     """
@@ -375,8 +363,8 @@ def moist_lapse(pressure, temperature):
 
     def dt(t, p):
         rs = saturation_mixing_ratio(p, t)
-        frac = ((Rd * t + Lv * rs) /
-                (Cp_d + (Lv * Lv * rs * epsilon / (Rd * t * t)))).to('kelvin')
+        frac = ((constants.Rd * t + constants.Lv * rs) /
+                (constants.Cp_d + (constants.Lv * constants.Lv * rs * constants.epsilon / (constants.Rd * t * t)))).to('kelvin')
         return frac / p
     return dt
                                     
@@ -401,7 +389,7 @@ def mixing_ratio(part_press, tot_press):
     vapor_pressure
     """
 
-    return epsilon * part_press / (tot_press - part_press)
+    return constants.epsilon * part_press / (tot_press - part_press)
 
 def saturation_mixing_ratio(tot_press, temperature):
     """
@@ -450,7 +438,7 @@ def vapor_pressure(pressure, mixing):
     --------
     saturation_vapor_pressure, dewpoint
     """
-    return pressure * mixing / (epsilon + mixing)
+    return pressure * mixing / (constants.epsilon + mixing)
     
 def saturation_vapor_pressure(temperature):
     r"""Calculate the saturation water vapor (partial) pressure.
@@ -474,8 +462,31 @@ def saturation_vapor_pressure(temperature):
     """
     # Converted from original in terms of C to use kelvin. Using raw absolute values of C in
     # a formula plays havoc with units support.
-    return sat_pressure_0c * np.exp(17.67 * (temperature - 273.15)
+    return constants.sat_pressure_0c * np.exp(17.67 * (temperature - 273.15)
                                     / (temperature - 29.65))
+                                    
+def exner_function(pressure, reference_pressure=constants.P0):
+    r"""Calculate the Exner function.
+    .. math:: \Pi = \left( \frac{p}{p_0} \right)^\kappa
+    This can be used to calculate potential temperature from temperature (and visa-versa),
+    since
+    .. math:: \Pi = \frac{T}{\theta}
+    Parameters
+    ----------
+    pressure : `pint.Quantity`
+        The total atmospheric pressure
+    reference_pressure : `pint.Quantity`, optional
+        The reference pressure against which to calculate the Exner function, defaults to P0
+    Returns
+    -------
+    `pint.Quantity`
+        The value of the Exner function at the given pressure
+    See Also
+    --------
+    potential_temperature
+    temperature_from_potential_temperature
+    """
+    return (pressure / reference_pressure)**constants.kappa
 
 def equivalent_potential_temperature(pressure, temperature, dewpoint):
     r"""Calculate equivalent potential temperature.
@@ -514,10 +525,43 @@ def equivalent_potential_temperature(pressure, temperature, dewpoint):
     r = saturation_mixing_ratio(pressure, dewpoint)
 
     t_l = 56 + 1. / (1. / (td - 56) + np.log(t / td) / 800.)
-    th_l = t * (1000 / (p - e)) ** kappa * (t / t_l) ** (0.28 * r)
+    th_l = t * (1000 / (p - e)) ** constants.kappa * (t / t_l) ** (0.28 * r)
     th_e = th_l * np.exp((3036. / t_l - 1.78) * r * (1 + 0.448 * r))
 
     return th_e
+    
+def temperature_from_potential_temperature(pressure, theta):
+    r"""Calculate the temperature from a given potential temperature.
+    Uses the inverse of the Poisson equation to calculate the temperature from a
+    given potential temperature at a specific pressure level.
+    Parameters
+    ----------
+    pressure : `pint.Quantity`
+        The total atmospheric pressure
+    theta : `pint.Quantity`
+        The potential temperature
+    Returns
+    -------
+    `pint.Quantity`
+        The temperature corresponding to the potential temperature and pressure.
+    See Also
+    --------
+    dry_lapse
+    potential_temperature
+    Notes
+    -----
+    Formula:
+    .. math:: T = \Theta (P / P_0)^\kappa
+    Examples
+    --------
+    >>> from metpy.units import units
+    >>> from metpy.calc import temperature_from_potential_temperature
+    >>> # potential temperature
+    >>> theta = np.array([ 286.12859679, 288.22362587]) * units.kelvin
+    >>> p = 850 * units.mbar
+    >>> T = temperature_from_potential_temperature(p,theta)
+    """
+    return theta * exner_function(pressure)
     
 def eof(x, svd=False, transform=False):
     '''

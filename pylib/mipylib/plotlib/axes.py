@@ -2701,16 +2701,18 @@ class Axes(object):
         :param Y: (*float*) The location y of the key.
         :param U: (*float*) The length of the key.
         :param label: (*string*) A string with the length and units of the key.
-        :param coordinates=['axes'|'figure'|'data'|'inches']: (*string*) Coordinate system and units for 
+        :param coordinates=['axes'|'figure'|'data']: (*string*) Coordinate system and units for 
             *X, Y*. 'axes' and 'figure' are normalized coordinate system with 0,0 in the lower left and 
             1,1 in the upper right, 'data' are the axes data coordinates (used for the locations of the 
-            vectors in the quiver plot itself); 'inches' is position in the figure in inches, with 0,0 
-            at the lower left corner.
+            vectors in the quiver plot itself).
         :param color: (*Color*) Overrides face and edge colors from Q.
         :param labelpos=['N'|'S'|'E'|'W']: (*string*) Position the label above, below, to the right, to
             the left of the arrow, respectively.
-        :param labelsep: (*float*) Distance in inches between the arrow and the label. Default is 0.1.
+        :param labelsep: (*float*) Distance in pixel between the arrow and the label. Default is 5.
         :param labelcolor: (*Color*) Label color. Default to default is black.
+        :param fontname: (*string*) Label font name. Default is ``Arial`` .
+        :param fontsize: (*int*) Label font size. Default is ``12`` .
+        :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
         :param fontproperties: (*dict*) A dictionary with keyword arguments accepted by the FontProperties
             initializer: *family, style, variant, size, weight*.
         """
@@ -2735,6 +2737,17 @@ class Axes(object):
         lcobj = kwargs.pop('labelcolor', 'b')
         lcolor = plotutil.getcolor(lcobj)
         wa.setLabelColor(lcolor)
+        fontname = kwargs.pop('fontname', 'Arial')
+        fontsize = kwargs.pop('fontsize', 12)
+        bold = kwargs.pop('bold', False)
+        if bold:
+            font = Font(fontname, Font.BOLD, fontsize)
+        else:
+            font = Font(fontname, Font.PLAIN, fontsize)
+        wa.setFont(font)
+        labelsep = kwargs.pop('labelsep', None)
+        if not labelsep is None:
+            wa.setLabelSep(labelsep)
         bbox = kwargs.pop('bbox', None)
         if not bbox is None:
             fill = bbox.pop('fill', None)
