@@ -1824,7 +1824,7 @@ def griddata(points, values, xi=None, **kwargs):
     :param xi: (*list*) The list contains x and y coordinate arrays of the grid data. Default is ``None``,
         the grid x and y coordinate size were both 500.
     :param method: (*string*) The interpolation method. [idw | cressman | nearest | inside | inside_min
-        | inside_max | inside_count | surface]
+        | inside_max | inside_count | surface | barnes]
     :param fill_value: (*float*) Fill value, Default is ``nan``.
     :param pointnum: (*int*) Only used for 'idw' method. The number of the points to be used for each grid
         value interpolation.
