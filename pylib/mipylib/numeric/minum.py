@@ -10,6 +10,7 @@ import datetime
 from org.meteoinfo.data import GridData, GridArray, StationData, DataMath, TableData, ArrayMath, ArrayUtil, TableUtil
 from org.meteoinfo.data.meteodata import Dimension
 from org.meteoinfo.data.meteodata.netcdf import NetCDFDataInfo
+from org.meteoinfo.math.interpolate import InterpUtil
 from ucar.ma2 import Array
 
 from dimarray import PyGridData, DimArray, PyStationData
@@ -1858,7 +1859,17 @@ def griddata(points, values, xi=None, **kwargs):
         radius = kwargs.pop('radius', [10, 7, 4, 2, 1])
         if isinstance(radius, MIArray):
             radius = radius.aslist()
-        r = ArrayUtil.cressman(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
+        r = InterpUtil.cressman(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)
+    elif method == 'barnes':
+        kappa = kwargs.pop('kappa', 1)
+        gamma = kwargs.pop('gamma', 1)
+        radius = kwargs.pop('radius', [10, 7, 4, 2, 1])
+        if radius is None:
+            r = InterpUtil.barnes(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), kappa, gamma)
+        else:
+            if isinstance(radius, MIArray):
+                radius = radius.aslist()
+            r = InterpUtil.barnes(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius, kappa, gamma)
     elif method == 'nearest':
         radius = kwargs.pop('radius', inf)
         r = ArrayUtil.interpolation_Nearest(x_s.aslist(), y_s.aslist(), values, x_g.aslist(), y_g.aslist(), radius)

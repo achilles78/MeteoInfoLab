@@ -85,3 +85,26 @@ def get_slp(wrfin, timeidx=0, units='hPa'):
     
     return DimArray(slp, dims=t.dims[1:])
     
+def get_rh(wrfin, timeidx=0):
+    '''
+    Return the relative humidity.
+    
+    This functions extracts the necessary variables from the NetCDF file 
+    object in order to perform the calculation.
+    
+    :param wrfin: (*DimDataFile*) Data file.
+    :param timeidx: (*int*) Time index.
+    
+    :returns: (*array*) Relative humidity.
+    '''
+    t = wrfin['T'][timeidx,:,:,:]
+    p = wrfin['P'][timeidx,:,:,:]
+    pb = wrfin['PB'][timeidx,:,:,:]
+    qvapor = wrfin['QVAPOR'][timeidx,:,:,:]
+    full_t = t + constants.T_BASE
+    full_p = p + pb
+    qvapor[qvapor < 0] = 0.
+    tk = meteo.temperature_from_potential_temperature(full_p * 0.01, full_t)
+    rh = meteo.relative_humidity_from_specific_humidity(qvapor, tk, full_p * 0.01) * 100
+    
+    return rh

@@ -14,7 +14,7 @@ import constants as constants
 
 __all__ = [
     'dewpoint','dewpoint2rh','dewpoint_rh','dry_lapse','ds2uv','equivalent_potential_temperature','exner_function','h2p',
-    'mixing_ratio','moist_lapse','p2h','potential_temperature','qair2rh','rh2dewpoint',
+    'mixing_ratio','mixing_ratio_from_specific_humidity','moist_lapse','p2h','potential_temperature','qair2rh','rh2dewpoint','relative_humidity_from_specific_humidity',
     'saturation_mixing_ratio','saturation_vapor_pressure','tc2tf','temperature_from_potential_temperature','tf2tc','uv2ds','pressure_to_height_std',
     'height_to_pressure_std','eof','vapor_pressure','varimax'
     ]
@@ -202,7 +202,57 @@ def dewpoint2rh(dewpoint, temp):
             r = DimArray(r, dewpoint.dims, dewpoint.fill_value, dewpoint.proj)
         return r
     else:
-        return MeteoMath.dewpoint2rh(temp, dewpoint)     
+        return MeteoMath.dewpoint2rh(temp, dewpoint)  
+
+def mixing_ratio_from_specific_humidity(specific_humidity):
+    r"""Calculate the mixing ratio from specific humidity.
+    Parameters
+    ----------
+    specific_humidity: `pint.Quantity`
+        Specific humidity of air
+    Returns
+    -------
+    `pint.Quantity`
+        Mixing ratio
+    Notes
+    -----
+    Formula from [Salby1996]_ pg. 118.
+    .. math:: w = \frac{q}{1-q}
+    * :math:`w` is mixing ratio
+    * :math:`q` is the specific humidity
+    See Also
+    --------
+    mixing_ratio, specific_humidity_from_mixing_ratio
+    """
+    return specific_humidity / (1 - specific_humidity)        
+
+def relative_humidity_from_specific_humidity(specific_humidity, temperature, pressure):
+    r"""Calculate the relative humidity from specific humidity, temperature, and pressure.
+    Parameters
+    ----------
+    specific_humidity: `pint.Quantity`
+        Specific humidity of air
+    temperature: `pint.Quantity`
+        Air temperature
+    pressure: `pint.Quantity`
+        Total atmospheric pressure
+    Returns
+    -------
+    `pint.Quantity`
+        Relative humidity
+    Notes
+    -----
+    Formula based on that from [Hobbs1977]_ pg. 74. and [Salby1996]_ pg. 118.
+    .. math:: RH = \frac{q}{(1-q)w_s}
+    * :math:`RH` is relative humidity as a unitless ratio
+    * :math:`q` is specific humidity
+    * :math:`w_s` is the saturation mixing ratio
+    See Also
+    --------
+    relative_humidity_from_mixing_ratio
+    """
+    return (mixing_ratio_from_specific_humidity(specific_humidity)
+            / saturation_mixing_ratio(pressure, temperature))        
         
 def rh2dewpoint(rh, temp):    
     """
