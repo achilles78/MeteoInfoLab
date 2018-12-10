@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\meteo\wrf">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\KeyData\PMMUL\script"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython"/>
     <RecentFolder Folder="D:\Working\MIScript"/>
@@ -22,17 +22,15 @@
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs_1.py"/>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\meteo\wrf\wrf_get_rh.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs_1.py"/>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\meteo\wrf\wrf_get_rh.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="SimSun" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,0" MainFormSize="1369,788"/>
+  <Startup MainFormLocation="-6,-6" MainFormSize="1296,696"/>
 </MeteoInfo>

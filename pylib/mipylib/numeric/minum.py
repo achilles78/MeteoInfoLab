@@ -30,7 +30,7 @@ __all__ = [
     'pi','e','inf','nan','absolute','arange','arange1',    
     'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','degrees','diag','dim_array','datatable','dot','exp','eye','fmax','fmin',
+    'corrcoef','cos','degrees','diag','dim_array','datatable','dot','exp','eye','fmax','fmin','full',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isarray','isnan','linint2','linregress','linspace','log','log10',
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
@@ -328,6 +328,26 @@ def ones(shape, dtype='float'):
     else:
         shapelist = shape
     return MIArray(ArrayUtil.ones(shapelist, dtype))
+    
+def full(shape, fill_value, dtype=None):
+    '''
+    Return a new array of given shape and type, filled with fill_value.
+    
+    :param shape: (*int or sequence of ints*) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+    :param fill_value: (*scalar*) Fill value.
+    :param dtype: (*data-type, optional*) The desired data-type for the array, including 'int', 
+        'float' and 'double'.
+        
+    :returns: (*MIArray*) Array of ones with the given shape and dtype.
+    '''
+    shapelist = []
+    if isinstance(shape, int):
+        shapelist.append(shape)
+    else:
+        shapelist = shape
+    if not dtype is None:
+        dtype = ArrayUtil.toDataType(dtype)
+    return MIArray(ArrayUtil.full(shapelist, fill_value, dtype))
     
 def identity(n, dtype='float'):
     '''
