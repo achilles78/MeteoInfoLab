@@ -2,7 +2,7 @@
 # Author: Yaqiang Wang
 # Date: 2018-11-23
 # Purpose: MeteoInfoLab wrf module
-# Note: Jython, some functions code revised wrf-python
+# Note: Jython, some functions revised from wrf-python
 #-----------------------------------------------------
 
 from org.meteoinfo.math.meteo import MeteoMath
@@ -12,7 +12,7 @@ import constants as constants
 import meteo as meteo
 
 __all__ = [
-    'destagger','get_slp'
+    'destagger','get_slp','get_rh','get_rh2m'
     ]
 
 def destagger(var, stagger_dim):
@@ -106,5 +106,25 @@ def get_rh(wrfin, timeidx=0):
     qvapor[qvapor < 0] = 0.
     tk = meteo.temperature_from_potential_temperature(full_p * 0.01, full_t)
     rh = meteo.relative_humidity_from_specific_humidity(qvapor, tk, full_p * 0.01) * 100
+    
+    return rh
+    
+def get_rh2m(wrfin, timeidx=0):
+    '''
+    Return the 2m relative humidity.
+    
+    This functions extracts the necessary variables from the NetCDF file 
+    object in order to perform the calculation.
+    
+    :param wrfin: (*DimDataFile*) Data file.
+    :param timeidx: (*int*) Time index.
+    
+    :returns: (*array*) Relative humidity.
+    '''
+    t2 = wrfin['T2'][timeidx,:,:]
+    psfc = wrfin['PSFC'][timeidx,:,:]
+    q2 = wrfin['Q2'][timeidx,:,:]
+    q2[q2 < 0] = 0.
+    rh = meteo.relative_humidity_from_specific_humidity(q2, t2, psfc * 0.01) * 100
     
     return rh
