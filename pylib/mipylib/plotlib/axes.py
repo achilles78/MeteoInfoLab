@@ -9,7 +9,7 @@
 from org.meteoinfo.chart import Location, ChartWindArrow, ChartText, LegendPosition, \
     ChartLegend, ChartColorBar
 from org.meteoinfo.chart.plot import Plot2D, PolarPlot, GraphicFactory, \
-    PlotOrientation
+    PlotOrientation, XAlign, YAlign
 from org.meteoinfo.chart.axis import Axis, LonLatAxis, TimeAxis, LogAxis
 from org.meteoinfo.legend import LegendManage, BarBreak, PolygonBreak, PolylineBreak, \
     PointBreak, LineStyles, PointStyle, LegendScheme, LegendType
@@ -2796,13 +2796,14 @@ class Axes(object):
             is True.
         :param facecolor: (*None or color*) Control the legend’s background color. Default is None which 
             set not draw background.
-        :param fontname: (*string*) Tick font name. Default is ``Arial`` .
-        :param fontsize: (*int*) Tick font size. Default is ``14`` .
+        :param fontname: (*string*) Label font name. Default is ``Arial`` .
+        :param fontsize: (*int*) Label font size. Default is ``14`` .
+        :param labelcolor: (*color*) Label string color. Defaul is ``black``.
         :param bold: (*boolean*) Is bold font or not. Default is ``False`` .
-        :param title: (*string*) Label string.
-        :param labelfontname: (*string*) Title font name.
-        :param labelfontsize: (*int*) Label font size.
-        :param labcolor: (*color*) Label color. Default is ``black`` .
+        :param title: (*string*) Title string.
+        :param titlefontname: (*string*) Title font name.
+        :param titlefontsize: (*int*) Title font size.
+        :param titlecolor: (*color*) Title color. Default is ``black`` .
         :param markerscale: (*float*) Marker symbol scale.
         :param markerwidth: (*float*) Marker symbol width.
         :param markerheight: (*float*) Marker symbol height.
@@ -2895,31 +2896,40 @@ class Axes(object):
             clegend.setDrawBackground(True)
             background = plotutil.getcolor(bcobj)
             clegend.setBackground(background)
-        tickfontdic = kwargs.pop('tickfont', None)
-        if tickfontdic is None:
-            tickfont = plotutil.getfont_1(**kwargs)    
+        labelfontdic = kwargs.pop('labelfont', None)
+        if labelfontdic is None:
+            labelfont = plotutil.getfont_1(**kwargs)    
         else:
-            tickfont = plotutil.getfont(tickfontdic)
-        clegend.setTickLabelFont(tickfont)
-        fontname = kwargs.pop('labelfontname', None)
-        exfont = False
-        if fontname is None:
-            fontname = 'Arial'
-        else:
-            exfont = True
-        fontsize = kwargs.pop('labelfontsize', 14)
-        bold = kwargs.pop('labelbold', False)
-        labcolor = kwargs.pop('labcolor', 'black')
-        labcolor = plotutil.getcolor(labcolor)
-        if bold:
-            font = Font(fontname, Font.BOLD, fontsize)
-        else:
-            font = Font(fontname, Font.PLAIN, fontsize)
-        title = kwargs.pop('title', '')
-        title = ChartText(title, font)
-        title.setColor(labcolor)
-        title.setUseExternalFont(exfont)
-        clegend.setLabel(title)
+            labelfont = plotutil.getfont(labelfontdic)
+        clegend.setTickLabelFont(labelfont)
+        title = kwargs.pop('title', None)
+        if not title is None:
+            titlefontdic = kwargs.pop('titlefont', None)
+            exfont = False
+            if titlefontdic is None:
+                fontname = kwargs.pop('titlefontname', None)
+                exfont = False
+                if fontname is None:
+                    fontname = 'Arial'
+                else:
+                    exfont = True
+                fontsize = kwargs.pop('titlefontsize', 14)
+                bold = kwargs.pop('titlebold', False)                  
+                if bold:
+                    titlefont = Font(fontname, Font.BOLD, fontsize)
+                else:
+                    titlefont = Font(fontname, Font.PLAIN, fontsize)                
+            else:
+                titlefont = plotutil.getfont(titlefontdic)
+            title = ChartText(title, titlefont)
+            title.setUseExternalFont(exfont)
+            titlecolor = kwargs.pop('titlecolor', None)
+            if not titlecolor is None:
+                titlecolor = plotutil.getcolor(titlecolor)
+                title.setColor(titlecolor)            
+            title.setXAlign(XAlign.CENTER)
+            title.setYAlign(YAlign.TOP)
+            clegend.setLabel(title)
         markerscale = kwargs.pop('markerscale', None)
         if not markerscale is None:
             clegend.setSymbolScale(markerscale)
