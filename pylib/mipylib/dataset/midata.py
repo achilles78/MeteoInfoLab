@@ -139,6 +139,9 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
                 ncfile.setLargeFile(largefile)
             datafile = DimDataFile(ncfile=ncfile)
         return datafile
+    elif access == 'w':
+        ncfile = NetcdfFileWriter.openExisting(fname)
+        datafile = DimDataFile(ncfile=ncfile)
     else:
         return None
     
