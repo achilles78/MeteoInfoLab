@@ -1,3 +1,4 @@
+# coding=utf-8
 #-----------------------------------------------------
 # Author: Yaqiang Wang
 # Date: 2014-12-27
@@ -1393,6 +1394,33 @@ def squeeze(a):
         return DimArray(MIArray(da), dims, a.fill_value, a.proj)
         
 def meshgrid(*args):
+    '''
+    Return coordinate matrices from coordinate vectors.
+
+    Make N-D coordinate arrays for vectorized evaluations of N-D scalar/vector fields 
+    over N-D grids, given one-dimensional coordinate arrays x1, x2,…, xn.
+
+    :param x1,x2...xn: (*array_like*) 1-D arrays representing the coordinates of a grid.. 
+    
+    :returns X1,X2...XN: For vectors x1, x2,…, ‘xn’ with lengths Ni=len(xi) , 
+        return (N1, N2, N3,...Nn) shaped arrays
+    '''
+    xs = []
+    for x in args:
+        if isinstance(x, list):
+            x = array(x)
+        if x.ndim != 1:
+            print 'The paramters must be vector arrays!'
+            return None
+        xs.append(x.array)
+
+    ra = ArrayUtil.meshgrid(xs)
+    rs = []
+    for r in ra:
+        rs.append(MIArray(r))
+    return tuple(rs)
+    
+def meshgrid_bak(*args):
     '''
     Return coordinate matrices from coordinate vectors.
 

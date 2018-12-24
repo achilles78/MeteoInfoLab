@@ -961,7 +961,8 @@ class Axes3D(Axes):
             vectors to draw, in increasing order.
         :param cmap: (*string*) Color map string.
         :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
-        :param size: (*float*) Base size of the arrows.
+        :param length: (*float*) The length of each quiver, default to 1.0, the unit is 
+            the same with the axes.
         
         :returns: (*Graphic list*) Created quiver graphics.
         """
@@ -1013,7 +1014,8 @@ class Axes3D(Axes):
         
         if not cdata is None:
             cdata = plotutil.getplotdata(cdata)
-        igraphic = GraphicFactory.createArrows3D(x, y, z, u, v, w, cdata, ls)
+        length = kwargs.pop('length', 1)
+        igraphic = GraphicFactory.createArrows3D(x, y, z, u, v, w, length, cdata, ls)
 
         visible = kwargs.pop('visible', True)
         if visible:

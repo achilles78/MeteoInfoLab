@@ -2902,6 +2902,10 @@ class Axes(object):
         else:
             labelfont = plotutil.getfont(labelfontdic)
         clegend.setTickLabelFont(labelfont)
+        labelcolor = kwargs.pop('labelcolor', None)
+        if not labelcolor is None:
+            labelcolor = plotutil.getcolor(labelcolor)
+            clegend.setTickLabelColor(labelcolor)
         title = kwargs.pop('title', None)
         if not title is None:
             titlefontdic = kwargs.pop('titlefont', None)
