@@ -1392,16 +1392,17 @@ def squeeze(a):
                 dims.append(dim)
         return DimArray(MIArray(da), dims, a.fill_value, a.proj)
         
-def meshgrid(x, y):
+def meshgrid(*args):
     '''
-    Returns 2-D grid coordinates based on the coordinates contained in vectors x and y. is a matrix 
-    where each row is a copy of x, and Y is a matrix where each column is a copy of y. The grid 
-    represented by the coordinates X and Y has length(y) rows and length(x) columns.
+    Return coordinate matrices from coordinate vectors.
 
-    :param x: (*array_like*) 1-D array representing the x coordinate of a grid. 
-    :param y: (*array_like*) 1-D array representing the y coordinate of a grid.
+    Make N-D coordinate arrays for vectorized evaluations of N-D scalar/vector fields 
+    over N-D grids, given one-dimensional coordinate arrays x1, x2,…, xn.
+
+    :param x1,x2...xn: (*array_like*) 1-D arrays representing the coordinates of a grid.. 
     
-    :returns X, Y: 2-D array. 2-D arrays.
+    :returns X1,X2...XN: For vectors x1, x2,…, ‘xn’ with lengths Ni=len(xi) , 
+        return (N1, N2, N3,...Nn) shaped arrays
     '''
     if isinstance(x, list):
         x = array(x)

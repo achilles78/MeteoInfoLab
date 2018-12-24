@@ -946,6 +946,80 @@ class Axes3D(Axes):
             self.add_graphic(graphics)
         return graphics
         
+    def quiver(self, *args, **kwargs):
+        """
+        Plot a 2-D field of arrows.
+        
+        :param x: (*array_like*) X coordinate array.
+        :param y: (*array_like*) Y coordinate array.
+        :param z: (*array_like*) Z coordinate array.
+        :param u: (*array_like*) U component of the arrow vectors (wind field).
+        :param v: (*array_like*) V component of the arrow vectors (wind field).
+        :param w: (*array_like*) W component of the arrow vectors (wind field).
+        :param z: (*array_like*) Optional, 2-D z value array.
+        :param levs: (*array_like*) Optional. A list of floating point numbers indicating the level 
+            vectors to draw, in increasing order.
+        :param cmap: (*string*) Color map string.
+        :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
+        :param size: (*float*) Base size of the arrows.
+        
+        :returns: (*Graphic list*) Created quiver graphics.
+        """
+        ls = kwargs.pop('symbolspec', None)
+        cmap = plotutil.getcolormap(**kwargs)
+        fill_value = kwargs.pop('fill_value', -9999.0)
+        n = len(args) 
+        iscolor = False
+        cdata = None
+        xaxistype = None
+        x = args[0]
+        y = args[1]
+        z = args[2]
+        u = args[3]
+        v = args[4]
+        w = args[5]
+        args = args[6:]
+        if len(args) > 0:
+            cdata = args[0]
+            iscolor = True
+            args = args[1:]
+        x = plotutil.getplotdata(x)
+        y = plotutil.getplotdata(y)
+        z = plotutil.getplotdata(z)
+        u = plotutil.getplotdata(u)
+        v = plotutil.getplotdata(v)   
+        w = plotutil.getplotdata(w)
+        
+        if ls is None:
+            if iscolor:
+                if len(args) > 0:
+                    cn = args[0]
+                    ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cn, cmap)
+                else:
+                    levs = kwargs.pop('levs', None)
+                    if levs is None:
+                        ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), cmap)
+                    else:
+                        if isinstance(levs, MIArray):
+                            levs = levs.tolist()
+                        ls = LegendManage.createLegendScheme(cdata.min(), cdata.max(), levs, cmap)
+            else:    
+                if cmap.getColorCount() == 1:
+                    c = cmap.getColor(0)
+                else:
+                    c = Color.black
+                ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
+            ls = plotutil.setlegendscheme_point(ls, **kwargs)
+        
+        if not cdata is None:
+            cdata = plotutil.getplotdata(cdata)
+        igraphic = GraphicFactory.createArrows3D(x, y, z, u, v, w, cdata, ls)
+
+        visible = kwargs.pop('visible', True)
+        if visible:
+            self.add_graphic(igraphic)
+        return igraphic
+        
     def plot_layer(self, layer, **kwargs):
         '''
         Plot a layer in 3D axes.
