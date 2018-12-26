@@ -1843,26 +1843,35 @@ def interpn(points, values, xi):
     
     :param points: (*list*) The points defining the regular grid in n dimensions.
     :param values: (*array_like*) The data on the regular grid in n dimensions.
-    :param xi: (*list*) The coordinates to sample the gridded data at.
+    :param xi: (*array_like*) The coordinates to sample the gridded data at.
     
     :returns: (*float*) Interpolated value at input coordinates.
     """
     npoints = []
     for p in points:
-        if isinstance(p, MIArray):
-            p = p.aslist()
-        npoints.append(p)
+        if isinstance(p, (list,tuple)):
+            p = array(p)
+        npoints.append(p.array)
         
-    if isinstance(xi, MIArray):
-        xi = xi.aslist()
-    nxi = []
-    for x in xi:
-        if isinstance(x, datetime.datetime):
-            x = miutil.date2num(x)
-        nxi.append(x)
-        
-    r = ArrayUtil.interpn(npoints, values.asarray(), nxi)
-    return r
+    if isinstance(xi, (list, tuple)):
+        if isinstance(xi[0], MIArray):
+            nxi = []
+            for x in xi:
+                nxi.append(x.array)
+        else:
+            nxi = []
+            for x in xi:
+                if isinstance(x, datetime.datetime):
+                    x = miutil.date2num(x)
+                nxi.append(x)
+            nxi = array(nxi).array        
+    else:
+        nxi = nxi.array
+    r = ArrayUtil.interpn(npoints, values.array, nxi)
+    if isinstance(r, Array):
+        return MIArray(r)
+    else:
+        return r
     
 def griddata(points, values, xi=None, **kwargs):
     '''

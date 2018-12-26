@@ -23,6 +23,8 @@ class MIArray(object):
         
     # array must be a ucar.ma2.Array object
     def __init__(self, array):
+        if not isinstance(array, Array):
+            array = ArrayUtil.array(array)
         self.array = array
         self.ndim = array.getRank()
         s = array.getShape()

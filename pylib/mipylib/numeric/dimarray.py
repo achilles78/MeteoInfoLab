@@ -948,16 +948,26 @@ class DimArray(MIArray):
         """
         points = []
         for i in range(self.ndim):
-            points.append(self.dims[i].getDimValue())
-        if isinstance(xi, (MIArray, DimArray)):
-            xi = xi.aslist()
-        nxi = []
-        for x in xi:
-            if isinstance(x, datetime.datetime):
-                x = miutil.date2num(x)
-            nxi.append(x)
-        r = ArrayUtil.interpn(points, self.asarray(), nxi)
-        return r
+            points.append(ArrayUtil.array(self.dims[i].getDimValue()))
+        if isinstance(xi, (list, tuple)):
+            if isinstance(xi[0], MIArray):
+                nxi = []
+                for x in xi:
+                    nxi.append(x.array)
+            else:
+                nxi = []
+                for x in xi:
+                    if isinstance(x, datetime.datetime):
+                        x = miutil.date2num(x)
+                    nxi.append(x)
+                nxi = MIArray(nxi).array
+        else:
+            nxi = nxi.array
+        r = ArrayUtil.interpn(points, self.array, nxi)
+        if isinstance(r, Array):
+            return MIArray(r)
+        else:
+            return r
      
     def tostation(self, x, y):
         gdata = self.asgriddata()
