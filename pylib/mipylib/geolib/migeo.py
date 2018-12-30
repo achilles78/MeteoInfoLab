@@ -14,7 +14,8 @@ from org.meteoinfo.legend import BreakTypes
 from org.meteoinfo.geoprocess import GeoComputation
 from org.meteoinfo.data import ArrayMath, ArrayUtil
 from org.meteoinfo.data.mapdata import MapDataManage, AttributeTable
-from org.meteoinfo.projection import KnownCoordinateSystems, ProjectionInfo, Reproject
+from org.meteoinfo.projection import KnownCoordinateSystems, Reproject
+from org.meteoinfo.projection.info import ProjectionInfo
 from org.meteoinfo.global import PointD
 from org.meteoinfo.io import IOUtil
 
@@ -391,7 +392,7 @@ def projinfo(proj4string=None, proj='longlat', **kwargs):
     :returns: (*ProjectionInfo*) ProjectionInfo object.
     """
     if not proj4string is None:
-        return ProjectionInfo(proj4string)
+        return ProjectionInfo.factory(proj4string)
     
     if proj == 'longlat' and len(kwargs) == 0:
         return KnownCoordinateSystems.geographic.world.WGS1984
@@ -430,7 +431,7 @@ def projinfo(proj4string=None, proj='longlat', **kwargs):
     if not h is None:
         projstr = projstr + ' +h=' + str(h)
         
-    return ProjectionInfo(projstr) 
+    return ProjectionInfo.factory(projstr) 
 
 def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, toproj=KnownCoordinateSystems.geographic.world.WGS1984):
     """
@@ -444,9 +445,9 @@ def project(x, y, fromproj=KnownCoordinateSystems.geographic.world.WGS1984, topr
     :returns: (*array_like*, *array_like*) Projected geographic coordinates.
     """
     if isinstance(fromproj, str):
-        fromproj = ProjectionInfo(fromproj)
+        fromproj = ProjectionInfo.factory(fromproj)
     if isinstance(toproj, str):
-        toproj = ProjectionInfo(toproj)
+        toproj = ProjectionInfo.factory(toproj)
     if isinstance(x, (tuple, list)):
         x = array(x)
     if isinstance(y, (tuple, list)):

@@ -216,7 +216,9 @@ class Figure(ChartPanel):
         :param xyscale: (*int*) Optional, set scale of x and y axis, default is 1. It is only
             valid in longlat projection.
         :param gridlabel: (*boolean*) Optional, set axis tick labels visible or not. Default is ``True`` .
-        :param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
+        :param gridlabelloc: (*string*) Optional, Set grid label locations 
+			[left_bottom | left_up | right_bottom | right_up | all]. Default is ``left_bottom'.
+		:param gridline: (*boolean*) Optional, set grid line visible or not. Default is ``False`` .
         :param griddx: (*float*) Optional, set x grid line interval. Default is 10 degree.
         :param griddy: (*float*) Optional, set y grid line interval. Default is 10 degree.
         :param frameon: (*boolean*) Optional, set frame visible or not. Default is ``False`` for lon/lat
@@ -248,6 +250,7 @@ class Figure(ChartPanel):
             topaxis = False
             rightaxis = False            
         gridlabel = kwargs.pop('gridlabel', True)
+        gridlabelloc = kwargs.pop('gridlabelloc', 'left_bottom')
         gridline = kwargs.pop('gridline', False)
         griddx = kwargs.pop('griddx', 10)
         griddy = kwargs.pop('griddy', 10)
@@ -285,6 +288,7 @@ class Figure(ChartPanel):
         mapframe.setGridFont(font)
         mapframe.setDrawGridLabel(gridlabel)
         mapframe.setDrawGridTickLine(gridlabel)
+        mapframe.setGridLabelPosition(gridlabelloc)
         mapframe.setDrawGridLine(gridline)
         mapframe.setGridXDelt(griddx)
         mapframe.setGridYDelt(griddy)

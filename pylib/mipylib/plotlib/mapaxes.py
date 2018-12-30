@@ -14,7 +14,7 @@ from org.meteoinfo.data.meteodata import DrawMeteoData
 from org.meteoinfo.map import MapView
 from org.meteoinfo.legend import BreakTypes, LegendManage, LegendScheme, LegendType
 from org.meteoinfo.shape import Shape, PolylineShape, PolygonShape, ShapeTypes, Graphic
-from org.meteoinfo.projection import ProjectionInfo
+from org.meteoinfo.projection.info import ProjectionInfo
 from org.meteoinfo.global import Extent
 from org.meteoinfo.layer import LayerTypes, WebMapLayer
 from org.meteoinfo.data.mapdata.webmap import WebMapProvider
@@ -75,7 +75,10 @@ class MapAxes(Axes):
                     + ' +x_0=' + str(x_0) \
                     + ' +y_0=' + str(y_0) \
                     + ' +h=' + str(h)
-                projinfo = ProjectionInfo(projstr)   
+                projinfo = ProjectionInfo.factory(projstr)
+            cutoff = kwargs.pop('cutoff', None)
+            if not cutoff is None:
+                projinfo.setCutoff(cutoff)
                 
             mapview = MapView(projinfo)     
             self.axes = MapPlot(mapview)
@@ -215,7 +218,7 @@ class MapAxes(Axes):
         :param lonlat: (*boolean*) Is longitude/latitude or not.
         """
         if limits is None:
-            self.axes.setDrawExtent(self.axes.getMapView().getExtent())
+            self.axes.setDrawExtent(self.axes.getFullExtent())
             self.axes.setExtent(self.axes.getDrawExtent().clone())
             return True
         else:

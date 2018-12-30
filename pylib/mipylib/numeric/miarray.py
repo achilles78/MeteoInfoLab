@@ -628,6 +628,14 @@ class MIArray(object):
     def log10(self):
         return MIArray(ArrayMath.log10(self.array))
         
+    def sign(self):
+        '''
+        Returns an element-wise indication of the sign of a number.
+
+        The sign function returns -1 if x < 0, 0 if x==0, 1 if x > 0. nan is returned for nan inputs.
+        '''
+        return MIArray(ArrayMath.sign(self.array))
+        
     def dot(self, other):
         """
         Matrix multiplication.

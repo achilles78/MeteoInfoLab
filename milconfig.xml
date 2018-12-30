@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\data_process">
-    <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py\ensemble"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\math"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\micaps"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\map\projection">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\CARSNET"/>
@@ -16,27 +11,32 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\data_process"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map\projection"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
   </Path>
   <File>
     <OpenedFiles>
-      <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
-      <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs.py"/>
-      <OpenedFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\CARSNET\pylib\frmProcess.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\quiver_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\meteo\vertical_slash-3.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\tmerc.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\sinu_proj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\wag3_proj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\stere_proj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\moll_proj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\hammer_proj.py"/>
     </OpenedFiles>
     <RecentFiles>
-      <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs_1.py"/>
-      <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
-      <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_aqi_obs.py"/>
-      <RecentFile File="D:\MyProgram\java\MeteoInfoDev\toolbox\CARSNET\pylib\frmProcess.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\3d\quiver_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\meteo\vertical_slash-3.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\tmerc.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\sinu_proj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\wag3_proj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\stere_proj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\moll_proj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\hammer_proj.py"/>
     </RecentFiles>
   </File>
   <Font>
-    <TextFont FontName="SimSun" FontSize="15"/>
+    <TextFont FontName="宋体" FontSize="15"/>
   </Font>
   <Startup MainFormLocation="-6,-6" MainFormSize="1296,696"/>
 </MeteoInfo>

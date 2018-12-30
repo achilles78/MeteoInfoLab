@@ -31,7 +31,7 @@ __all__ = [
     'pi','e','inf','nan','absolute','arange','arange1',    
     'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','degrees','diag','dim_array','datatable','dot','exp','eye','fmax','fmin','full',
+    'corrcoef','cos','degrees','diag','dim_array','datatable','dot','empty','exp','eye','fmax','fmin','full',
     'griddata','hcurl','hdivg','identity','interp2d',
     'interpn','isarray','isnan','linint2','linregress','linspace','log','log10',
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
@@ -245,6 +245,33 @@ def logspace(start, stop, num=50, endpoint=True, base=10.0, dtype=None):
     r = MIArray(ArrayUtil.lineSpace(start, stop, num, endpoint))
     r = pow(base, r)
     return r
+
+def empty(shape, dtype='float'):
+    """
+    Create a new aray of given shape and type, without initializing entries.
+
+    :param shape: (*int or sequence of ints*) Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+    :param dtype: (*data-type, optional*) The desired data-type for the array, including 'int', 
+        'float' and 'double'.
+        
+    :returns: (*MIArray*) Array of zeros with the given shape and dtype.
+                    
+    Examples::
+    
+        >>> empty(5)
+        array([0.0, 0.0, 0.0, 0.0, 0.0])
+        >>> empty(5, dtype='int')
+        array([0, 0, 0, 0, 0])
+        >>> empty((2, 1))
+        array([[0.0]
+              [0.0]])
+    """
+    shapelist = []
+    if isinstance(shape, int):
+        shapelist.append(shape)
+    else:
+        shapelist = shape
+    return MIArray(ArrayUtil.zeros(shapelist, dtype))
     
 def zeros(shape, dtype='float'):
     """
@@ -805,6 +832,24 @@ def log10(x):
             return cmath.log10(x)
         else:
             return math.log10(x)
+            
+def sign(x):
+    '''
+    Returns an element-wise indication of the sign of a number.
+
+    The sign function returns -1 if x < 0, 0 if x==0, 1 if x > 0. nan is returned for nan inputs.
+    
+    :param x: (*array_like*) Input values.
+    
+    :returns: The sign of x. This is a scalar if x is a scalar.
+    '''
+    if isinstance(x, list):
+        x = array(x)
+        
+    if isinstance(x, MIArray):
+        return x.sign()
+    else:
+        return math.copysign(1, x)
 
 def sum(x, axis=None):
     """
@@ -814,7 +859,7 @@ def sum(x, axis=None):
     :param axis: (*int*) Axis along which the standard deviation is computed. 
         The default is to compute the standard deviation of the flattened array.
     
-    returns: (*array_like*) Sum result
+    :returns: (*array_like*) Sum result
     """
     if isinstance(x, list):
         if isinstance(x[0], MIArray):

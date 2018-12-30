@@ -20,6 +20,7 @@ import org.meteoinfo.global.util.FontUtil;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.gui.FrmMain;
 import org.meteoinfo.laboratory.gui.MyPythonInterpreter;
+import org.python.core.Py;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveConsole;
@@ -91,7 +92,8 @@ public class MeteoInfoLab {
         PySystemState state = new PySystemState();
         if (args.length > idx + 1) {
             for (int i = idx + 1; i < args.length; i++) {
-                state.argv.append(new PyString(args[i]));
+                state.argv.append(Py.newStringOrUnicode(args[i]));
+                //state.argv.append(new PyString(args[i]));
             }
         }
         //state.setdefaultencoding("utf-8");
