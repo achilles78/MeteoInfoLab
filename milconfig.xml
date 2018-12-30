@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
   <Path OpenPath="D:\Working\MIScript\Jython\mis\map\projection">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\traj"/>
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\CARSNET"/>
     <RecentFolder Folder="D:\MyProgram\java\MeteoInfoDev\toolbox\CARSNET\pylib"/>
@@ -16,6 +15,7 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map\projection"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\hdf"/>
   </Path>
   <File>
     <OpenedFiles>
@@ -25,6 +25,8 @@
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\stere_proj.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\moll_proj.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\hammer_proj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\geos_proj.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\map\projection\ortho_proj.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\tmerc.py"/>
@@ -33,6 +35,8 @@
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\stere_proj.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\moll_proj.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\hammer_proj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\geos_proj.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\map\projection\ortho_proj.py"/>
     </RecentFiles>
   </File>
   <Font>

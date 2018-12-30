@@ -226,6 +226,7 @@ class Figure(ChartPanel):
         :param tickfontname: (*string*) Optional, set axis tick labels font name. Default is ``Arial`` .
         :param tickfontsize: (*int*) Optional, set axis tick labels font size. Default is 14.
         :param tickbold: (*boolean*) Optional, set axis tick labels font bold or not. Default is ``False`` .
+        :param boundaryprop: (*dict*) boundary property.
         
         :returns: The map axes.
         """       
@@ -295,6 +296,10 @@ class Figure(ChartPanel):
         ax.axes.setDrawNeatLine(frameon)
         bgcolor = plotutil.getcolor(bgcobj)
         ax.axes.setBackground(bgcolor)
+        boundaryprop = kwargs.pop('boundaryprop', None)
+        if not boundaryprop is None:
+            boundaryprop = plotutil.getlegendbreak('polygon', **boundaryprop)[0]
+            ax.axes.setBoundaryProp(boundaryprop)
      
         return ax
 
