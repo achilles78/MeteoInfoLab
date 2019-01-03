@@ -25,8 +25,9 @@ import jarray
 class DimDataFile():
     
     # dataset must be org.meteoinfo.data.meteodata.MeteoDataInfo
-    def __init__(self, dataset=None, ncfile=None, arldata=None, bufrdata=None):
+    def __init__(self, dataset=None, access='r', ncfile=None, arldata=None, bufrdata=None):
         self.dataset = dataset
+        self.access = access
         if not dataset is None:
             self.filename = dataset.getFileName()
             self.nvar = dataset.getDataInfo().getVariableNum()
@@ -357,13 +358,17 @@ class DimDataFile():
         :param value: (*array_like*) Data array to be write.
         :param origin: (*list*) Dimensions origin indices. None means all from 0.
         '''
-        if isinstance(value, (DimArray, MIArray)):
-            value = value.asarray()
+        if isinstance(value, MIArray):
+            value = value.array
+        if self.access == 'c':
+            ncvariable = variable.ncvariable
+        else:
+            ncvariable = self.dataset.getDataInfo().findNCVariable(variable.name)
         if origin is None:
-            self.ncfile.write(variable.ncvariable, value)
+            self.ncfile.write(ncvariable, value)
         else:
             origin = jarray.array(origin, 'i')
-            self.ncfile.write(variable.ncvariable, origin, value)
+            self.ncfile.write(ncvariable, origin, value)
     def flush(self):
         '''
         Flush the data.

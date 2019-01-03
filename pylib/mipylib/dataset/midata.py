@@ -110,7 +110,7 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
         
         meteodata = MeteoDataInfo()
         meteodata.openData(fname, keepopen)
-        datafile = DimDataFile(meteodata)
+        datafile = DimDataFile(meteodata, access=access)
         return datafile
     elif access == 'c':
         if dtype == 'arl':
@@ -137,11 +137,19 @@ def addfile(fname, access='r', dtype='netcdf', keepopen=False, **kwargs):
             largefile = kwargs.pop('largefile', None)
             if not largefile is None:
                 ncfile.setLargeFile(largefile)
-            datafile = DimDataFile(ncfile=ncfile)
+            datafile = DimDataFile(access=access, ncfile=ncfile)
         return datafile
     elif access == 'w':
+        fname = fname.strip()
+        fname, isweb = __getfilename(fname)
+        if fname is None:
+            raise IOError(fname)
+            meteodata = MeteoDataInfo()
         ncfile = NetcdfFileWriter.openExisting(fname)
-        datafile = DimDataFile(ncfile=ncfile)
+        meteodata = MeteoDataInfo()
+        meteodata.openData(ncfile.getNetcdfFile(), True)  
+        datafile = DimDataFile(dataset=meteodata, access=access, ncfile=ncfile)
+        return datafile
     else:
         return None
     
