@@ -68,14 +68,10 @@ class DimVariable():
         
     def __getitem__(self, indices):
         if indices is None:
-            rr = self.dataset.read(self.name)
-            if rr.getDataType().isNumeric():
-                ArrayMath.missingToNaN(rr, self.fill_value)
-                array = MIArray(rr)
-                data = DimArray(array, self.dims, self.fill_value, self.dataset.proj)
-                return data
-            else:
-                return rr
+            inds = []
+            for i in range(self.ndim):
+                inds.append(slice(None))
+            indices = tuple(inds)
                 
         if isinstance(indices, str):    #metadata
             rr = self.dataset.read(self.name)

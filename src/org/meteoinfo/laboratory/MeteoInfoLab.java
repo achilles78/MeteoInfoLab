@@ -15,27 +15,52 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import org.meteoinfo.global.DataConvert;
 import org.meteoinfo.global.util.FontUtil;
 import org.meteoinfo.global.util.GlobalUtil;
 import org.meteoinfo.laboratory.gui.FrmMain;
 import org.meteoinfo.laboratory.gui.MyPythonInterpreter;
 import org.python.core.Py;
-import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveConsole;
 
 /**
  *
- * @author wyq
+ * @author Yaqiang Wang
  */
 public class MeteoInfoLab {
+    
+    /**
+     * Disable illegal access warning message
+     */
+    @SuppressWarnings("unchecked")
+    public static void disableAccessWarnings() {
+        try {
+            Class unsafeClass = Class.forName("sun.misc.Unsafe");
+            Field field = unsafeClass.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            Object unsafe = field.get(null);
+
+            Method putObjectVolatile = unsafeClass.getDeclaredMethod("putObjectVolatile", Object.class, long.class, Object.class);
+            Method staticFieldOffset = unsafeClass.getDeclaredMethod("staticFieldOffset", Field.class);
+
+            Class loggerClass = Class.forName("jdk.internal.module.IllegalAccessLogger");
+            Field loggerField = loggerClass.getDeclaredField("logger");
+            Long offset = (Long) staticFieldOffset.invoke(unsafe, loggerField);
+            putObjectVolatile.invoke(unsafe, loggerClass, offset, null);
+        } catch (Exception ignored) {
+        }
+    }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here        
+        // Disable illegal access warning message  
+        disableAccessWarnings();
+        
         if (args.length >= 1) {
             if (args[0].equalsIgnoreCase("-r")) {
                 String fontPath = GlobalUtil.getAppPath(FrmMain.class) + File.separator + "fonts";
