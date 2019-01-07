@@ -2051,7 +2051,7 @@ class Axes(object):
             igraphic = GraphicFactory.createImage(rgbdata, extent)
             ls = None
         elif isimage:
-            igraphic = GraphicFactory.createImage(image)
+            igraphic = GraphicFactory.createImage(X)
             ls = None
         else:
             ls = kwargs.pop('symbolspec', None)

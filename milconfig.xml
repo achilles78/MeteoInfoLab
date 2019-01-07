@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\cuace_dust\py\ensemble">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\3d"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\array"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\image">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
@@ -16,19 +14,25 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\meteo"/>
     <RecentFolder Folder="D:\Working\MIScript\cuace_dust\py\ensemble"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\dataconvert"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\chart"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\image"/>
   </Path>
   <File>
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\chart_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\image\gifread_4.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\chart\chart_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\image\gifread_4.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-6,-6" MainFormSize="1296,696"/>
+  <Startup MainFormLocation="-6,0" MainFormSize="1384,803"/>
 </MeteoInfo>
