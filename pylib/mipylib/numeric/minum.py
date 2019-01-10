@@ -28,7 +28,7 @@ inf = Double.POSITIVE_INFINITY
 nan = Double.NaN
 
 __all__ = [
-    'pi','e','inf','nan','absolute','arange','arange1',    
+    'pi','e','inf','nan','absolute','all','any','arange','arange1',    
     'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
     'corrcoef','cos','degrees','diag','dim_array','datatable','dot','empty','exp','eye','fmax','fmin','full',
@@ -850,6 +850,48 @@ def sign(x):
         return x.sign()
     else:
         return math.copysign(1, x)
+        
+def any(x, axis=None):
+    '''
+    Test whether any array element along a given axis evaluates to True.
+    
+    :param x: (*array_like or list*) Input values.
+    :param axis: (*int*) Axis along which a logical OR reduction is performed. 
+        The default (axis = None) is to perform a logical OR over all the 
+        dimensions of the input array.
+    
+    :returns: (*array_like*) Any result
+    '''
+    if isinstance(x, list):
+        x = array(x)
+        
+    if axis is None:
+        return ArrayMath.any(x.array)
+    else:
+        if axis < 0:
+            axis += x.ndim
+        return MIArray(ArrayMath.any(x.array, axis))
+        
+def all(x, axis=None):
+    '''
+    Test whether all array element along a given axis evaluates to True.
+    
+    :param x: (*array_like or list*) Input values.
+    :param axis: (*int*) Axis along which a logical OR reduction is performed. 
+        The default (axis = None) is to perform a logical OR over all the 
+        dimensions of the input array.
+    
+    :returns: (*array_like*) All result
+    '''
+    if isinstance(x, list):
+        x = array(x)
+        
+    if axis is None:
+        return ArrayMath.all(x.array)
+    else:
+        if axis < 0:
+            axis += x.ndim
+        return MIArray(ArrayMath.all(x.array, axis))
 
 def sum(x, axis=None):
     """
