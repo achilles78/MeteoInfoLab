@@ -9,10 +9,8 @@ from org.meteoinfo.data import GridData, GridArray, ArrayMath, ArrayUtil
 from org.meteoinfo.data.meteodata import Dimension, DimensionType
 from org.meteoinfo.geoprocess.analysis import ResampleMethods
 from org.meteoinfo.global import PointD
-from ucar.ma2 import Array, Range, MAMath
-#import milayer
+from ucar.ma2 import Array, Range, MAMath, DataType
 from miarray import MIArray
-#from milayer import MILayer
 import math
 import datetime
 import mipylib.miutil as miutil
@@ -333,6 +331,43 @@ class DimArray(MIArray):
     def __rshift__(self, other):
         r = super(DimArray, self).__rshift__(other)
         return DimArray(r, self.dims, self.fill_value, self.proj)
+    
+    def member_names(self):
+        '''
+        Get member names. Only valid for Structure data type.
+        
+        :returns: (*list*) Member names
+        '''
+        if self.array.getDataType() != DataType.STRUCTURE:
+            print 'This method is only valid for structure array!'
+            return None
+            
+        ms = self.array.getStructureMemberNames()
+        return list(ms)
+    
+    def member_array(self, member, indices=None):
+        '''
+        Extract member array. Only valid for Structure data type.
+        
+        :param member: (*string*) Member name.
+        :param indices: (*slice*) Indices.
+        
+        :returns: (*array*) Extracted member array.
+        '''
+        if self.array.getDataType() != DataType.STRUCTURE:
+            print 'This method is only valid for structure array!'
+            return None
+        
+        m = self.array.findMember(member)
+        if m is None:
+            raise KeyError('The member %s not exists!' % member)
+            
+        a = self.array.extractMemberArray(m)
+        r = DimArray(a, self.dims, self.fill_value, self.proj)
+        if not indices is None:
+            r = r.__getitem__(indices)
+            
+        return r
     
     def in_values(self, other):
         '''

@@ -199,7 +199,7 @@ class MIArray(object):
         
         if len(indices) != self.ndim:
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
-            return None
+            raise IndexError()
 
         ranges = []
         flips = []

@@ -85,7 +85,7 @@ public class FrmAbout extends javax.swing.JDialog {
         jLabel10.setText("Homepage:");
 
         jLabel_web.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel_web.setText("htt://www.meteothink.org");
+        jLabel_web.setText("http://www.meteothink.org");
         jLabel_web.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_web.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {

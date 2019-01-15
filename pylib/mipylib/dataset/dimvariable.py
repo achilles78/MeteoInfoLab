@@ -269,9 +269,12 @@ class DimVariable():
                 rr = rr.flip(i)
             rr = rr.reduce()
             ArrayMath.missingToNaN(rr, self.fill_value)
-            rrr = Array.factory(rr.getDataType(), rr.getShape());
-            MAMath.copy(rrr, rr);
-            array = MIArray(rrr)
+            if len(flips) > 0:
+                rrr = Array.factory(rr.getDataType(), rr.getShape())
+                MAMath.copy(rrr, rr)
+                array = MIArray(rrr)
+            else:
+                array = MIArray(rr)
             data = DimArray(array, dims, self.fill_value, self.dataset.proj)
             return data
     

@@ -18,7 +18,7 @@ from dimarray import PyGridData, DimArray, PyStationData
 from miarray import MIArray
 from mitable import PyTableData
 
-from java.lang import Math, Double
+from java.lang import Math, Double, Float
 from java.util import Calendar
 
 # Global variables
@@ -30,15 +30,15 @@ nan = Double.NaN
 __all__ = [
     'pi','e','inf','nan','absolute','all','any','arange','arange1',    
     'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
-    'atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
+    'atleast_1d','atleast_2d','atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
     'corrcoef','cos','degrees','diag','dim_array','datatable','dot','empty','exp','eye','fmax','fmin','full',
-    'griddata','hcurl','hdivg','identity','interp2d',
+    'griddata','hcurl','hdivg','hstack','identity','interp2d',
     'interpn','isarray','isnan','linint2','linregress','linspace','log','log10',
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
     'nonzero','ones','ones_like','pol2cart','polyval','power',
     'radians','reshape','repeat',
     'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','std','sum','tan',
-    'tile','transpose','trapz','vdot','unravel_index','var',
+    'tile','transpose','trapz','vdot','unravel_index','var','vstack',
     'where','zeros','zeros_like'
     ]
 
@@ -1352,7 +1352,7 @@ def isnan(a):
     if isarray(a):
         return a == nan
     else:
-        return a is nan
+        return Double.isNaN(a)
     
 def nonzero(a):
     '''
@@ -1403,6 +1403,101 @@ def concatenate(arrays, axis=0):
         ars.append(a.asarray())
     r = ArrayUtil.concatenate(ars, axis)
     return MIArray(r)
+
+def atleast_1d(*args):
+    '''
+    View inputs as arrays with at least one dimensions.
+    
+    Parameters
+    ----------
+    args1, args2, ... : array_like
+        One or more array-like sequences. 
+        
+    Returns
+    -------
+    res, res2, ... : array_like
+        An array, or list of arrays, each with ``a.ndim >= 1``.
+    '''
+    res = []
+    for arg in args:
+        arg = array(arg)
+        if arg.ndim == 0:
+            result = arg.reshape(1)
+        else:
+            result = arg
+        res.append(result)
+    if len(res) == 1:
+        return res[0]
+    else:
+        return res
+
+    
+def atleast_2d(*args):
+    '''
+    View inputs as arrays with at least two dimensions.
+    
+    Parameters
+    ----------
+    args1, args2, ... : array_like
+        One or more array-like sequences.  Non-array inputs are converted
+        to arrays.  Arrays that already have two or more dimensions are
+        preserved.
+    Returns
+    -------
+    res, res2, ... : array_like
+        An array, or list of arrays, each with ``a.ndim >= 2``.
+        Copies are avoided where possible, and views with two or more
+        dimensions are returned.
+    '''
+    res = []
+    for arg in args:
+        arg = array(arg)
+        if arg.ndim == 0:
+            result = arg.reshape(1, 1)
+        elif arg.ndim == 1:
+            result = arg.reshape(1,len(arg))
+        else:
+            result = arg
+        res.append(result)
+    if len(res) == 1:
+        return res[0]
+    else:
+        return res
+        
+def vstack(tup):
+    '''
+    Stack arrays in sequence vertically (row wise).
+    
+    This is equivalent to concatenation along the first axis after 1-D arrays
+    of shape `(N,)` have been reshaped to `(1,N)`.
+    
+    :param tup: (*tuple*) Sequence of array. The arrays must have the same shape 
+        along all but the first axis. 1-D arrays must have the same length.
+        
+    :returns: (*array*) The array formed by stacking the given arrays, will be 
+        at least 2-D.
+    '''
+    return concatenate([atleast_2d(_m) for _m in tup], 0)
+    
+def hstack(tup):
+    '''
+    Stack arrays in sequence horizontally (column wise).
+
+    This is equivalent to concatenation along the second axis, except for 1-D
+    arrays where it concatenates along the first axis.
+    
+    :param tup: (*tuple*) Sequence of array. The arrays must have the same shape 
+        along all but the first axis. 1-D arrays must have the same length.
+        
+    :returns: (*array*) The array formed by stacking the given arrays.
+    '''
+    arrs = [atleast_1d(_m) for _m in tup]
+    # As a special case, dimension 0 of 1-dimensional arrays is "horizontal"
+    if arrs and arrs[0].ndim == 1:
+        return concatenate(arrs, 0)
+    else:
+        return concatenate(arrs, 1)
+
                 
 def dot(a, b):
     """
