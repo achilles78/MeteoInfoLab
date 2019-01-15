@@ -788,6 +788,10 @@ class DataFrame(object):
             then the behavior is identical to ``header=None``. 
         :param index_col: (*int*) Column to use as the row labels (index) of the DataFrame.
         :param index_format: (*string*) Index column format.
+        :param usecols: (*list*) Return a subset of the columns. If list-like, all elements 
+            must either be positional (i.e. integer indices into the document columns) or 
+            strings that correspond to column names provided either by the user in names or 
+            inferred from the document header row(s).
             
         :returns: (*DataFrame*) The DataFrame.
         '''
@@ -800,8 +804,13 @@ class DataFrame(object):
         header = kwargs.pop('header', 0)
         index_col = kwargs.pop('index_col', -1)
         index_format = kwargs.pop('index_format', None)
-        midf = MIDataFrame.readTable(filepath, delimiter, skiprows, format, encoding,
-            index_col, index_format, names, header, skipfooter)
+        usecols = kwargs.pop('usecols', None)
+        if usecols is None:
+            midf = MIDataFrame.readTable(filepath, delimiter, skiprows, format, encoding,
+                index_col, index_format, names, header, skipfooter)
+        else:
+            midf = MIDataFrame.readTable(filepath, delimiter, skiprows, format, encoding,
+                index_col, index_format, names, header, skipfooter, usecols)
         return DataFrame(dataframe=midf)
         
     def to_csv(self, filepath, delimiter=',', format=None, date_format=None, \
