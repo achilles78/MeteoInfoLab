@@ -18,6 +18,7 @@ from index import Index, DateTimeIndex
 import groupby
 
 from java.lang import Double
+from java.util import Date
 nan = Double.NaN
 
 class Series(object):
@@ -63,7 +64,10 @@ class Series(object):
     
     #---- values property
     def get_values(self):
-        return self._data
+        if isinstance(self._data[0], Date):
+            return miutil.pydate(self._data.aslist())
+        else:
+            return self._data
         
     def set_values(self, value):
         self._data = minum.array(value)

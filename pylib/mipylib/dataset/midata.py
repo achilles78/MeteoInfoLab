@@ -469,6 +469,10 @@ def readtable(filename, **kwargs):
         the variable names should be read from the file.
     :param readvarnames: (*boolean*) Read variable names or not. Default is ``True``.
     :param readrownames: (*boolean*) Read row names or not. Default is ``False``.
+    :param usecols: (*list*) Return a subset of the columns. If list-like, all elements 
+        must either be positional (i.e. integer indices into the document columns) or 
+        strings that correspond to column names provided either by the user in names or 
+        inferred from the document header row(s).
         
     :returns: (*PyTableData*) The table.
     '''
@@ -478,7 +482,11 @@ def readtable(filename, **kwargs):
     encoding = kwargs.pop('encoding', 'UTF8')
     readvarnames = kwargs.pop('readvarnames', True)
     readrownames = kwargs.pop('readrownames', False)
-    tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding, readvarnames)
+    usecols = kwargs.pop('usecols', None)
+    if usecols is None:
+        tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding, readvarnames)
+    else:
+        tdata = TableUtil.readASCIIFile(filename, delimiter, headerlines, format, encoding, readvarnames, usecols)
     r = PyTableData(tdata)
     varnames = kwargs.pop('colnames', None)
     varnames = kwargs.pop('varnames', varnames)
