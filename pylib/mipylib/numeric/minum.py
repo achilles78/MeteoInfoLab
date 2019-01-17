@@ -37,7 +37,7 @@ __all__ = [
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
     'nonzero','ones','ones_like','pol2cart','polyval','power',
     'radians','reshape','repeat',
-    'rolling_mean','rot90','sin','sort','squeeze','argsort','sqrt','std','sum','tan',
+    'rolling_mean','rot90','sin','smooth5','smooth9','sort','squeeze','argsort','sqrt','std','sum','tan',
     'tile','transpose','trapz','vdot','unravel_index','var','vstack',
     'where','zeros','zeros_like'
     ]
@@ -1807,8 +1807,63 @@ def rolling_mean(x, window, center=False):
         x = array(x)
     r = ArrayMath.rolling_mean(x.asarray(), window, center)
     return MIArray(r)  
-
-# Performs a centered difference operation on a array in a specific direction    
+    
+def smooth5(x):
+    '''
+    Performs a 5 point smoothing to the 2D array x. 
+    
+    The result at each grid point is a weighted average of the grid point plus the 4 
+    surrounding points. The center point receives a wieght of 1.0, the points at each side 
+    and above and below receive a weight of 0.5.
+    
+    All 5 points are multiplied by their weights and summed, then divided by the total 
+    weight to obtain the smoothed value. Any missing data points are not included in the 
+    sum; points beyond the grid boundary are considered to be missing. Thus the final result 
+    may be the result of an averaging with less than 5 points.
+    
+    :param x: (*array_like*) Input 2D array.
+    
+    :returned: (*array*) Smoothed 2D array.
+    '''
+    if isinstance(x, list):
+        x = array(x)
+    if x.ndim != 2:
+        print 'The array must be 2 dimension!'
+        raise ValueError()
+    r = ArrayUtil.smooth5(x.array)
+    if isinstance(x, DimArray):
+        return DimArray(r, x.dims, x.fill_value, x.proj)
+    else:
+        return MIArray(r)
+        
+def smooth9(x):
+    '''
+    Performs a 9 point smoothing to the 2D array x. 
+    
+    The result at each grid point is a weighted average of the grid point plus the 4 
+    surrounding points. The center point receives a wieght of 1.0, the points at each side 
+    and above and below receive a weight of 0.5, and corner points receive a weight of 0.3.
+    
+    All 9 points are multiplied by their weights and summed, then divided by the total 
+    weight to obtain the smoothed value. Any missing data points are not included in the 
+    sum; points beyond the grid boundary are considered to be missing. Thus the final result 
+    may be the result of an averaging with less than 9 points.
+    
+    :param x: (*array_like*) Input 2D array.
+    
+    :returned: (*array*) Smoothed 2D array.
+    '''
+    if isinstance(x, list):
+        x = array(x)
+    if x.ndim != 2:
+        print 'The array must be 2 dimension!'
+        raise ValueError()
+    r = ArrayUtil.smooth9(x.array)
+    if isinstance(x, DimArray):
+        return DimArray(r, x.dims, x.fill_value, x.proj)
+    else:
+        return MIArray(r)
+ 
 def cdiff(a, dimidx):
     '''
     Performs a centered difference operation on a array in a specific direction

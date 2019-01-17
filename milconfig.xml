@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\array">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\hdf">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\data_process"/>
@@ -22,11 +22,13 @@
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\hdf\FY3A.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\array\dataframe_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\hdf\FY3A.py"/>
     </RecentFiles>
   </File>
   <Font>
