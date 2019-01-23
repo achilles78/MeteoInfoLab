@@ -840,6 +840,9 @@ class MapAxes(Axes):
         isadd = kwargs.pop('isadd', True)
         smooth = kwargs.pop('smooth', True)
         layer = DrawMeteoData.createContourLayer(a.array, x.array, y.array, ls, 'layer', 'data', smooth)
+        if layer is None:
+            return None
+            
         proj = kwargs.pop('proj', None)
         if not proj is None:
             layer.setProjInfo(proj)
@@ -1215,7 +1218,7 @@ class MapAxes(Axes):
             else:
                 c = Color.black
             ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-        ls = plotutil.setlegendscheme_point(ls, **kwargs)
+        ls = plotutil.setlegendscheme_arrow(ls, **kwargs)
         if not cdata is None:
             cdata = cdata.array
         if u.ndim == 2 and x.ndim == 1:

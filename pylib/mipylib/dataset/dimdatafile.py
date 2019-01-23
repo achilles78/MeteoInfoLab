@@ -22,7 +22,7 @@ from java.lang import Float
 import jarray
 
 # Dimension dataset
-class DimDataFile():
+class DimDataFile(object):
     
     # dataset must be org.meteoinfo.data.meteodata.MeteoDataInfo
     def __init__(self, dataset=None, access='r', ncfile=None, arldata=None, bufrdata=None):

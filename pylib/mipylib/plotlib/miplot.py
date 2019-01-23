@@ -1336,6 +1336,9 @@ def savefig(fname, width=None, height=None, dpi=None, sleep=None):
     :param dpi: (*int*) Optional, figure resolution.
     :param sleep: (*int*) Optional, sleep seconds. For web map tiles loading.
     """
+    if fname.endswith('.eps') or fname.endswith('.pdf'):
+        dpi = None
+        
     if dpi != None:
         if (not width is None) and (not height is None):
             g_figure.saveImage(fname, dpi, width, height, sleep)

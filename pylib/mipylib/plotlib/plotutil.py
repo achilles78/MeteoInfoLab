@@ -8,7 +8,7 @@
 import datetime
 
 from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak, PolylineBreak, \
-    PolygonBreak, LegendManage, PointStyle, MarkerType, LegendScheme
+    PolygonBreak, ArrowBreak, LegendManage, PointStyle, MarkerType, LegendScheme
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.shape import ShapeTypes
 from org.meteoinfo.chart import ChartText
@@ -106,6 +106,8 @@ def getcolor(style, alpha=None):
             c = Color.cyan
         elif style == 'magenta' or style == 'm':
             c = Color.magenta
+        elif style == 'pink' or style == 'p':
+            c = Color.pink
         else:
             c = Color.decode(style)
     elif isinstance(style, (tuple, list)):
@@ -147,6 +149,9 @@ def getcolor_style(style):
     elif 'y' in style:
         c = Color.yellow
         rr = 'y'
+    elif 'p' in style:
+        c = Color.pink
+        rr = 'p'
     
     if not rr is None:
         style = style.replace(rr, '')
@@ -330,7 +335,7 @@ def getplotstyle(style, caption, **kwargs):
         else:
             plb = PolylineBreak()
             plb.setCaption(caption)
-            plb.setSize(linewidth)
+            plb.setWidth(linewidth)
             plb.setStyle(lineStyle)
             plb.setDrawSymbol(True)
             plb.setSymbolStyle(pointStyle)
@@ -352,7 +357,7 @@ def getplotstyle(style, caption, **kwargs):
     else:
         plb = PolylineBreak()
         plb.setCaption(caption)
-        plb.setSize(linewidth)
+        plb.setWidth(linewidth)
         if not c is None:
             plb.setColor(c)
         if not lineStyle is None:
@@ -398,7 +403,7 @@ def getlegendbreak(geometry, **kwargs):
         lb = PolylineBreak()
         size = kwargs.pop('size', 1.0)
         size = kwargs.pop('linewidth', size)
-        lb.setSize(size)
+        lb.setWidth(size)
         lsobj = kwargs.pop('linestyle', '-')
         linestyle = getlinestyle(lsobj)
         lb.setStyle(linestyle)
@@ -540,6 +545,58 @@ def setlegendscheme_point(ls, **kwargs):
         i += 1
 
     return ls
+    
+def setlegendscheme_arrow(ls, **kwargs):
+    '''
+    Set legend scheme as arrow breaks.
+    
+    :param ls: (*LegendScheme') Input legend scheme.
+    
+    :returns: (*LegendScheme*) Result legend scheme.
+    '''
+    ls = ls.convertTo(ShapeTypes.Point)  
+    sizes = kwargs.get('size', None)
+    colors = kwargs.get('colors', None)
+    marker = kwargs.get('marker', None)
+    for i in range(ls.getBreakNum()):
+        lb = ls.getLegendBreak(i)
+        if isinstance(sizes, (list, tuple, MIArray)): 
+            kwargs['size'] = sizes[i]
+        if isinstance(colors, (list, tuple, MIArray)):
+            kwargs['color'] = colors[i]
+        if isinstance(marker, (list, tuple, MIArray)):
+            kwargs['marker'] = marker[i]
+        setpointlegendbreak(lb, **kwargs)
+        lb = _point2arrow(lb, **kwargs)
+        ls.setLegendBreak(i, lb)
+
+    return ls
+    
+def _point2arrow(pb, **kwargs):
+    '''
+    Convert point break to arrow break.
+    
+    :param pb: (*PointBreak*) Point break.
+    :param width: (*float*) Arrow line width.
+    :param headwidth: (*float*) Arrow head width. Default is ``width*5``.
+    :param headlength: (*float*) Arrow head length. 
+    :param overhang: (*float*) fraction that the arrow is swept back (0 overhang means 
+        triangular shape). Can be negative or greater than one.
+    
+    :returns: (*ArrowBreak*) Arrow break.
+    '''
+    arrowbreak = ArrowBreak(pb)
+    width = kwargs.pop('width', 1.)
+    arrowbreak.setWidth(width)
+    headwidth = kwargs.pop('headwidth', width * 5.)
+    arrowbreak.setHeadWidth(headwidth)
+    headlength = kwargs.pop('headlength', headwidth * 1.5)
+    arrowbreak.setHeadLength(headlength)
+    overhang = kwargs.pop('overhang', None)
+    if not overhang is None:
+        arrowbreak.setOverhang(overhang)
+    
+    return arrowbreak
     
 def setlegendscheme_line(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Polyline)

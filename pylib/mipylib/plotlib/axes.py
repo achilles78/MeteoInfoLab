@@ -277,8 +277,8 @@ class Axes(object):
         Set y axis tick locations.
         '''
         axis = self.axes.getYAxis()
-        if isinstance(locs, (MIArray, DimArray)):
-            locs = labels.aslist()
+        if isinstance(locs, MIArray):
+            locs = locs.aslist()
         axis.setTickLocations(locs)
         
         if self.axestype == '3d':
@@ -621,6 +621,7 @@ class Axes(object):
         linestyle = kwargs.pop('linestyle', None)
         tickline = kwargs.pop('tickline', None)
         tickline = kwargs.pop('tickvisible', tickline)
+        ticklength = kwargs.pop('ticklength', None)
         ticklabel = kwargs.pop('ticklabel', None)
         minortick = kwargs.pop('minortick', False)
         tickin = kwargs.pop('tickin', True)
@@ -662,6 +663,8 @@ class Axes(object):
                 axis.setLineStyle(linestyle)
             if not tickline is None:
                 axis.setDrawTickLine(tickline)
+            if not ticklength is None:
+                axis.setTickLength(ticklength)
             if not ticklabel is None:
                 axis.setDrawTickLabel(ticklabel)
             axis.setMinorTickVisible(minortick)
@@ -684,6 +687,7 @@ class Axes(object):
         linestyle = kwargs.pop('linestyle', None)
         tickline = kwargs.pop('tickline', None)
         tickline = kwargs.pop('tickvisible', tickline)
+        ticklength = kwargs.pop('ticklength', None)
         ticklabel = kwargs.pop('ticklabel', None)
         minortick = kwargs.pop('minortick', False)
         tickin = kwargs.pop('tickin', True)
@@ -725,6 +729,8 @@ class Axes(object):
                 axis.setLineStyle(linestyle)
             if not tickline is None:
                 axis.setDrawTickLine(tickline)
+            if not ticklength is None:
+                axis.setTickLength(ticklength)
             if not ticklabel is None:
                 axis.setDrawTickLabel(ticklabel)
             axis.setMinorTickVisible(minortick)
@@ -2614,14 +2620,16 @@ class Axes(object):
         :param fill_value: (*float*) Fill_value. Default is ``-9999.0``.
         :param isuv: (*boolean*) Is U/V or direction/speed data array pairs. Default is True.
         :param size: (*float*) Base size of the arrows.
-        :param order: (*int*) Z-order of created layer for display.
+        :param overhang: (*float*) fraction that the arrow is swept back (0 overhang means 
+            triangular shape). Can be negative or greater than one.
+        :param zorder: (*int*) Z-order of created layer for display.
         
         :returns: (*VectoryLayer*) Created quiver VectoryLayer.
         """
         ls = kwargs.pop('symbolspec', None)
         cmap = plotutil.getcolormap(**kwargs)
         fill_value = kwargs.pop('fill_value', -9999.0)
-        order = kwargs.pop('order', None)
+        zorder = kwargs.pop('zorder', None)
         isuv = kwargs.pop('isuv', True)
         n = len(args) 
         iscolor = False
@@ -2678,7 +2686,7 @@ class Axes(object):
                 else:
                     c = Color.black
                 ls = LegendManage.createSingleSymbolLegendScheme(ShapeTypes.Point, c, 10)
-            ls = plotutil.setlegendscheme_point(ls, **kwargs)
+            ls = plotutil.setlegendscheme_arrow(ls, **kwargs)
         
         if not cdata is None:
             cdata = plotutil.getplotdata(cdata)
@@ -2731,10 +2739,10 @@ class Axes(object):
         if len(args) == 5:
             label = args[4]
             wa.setLabel(label)
-        cobj = kwargs.pop('color', 'b')
-        color = plotutil.getcolor(cobj)
-        wa.setColor(color)
-        lcobj = kwargs.pop('labelcolor', 'b')
+        arrowbreak, isunique = plotutil.getlegendbreak('point', **kwargs)
+        arrowbreak = plotutil._point2arrow(arrowbreak, **kwargs)
+        wa.setArrowBreak(arrowbreak)
+        lcobj = kwargs.pop('labelcolor', 'k')
         lcolor = plotutil.getcolor(lcobj)
         wa.setLabelColor(lcolor)
         fontname = kwargs.pop('fontname', 'Arial')

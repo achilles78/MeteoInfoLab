@@ -17,7 +17,7 @@ import mipylib.miutil as miutil
 import datetime
 
 # Dimension variable
-class DimVariable():
+class DimVariable(object):
     
     # variable must be org.meteoinfo.data.meteodata.Variable
     # dataset is DimDataFile
