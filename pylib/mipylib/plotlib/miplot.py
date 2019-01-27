@@ -39,7 +39,7 @@ g_figure = None
 gca = None
 
 __all__ = [
-    'gca','antialias','axes','axes3d','axesm','caxes','axis','axism','bar','barh','barbs','barbsm','bgcolor','box',
+    'gca','annotate','antialias','arrow','arrowline','axes','axes3d','axesm','caxes','axis','axism','bar','barh','barbs','barbsm','bgcolor','box',
     'boxplot','windrose','cla','clabel','clc','clear','clf','cll','cloudspec','colorbar','contour','contourf',
     'contourfm','contourm','draw','draw_if_interactive','errorbar',
     'figure','figsize','patch','rectangle','fill_between','fill_betweenx','webmap','geoshow','gifaddframe','gifanimation','giffinish',
@@ -677,6 +677,84 @@ def scatter3(x, y, z, s=8, c='b', marker='o', alpha=None, linewidth=None,
             gca = axes3d()   
     
     return gca.scatter(x, y, z, s, c, marker, alpha, linewidth, verts, **kwargs)
+
+def arrow(x, y, dx, dy, **kwargs):
+    '''
+    Add an arrow to the axes.
+    
+    :param x: (*float*) X coordinate.
+    :param y: (*float*) Y coordinate.
+    :param dx: (*float*) The length of arrow along x direction.
+    :param dy: (*float*) The length of arrow along y direction.
+    
+    :returns: Arrow graphic.
+    '''
+    global gca
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.arrow(x, y, dx, dy, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
+
+def arrowline(x, y, dx=0, dy=0, **kwargs):
+    '''
+    Add an arrow line to the axes.
+    
+    :param x: (*float or array_like*) X coordinates.
+    :param y: (*float or array_like*) Y coordinates.
+    :param dx: (*float*) The length of arrow along x direction. Only valid when x is float.
+    :param dy: (*float*) The length of arrow along y direction. Only valid when y is float.
+    
+    :returns: Arrow line graphic.
+    '''
+    global gca
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.arrowline(x, y, dx, dy, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
+    
+def annotate(s, xy, *args, **kwargs):
+    '''
+    Annotate the point xy with text s.
+    
+    :param s: (*string*) The text of the annotation.
+    :param xy: (*float, float*) The point (x,y) to annotate.
+    :param xytext: (*float, float*) The position (x,y) to place the text at. If None, 
+        defaults to xy.
+        
+    :returns: Annotation.
+    '''
+    global gca
+    if g_figure is None:
+        figure()
+
+    if gca is None:    
+        gca = axes()
+    else:
+        if gca.axestype != 'cartesian':
+            gca = axes()
+            
+    r = gca.annotate(s, xy, *args, **kwargs)
+    if not r is None:
+        draw_if_interactive()
+    return r
 
 def patch(x, y=None, **kwargs):
     '''
@@ -1560,11 +1638,12 @@ def xticks(*args, **kwargs):
     """
     if len(args) > 0:
         locs = args[0]
-        if isinstance(locs, (MIArray, DimArray)):
-            locs = locs.aslist()
-        if isinstance(locs[0], datetime.datetime):
-            for i in range(len(locs)):
-                locs[i] = miutil.date2num(locs[i])
+        if len(locs) > 0:
+            if isinstance(locs, MIArray):
+                locs = locs.aslist()
+            if isinstance(locs[0], datetime.datetime):
+                for i in range(len(locs)):
+                    locs[i] = miutil.date2num(locs[i])
         gca.set_xticks(locs)
         args = args[1:]
     if len(args) > 0:

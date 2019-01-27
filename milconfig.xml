@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types\wind">
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\plot_types">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\interpolate"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\data_process"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
@@ -21,14 +21,14 @@
     <OpenedFiles>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiver_1.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiverm_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\annotate_2.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\arrowline_4.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiver_1.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiverm_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\annotate_2.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\arrowline_4.py"/>
     </RecentFiles>
   </File>
   <Font>

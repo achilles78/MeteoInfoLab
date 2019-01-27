@@ -8,7 +8,7 @@
 import datetime
 
 from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak, PolylineBreak, \
-    PolygonBreak, ArrowBreak, LegendManage, PointStyle, MarkerType, LegendScheme
+    PolygonBreak, ArrowBreak, ArrowLineBreak, ArrowPolygonBreak, LegendManage, PointStyle, MarkerType, LegendScheme
 from org.meteoinfo.global.colors import ColorUtil, ColorMap
 from org.meteoinfo.shape import ShapeTypes
 from org.meteoinfo.chart import ChartText
@@ -557,7 +557,7 @@ def setlegendscheme_arrow(ls, **kwargs):
     ls = ls.convertTo(ShapeTypes.Point)  
     sizes = kwargs.get('size', None)
     colors = kwargs.get('colors', None)
-    marker = kwargs.get('marker', None)
+    marker = kwargs.get('marker', None)    
     for i in range(ls.getBreakNum()):
         lb = ls.getLegendBreak(i)
         if isinstance(sizes, (list, tuple, MIArray)): 
@@ -566,19 +566,21 @@ def setlegendscheme_arrow(ls, **kwargs):
             kwargs['color'] = colors[i]
         if isinstance(marker, (list, tuple, MIArray)):
             kwargs['marker'] = marker[i]
+        if not kwargs.has_key('edgecolor'):
+            kwargs['edgecolor'] = None
         setpointlegendbreak(lb, **kwargs)
-        lb = _point2arrow(lb, **kwargs)
+        lb = point2arrow(lb, **kwargs)
         ls.setLegendBreak(i, lb)
 
     return ls
     
-def _point2arrow(pb, **kwargs):
+def point2arrow(pb, **kwargs):
     '''
     Convert point break to arrow break.
     
     :param pb: (*PointBreak*) Point break.
     :param width: (*float*) Arrow line width.
-    :param headwidth: (*float*) Arrow head width. Default is ``width*5``.
+    :param headwidth: (*float*) Arrow head width. Default is ``width*3``.
     :param headlength: (*float*) Arrow head length. 
     :param overhang: (*float*) fraction that the arrow is swept back (0 overhang means 
         triangular shape). Can be negative or greater than one.
@@ -588,10 +590,69 @@ def _point2arrow(pb, **kwargs):
     arrowbreak = ArrowBreak(pb)
     width = kwargs.pop('width', 1.)
     arrowbreak.setWidth(width)
-    headwidth = kwargs.pop('headwidth', width * 5.)
+    headwidth = kwargs.pop('headwidth', width * 3.)
     arrowbreak.setHeadWidth(headwidth)
     headlength = kwargs.pop('headlength', headwidth * 1.5)
     arrowbreak.setHeadLength(headlength)
+    overhang = kwargs.pop('overhang', None)
+    if not overhang is None:
+        arrowbreak.setOverhang(overhang)
+    
+    return arrowbreak
+    
+def line2arrow(lb, **kwargs):
+    '''
+    Convert linestring break to arrow line break.
+    
+    :param lb: (*PolylineBreak*) Linestring break.
+    :param headwidth: (*float*) Arrow head width. Default is ``width*3``.
+    :param headlength: (*float*) Arrow head length. 
+    :param overhang: (*float*) fraction that the arrow is swept back (0 overhang means 
+        triangular shape). Can be negative or greater than one.
+    :param fillcolor: (*Color*) Arrow fill color.
+    :param edgecolor: (*Color*) Arrow edge color.
+    
+    :returns: (*ArrowLineBreak*) Arrow line break.
+    '''
+    albreak = ArrowLineBreak(lb)
+    headwidth = kwargs.pop('headwidth', lb.getWidth() * 3.)
+    albreak.setArrowHeadWidth(headwidth)
+    headlength = kwargs.pop('headlength', headwidth * 1.5)
+    albreak.setArrowHeadLength(headlength)
+    overhang = kwargs.pop('overhang', None)
+    if not overhang is None:
+        albreak.setArrowOverhang(overhang)
+    if kwargs.has_key('fillcolor'):
+        fillcolor = kwargs.pop('fillcolor')
+        albreak.setArrowFillColor(getcolor(fillcolor))
+    if kwargs.has_key('edgecolor'):
+        edgecolor = kwargs.pop('edgecolor')
+        albreak.setArrowOutlineColor(getcolor(edgecolor))
+    
+    return albreak
+    
+def polygon2arrow(pb, **kwargs):
+    '''
+    Convert polygon break to arrow polygon break.
+    
+    :param pb: (*PolygonBreak*) Polygon break.
+    :param width: (*float*) Arrow line width.
+    :param headwidth: (*float*) Arrow head width. Default is ``width*3``.
+    :param headlength: (*float*) Arrow head length. 
+    :param overhang: (*float*) fraction that the arrow is swept back (0 overhang means 
+        triangular shape). Can be negative or greater than one.
+    
+    :returns: (*ArrowPolygonBreak*) Arrow polygon break.
+    '''
+    arrowbreak = ArrowPolygonBreak(pb)
+    width = kwargs.pop('width', 0.001)
+    arrowbreak.setWidth(width)
+    headwidth = kwargs.pop('headwidth', width * 3.)
+    arrowbreak.setHeadWidth(headwidth)
+    headlength = kwargs.pop('headlength', headwidth * 1.5)
+    arrowbreak.setHeadLength(headlength)
+    length_includes_head = kwargs.pop('length_includes_head', False)
+    arrowbreak.setLengthIncludesHead(length_includes_head)
     overhang = kwargs.pop('overhang', None)
     if not overhang is None:
         arrowbreak.setOverhang(overhang)

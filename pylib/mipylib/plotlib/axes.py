@@ -2199,7 +2199,103 @@ class Axes(object):
         ctext = plotutil.text(x, y, s, **kwargs)
         self.axes.addText(ctext)
         return ctext
+    
+    def arrow(self, x, y, dx, dy, **kwargs):
+        '''
+        Add an arrow to the axes.
         
+        :param x: (*float*) X coordinate.
+        :param y: (*float*) Y coordinate.
+        :param dx: (*float*) The length of arrow along x direction. 
+        :param dy: (*float*) The length of arrow along y direction.
+        
+        :returns: Arrow graphic.
+        '''
+        if not kwargs.has_key('facecolor'):
+            kwargs['facecolor'] = (51,204,255)
+        apb, isunique = plotutil.getlegendbreak('polygon', **kwargs)
+        apb = plotutil.polygon2arrow(apb, **kwargs)
+        graphic = GraphicFactory.createArrow(x, y, dx, dy, apb)
+            
+        self.add_graphic(graphic)
+        self.axes.setAutoExtent()
+        
+        return graphic
+    
+    def arrowline(self, x, y, dx=0, dy=0, **kwargs):
+        '''
+        Add an arrow line to the axes.
+        
+        :param x: (*float or array_like*) X coordinates.
+        :param y: (*float or array_like*) Y coordinates.
+        :param dx: (*float*) The length of arrow along x direction. Only valid when x is float.
+        :param dy: (*float*) The length of arrow along y direction. Only valid when y is float.
+        
+        :returns: Arrow line graphic.
+        '''
+        if isinstance(x, (list, tuple)):
+            x = minum.array(x)
+        if isinstance(y, (list, tuple)):
+            y = minum.array(y)
+            
+        alb, isunique = plotutil.getlegendbreak('line', **kwargs)
+        alb = plotutil.line2arrow(alb, **kwargs)
+        if isinstance(x, MIArray):
+            iscurve = kwargs.pop('iscurve', False)
+            graphic = GraphicFactory.createArrowLine(x.array, y.array, alb, iscurve)
+        else:
+            graphic = GraphicFactory.createArrowLine(x, y, dx, dy, alb)
+            
+        self.add_graphic(graphic)
+        self.axes.setAutoExtent()
+        
+        return graphic
+        
+    def annotate(self, s, xy, *args, **kwargs):
+        '''
+        Annotate the point xy with text s.
+        
+        :param s: (*string*) The text of the annotation.
+        :param xy: (*float, float*) The point (x,y) to annotate.
+        :param xytext: (*float, float*) The position (x,y) to place the text at. If None, 
+            defaults to xy.
+        :param arrowprops: (*dict*) Arrow properties.
+            
+        :returns: Annotation.
+        '''
+        if len(args) > 0:
+            xytext = args[0]
+        else:
+            xytext = xy
+        
+        ctext = plotutil.text(xytext[0], xytext[1], s, **kwargs)
+        self.axes.addText(ctext)
+                
+        arrowprops = kwargs.pop('arrowprops', dict())
+        if not arrowprops.has_key('headwidth'):
+            arrowprops['headwidth'] = 10
+        if not arrowprops.has_key('shrink'):
+            arrowprops['shrink'] = 0.05
+        alb, isunique = plotutil.getlegendbreak('line', **arrowprops)
+        alb = plotutil.line2arrow(alb, **arrowprops)
+        x0 = xytext[0]
+        y0 = xytext[1]
+        dx = xy[0] - xytext[0]
+        dy = xy[1] - xytext[1]
+        shrink = arrowprops['shrink']
+        if shrink > 0:
+            sx = dx * shrink
+            sy = dy * shrink
+            x0 = xytext[0] + sx
+            y0 = xytext[1] + sy
+            dx = dx - sx * 2
+            dy = dy - sy * 2
+        graphic = GraphicFactory.createArrowLine(x0, y0, dx, dy, alb)
+        self.add_graphic(graphic)
+        self.axes.setAutoExtent()
+        
+        return ctext, graphic
+    
     def patch(self, x, y=None, **kwargs):
         '''
         Create one or more filled polygons.
@@ -2740,7 +2836,7 @@ class Axes(object):
             label = args[4]
             wa.setLabel(label)
         arrowbreak, isunique = plotutil.getlegendbreak('point', **kwargs)
-        arrowbreak = plotutil._point2arrow(arrowbreak, **kwargs)
+        arrowbreak = plotutil.point2arrow(arrowbreak, **kwargs)
         wa.setArrowBreak(arrowbreak)
         lcobj = kwargs.pop('labelcolor', 'k')
         lcolor = plotutil.getcolor(lcobj)
