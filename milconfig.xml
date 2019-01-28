@@ -23,16 +23,20 @@
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\annotate_2.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\arrowline_4.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiver_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiverm_2.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\plot_inputs_data.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\annotate_2.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\arrowline_4.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiver_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\plot_types\wind\quiverm_2.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-7,-7" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-7,0" MainFormSize="1397,813"/>
 </MeteoInfo>

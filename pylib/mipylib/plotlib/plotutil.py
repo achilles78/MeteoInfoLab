@@ -580,7 +580,7 @@ def point2arrow(pb, **kwargs):
     
     :param pb: (*PointBreak*) Point break.
     :param width: (*float*) Arrow line width.
-    :param headwidth: (*float*) Arrow head width. Default is ``width*3``.
+    :param headwidth: (*float*) Arrow head width. Default is ``width*5``.
     :param headlength: (*float*) Arrow head length. 
     :param overhang: (*float*) fraction that the arrow is swept back (0 overhang means 
         triangular shape). Can be negative or greater than one.
@@ -590,7 +590,7 @@ def point2arrow(pb, **kwargs):
     arrowbreak = ArrowBreak(pb)
     width = kwargs.pop('width', 1.)
     arrowbreak.setWidth(width)
-    headwidth = kwargs.pop('headwidth', width * 3.)
+    headwidth = kwargs.pop('headwidth', width * 5.)
     arrowbreak.setHeadWidth(headwidth)
     headlength = kwargs.pop('headlength', headwidth * 1.5)
     arrowbreak.setHeadLength(headlength)
@@ -605,7 +605,7 @@ def line2arrow(lb, **kwargs):
     Convert linestring break to arrow line break.
     
     :param lb: (*PolylineBreak*) Linestring break.
-    :param headwidth: (*float*) Arrow head width. Default is ``width*3``.
+    :param headwidth: (*float*) Arrow head width. Default is ``width*5``.
     :param headlength: (*float*) Arrow head length. 
     :param overhang: (*float*) fraction that the arrow is swept back (0 overhang means 
         triangular shape). Can be negative or greater than one.
@@ -615,7 +615,7 @@ def line2arrow(lb, **kwargs):
     :returns: (*ArrowLineBreak*) Arrow line break.
     '''
     albreak = ArrowLineBreak(lb)
-    headwidth = kwargs.pop('headwidth', lb.getWidth() * 3.)
+    headwidth = kwargs.pop('headwidth', lb.getWidth() * 5.)
     albreak.setArrowHeadWidth(headwidth)
     headlength = kwargs.pop('headlength', headwidth * 1.5)
     albreak.setArrowHeadLength(headlength)
