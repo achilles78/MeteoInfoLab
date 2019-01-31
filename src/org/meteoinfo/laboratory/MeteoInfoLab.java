@@ -152,7 +152,7 @@ public class MeteoInfoLab {
             interp.exec("from milab import *");
             if (!isDebug) {
                 interp.exec("sys.path.append('" + toolboxPath + "')");
-                interp.exec("from toolbox import *");
+                //interp.exec("from toolbox import *");
             }
             interp.exec("mipylib.plotlib.miplot.batchmode = True");
             interp.exec("mipylib.plotlib.miplot.isinteractive = False");
@@ -184,7 +184,7 @@ public class MeteoInfoLab {
             console.exec("sys.path.append('" + path + "')");
             console.exec("from milab import *");
             console.exec("sys.path.append('" + toolboxPath + "')");
-            console.exec("from toolbox import *");
+            //console.exec("from toolbox import *");
             console.exec("mipylib.plotlib.miplot.isinteractive = True");
             console.exec("mipylib.migl.mapfolder = '" + mapPath + "'");
             console.exec("mipylib.migl.currentfolder = '" + startPath + "'" );

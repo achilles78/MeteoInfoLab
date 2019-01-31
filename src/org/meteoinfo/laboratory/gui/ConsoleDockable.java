@@ -124,8 +124,8 @@ public class ConsoleDockable extends DefaultSingleCDockable {
             interp.exec("sys.path.append('" + path + "')");
             interp.exec("from milab import *");
             interp.exec("sys.path.append('" + toolboxPath + "')");
-            interp.exec("import toolbox");
-            interp.exec("from toolbox import *");
+            //interp.exec("import toolbox");
+            //interp.exec("from toolbox import *");
         } catch (Exception e) {
             System.out.println(e.toString());
             e.printStackTrace();
