@@ -400,6 +400,17 @@ class MIArray(object):
         # if self.idx >= self.size:
             # raise StopIteration()        
         # return self.array.getObject(self.idx)
+        
+    def tojarray(self, dtype=None):
+        '''
+        Convert to java array.
+
+        :param dtype: (*string*) Data type ['double','long',None]. 
+        
+        :returns: (*java array*) Java array.
+        '''
+        r = ArrayUtil.copyToNDJavaArray(self.array, dtype)
+        return r
     
     def in_values(self, other):
         '''
