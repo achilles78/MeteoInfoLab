@@ -1670,11 +1670,12 @@ def yticks(*args, **kwargs):
     """
     if len(args) > 0:
         locs = args[0]
-        if isinstance(locs, (MIArray, DimArray)):
-            locs = locs.aslist()
-        if isinstance(locs[0], datetime.datetime):
-            for i in range(len(locs)):
-                locs[i] = miutil.date2num(locs[i])
+        if len(locs) > 0:
+            if isinstance(locs, (MIArray, DimArray)):
+                locs = locs.aslist()
+            if isinstance(locs[0], datetime.datetime):
+                for i in range(len(locs)):
+                    locs[i] = miutil.date2num(locs[i])
         gca.set_yticks(locs)
         args = args[1:]
     if len(args) > 0:
