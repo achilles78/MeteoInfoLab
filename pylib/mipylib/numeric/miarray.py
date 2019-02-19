@@ -369,7 +369,6 @@ class MIArray(object):
         return r
         
     def __invert__(self):
-        other = MIArray.__value_other(self, other)
         r = MIArray(ArrayMath.bitInvert(self.array))
         return r
         
@@ -454,7 +453,7 @@ class MIArray(object):
             r = MIArray(ArrayUtil.toInteger(self.array))
         elif dtype == 'float' or dtype is float:
             r = MIArray(ArrayUtil.toFloat(self.array))
-        elif dtype == 'boolean' or dtype is bool:
+        elif dtype == 'boolean' or dtype == 'bool' or dtype is bool:
             r = MIArray(ArrayUtil.toBoolean(self.array))
         else:
             r = self

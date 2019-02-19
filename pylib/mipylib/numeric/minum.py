@@ -31,7 +31,7 @@ __all__ = [
     'pi','e','inf','nan','absolute','all','any','arange','arange1',    
     'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atleast_1d','atleast_2d','atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','degrees','diag','dim_array','datatable','dot','empty','exp','eye','fmax','fmin','full',
+    'corrcoef','cos','degrees','delete','diag','dim_array','datatable','dot','empty','exp','eye','fmax','fmin','full',
     'griddata','hcurl','hdivg','hstack','identity','interp2d',
     'interpn','isarray','isnan','linint2','linregress','linspace','log','log10',
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
@@ -1387,6 +1387,31 @@ def where(condition):
     :returns: (*tuple*) Indices of elements that are non-zero.
     '''
     return nonzero(condition)
+    
+def delete(arr, obj, axis=None):
+    '''
+    Return a new array with sub-arrays along an axis deleted.
+    
+    :param arr: (*array_like*) Input array.
+    :param obj: (*slice, int or array of ints*) Indicate which sub-arrays to remove.
+    :param axis: (*int*) The axis along which to delete the subarray defined by obj. 
+        If axis is None, obj is applied to the flattened array.
+        
+    :returns: A copy of arr with the elements specified by obj removed. If axis is None, 
+        out is a flattened array.
+    '''
+    if isinstance(arr, (list, tuple)):
+        arr = array(arr)
+    
+    if isinstance(obj, MIArray):
+        obj = obj.aslist()
+        
+    if axis is None:
+        arr = arr.reshape(arr.size)
+        axis = 0
+    
+    r = ArrayUtil.delete(arr.array, obj, axis)
+    return MIArray(r)
     
 def concatenate(arrays, axis=0):
     '''

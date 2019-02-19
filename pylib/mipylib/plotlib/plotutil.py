@@ -5,6 +5,7 @@
 # Note: Jython
 #-----------------------------------------------------
 
+import os
 import datetime
 
 from org.meteoinfo.legend import LineStyles, HatchStyle, ColorBreak, PointBreak, PolylineBreak, \

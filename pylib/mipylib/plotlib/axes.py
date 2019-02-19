@@ -162,7 +162,7 @@ class Axes(object):
             
         return title
             
-    def set_xlabel(self, label, fontname=None, fontsize=14, bold=False, color='black'):
+    def set_xlabel(self, label, **kwargs):
         """
         Set the x axis label of the current axes.
         
@@ -172,35 +172,22 @@ class Axes(object):
         :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
         :param color: (*color*) Label string color. Default is ``black`` .
         """
-        exfont = False
-        if fontname is None:
-            fontname = 'Arial'
-        else:
-            exfont = True
-            
-        if bold:
-            font = Font(fontname, Font.BOLD, fontsize)
-        else:
-            font = Font(fontname, Font.PLAIN, fontsize)
-        c = plotutil.getcolor(color)
+        if not kwargs.has_key('xalign'):
+            kwargs['xalign'] = 'center'
+        if not kwargs.has_key('yalign'):
+            kwargs['yalign'] = 'top'
+        ctext = plotutil.text(0, 0, label, **kwargs)
         axis = self.axes.getXAxis()
-        text = ChartText(label, font)
-        text.setUseExternalFont(exfont)
-        text.setColor(c)
-        text.setXAlign('center')
-        text.setYAlign('top')
-        axis.setLabel(text)
+        axis.setLabel(ctext)
         axis.setDrawLabel(True)
         if self.axestype != '3d':
             axis_t = self.axes.getAxis(Location.TOP)
-            text = ChartText(label, font)
-            text.setUseExternalFont(exfont)
-            text.setColor(c)
+            text = ctext.clone()
             text.setXAlign('center')
             text.setYAlign('bottom')
             axis_t.setLabel(text)
     
-    def set_ylabel(self, label, fontname=None, fontsize=14, bold=False, color='black'):
+    def set_ylabel(self, label, **kwargs):
         """
         Set the y axis label of the current axes.
         
@@ -210,32 +197,19 @@ class Axes(object):
         :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
         :param color: (*color*) Label string color. Default is ``black`` .
         """
-        exfont = False
-        if fontname is None:
-            fontname = 'Arial'
-        else:
-            exfont = True
-        
-        if bold:
-            font = Font(fontname, Font.BOLD, fontsize)
-        else:
-            font = Font(fontname, Font.PLAIN, fontsize)
-        c = plotutil.getcolor(color)
+        if not kwargs.has_key('xalign'):
+            kwargs['xalign'] = 'center'
+        if not kwargs.has_key('yalign'):
+            kwargs['yalign'] = 'bottom'
+        if not kwargs.has_key('rotation'):
+            kwargs['rotation'] = 90
+        ctext = plotutil.text(0, 0, label, **kwargs)
         axis = self.axes.getYAxis()
-        text = ChartText(label, font)
-        text.setUseExternalFont(exfont)
-        text.setAngle(90)
-        text.setColor(c)
-        text.setXAlign('center')
-        text.setYAlign('bottom')
-        axis.setLabel(text)
+        axis.setLabel(ctext)
         axis.setDrawLabel(True)
         if self.axestype != '3d':
             axis_r = self.axes.getAxis(Location.RIGHT)
-            text = ChartText(label, font)
-            text.setAngle(90)
-            text.setUseExternalFont(exfont)
-            text.setColor(c)
+            text = ctext.clone()            
             text.setXAlign('left')
             text.setYAlign('center')
             axis_r.setLabel(text)

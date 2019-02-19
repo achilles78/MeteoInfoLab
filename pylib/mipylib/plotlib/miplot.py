@@ -1565,7 +1565,7 @@ def right_title(label, fontname=None, fontsize=14, bold=False, color='black', **
     draw_if_interactive()
     return r
 
-def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
+def xlabel(label, **kwargs):
     """
     Set the x axis label of the current axes.
     
@@ -1575,10 +1575,10 @@ def xlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Label string color. Default is ``black`` .
     """
-    gca.set_xlabel(label, fontname, fontsize, bold, color)
+    gca.set_xlabel(label, **kwargs)
     draw_if_interactive()
     
-def ylabel(label, fontname=None, fontsize=14, bold=False, color='black'):
+def ylabel(label, **kwargs):
     """
     Set the y axis label of the current axes.
     
@@ -1588,7 +1588,7 @@ def ylabel(label, fontname=None, fontsize=14, bold=False, color='black'):
     :param bold: (*boolean*) Is bold font or not. Default is ``True`` .
     :param color: (*color*) Label string color. Default is ``black`` .
     """
-    gca.set_ylabel(label, fontname, fontsize, bold, color)
+    gca.set_ylabel(label, **kwargs)
     draw_if_interactive()
     
 def zlabel(label, fontname=None, fontsize=14, bold=False, color='black'):
