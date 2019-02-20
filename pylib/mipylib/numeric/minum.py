@@ -31,7 +31,7 @@ __all__ = [
     'pi','e','inf','nan','absolute','all','any','arange','arange1',    
     'argmin','argmax','array','asarray','asgridarray','asgriddata','asin','asmiarray','asstationdata',
     'atleast_1d','atleast_2d','atan','atan2','ave_month','histogram','broadcast_to','cdiff','concatenate',
-    'corrcoef','cos','degrees','delete','diag','dim_array','datatable','dot','empty','exp','eye','fmax','fmin','full',
+    'corrcoef','cos','degrees','delete','delnan','diag','dim_array','datatable','dot','empty','exp','eye','fmax','fmin','full',
     'griddata','hcurl','hdivg','hstack','identity','interp2d',
     'interpn','isarray','isnan','linint2','linregress','linspace','log','log10',
     'logspace','magnitude','max','maximum','mean','median','meshgrid','min','minimum','monthname',
@@ -1353,6 +1353,29 @@ def isnan(a):
         return a == nan
     else:
         return Double.isNaN(a)
+        
+def delnan(a):
+    '''
+    Delete NaN values.
+    
+    :param a: (*arrays*) Input arrays with one dimension.
+    
+    :returns: The array or arrays without NaN values.
+    '''
+    if isinstance(a, (list, tuple))and (not isinstance(a[0], MIArray)):
+        a = array(a)
+    if isinstance(a, MIArray):
+        r = ArrayMath.removeNaN(a.array)[0]
+        return MIArray(r)
+    else:
+        aa = []
+        for a0 in a:
+            aa.append(a0.array)
+        r = ArrayMath.removeNaN(aa)
+        rr = []
+        for r1 in r:
+            rr.append(MIArray(r1))
+        return rr
     
 def nonzero(a):
     '''
