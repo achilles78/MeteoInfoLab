@@ -70,7 +70,7 @@ def cov(m, y=None, rowvar=True, bias=False):
         r = StatsUtil.cov(m.asarray(), y.asarray(), not bias)
         return MIArray(r)
         
-def pearsonr(x, y):
+def pearsonr(x, y, axis=None):
     '''
     Calculates a Pearson correlation coefficient and the p-value for testing non-correlation.
 
@@ -88,6 +88,8 @@ def pearsonr(x, y):
     
     :param x: (*array_like*) x data array.
     :param y: (*array_like*) y data array.
+    :param axis: (*int*) By default, the index is into the flattened array, otherwise 
+        along the specified axis.
     
     :returns: Pearson’s correlation coefficient and 2-tailed p-value.
     '''
@@ -95,8 +97,12 @@ def pearsonr(x, y):
         x = MIArray(ArrayUtil.array(x))
     if isinstance(y, list):
         y = MIArray(ArrayUtil.array(y))
-    r = StatsUtil.pearsonr(x.asarray(), y.asarray())
-    return r[0], r[1]
+    if axis is None:
+        r = StatsUtil.pearsonr(x.asarray(), y.asarray())
+        return r[0], r[1]
+    else:
+        r = StatsUtil.pearsonr(x.array, y.array, axis)
+        return MIArray(r[0]), MIArray(r[1])
     
 def kendalltau(x, y):
     '''

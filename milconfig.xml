@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="milconfig.xml" Type="configurefile">
-  <Path OpenPath="D:\Working\MIScript\Jython\mis\array">
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\satellite"/>
-    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\ascii"/>
+  <Path OpenPath="D:\Working\MIScript\Jython\mis\common_math\stats">
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\map\projection"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types"/>
@@ -16,6 +14,8 @@
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\plot_types\wind"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox"/>
     <RecentFolder Folder="D:\Working\MIScript\Jython\mis\toolbox\miml"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math"/>
+    <RecentFolder Folder="D:\Working\MIScript\Jython\mis\common_math\stats"/>
   </Path>
   <File>
     <OpenedFiles>
@@ -24,7 +24,7 @@
       <OpenedFile File="D:\Working\MIScript\Jython\mis\toolbox\miml\fit_sin.py"/>
       <OpenedFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily-ANN.py"/>
       <OpenedFile File="D:\Working\MIScript\Jython\mis\chart\text_rotation.py"/>
-      <OpenedFile File="D:\Working\MIScript\Jython\mis\array\argsort_1.py"/>
+      <OpenedFile File="D:\Working\MIScript\Jython\mis\common_math\stats\pearsonr.py"/>
     </OpenedFiles>
     <RecentFiles>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily_input.py"/>
@@ -32,11 +32,11 @@
       <RecentFile File="D:\Working\MIScript\Jython\mis\toolbox\miml\fit_sin.py"/>
       <RecentFile File="D:\Working\MIScript\cuace_dust\py\ensemble\daily-ANN.py"/>
       <RecentFile File="D:\Working\MIScript\Jython\mis\chart\text_rotation.py"/>
-      <RecentFile File="D:\Working\MIScript\Jython\mis\array\argsort_1.py"/>
+      <RecentFile File="D:\Working\MIScript\Jython\mis\common_math\stats\pearsonr.py"/>
     </RecentFiles>
   </File>
   <Font>
     <TextFont FontName="宋体" FontSize="15"/>
   </Font>
-  <Startup MainFormLocation="-3,0" MainFormSize="1293,693"/>
+  <Startup MainFormLocation="-3,0" MainFormSize="1397,848"/>
 </MeteoInfo>
