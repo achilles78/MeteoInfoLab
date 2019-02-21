@@ -598,6 +598,7 @@ class Axes(object):
         ticklength = kwargs.pop('ticklength', None)
         ticklabel = kwargs.pop('ticklabel', None)
         minortick = kwargs.pop('minortick', False)
+        minorticknum = kwargs.pop('minorticknum', 5)
         tickin = kwargs.pop('tickin', True)
         axistype = kwargs.pop('axistype', None)
         timetickformat = kwargs.pop('timetickformat', None)
@@ -642,6 +643,7 @@ class Axes(object):
             if not ticklabel is None:
                 axis.setDrawTickLabel(ticklabel)
             axis.setMinorTickVisible(minortick)
+            axis.setMinorTickNum(minorticknum)
             axis.setInsideTick(tickin)
             axis.setTickLabelFont(font)
         
@@ -664,6 +666,7 @@ class Axes(object):
         ticklength = kwargs.pop('ticklength', None)
         ticklabel = kwargs.pop('ticklabel', None)
         minortick = kwargs.pop('minortick', False)
+        minorticknum = kwargs.pop('minorticknum', 5)
         tickin = kwargs.pop('tickin', True)
         axistype = kwargs.pop('axistype', None)
         timetickformat = kwargs.pop('timetickformat', None)
@@ -708,6 +711,7 @@ class Axes(object):
             if not ticklabel is None:
                 axis.setDrawTickLabel(ticklabel)
             axis.setMinorTickVisible(minortick)
+            axis.setMinorTickNum(minorticknum)
             axis.setInsideTick(tickin)
             axis.setTickLabelFont(font)
     

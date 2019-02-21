@@ -270,6 +270,7 @@ class Axes3D(Axes):
         tickline = kwargs.pop('tickvisible', tickline)
         ticklabel = kwargs.pop('ticklabel', None)
         minortick = kwargs.pop('minortick', False)
+        minorticknum = kwargs.pop('minorticknum', 5)
         tickin = kwargs.pop('tickin', True)
         axistype = kwargs.pop('axistype', None)
         tickfontname = kwargs.pop('tickfontname', 'Arial')
@@ -297,6 +298,7 @@ class Axes3D(Axes):
             if not ticklabel is None:
                 axis.setDrawTickLabel(ticklabel)
             axis.setMinorTickVisible(minortick)
+            axis.setMinorTickNum(minorticknum)
             axis.setInsideTick(tickin)
             axis.setTickLabelFont(font)
     
