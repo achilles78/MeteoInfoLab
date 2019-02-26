@@ -61,7 +61,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Select action
         CButton button = new CButton();
         button.setText("Select");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/Arrow.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Arrow.png")));
         button.setTooltip("Select");
         button.addActionListener( new ActionListener(){
             @Override
@@ -76,7 +76,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Zoom in action
         button = new CButton();
         button.setText("Zoom In");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_ZoomIn.Image.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_ZoomIn.Image.png")));
         button.setTooltip("Zoom In");
         button.addActionListener( new ActionListener(){
             @Override
@@ -90,7 +90,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Zoom out action
         button = new CButton();
         button.setText("Zoom Out");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_ZoomOut.Image.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_ZoomOut.Image.png")));
         button.setTooltip("Zoom Out");
         button.addActionListener( new ActionListener(){
             @Override
@@ -104,7 +104,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Pan action
         button = new CButton();
         button.setText("Pan");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_Pan.Image.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_Pan.Image.png")));
         button.setTooltip("Pan");
         button.addActionListener( new ActionListener(){
             @Override
@@ -118,7 +118,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Rotate action
         button = new CButton();
         button.setText("Rotate");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/rotate_16.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/rotate_16.png")));
         button.setTooltip("Rotate");
         button.addActionListener( new ActionListener(){
             @Override
@@ -132,7 +132,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Full extent action
         button = new CButton();
         button.setText("Full Extent");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_FullExtent.Image.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_FullExtent.Image.png")));
         button.setTooltip("Full Extent");
         button.addActionListener( new ActionListener(){
             @Override
@@ -147,7 +147,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Identifer action
         button = new CButton();
         button.setText("Identifer");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/information.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/information.png")));
         button.setTooltip("Identifer");
         button.addActionListener( new ActionListener(){
             @Override

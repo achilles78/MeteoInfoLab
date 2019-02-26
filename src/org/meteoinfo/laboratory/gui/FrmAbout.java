@@ -58,7 +58,7 @@ public class FrmAbout extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/logo.jpg"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo.jpg"))); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("宋体", 1, 18)); // NOI18N
         jLabel2.setText("MeteoInfoLab");

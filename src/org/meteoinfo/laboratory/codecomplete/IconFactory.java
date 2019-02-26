@@ -136,12 +136,12 @@ public class IconFactory {
     }
 
     private Icon loadIcon(String name) {
-        URL res = getClass().getResource("/org/meteoinfo/laboratory/resources/codecomplete/" + name);
+        URL res = getClass().getResource("/images/codecomplete/" + name);
         if (res == null) {
             // IllegalArgumentException is what would be thrown if res
             // was null anyway, we're just giving the actual arg name to
             // make the message more descriptive
-            throw new IllegalArgumentException("icon not found: /org/meteoinfo/laboratory/resources/codecomplete/" + name);
+            throw new IllegalArgumentException("icon not found: /images/codecomplete/" + name);
         }
         return new ImageIcon(res);
     }

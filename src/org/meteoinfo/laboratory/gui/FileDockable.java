@@ -31,7 +31,7 @@ public class FileDockable extends DefaultSingleCDockable {
         //Up action
         CButton button = new CButton();        
         button.setText("Up");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/up_arrow.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/up_arrow.png")));
         button.setTooltip("Up folder");
         button.addActionListener( new ActionListener(){
             @Override
@@ -48,7 +48,7 @@ public class FileDockable extends DefaultSingleCDockable {
         //Update action        
         button = new CButton();
         button.setText("Update");
-        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/update.png")));
+        button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/update.png")));
         button.setTooltip("Update");
         button.addActionListener( new ActionListener(){
             @Override

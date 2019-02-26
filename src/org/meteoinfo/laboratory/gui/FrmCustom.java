@@ -58,7 +58,7 @@ public class FrmCustom extends ScreenDockFrame implements ScreenDockWindow {
         
         JToolBar toolBar = new JToolBar();
         JButton jButton_ZoomIn = new JButton();
-        jButton_ZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_ZoomIn.Image.png"))); // NOI18N
+        jButton_ZoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_ZoomIn.Image.png"))); // NOI18N
         jButton_ZoomIn.setToolTipText("Zoom In"); // NOI18N
         jButton_ZoomIn.setFocusable(false);
         jButton_ZoomIn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

@@ -188,15 +188,15 @@ public class FileExplorer extends JPanel implements MouseListener{
         //Add "To Parent" line if the path is not root path
         if (path.getParent() != null)
         {
-            java.net.URL imgURL = this.getClass().getResource("/org/meteoinfo/laboratory/resources/previous.png");
+            java.net.URL imgURL = this.getClass().getResource("/images/previous.png");
             ImageIcon icon = new ImageIcon(imgURL);
             dtmFile.addRow(new Object[]{new IconText(icon, ""), "", "", ""});
         }
 
         //List all files
-        java.net.URL folderURL = this.getClass().getResource("/org/meteoinfo/laboratory/resources/folder.png");
+        java.net.URL folderURL = this.getClass().getResource("/images/folder.png");
         ImageIcon folderIcon = new ImageIcon(folderURL);
-        java.net.URL fileURL = this.getClass().getResource("/org/meteoinfo/laboratory/resources/TSB_NewFile.Image.png");
+        java.net.URL fileURL = this.getClass().getResource("/images/TSB_NewFile.Image.png");
         ImageIcon fileIcon = new ImageIcon(fileURL);
         File[] files = path.listFiles();
         Arrays.sort(files);

@@ -46,7 +46,7 @@ public class ConsoleDockable extends DefaultSingleCDockable {
         console.setLocale(Locale.getDefault());
         //System.out.println(console.getFont());
         console.setPreferredSize(new Dimension(600, 400));
-        console.println(new ImageIcon(this.getClass().getResource("/org/meteoinfo/laboratory/resources/jython_small_c.png")));
+        console.println(new ImageIcon(this.getClass().getResource("/images/jython_small_c.png")));
         this.initializeConsole(console, parent.getCurrentFolder());
         JIntrospect nameComplete = new JIntrospect(this.interp);
         console.setNameCompletion(nameComplete);
